@@ -22,11 +22,6 @@ public class System_6_5Controller : Controller
     return View();
   }
 
-  public IActionResult Create()
-  {
-    return View();
-  }
-
   public IActionResult CreateProcessing()
   {
     return View();

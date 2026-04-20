@@ -673,7 +673,6 @@ Views/
   _System65TraceNode.cshtml
   _ValidationScriptsPartial.cshtml
  System_6_5/
-  Create.cshtml
   CreateDeclaration.cshtml
   CreateProcessing.cshtml
   Index.cshtml
@@ -916,7 +915,6 @@ Views/
   _System65TraceNode.cshtml
   _ValidationScriptsPartial.cshtml
  System_6_5/
-  Create.cshtml
   CreateDeclaration.cshtml
   CreateProcessing.cshtml
   Index.cshtml
