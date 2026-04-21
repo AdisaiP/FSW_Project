@@ -607,8 +607,10 @@ Views/
  Icons/RiIcons.cshtml
  ImportAdjustment/
   CreateIMD.cshtml
+  CreatePost.cshtml
   CreatePurchase.cshtml
   IndexIMD.cshtml
+  IndexPost.cshtml
   IndexPurchase.cshtml
  Invoice/
   Add.cshtml
@@ -854,8 +856,10 @@ Views/
  Icons/RiIcons.cshtml
  ImportAdjustment/
   CreateIMD.cshtml
+  CreatePost.cshtml
   CreatePurchase.cshtml
   IndexIMD.cshtml
+  IndexPost.cshtml
   IndexPurchase.cshtml
  Invoice/
   Add.cshtml

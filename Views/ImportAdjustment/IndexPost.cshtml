@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "ขออนุมัติปริมาณ (จับคู่ IMD)";
+    ViewData["Title"] = "ขออนุมัติปริมาณ (จับคู่ภายหลัง)";
 
     var imdRecords = new[]
     {
@@ -255,14 +255,14 @@
 }
 
 @* ===== Content ===== *@
-<h4 class="mb-1">ขออนุมัติปริมาณ (จับคู่ IMD)</h4>
-<p class="mb-1">แสดงรายการขออนุมัติปริมาณตั้งต้นวัตถุดิบสัตว์นํ้านำเข้าครั้งแรก</p>
+<h4 class="mb-1">ขออนุมัติปริมาณ (จับคู่ภายหลัง)</h4>
+<p class="mb-1">แสดงรายการขออนุมัติปริมาณตั้งต้นวัตถุดิบสัตว์นํ้านำเข้าภายหลัง</p>
 
 <nav aria-label="breadcrumb" class="mb-6">
     <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
         <li class="breadcrumb-item">
-            <a href="@Url.Action("IndexIMD", "ImportAdjustment")" class="text-primary fw-semibold">ขออนุมัติปริมาณ
-                (จับคู่ IMD)</a>
+            <a href="@Url.Action("IndexPurchase", "ImportAdjustment")" class="text-primary fw-semibold">ขออนุมัติปริมาณ
+                (จับคู่ภายหลัง)</a>
         </li>
     </ol>
 </nav>
@@ -362,7 +362,7 @@
             <h5 class="card-title mb-1">รายการ IMD</h5>
             <p class="text-muted small mb-0">แสดงรายการขออนุมัติปริมาณตั้งต้นวัตถุดิบสัตว์น้ำนำเข้าครั้งแรก</p>
         </div>
-        <a href="@Url.Action("CreateIMD", "ImportAdjustment")" class="btn btn-primary btn-sm">
+        <a href="@Url.Action("CreatePost", "ImportAdjustment")" class="btn btn-primary btn-sm">
             <i class="ri ri-add-line me-1"></i> สร้างคำขอ
         </a>
     </div>
