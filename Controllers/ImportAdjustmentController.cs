@@ -12,14 +12,34 @@ public class ImportAdjustmentController : Controller
     _env = env;
   }
 
-  public IActionResult Index()
+  public IActionResult IndexIMD()
   {
     return View();
   }
 
-  public IActionResult CreateImportAdjustment()
+  public IActionResult CreateIMD()
   {
     return View();
   }
-  
+
+  public IActionResult IndexPurchase()
+  {
+    return View();
+  }
+
+  public IActionResult CreatePurchase()
+  {
+    return View();
+  }
+
+  public IActionResult IndexPost()
+  {
+    return View();
+  }
+
+  public IActionResult CreatePost()
+  {
+    return View();
+  }
+
 }

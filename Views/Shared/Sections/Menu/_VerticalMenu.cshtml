@@ -43,9 +43,19 @@
         <div data-i18n="ขอเปลี่ยนแปลงปริมาณ">ขอเปลี่ยนแปลงปริมาณ</div>
       </a>
       <ul class="menu-sub">
-        <li class='menu-item@(currentPage == "/ImportAdjustment/Index" ? " active" : "")'>
-          <a asp-controller="ImportAdjustment" asp-action="Index" class="menu-link">
-            <div data-i18n="ขออนุมัติปริมาณ">ขออนุมัติปริมาณ</div>
+        <li class='menu-item@(currentPage == "/ImportAdjustment/IndexIMD" ? " active" : "")'>
+          <a asp-controller="ImportAdjustment" asp-action="IndexIMD" class="menu-link">
+            <div data-i18n="จับคู่ IMD">จับคู่ IMD</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/ImportAdjustment/IndexPurchase" ? " active" : "")'>
+          <a asp-controller="ImportAdjustment" asp-action="IndexPurchase" class="menu-link">
+            <div data-i18n="จับคู่ซื้อต่อ">จับคู่ซื้่อต่อ</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/ImportAdjustment/IndexPost" ? " active" : "")'>
+          <a asp-controller="ImportAdjustment" asp-action="IndexPost" class="menu-link">
+            <div data-i18n="จับคู่ภายหลัง">จับคู่ภายหลัง</div>
           </a>
         </li>
       </ul>
