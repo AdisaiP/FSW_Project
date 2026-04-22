@@ -42,4 +42,14 @@ public class ImportAdjustmentController : Controller
     return View();
   }
 
+  public IActionResult IndexChangeCCSCC()
+  {
+    return View();
+  }
+
+  public IActionResult CreateChangeCCSCC()
+  {
+    return View();
+  }
+
 }

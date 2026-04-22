@@ -606,9 +606,11 @@ Views/
   Privacy.cshtml
  Icons/RiIcons.cshtml
  ImportAdjustment/
+  CreateChangeCCSCC.cshtml
   CreateIMD.cshtml
   CreatePost.cshtml
   CreatePurchase.cshtml
+  IndexChangeCCSCC.cshtml
   IndexIMD.cshtml
   IndexPost.cshtml
   IndexPurchase.cshtml
@@ -855,9 +857,11 @@ Views/
   Privacy.cshtml
  Icons/RiIcons.cshtml
  ImportAdjustment/
+  CreateChangeCCSCC.cshtml
   CreateIMD.cshtml
   CreatePost.cshtml
   CreatePurchase.cshtml
+  IndexChangeCCSCC.cshtml
   IndexIMD.cshtml
   IndexPost.cshtml
   IndexPurchase.cshtml
