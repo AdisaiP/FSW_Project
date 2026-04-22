@@ -52,4 +52,34 @@ public class ImportAdjustmentController : Controller
     return View();
   }
 
+  public IActionResult IndexChangeRMBS1()
+  {
+    return View();
+  }
+
+  public IActionResult CreateChangeRMBS1()
+  {
+    return View();
+  }
+
+  public IActionResult IndexAdjustRMBS1PS()
+  {
+    return View();
+  }
+
+  public IActionResult CreateAdjustRMBS1PS()
+  {
+    return View();
+  }
+
+  public IActionResult IndexAdjustRMBS1NoPS()
+  {
+    return View();
+  }
+
+  public IActionResult CreateAdjustRMBS1NoPS()
+  {
+    return View();
+  }
+
 }

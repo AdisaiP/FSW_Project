@@ -607,10 +607,12 @@ Views/
  Icons/RiIcons.cshtml
  ImportAdjustment/
   CreateChangeCCSCC.cshtml
+  CreateChangeRMBS1.cshtml
   CreateIMD.cshtml
   CreatePost.cshtml
   CreatePurchase.cshtml
   IndexChangeCCSCC.cshtml
+  IndexChangeRMBS1.cshtml
   IndexIMD.cshtml
   IndexPost.cshtml
   IndexPurchase.cshtml
@@ -858,10 +860,12 @@ Views/
  Icons/RiIcons.cshtml
  ImportAdjustment/
   CreateChangeCCSCC.cshtml
+  CreateChangeRMBS1.cshtml
   CreateIMD.cshtml
   CreatePost.cshtml
   CreatePurchase.cshtml
   IndexChangeCCSCC.cshtml
+  IndexChangeRMBS1.cshtml
   IndexIMD.cshtml
   IndexPost.cshtml
   IndexPurchase.cshtml
