@@ -606,6 +606,7 @@ Views/
   Privacy.cshtml
  Icons/RiIcons.cshtml
  ImportAdjustment/
+  CreateAdjustRMBS1PS.cshtml
   CreateChangeCCSCC.cshtml
   CreateChangeRMBS1.cshtml
   CreateIMD.cshtml
@@ -859,6 +860,7 @@ Views/
   Privacy.cshtml
  Icons/RiIcons.cshtml
  ImportAdjustment/
+  CreateAdjustRMBS1PS.cshtml
   CreateChangeCCSCC.cshtml
   CreateChangeRMBS1.cshtml
   CreateIMD.cshtml
