@@ -667,6 +667,9 @@ Views/
   IndexSearchSelfDecl.cshtml
   IndexStatistics.cshtml
   IndexUserData.cshtml
+  ReviewReplacementDeclaration.cshtml
+  ReviewReplacementProcessing.cshtml
+  ReviewReturnWeight.cshtml
  Pages/
   AccountSettings.cshtml
   AccountSettingsBilling.cshtml
@@ -690,14 +693,18 @@ Views/
   CreateManageCertificateNoPS.cshtml
   CreateManageCertificatePS.cshtml
   CreateProcessing.cshtml
+  CreateReplacementDeclaration.cshtml
+  CreateReplacementProcessing.cshtml
   CreateTrackRequestStatus.cshtml
   CreateUpdateCertificate.cshtml
   Index.cshtml
   IndexApproveReturnWeight.cshtml
   IndexManageCertificate.cshtml
+  IndexReplacementCertificate.cshtml
   IndexTrackRequestStatus.cshtml
   IndexUpdateCertificate.cshtml
   SelectType.cshtml
+  SelectTypeReplacement.cshtml
  Shared/
   Error.cshtml
   Sections/Footer/
@@ -957,6 +964,9 @@ Views/
   IndexSearchSelfDecl.cshtml
   IndexStatistics.cshtml
   IndexUserData.cshtml
+  ReviewReplacementDeclaration.cshtml
+  ReviewReplacementProcessing.cshtml
+  ReviewReturnWeight.cshtml
  Pages/
   AccountSettings.cshtml
   AccountSettingsBilling.cshtml
@@ -980,14 +990,18 @@ Views/
   CreateManageCertificateNoPS.cshtml
   CreateManageCertificatePS.cshtml
   CreateProcessing.cshtml
+  CreateReplacementDeclaration.cshtml
+  CreateReplacementProcessing.cshtml
   CreateTrackRequestStatus.cshtml
   CreateUpdateCertificate.cshtml
   Index.cshtml
   IndexApproveReturnWeight.cshtml
   IndexManageCertificate.cshtml
+  IndexReplacementCertificate.cshtml
   IndexTrackRequestStatus.cshtml
   IndexUpdateCertificate.cshtml
   SelectType.cshtml
+  SelectTypeReplacement.cshtml
  Shared/
   Error.cshtml
   Sections/Footer/

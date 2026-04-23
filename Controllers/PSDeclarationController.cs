@@ -87,4 +87,24 @@ public class PSDeclarationController : Controller
     return View();
   }
 
+  public IActionResult IndexReplacementCertificate()
+  {
+    return View();
+  }
+
+  public IActionResult SelectTypeReplacement()
+  {
+    return View();
+  }
+
+  public IActionResult CreateReplacementDeclaration()
+  {
+    return View();
+  }
+
+  public IActionResult CreateReplacementProcessing()
+  {
+    return View();
+  }
+
 }

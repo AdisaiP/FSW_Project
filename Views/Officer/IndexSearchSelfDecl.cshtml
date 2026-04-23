@@ -1,137 +1,860 @@
 @{
-    ViewData["Title"] = "ค้นหาใบสำรองตนเอง";
+    ViewData["Title"] = "ค้นหาหนังสือรับรองตนเอง";
 
-    var results = new[]
+    var declarations = new[]
     {
-        new { RowNo=1, DocNo="SD-2026-00901", CompanyName="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", ProductDesc="ทูน่ากระป๋อง", WeightKg=5000m, CreatedAt=new DateTime(2026,4,18), ExpiresAt=new DateTime(2026,7,18), UsedWeightKg=3200m, RemainingKg=1800m, StatusText="ใช้งาน", StatusClass="bg-label-success" },
-        new { RowNo=2, DocNo="SD-2026-00902", CompanyName="บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", ProductDesc="ปลาโอสาแช่แข็ง", WeightKg=2000m, CreatedAt=new DateTime(2026,4,19), ExpiresAt=new DateTime(2026,7,19), UsedWeightKg=2000m, RemainingKg=0m, StatusText="หมดแล้ว", StatusClass="bg-label-secondary" },
-        new { RowNo=3, DocNo="SD-2026-00903", CompanyName="บริษัท กัลฟ์ แคทช์ โปรเซสซิ่ง จำกัด", ProductDesc="ทูน่าครีบเหลืองแช่แข็ง", WeightKg=8000m, CreatedAt=new DateTime(2026,4,20), ExpiresAt=new DateTime(2026,7,20), UsedWeightKg=1500m, RemainingKg=6500m, StatusText="ใช้งาน", StatusClass="bg-label-success" },
-        new { RowNo=4, DocNo="SD-2025-00411", CompanyName="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", ProductDesc="ปลาหมึกแปรรูป", WeightKg=1000m, CreatedAt=new DateTime(2025,10,10), ExpiresAt=new DateTime(2026,1,10), UsedWeightKg=800m, RemainingKg=200m, StatusText="หมดอายุ", StatusClass="bg-label-danger" },
-        new { RowNo=5, DocNo="SD-2026-00904", CompanyName="บริษัท อันดามัน โคลด์สโตเรจ จำกัด", ProductDesc="กุ้งแปรรูป", WeightKg=3000m, CreatedAt=new DateTime(2026,4,22), ExpiresAt=new DateTime(2026,7,22), UsedWeightKg=0m, RemainingKg=3000m, StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new
+        {
+            RowNo = 1,
+            DocNo = "SD-2026-00901",
+            CertType = "PS",
+            CompanyName = "บริษัท สยาม มารีน ฟู้ดส์ จำกัด",
+            EstablishmentCode = "TH-1234",
+            HsCode = "1604.14",
+            ProductDesc = "CANNED TUNA IN OIL",
+            Species = "ทูน่าครีบเหลือง (Yellowfin Tuna)",
+            SourceCountry = "มหาสมุทรอินเดีย / Pacific Ocean",
+            WeightKg = 5000m,
+            UsedWeightKg = 3200m,
+            RemainingKg = 1800m,
+            IssuedAt = new DateTime(2026, 4, 18),
+            ExpiresAt = new DateTime(2026, 7, 18),
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2026-0418-001", RawMaterial = "ทูน่าแช่แข็ง (Frozen Yellowfin)", WeightKg = 3000m, Rmbs2No = "RMBS2-TH-2026-01145", Rmbs1No = "RMBS1-2026-04512", P2No = "P2-2026-0418-A1", P1No = "P1-2026-0418-B1", LotDate = new DateTime(2026, 4, 10) },
+                new { BatchNo = "LOT-2026-0418-002", RawMaterial = "ทูน่าแช่แข็ง (Frozen Bigeye)", WeightKg = 2000m, Rmbs2No = "RMBS2-TH-2026-01146", Rmbs1No = "RMBS1-2026-04513", P2No = "P2-2026-0418-A2", P1No = "P1-2026-0418-B2", LotDate = new DateTime(2026, 4, 12) }
+            }
+        },
+        new
+        {
+            RowNo = 2,
+            DocNo = "SD-2026-00902",
+            CertType = "NoPS",
+            CompanyName = "บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด",
+            EstablishmentCode = "TH-2201",
+            HsCode = "0303.42",
+            ProductDesc = "FROZEN SKIPJACK TUNA",
+            Species = "ปลาโอสาย (Skipjack Tuna)",
+            SourceCountry = "มหาสมุทรแปซิฟิก",
+            WeightKg = 2000m,
+            UsedWeightKg = 2000m,
+            RemainingKg = 0m,
+            IssuedAt = new DateTime(2026, 4, 19),
+            ExpiresAt = new DateTime(2026, 7, 19),
+            StatusText = "หมดแล้ว",
+            StatusClass = "bg-label-secondary",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2026-0419-001", RawMaterial = "ปลาโอสาแช่แข็ง (Frozen Skipjack)", WeightKg = 2000m, Rmbs2No = "RMBS2-TH-2026-01198", Rmbs1No = "RMBS1-2026-04601", P2No = "P2-2026-0419-A1", P1No = "P1-2026-0419-B1", LotDate = new DateTime(2026, 4, 5) }
+            }
+        },
+        new
+        {
+            RowNo = 3,
+            DocNo = "SD-2026-00903",
+            CertType = "PS",
+            CompanyName = "บริษัท กัลฟ์ แคทช์ โปรเซสซิ่ง จำกัด",
+            EstablishmentCode = "TH-0887",
+            HsCode = "0304.87",
+            ProductDesc = "YELLOWFIN TUNA LOIN FROZEN",
+            Species = "ทูน่าครีบเหลือง (Yellowfin Tuna)",
+            SourceCountry = "มหาสมุทรอินเดีย",
+            WeightKg = 8000m,
+            UsedWeightKg = 1500m,
+            RemainingKg = 6500m,
+            IssuedAt = new DateTime(2026, 4, 20),
+            ExpiresAt = new DateTime(2026, 7, 20),
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2026-0420-001", RawMaterial = "ทูน่าครีบเหลือง (Whole Round)", WeightKg = 5000m, Rmbs2No = "RMBS2-TH-2026-01230", Rmbs1No = "RMBS1-2026-04710", P2No = "P2-2026-0420-A1", P1No = "P1-2026-0420-B1", LotDate = new DateTime(2026, 4, 15) },
+                new { BatchNo = "LOT-2026-0420-002", RawMaterial = "ทูน่าครีบเหลือง (Loins)", WeightKg = 3000m, Rmbs2No = "RMBS2-TH-2026-01231", Rmbs1No = "RMBS1-2026-04711", P2No = "P2-2026-0420-A2", P1No = "P1-2026-0420-B2", LotDate = new DateTime(2026, 4, 16) }
+            }
+        },
+        new
+        {
+            RowNo = 4,
+            DocNo = "SD-2025-00411",
+            CertType = "NoPS",
+            CompanyName = "บริษัท สยาม มารีน ฟู้ดส์ จำกัด",
+            EstablishmentCode = "TH-1234",
+            HsCode = "0307.49",
+            ProductDesc = "FROZEN SQUID CLEANED",
+            Species = "ปลาหมึกกล้วย (Squid)",
+            SourceCountry = "ทะเลอันดามัน",
+            WeightKg = 1000m,
+            UsedWeightKg = 800m,
+            RemainingKg = 200m,
+            IssuedAt = new DateTime(2025, 10, 10),
+            ExpiresAt = new DateTime(2026, 1, 10),
+            StatusText = "หมดอายุ",
+            StatusClass = "bg-label-danger",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2025-1010-001", RawMaterial = "ปลาหมึกกล้วย (Whole)", WeightKg = 1000m, Rmbs2No = "RMBS2-TH-2025-09001", Rmbs1No = "RMBS1-2025-09211", P2No = "P2-2025-1010-A1", P1No = "P1-2025-1010-B1", LotDate = new DateTime(2025, 10, 1) }
+            }
+        },
+        new
+        {
+            RowNo = 5,
+            DocNo = "SD-2026-00904",
+            CertType = "PS",
+            CompanyName = "บริษัท อันดามัน โคลด์สโตเรจ จำกัด",
+            EstablishmentCode = "TH-3301",
+            HsCode = "1605.21",
+            ProductDesc = "COOKED SHRIMP FROZEN",
+            Species = "กุ้งแวนนาไม (Vannamei Shrimp)",
+            SourceCountry = "ไทย (เพาะเลี้ยง)",
+            WeightKg = 3000m,
+            UsedWeightKg = 0m,
+            RemainingKg = 3000m,
+            IssuedAt = new DateTime(2026, 4, 22),
+            ExpiresAt = new DateTime(2026, 7, 22),
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2026-0422-001", RawMaterial = "กุ้งแวนนาไมสด (Fresh Vannamei)", WeightKg = 3000m, Rmbs2No = "RMBS2-TH-2026-01302", Rmbs1No = "RMBS1-2026-04822", P2No = "P2-2026-0422-A1", P1No = "P1-2026-0422-B1", LotDate = new DateTime(2026, 4, 20) }
+            }
+        },
+        new
+        {
+            RowNo = 6,
+            DocNo = "SD-2026-00905",
+            CertType = "PS",
+            CompanyName = "บริษัท ไทย ยูเนี่ยน กรุ๊ป จำกัด (มหาชน)",
+            EstablishmentCode = "TH-0011",
+            HsCode = "1604.20",
+            ProductDesc = "TUNA CHUNKS IN BRINE",
+            Species = "ทูน่า (Mixed Tuna Species)",
+            SourceCountry = "มหาสมุทรแปซิฟิก / อินเดีย",
+            WeightKg = 12000m,
+            UsedWeightKg = 4800m,
+            RemainingKg = 7200m,
+            IssuedAt = new DateTime(2026, 4, 23),
+            ExpiresAt = new DateTime(2026, 7, 23),
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2026-0423-001", RawMaterial = "ทูน่าครีบเหลืองแช่แข็ง", WeightKg = 6000m, Rmbs2No = "RMBS2-TH-2026-01401", Rmbs1No = "RMBS1-2026-04901", P2No = "P2-2026-0423-A1", P1No = "P1-2026-0423-B1", LotDate = new DateTime(2026, 4, 18) },
+                new { BatchNo = "LOT-2026-0423-002", RawMaterial = "ทูน่าตาโตแช่แข็ง (Bigeye)", WeightKg = 4000m, Rmbs2No = "RMBS2-TH-2026-01402", Rmbs1No = "RMBS1-2026-04902", P2No = "P2-2026-0423-A2", P1No = "P1-2026-0423-B2", LotDate = new DateTime(2026, 4, 19) },
+                new { BatchNo = "LOT-2026-0423-003", RawMaterial = "ปลาโอสาแช่แข็ง (Skipjack)", WeightKg = 2000m, Rmbs2No = "RMBS2-TH-2026-01403", Rmbs1No = "RMBS1-2026-04903", P2No = "P2-2026-0423-A3", P1No = "P1-2026-0423-B3", LotDate = new DateTime(2026, 4, 20) }
+            }
+        },
+        new
+        {
+            RowNo = 7,
+            DocNo = "SD-2026-00906",
+            CertType = "NoPS",
+            CompanyName = "บริษัท ซีเฟรช อินดัสทรี จำกัด (มหาชน)",
+            EstablishmentCode = "TH-0456",
+            HsCode = "0306.17",
+            ProductDesc = "FROZEN WARMWATER SHRIMP",
+            Species = "กุ้งขาวแวนนาไม (Litopenaeus vannamei)",
+            SourceCountry = "ไทย / เวียดนาม",
+            WeightKg = 6000m,
+            UsedWeightKg = 2100m,
+            RemainingKg = 3900m,
+            IssuedAt = new DateTime(2026, 4, 21),
+            ExpiresAt = new DateTime(2026, 7, 21),
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2026-0421-001", RawMaterial = "กุ้งสด (Fresh Shrimp - TH)", WeightKg = 4000m, Rmbs2No = "RMBS2-TH-2026-01350", Rmbs1No = "RMBS1-2026-04850", P2No = "P2-2026-0421-A1", P1No = "P1-2026-0421-B1", LotDate = new DateTime(2026, 4, 17) },
+                new { BatchNo = "LOT-2026-0421-002", RawMaterial = "กุ้งสด (Fresh Shrimp - VN)", WeightKg = 2000m, Rmbs2No = "RMBS2-TH-2026-01351", Rmbs1No = "RMBS1-2026-04851", P2No = "P2-2026-0421-A2", P1No = "P1-2026-0421-B2", LotDate = new DateTime(2026, 4, 18) }
+            }
+        },
+        new
+        {
+            RowNo = 8,
+            DocNo = "SD-2026-00907",
+            CertType = "PS",
+            CompanyName = "บริษัท ปทุม ไรซ์ มิล แอนด์ แกรนารี จำกัด",
+            EstablishmentCode = "TH-0902",
+            HsCode = "1604.13",
+            ProductDesc = "SARDINES IN TOMATO SAUCE",
+            Species = "ปลาซาร์ดีน (Sardinella spp.)",
+            SourceCountry = "อ่าวไทย",
+            WeightKg = 4500m,
+            UsedWeightKg = 4500m,
+            RemainingKg = 0m,
+            IssuedAt = new DateTime(2026, 4, 15),
+            ExpiresAt = new DateTime(2026, 7, 15),
+            StatusText = "หมดแล้ว",
+            StatusClass = "bg-label-secondary",
+            Batches = new[]
+            {
+                new { BatchNo = "LOT-2026-0415-001", RawMaterial = "ปลาซาร์ดีนสด (Fresh Sardine)", WeightKg = 4500m, Rmbs2No = "RMBS2-TH-2026-01100", Rmbs1No = "RMBS1-2026-04200", P2No = "P2-2026-0415-A1", P1No = "P1-2026-0415-B1", LotDate = new DateTime(2026, 4, 8) }
+            }
+        }
     };
+
+    var totalCount = declarations.Length;
+    var activeCount = declarations.Count(d => d.StatusText == "ใช้งาน");
+    var exhaustedCount = declarations.Count(d => d.StatusText == "หมดแล้ว");
+    var expiredCount = declarations.Count(d => d.StatusText == "หมดอายุ");
+    var psCount = declarations.Count(d => d.CertType == "PS");
+    var nopsCount = declarations.Count(d => d.CertType == "NoPS");
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
 }
 
 @section PageStyles {
 <style>
-    .sd-table { font-size: 0.78rem; }
-    .sd-table th, .sd-table td { padding: 0.4rem 0.5rem; vertical-align: middle; }
-    .sd-table .btn-icon { width: 1.65rem; height: 1.65rem; }
-    .filter-sq { width: 48px; height: 48px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+    .sd-table {
+        font-size: 0.78rem;
+    }
+
+    .sd-table th,
+    .sd-table td {
+        padding: 0.45rem 0.5rem;
+        vertical-align: middle;
+        line-height: 1.3;
+    }
+
+    .sd-table .btn-icon {
+        width: 1.65rem;
+        height: 1.65rem;
+    }
+
+    .sd-table .badge {
+        font-size: 0.68rem;
+    }
+
+    .filter-sq {
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .weight-bar-wrap {
+        min-width: 80px;
+    }
+
+    .weight-bar {
+        height: 4px;
+        border-radius: 2px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .weight-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s;
+    }
+
+    .traceability-link {
+        font-size: 0.72rem;
+    }
+
+    .modal-xl-custom {
+        max-width: 900px;
+    }
+
+    .batch-card {
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+    }
+
+    .batch-card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 6px 6px 0 0;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .batch-card-body {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.76rem;
+    }
+
+    .link-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.18rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .link-chip:hover {
+        opacity: 0.85;
+    }
+
+    .link-chip-rmbs2 {
+        color: #6f42c1;
+        border-color: #6f42c1;
+        background: #f3eeff;
+    }
+
+    .link-chip-rmbs1 {
+        color: #0d6efd;
+        border-color: #0d6efd;
+        background: #e8f0ff;
+    }
+
+    .link-chip-p2 {
+        color: #198754;
+        border-color: #198754;
+        background: #e8f5ed;
+    }
+
+    .link-chip-p1 {
+        color: #fd7e14;
+        border-color: #fd7e14;
+        background: #fff3e8;
+    }
+
+    .source-detail-table { font-size: 0.76rem; }
+    .source-detail-table th { font-weight: 600; color: #6c757d; width: 38%; }
 </style>
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
 }
 
 @section PageScripts {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    /* --- Flatpickr --- */
+    ['filterDateFrom', 'filterDateTo'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) flatpickr(el, { dateFormat: 'd/m/Y', allowInput: true });
+    });
+
+    /* --- Tooltips --- */
+    if (window.bootstrap && bootstrap.Tooltip) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            new bootstrap.Tooltip(el);
+        });
+    }
+
+    /* --- Date parse helper --- */
+    function parseDateInput(value, endOfDay) {
+        if (!value) return null;
+        var parts = value.split('/');
+        if (parts.length !== 3) return null;
+        var d = parseInt(parts[0], 10), m = parseInt(parts[1], 10) - 1, y = parseInt(parts[2], 10);
+        var h = endOfDay ? 23 : 0, min = endOfDay ? 59 : 0, s = endOfDay ? 59 : 0;
+        var dt = new Date(y, m, d, h, min, s);
+        return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    /* --- Filter --- */
     function filterRows() {
         var keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
         var status = (document.getElementById('filterStatus').value || '').trim();
+        var certType = (document.getElementById('filterCertType').value || '').trim();
+        var fromDate = parseDateInput(document.getElementById('filterDateFrom').value, false);
+        var toDate = parseDateInput(document.getElementById('filterDateTo').value, true);
+
         var rows = document.querySelectorAll('#sdTableBody tr[data-id]');
         var count = 0;
         rows.forEach(function (row) {
             var text = (row.dataset.searchText || '').toLowerCase();
             var rowStatus = row.dataset.status || '';
-            var show = (!keyword || text.includes(keyword)) && (!status || rowStatus === status);
-            row.classList.toggle('d-none', !show);
-            if (show) count++;
+            var rowCertType = row.dataset.certType || '';
+            var rowDate = new Date(row.dataset.issuedDate || '');
+
+            var ok = (!keyword || text.includes(keyword))
+                && (!status || rowStatus === status)
+                && (!certType || rowCertType === certType)
+                && (!fromDate || rowDate >= fromDate)
+                && (!toDate || rowDate <= toDate);
+
+            row.classList.toggle('d-none', !ok);
+            if (ok) count++;
         });
         document.getElementById('sdTableEmpty').classList.toggle('d-none', count !== 0);
     }
+
     document.getElementById('btnSearch').addEventListener('click', filterRows);
     document.getElementById('btnReset').addEventListener('click', function () {
-        document.getElementById('filterKeyword').value = '';
-        document.getElementById('filterStatus').value = '';
+        ['filterKeyword', 'filterStatus', 'filterCertType', 'filterDateFrom', 'filterDateTo'].forEach(function (id) {
+            document.getElementById(id).value = '';
+        });
         filterRows();
     });
-    document.getElementById('filterKeyword').addEventListener('keydown', function (e) { if (e.key === 'Enter') filterRows(); });
-    document.getElementById('filterStatus').addEventListener('change', filterRows);
-    if (window.bootstrap && bootstrap.Tooltip) {
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) { new bootstrap.Tooltip(el); });
-    }
+    document.getElementById('filterKeyword').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
+    });
+    ['filterStatus', 'filterCertType', 'filterDateFrom', 'filterDateTo'].forEach(function (id) {
+        document.getElementById(id).addEventListener('change', filterRows);
+    });
+
+    /* --- Detail Modal --- */
+    var detailModal = new bootstrap.Modal(document.getElementById('modalSelfDeclDetail'));
+
+    document.querySelectorAll('[data-action="show-detail"]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = this.dataset.docId;
+            var card = document.getElementById('detail-' + id);
+            if (!card) return;
+
+            // Fill modal header
+            document.getElementById('modalDocNo').textContent = card.dataset.docno;
+            document.getElementById('modalDocNo2').textContent = card.dataset.docno;
+            document.getElementById('modalCompany').textContent = card.dataset.company;
+            document.getElementById('modalCertType').textContent = card.dataset.certtype;
+            document.getElementById('modalHsCode').textContent = card.dataset.hscode;
+            document.getElementById('modalProduct').textContent = card.dataset.product;
+            document.getElementById('modalSpecies').textContent = card.dataset.species;
+            document.getElementById('modalSourceCountry').textContent = card.dataset.sourcecountry;
+            document.getElementById('modalEstCode').textContent = card.dataset.estcode;
+            document.getElementById('modalIssuedAt').textContent = card.dataset.issuedat;
+            document.getElementById('modalExpiresAt').textContent = card.dataset.expiresat;
+            document.getElementById('modalWeightTotal').textContent = parseInt(card.dataset.weighttotal).toLocaleString('th-TH');
+            document.getElementById('modalWeightUsed').textContent = parseInt(card.dataset.weightused).toLocaleString('th-TH');
+            document.getElementById('modalWeightRemain').textContent = parseInt(card.dataset.weightremain).toLocaleString('th-TH');
+
+            // Fill batches
+            var batchContainer = document.getElementById('modalBatches');
+            var batchTemplate = document.getElementById('batch-template-' + id);
+            batchContainer.innerHTML = batchTemplate ? batchTemplate.innerHTML : '<p class="text-muted small">ไม่มีข้อมูลรุ่นวัตถุดิบ</p>';
+
+            detailModal.show();
+        });
+    });
 });
 </script>
 }
 
-<h4 class="mb-1">ค้นหาใบสำรองตนเอง</h4>
-<p class="mb-1 text-muted">ค้นหาและตรวจสอบใบสำรองตนเอง (Self-Declaration) พร้อมสถานะน้ำหนักคงเหลือ</p>
+@* ============================================================ *@
+@*  Page header                                                  *@
+@* ============================================================ *@
+<h4 class="mb-1">ค้นหาหนังสือรับรองตนเอง</h4>
+<p class="mb-1">ตรวจสอบข้อมูลหนังสือรับรองตนเอง (Self-Declaration) แหล่งที่มาสัตว์น้ำ รุ่นวัตถุดิบ และเชื่อมโยง RMBS2 / RMBS1 / P2 / P1</p>
 
-<!-- Breadcrumb -->
-<nav aria-label="breadcrumb" class="mb-4">
+<nav aria-label="breadcrumb" class="mb-6">
     <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
         <li class="breadcrumb-item"><a href="#" class="text-primary fw-semibold">เจ้าหน้าที่</a></li>
-        <li class="breadcrumb-item active text-secondary">ค้นหาใบสำรองตนเอง</li>
+        <li class="breadcrumb-item active text-secondary">ค้นหาหนังสือรับรองตนเอง</li>
     </ol>
 </nav>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row g-2 align-items-end">
-            <div class="col-12 col-sm-5">
-                <label class="form-label small mb-1">ค้นหา</label>
-                <input id="filterKeyword" type="text" class="form-control form-control-sm" placeholder="เลขที่เอกสาร / ชื่อบริษัท / สินค้า" />
+@* ============================================================ *@
+@*  Summary cards                                                *@
+@* ============================================================ *@
+<div class="row mb-6 g-6">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@totalCount</h5>
+                        <small>หนังสือรับรองตนเองทั้งหมด</small>
+                    </div>
+                    <span class="badge bg-label-primary rounded-circle p-2">
+                        <i class="icon-base ri ri-list-check-3 icon-24px"></i>
+                    </span>
+                </div>
             </div>
-            <div class="col-12 col-sm-3">
-                <label class="form-label small mb-1">สถานะ</label>
-                <select id="filterStatus" class="form-select form-select-sm">
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@activeCount</h5>
+                        <small>ใช้งานอยู่</small>
+                    </div>
+                    <span class="badge bg-label-success rounded-circle p-2">
+                        <i class="icon-base ri ri-checkbox-circle-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@psCount</h5>
+                        <small>ประเภท PS (Processing Statement)</small>
+                    </div>
+                    <span class="badge bg-label-warning rounded-circle p-2">
+                        <i class="icon-base ri ri-settings-3-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@nopsCount</h5>
+                        <small>ประเภท NoPS (Non-Processing)</small>
+                    </div>
+                    <span class="badge bg-label-info rounded-circle p-2">
+                        <i class="icon-base ri ri-leaf-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ============================================================ *@
+@*  Search / Filter                                              *@
+@* ============================================================ *@
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-1">ค้นหาหนังสือรับรองตนเอง</h5>
+        <p class="text-muted small mb-0">ค้นหาตามเงื่อนไขที่กรมประมงกำหนด</p>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4 col-lg-3">
+                <label for="filterKeyword" class="form-label">ค้นหา</label>
+                <input type="text" id="filterKeyword" class="form-control" placeholder="เลขที่ / ชื่อบริษัท / HS Code / สินค้า" />
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label for="filterCertType" class="form-label">ประเภทใบรับรอง</label>
+                <select id="filterCertType" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="PS">PS (Processing Statement)</option>
+                    <option value="NoPS">NoPS (Non-Processing)</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label for="filterStatus" class="form-label">สถานะ</label>
+                <select id="filterStatus" class="form-select">
                     <option value="">ทั้งหมด</option>
                     <option value="ใช้งาน">ใช้งาน</option>
                     <option value="หมดแล้ว">หมดแล้ว</option>
                     <option value="หมดอายุ">หมดอายุ</option>
                 </select>
             </div>
-            <div class="col-auto d-flex gap-2">
-                <button id="btnSearch" class="btn btn-primary btn-sm filter-sq" data-bs-toggle="tooltip" title="ค้นหา"><i class="ri ri-search-line"></i></button>
-                <button id="btnReset" class="btn btn-outline-secondary btn-sm filter-sq" data-bs-toggle="tooltip" title="รีเซ็ต"><i class="ri ri-refresh-line"></i></button>
+            <div class="col-md-3 col-lg-2">
+                <label for="filterDateFrom" class="form-label">วันที่ออก (จาก)</label>
+                <input type="text" id="filterDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label for="filterDateTo" class="form-label">ถึงวันที่</label>
+                <input type="text" id="filterDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-2 col-lg-1">
+                <div class="d-flex gap-2">
+                    <button id="btnSearch" type="button" class="btn btn-outline-primary filter-sq" title="ค้นหา" data-bs-toggle="tooltip">
+                        <i class="ri ri-search-line"></i>
+                    </button>
+                    <button id="btnReset" type="button" class="btn btn-outline-secondary filter-sq" title="รีเซ็ต" data-bs-toggle="tooltip">
+                        <i class="ri ri-refresh-line"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+@* ============================================================ *@
+@*  Results table                                                *@
+@* ============================================================ *@
 <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="mb-0">รายการใบสำรองตนเอง</h6>
-        <button class="btn btn-outline-secondary btn-sm"><i class="ri ri-download-2-line me-1"></i>Export</button>
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h5 class="card-title mb-1">รายการหนังสือรับรองตนเอง</h5>
+            <p class="text-muted small mb-0">แสดงข้อมูลหนังสือรับรองตนเอง รายละเอียดแหล่งที่มา และรุ่นวัตถุดิบที่ใช้ในการผลิต</p>
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm">
+            <i class="ri ri-download-2-line me-1"></i>Export Excel
+        </button>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover sd-table mb-0">
-            <thead class="table-light">
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0 sd-table">
+            <thead class="text-center">
                 <tr>
-                    <th class="text-center" style="width:50px">ลำดับ</th>
-                    <th>เลขที่เอกสาร</th>
-                    <th>บริษัท</th>
-                    <th>สินค้า</th>
-                    <th class="text-end">น้ำหนักทั้งหมด</th>
-                    <th class="text-end">ใช้ไปแล้ว</th>
-                    <th class="text-end">คงเหลือ</th>
-                    <th>วันสร้าง</th>
+                    <th style="width:46px">#</th>
+                    <th>เลขที่หนังสือรับรองตนเอง</th>
+                    <th>ประเภท</th>
+                    <th>บริษัท / สถานประกอบการ</th>
+                    <th>HS Code</th>
+                    <th>สินค้า / ชนิดสัตว์น้ำ</th>
+                    <th>แหล่งที่มา</th>
+                    <th>น้ำหนัก (กก.)</th>
+                    <th>วันที่ออก</th>
                     <th>วันหมดอายุ</th>
                     <th class="text-center">สถานะ</th>
-                    <th class="text-center" style="width:60px">จัดการ</th>
+                    <th style="width:90px"></th>
                 </tr>
             </thead>
             <tbody id="sdTableBody">
-                @foreach (var r in results)
+                @foreach (var d in declarations)
                 {
-                    <tr data-id="@r.DocNo" data-status="@r.StatusText" data-search-text="@r.DocNo.ToLower() @r.CompanyName.ToLower() @r.ProductDesc.ToLower()">
-                        <td class="text-center text-muted">@r.RowNo</td>
-                        <td><span class="fw-semibold text-primary">@r.DocNo</span></td>
-                        <td>@r.CompanyName</td>
-                        <td>@r.ProductDesc</td>
-                        <td class="text-end">@r.WeightKg.ToString("N0")</td>
-                        <td class="text-end text-muted">@r.UsedWeightKg.ToString("N0")</td>
-                        <td class="text-end fw-bold @(r.RemainingKg == 0 ? "text-danger" : r.RemainingKg < r.WeightKg * 0.2m ? "text-warning" : "text-success")">@r.RemainingKg.ToString("N0")</td>
-                        <td>@r.CreatedAt.ToString("dd/MM/yyyy")</td>
-                        <td>@r.ExpiresAt.ToString("dd/MM/yyyy")</td>
-                        <td class="text-center"><span class="badge rounded-pill @r.StatusClass">@r.StatusText</span></td>
+                    var pct = d.WeightKg > 0 ? (int)Math.Round(d.UsedWeightKg / d.WeightKg * 100) : 0;
+                    var barColor = d.RemainingKg == 0 ? "bg-danger" : pct > 80 ? "bg-warning" : "bg-success";
+                    <tr data-id="@d.DocNo"
+                        data-status="@d.StatusText"
+                        data-cert-type="@d.CertType"
+                        data-issued-date="@d.IssuedAt.ToString("yyyy-MM-dd")"
+                        data-search-text="@d.DocNo.ToLower() @d.CompanyName.ToLower() @d.HsCode.ToLower() @d.ProductDesc.ToLower() @d.Species.ToLower() @d.EstablishmentCode.ToLower()">
+                        <td class="text-center text-muted">@d.RowNo</td>
+                        <td>
+                            <button type="button" class="btn btn-link p-0 fw-semibold text-primary text-decoration-none" data-action="show-detail" data-doc-id="@d.DocNo">
+                                @d.DocNo
+                            </button>
+                        </td>
                         <td class="text-center">
-                            <button class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="ดูรายละเอียด"><i class="ri ri-eye-line ri-16px"></i></button>
+                            @if (d.CertType == "PS")
+                            {
+                                <span class="badge bg-label-warning">PS</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-info">NoPS</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="fw-semibold">@d.CompanyName</div>
+                            <small class="text-muted">รหัส: @d.EstablishmentCode</small>
+                        </td>
+                        <td class="text-center">@d.HsCode</td>
+                        <td>
+                            <div>@d.ProductDesc</div>
+                            <small class="text-muted">@d.Species</small>
+                        </td>
+                        <td>@d.SourceCountry</td>
+                        <td>
+                            <div class="weight-bar-wrap">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="fw-semibold">@d.WeightKg.ToString("N0")</span>
+                                    <span class="text-muted">@(pct)%</span>
+                                </div>
+                                <div class="weight-bar">
+                                    <div class="weight-bar-fill @barColor" style="width:@(pct)%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between" style="font-size:0.68rem;">
+                                    <span class="text-muted">ใช้ @d.UsedWeightKg.ToString("N0")</span>
+                                    <span class="@(d.RemainingKg==0?"text-danger":d.RemainingKg<d.WeightKg*0.2m?"text-warning":"text-success") fw-bold">คงเหลือ @d.RemainingKg.ToString("N0")</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@d.IssuedAt.ToString("dd/MM/yyyy")</td>
+                        <td>@d.ExpiresAt.ToString("dd/MM/yyyy")</td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill @d.StatusClass">@d.StatusText</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 justify-content-center">
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-info" title="ดูรายละเอียด / ตรวจสอบแหล่งที่มา" data-bs-toggle="tooltip" data-bs-placement="top" data-action="show-detail" data-doc-id="@d.DocNo" aria-label="ดูรายละเอียด">
+                                    <i class="ri ri-eye-line text-info"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="Export PDF" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Export PDF">
+                                    <i class="ri ri-file-pdf-line text-secondary"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 }
-            </tbody>
-            <tbody id="sdTableEmpty" class="d-none">
-                <tr><td colspan="11" class="text-center text-muted py-4">ไม่พบข้อมูล</td></tr>
+                <tr id="sdTableEmpty" class="d-none">
+                    <td colspan="12" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+@* ============================================================ *@
+@*  Hidden detail / batch data (read by JS for modal)           *@
+@* ============================================================ *@
+@foreach (var d in declarations)
+{
+    var pct2 = d.WeightKg > 0 ? (int)Math.Round(d.UsedWeightKg / d.WeightKg * 100) : 0;
+    <div id="detail-@d.DocNo" class="d-none"
+         data-docno="@d.DocNo"
+         data-company="@d.CompanyName"
+         data-certtype="@d.CertType"
+         data-hscode="@d.HsCode"
+         data-product="@d.ProductDesc"
+         data-species="@d.Species"
+         data-sourcecountry="@d.SourceCountry"
+         data-estcode="@d.EstablishmentCode"
+         data-issuedat="@d.IssuedAt.ToString("dd/MM/yyyy")"
+         data-expiresat="@d.ExpiresAt.ToString("dd/MM/yyyy")"
+         data-weighttotal="@((int)d.WeightKg)"
+         data-weightused="@((int)d.UsedWeightKg)"
+         data-weightremain="@((int)d.RemainingKg)"></div>
+
+    <div id="batch-template-@d.DocNo" class="d-none">
+        @foreach (var b in d.Batches)
+        {
+            <div class="batch-card mb-3">
+                <div class="batch-card-header d-flex align-items-center justify-content-between">
+                    <span><i class="ri ri-box-3-line me-1 text-primary"></i>@b.BatchNo</span>
+                    <small class="text-muted">วันที่ผลิต: @b.LotDate.ToString("dd/MM/yyyy")</small>
+                </div>
+                <div class="batch-card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <table class="table table-sm mb-0 source-detail-table">
+                                <tbody>
+                                    <tr>
+                                        <th>วัตถุดิบ</th>
+                                        <td>@b.RawMaterial</td>
+                                    </tr>
+                                    <tr>
+                                        <th>น้ำหนักวัตถุดิบ</th>
+                                        <td>@b.WeightKg.ToString("N0") กก.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div>
+                                <div class="mb-2">
+                                    <span class="text-muted small d-block mb-1">เอกสารการนำเข้า / ควบคุมวัตถุดิบ</span>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <a href="#" class="link-chip link-chip-rmbs2" title="ระบบ RMBS2 (ใบรับรองนำเข้า)" data-bs-toggle="tooltip">
+                                            <i class="ri ri-links-line"></i> RMBS2: @b.Rmbs2No
+                                        </a>
+                                        <a href="#" class="link-chip link-chip-rmbs1" title="ระบบ RMBS1 (ควบคุมปริมาณวัตถุดิบ)" data-bs-toggle="tooltip">
+                                            <i class="ri ri-links-line"></i> RMBS1: @b.Rmbs1No
+                                        </a>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="text-muted small d-block mb-1">เอกสารการผลิต / ผลิตภัณฑ์</span>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <a href="#" class="link-chip link-chip-p2" title="เอกสาร P2 (แบบรายงานการผลิต)" data-bs-toggle="tooltip">
+                                            <i class="ri ri-links-line"></i> P2: @b.P2No
+                                        </a>
+                                        <a href="#" class="link-chip link-chip-p1" title="เอกสาร P1 (แบบรายงานผลิตภัณฑ์)" data-bs-toggle="tooltip">
+                                            <i class="ri ri-links-line"></i> P1: @b.P1No
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@* ============================================================ *@
+@*  Detail Modal                                                 *@
+@* ============================================================ *@
+<div class="modal fade" id="modalSelfDeclDetail" tabindex="-1" aria-labelledby="modalSelfDeclDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSelfDeclDetailLabel">
+                    <i class="ri ri-file-certificate-line me-2 text-primary"></i>
+                    รายละเอียดหนังสือรับรองตนเอง — <span id="modalDocNo" class="text-primary"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                @* --- Certificate info --- *@
+                <div class="card mb-4 border-0 bg-light">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3"><i class="ri ri-information-line me-1 text-primary"></i>ข้อมูลหนังสือรับรองตนเอง</h6>
+                        <div class="row g-2" style="font-size:0.82rem;">
+                            <div class="col-sm-6 col-lg-3">
+                                <span class="text-muted d-block">เลขที่เอกสาร</span>
+                                <strong id="modalDocNo2"></strong>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <span class="text-muted d-block">ประเภทใบรับรอง</span>
+                                <strong id="modalCertType"></strong>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <span class="text-muted d-block">HS Code</span>
+                                <strong id="modalHsCode"></strong>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <span class="text-muted d-block">รหัสสถานประกอบการ</span>
+                                <strong id="modalEstCode"></strong>
+                            </div>
+                            <div class="col-sm-12 col-lg-6">
+                                <span class="text-muted d-block">บริษัท / สถานประกอบการ</span>
+                                <strong id="modalCompany"></strong>
+                            </div>
+                            <div class="col-sm-6 col-lg-6">
+                                <span class="text-muted d-block">ผลิตภัณฑ์สัตว์น้ำ</span>
+                                <strong id="modalProduct"></strong>
+                            </div>
+                            <div class="col-sm-6 col-lg-4">
+                                <span class="text-muted d-block">ชนิดสัตว์น้ำ</span>
+                                <strong id="modalSpecies"></strong>
+                            </div>
+                            <div class="col-sm-6 col-lg-4">
+                                <span class="text-muted d-block">แหล่งที่มา / พื้นที่จับ</span>
+                                <strong id="modalSourceCountry"></strong>
+                            </div>
+                            <div class="col-sm-6 col-lg-4">
+                                <span class="text-muted d-block">วันที่ออก / หมดอายุ</span>
+                                <strong><span id="modalIssuedAt"></span> — <span id="modalExpiresAt"></span></strong>
+                            </div>
+                        </div>
+                        <hr class="my-3" />
+                        <div class="row g-3" style="font-size:0.82rem;">
+                            <div class="col-sm-4">
+                                <span class="text-muted d-block">น้ำหนักรวม (กก.)</span>
+                                <strong class="fs-5" id="modalWeightTotal"></strong>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-muted d-block">ใช้ไปแล้ว (กก.)</span>
+                                <strong class="fs-5 text-warning" id="modalWeightUsed"></strong>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-muted d-block">คงเหลือ (กก.)</span>
+                                <strong class="fs-5 text-success" id="modalWeightRemain"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* --- Batch / Traceability --- *@
+                <h6 class="fw-bold mb-3">
+                    <i class="ri ri-git-branch-line me-1 text-primary"></i>
+                    รุ่นวัตถุดิบ (Batch/Lot) และเชื่อมโยงระบบตรวจสอบแหล่งที่มา
+                </h6>
+                <div class="alert alert-info py-2 px-3 mb-3 small d-flex gap-2 align-items-start">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <div>
+                        <strong>RMBS2</strong> = ระบบตรวจสอบแหล่งที่มาของสัตว์น้ำนำเข้า (ใบรับรองนำเข้า) &nbsp;|&nbsp;
+                        <strong>RMBS1</strong> = ระบบควบคุมปริมาณวัตถุดิบ &nbsp;|&nbsp;
+                        <strong>P2</strong> = แบบรายงานการผลิต &nbsp;|&nbsp;
+                        <strong>P1</strong> = แบบรายงานผลิตภัณฑ์
+                    </div>
+                </div>
+                <div id="modalBatches"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm">
+                    <i class="ri ri-file-pdf-line me-1"></i>Export PDF
+                </button>
+            </div>
+        </div>
     </div>
 </div>

@@ -486,7 +486,7 @@
                         data-return-weight-status="@request.ReturnWeightStatusText"
                         data-doc-date="@request.DocumentDate.ToString("yyyy-MM-ddTHH:mm:ss")">
                         <td>
-                            <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")"
+                            <a href="@Url.Action("ReviewReturnWeight", "Officer")"
                                    class="fw-semibold text-primary text-decoration-none d-block mb-1">
                                 @request.DocumentNumber
                             </a>
@@ -513,7 +513,7 @@
                         <td>@request.OperatorName</td>
                         <td class="text-center">
                             <div class="d-flex gap-1 justify-content-center">
-                                <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")"
+                                <a href="@Url.Action("ReviewReturnWeight", "Officer")"
                                        class="btn btn-sm btn-icon btn-outline-info" data-bs-toggle="tooltip"
                                        title="ดูรายละเอียด">
                                     <i class="ri ri-eye-line text-info"></i>

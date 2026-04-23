@@ -1,0 +1,665 @@
+@{
+    ViewData["Title"] = "คำขอใบรับรองทดแทนฉบับเก่า (Declaration)";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/select2/select2.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-1">สร้างคำขอ</h4>
+<p class="mb-1">ขอใบรับรองทดแทนฉบับเก่า — ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("IndexReplacementCertificate", "PSDeclaration")" class="text-primary fw-semibold">ขอใบรับรองทดแทนฉบับเก่า</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("SelectTypeReplacement", "PSDeclaration")" class="text-primary fw-semibold">เลือกประเภทใบรับรองทดแทน</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary">ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-12">
+
+        <form method="post" action="#">
+        <div class="nav-align-top nav-tabs-shadow mb-4">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-detail" aria-controls="tab-detail" aria-selected="true">
+                        <i class="ri ri-file-list-2-line me-1"></i> รายละเอียดคำขอ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-evidence" aria-controls="tab-evidence" aria-selected="false">
+                        <i class="ri ri-folder-open-line me-1"></i> หลักฐานประกอบ
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+
+                <!-- ==================== TAB 1: รายละเอียดคำขอ ==================== -->
+                <div id="tab-detail" class="tab-pane fade show active" role="tabpanel">
+
+                    <!-- Accordion: ข้อมูลคำขอทดแทน -->
+                    <div class="accordion accordion-custom-button mb-4" id="accordionReplacement">
+                        <div class="accordion-item active">
+                            <h2 class="accordion-header" id="headingReplacement">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseReplacementContent" aria-expanded="true"
+                                    aria-controls="collapseReplacementContent">
+                                    <i class="icon-base ri ri-file-copy-2-line me-2"></i>
+                                    ข้อมูลใบรับรองที่ต้องการขอทดแทน
+                                </button>
+                            </h2>
+                            <div id="collapseReplacementContent" class="accordion-collapse collapse show"
+                                aria-labelledby="headingReplacement">
+                                <div class="accordion-body p-0">
+
+                                    <!-- ผู้ประกอบการ -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-information-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">รายละเอียด</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-8">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" id="operatorName"
+                                                        value="Alpha Office Automation Co., Ltd. (สาขา 00001)" readonly />
+                                                    <label for="operatorName">ผู้ประกอบการ <span class="text-danger">●</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" id="operatorTaxId"
+                                                        value="0105539133390" readonly />
+                                                    <label for="operatorTaxId">เลขประจำตัวผู้เสียภาษี</label>
+                                                </div>
+                                            </div>
+
+                                            <!-- ใบรับรองที่ต้องการทดแทน -->
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="replaceCertType" class="select2 form-select" required>
+                                                        <option value="">-- เลือกประเภทใบรับรอง --</option>
+                                                        <option value="declaration" selected>ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</option>
+                                                    </select>
+                                                    <label for="replaceCertType">ประเภทใบรับรอง <span class="text-danger">●</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="originalCertNumber" class="form-control"
+                                                        placeholder="ระบุเลขที่ใบรับรองฉบับเดิม" value="HC821B211301" required />
+                                                    <label for="originalCertNumber">เลขที่ใบรับรองฉบับเดิม <span class="text-danger">●</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" id="originalCertStatus"
+                                                        value="ปกติ" readonly />
+                                                    <label for="originalCertStatus">สถานะใบรับรองเดิม</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="originalCertDate" class="form-control flatpickr-date bg-light"
+                                                        value="10/04/2026" readonly />
+                                                    <label for="originalCertDate">วันที่ออกใบรับรองเดิม</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" id="originalCertExpiry"
+                                                        value="10/04/2027" readonly />
+                                                    <label for="originalCertExpiry">วันหมดอายุ</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- เหตุผลการขอทดแทน -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-warning rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-question-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">เหตุผลการขอใบรับรองทดแทน</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label d-block mb-2">เหตุผล <span class="text-danger">●</span></label>
+                                                <div class="border rounded p-3">
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="radio" name="replacementReason"
+                                                            id="reasonLost" value="lost" checked />
+                                                        <label class="form-check-label" for="reasonLost">
+                                                            ใบรับรองสูญหาย
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="radio" name="replacementReason"
+                                                            id="reasonDamaged" value="damaged" />
+                                                        <label class="form-check-label" for="reasonDamaged">
+                                                            ใบรับรองชำรุด/เสียหาย
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="replacementReason"
+                                                            id="reasonOther" value="other" />
+                                                        <label class="form-check-label" for="reasonOther">
+                                                            เหตุผลอื่น (ระบุในรายละเอียด)
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="replacementDetail" class="form-label">รายละเอียดเพิ่มเติม <span class="text-danger">●</span></label>
+                                                <textarea id="replacementDetail" class="form-control" rows="4"
+                                                    placeholder="ระบุรายละเอียดเหตุผลการขอใบรับรองทดแทน" required></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ผู้ผ่านพิธีการ / ผู้รับมอบอำนาจ -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-user-star-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ผู้ผ่านพิธีการ / ผู้รับมอบอำนาจ</h6>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="selectBroker" class="select2 form-select" required>
+                                                        <option value="">-- เลือก --</option>
+                                                        <option value="1" selected>บริษัท อินโนเวชั่นส์ โซลูชั่น แอนด์ เซอร์วิส จำกัด (สาขาสำนักงานใหญ่)</option>
+                                                    </select>
+                                                    <label for="selectBroker">ผู้ผ่านพิธีการ <span class="text-danger">●</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="selectAuthorized" class="select2 form-select" required>
+                                                        <option value="">-- เลือก --</option>
+                                                        <option value="1" selected>นาย สมชาย รักษาผล</option>
+                                                    </select>
+                                                    <label for="selectAuthorized">ผู้รับมอบอำนาจ <span class="text-danger">●</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ข้อมูลผู้ส่งออก -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-building-2-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ข้อมูลผู้ส่งออก</h6>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col-12">
+                                                <label class="form-label">ผู้ส่งออก <span class="text-danger">●</span></label>
+                                                <div class="input-group">
+                                                    <button type="button" class="btn btn-outline-secondary" title="ค้นหาผู้ส่งออก">
+                                                        <i class="ri ri-search-line"></i>
+                                                    </button>
+                                                    <input type="text" id="exporterName" class="form-control"
+                                                        placeholder="ชื่อผู้ส่งออก"
+                                                        value="บริษัท อินโนเวชั่นส์ โซลูชั่น แอนด์ เซอร์วิส จำกัด (สาขาสำนักงานใหญ่)"
+                                                        required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- แจ้งความประสงค์ -->
+                                    <div class="p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-file-text-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">แจ้งความประสงค์</h6>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="selectDept" class="select2 form-select" required>
+                                                        <option value="">-- เลือก --</option>
+                                                        <option value="1" selected>กองตรวจสอบคุณภาพสินค้าประมง</option>
+                                                    </select>
+                                                    <label for="selectDept">หน่วยงาน <span class="text-danger">●</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="selectOfficer" class="select2 form-select" required>
+                                                        <option value="">-- เลือก --</option>
+                                                        <option value="1" selected>นางสาว วรรณา พิมพ์ทอง</option>
+                                                    </select>
+                                                    <label for="selectOfficer">ชื่อเจ้าหน้าที่ <span class="text-danger">●</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" id="timeFrame"
+                                                        value="ก่อนนำเข้า/ส่งออก/นำผ่าน" readonly />
+                                                    <label for="timeFrame">ช่วงเวลาดำเนินการ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" id="requestType"
+                                                        value="ขอทดแทน" readonly />
+                                                    <label for="requestType">ลักษณะการขอ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" id="regulation"
+                                                        value="ส่งออก" readonly />
+                                                    <label for="regulation">ระเบียบข้อบังคับ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="selectCountry" class="select2 form-select">
+                                                        <option value="">-- เลือก --</option>
+                                                        <option value="FR" selected>ฝรั่งเศส</option>
+                                                        <option value="US">สหรัฐอเมริกา</option>
+                                                        <option value="JP">ญี่ปุ่น</option>
+                                                        <option value="CN">จีน</option>
+                                                        <option value="EU">สหภาพยุโรป</option>
+                                                    </select>
+                                                    <label for="selectCountry">ชื่อประเทศปลายทาง</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="exportDate" class="form-control flatpickr-date"
+                                                        placeholder="วว/ดด/ปปปป" value="25/04/2026" />
+                                                    <label for="exportDate">วันที่ส่งออก</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Accordion ข้อมูลคำขอทดแทน -->
+
+                    <!-- Accordion: ข้อมูลใบรับรองสัตว์น้ำไม่แปรรูป (Declaration) -->
+                    <div class="accordion accordion-custom-button mb-4" id="accordionDeclarationInfo">
+                        <div class="accordion-item active">
+                            <h2 class="accordion-header" id="headingDeclarationInfo">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseDeclarationInfoContent" aria-expanded="true"
+                                    aria-controls="collapseDeclarationInfoContent">
+                                    <i class="icon-base ri ri-leaf-line me-2"></i>
+                                    ข้อมูลใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)
+                                </button>
+                            </h2>
+                            <div id="collapseDeclarationInfoContent" class="accordion-collapse collapse show"
+                                aria-labelledby="headingDeclarationInfo">
+                                <div class="accordion-body p-0">
+
+                                    <!-- Description of Product -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-box-3-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">Description of Product</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label small">HS Code (พิกัดศุลกากร) <span class="text-danger">●</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="hsCode" placeholder="เช่น 0303.42" value="0303.42" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <label class="form-label small">Product Name <span class="text-danger">●</span></label>
+                                                <div class="input-group">
+                                                    <textarea class="form-control" id="productName" rows="2"
+                                                        placeholder="ชื่อสินค้า">FROZEN TUNA LOIN / Thunnus albacares</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small text-muted">Total Weight of Product <span class="text-success">●</span></label>
+                                                <input type="number" class="form-control" id="totalWeight"
+                                                    placeholder="น้ำหนักรวม (กก.)" value="5200" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="totalWeightUnit" class="form-select">
+                                                        <option value="KGM" selected>KGM = กิโลกรัม</option>
+                                                        <option value="TNE">TNE = เมตริกตัน</option>
+                                                    </select>
+                                                    <label for="totalWeightUnit">หน่วยน้ำหนัก</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Health Certificate -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-shield-check-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ข้อมูล Health Certificate</h6>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="hcNumber" class="form-control"
+                                                        placeholder="Health Certificate Number" value="HC821B211301" />
+                                                    <label for="hcNumber">Health Certificate Number</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="hcDate" class="form-control flatpickr-date"
+                                                        placeholder="วว/ดด/ปปปป" value="10/04/2026" />
+                                                    <label for="hcDate">Date</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Establishment -->
+                                    <div class="p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-store-2-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">Establishment Plant</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Approval Number <span class="text-danger">●</span></label>
+                                                <input type="text" class="form-control" id="approvalNumber" value="TH-DEC-2025-0188" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <label class="form-label small">Name of the Establishment <span class="text-danger">●</span></label>
+                                                <input type="text" class="form-control" id="estName"
+                                                    value="บริษัท อินโนเวชั่นส์ โซลูชั่น แอนด์ เซอร์วิส จำกัด" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">ID of the Establishment <span class="text-danger">●</span></label>
+                                                <input type="text" class="form-control" id="estId" value="0105566089321" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Branch of the Establishment</label>
+                                                <input type="text" class="form-control" id="estBranch" value="สำนักงานใหญ่" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Place of the Establishment <span class="text-danger">●</span></label>
+                                                <input type="text" class="form-control" id="estPlace" value="สมุทรสาคร" />
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small">Address of the Establishment <span class="text-danger">●</span></label>
+                                                <textarea class="form-control" id="estAddress" rows="2">99/1 หมู่ 5 ถนนพระราม 2 ตำบลท่าทราย อำเภอเมืองสมุทรสาคร จังหวัดสมุทรสาคร 74000</textarea>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Responsible person <span class="text-danger">●</span></label>
+                                                <input type="text" class="form-control" id="respPerson" value="นาย สมชาย รักษาผล" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Telephone</label>
+                                                <input type="text" class="form-control" id="estTel" value="034-456-789" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Fax</label>
+                                                <input type="text" class="form-control" id="estFax" value="034-456-790" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Accordion Declaration Info -->
+
+                </div>
+                <!-- /TAB 1 -->
+
+                <!-- ==================== TAB 2: หลักฐานประกอบ ==================== -->
+                <div id="tab-evidence" class="tab-pane fade" role="tabpanel">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div>
+                                <h6 class="mb-1 fw-semibold">หลักฐานประกอบการขอทดแทน</h6>
+                                <p class="text-muted small mb-0">แนบเอกสารหลักฐานที่เกี่ยวข้อง เช่น ใบแจ้งความ หนังสือรับรองการสูญหาย เป็นต้น</p>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#modalAddEvidence">
+                                <i class="ri ri-add-line me-1"></i> เพิ่มหลักฐาน
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0 small" id="evidenceTable">
+                                <thead class="text-center">
+                                    <tr>
+                                        <th style="width:2.5rem;">#</th>
+                                        <th>ประเภทเอกสาร</th>
+                                        <th>ชื่อเอกสาร / คำอธิบาย</th>
+                                        <th>วันที่เอกสาร</th>
+                                        <th>ไฟล์แนบ</th>
+                                        <th style="width:5rem;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="evidenceTbody">
+                                    <!-- ตัวอย่างแถว -->
+                                    <tr>
+                                        <td class="text-center text-muted">1</td>
+                                        <td><span class="badge bg-label-danger">ใบแจ้งความ</span></td>
+                                        <td>ใบแจ้งความกรณีเอกสารสูญหาย</td>
+                                        <td class="text-center">18/04/2026</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-label-secondary">
+                                                <i class="ri ri-file-pdf-line me-1"></i> report_lost.pdf
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-evidence" title="ลบ">
+                                                <i class="ri ri-delete-bin-line text-danger"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr id="evidenceTableEmpty" class="d-none">
+                                        <td colspan="6" class="text-center text-muted py-4">ยังไม่มีหลักฐานประกอบ</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /TAB 2 -->
+
+            </div><!-- /tab-content -->
+        </div><!-- /nav-align-top -->
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <a href="@Url.Action("SelectTypeReplacement", "PSDeclaration")" class="btn btn-outline-secondary">
+                <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+            </a>
+            <button type="button" class="btn btn-outline-primary">
+                <i class="ri ri-save-line me-1"></i> บันทึกร่าง
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="ri ri-send-plane-line me-1"></i> ส่งคำขอ
+            </button>
+        </div>
+
+        </form>
+
+    </div><!-- /col -->
+</div><!-- /row -->
+
+<!-- ==================== Modal: เพิ่มหลักฐานประกอบ ==================== -->
+<div class="modal fade" id="modalAddEvidence" tabindex="-1" aria-labelledby="modalAddEvidenceLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddEvidenceLabel">
+                    <i class="ri ri-folder-add-line me-1"></i> เพิ่มหลักฐานประกอบ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="ev_doctype" class="form-label">ประเภทเอกสาร <span class="text-danger">●</span></label>
+                        <select id="ev_doctype" class="form-select" required>
+                            <option value="">-- เลือกประเภทเอกสาร --</option>
+                            <option value="police_report">ใบแจ้งความ</option>
+                            <option value="loss_certificate">หนังสือรับรองการสูญหาย</option>
+                            <option value="damage_photo">รูปภาพเอกสารชำรุด</option>
+                            <option value="statutory_declaration">คำให้การ/คำสาบาน</option>
+                            <option value="other">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="ev_date" class="form-label">วันที่เอกสาร</label>
+                        <input type="text" id="ev_date" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+                    </div>
+                    <div class="col-12">
+                        <label for="ev_description" class="form-label">ชื่อเอกสาร / คำอธิบาย <span class="text-danger">●</span></label>
+                        <input type="text" id="ev_description" class="form-control"
+                            placeholder="ระบุชื่อหรือคำอธิบายเอกสาร" required />
+                    </div>
+                    <div class="col-12">
+                        <label for="ev_file" class="form-label">ไฟล์แนบ</label>
+                        <input type="file" id="ev_file" class="form-control"
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" />
+                        <div class="form-text">รองรับ PDF, JPG, PNG, DOC, DOCX ขนาดไม่เกิน 10 MB</div>
+                    </div>
+                    <div class="col-12">
+                        <label for="ev_remark" class="form-label">หมายเหตุ</label>
+                        <textarea id="ev_remark" class="form-control" rows="3" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i> ยกเลิก
+                </button>
+                <button type="button" class="btn btn-primary" id="btnConfirmAddEvidence">
+                    <i class="ri ri-check-line me-1"></i> เพิ่มหลักฐาน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Evidence -->
+
+@section PageScripts {
+<script>
+    $(document).ready(function () {
+        // Select2
+        $('.select2').select2({ width: '100%' });
+
+        // Flatpickr
+        function initFlatpickr(el) {
+            if (el && !el._flatpickr) {
+                flatpickr(el, {
+                    dateFormat: 'd/m/Y',
+                    allowInput: true,
+                    locale: { firstDayOfWeek: 1 }
+                });
+            }
+        }
+        document.querySelectorAll('.flatpickr-date').forEach(function (el) { initFlatpickr(el); });
+
+        $('#modalAddEvidence').on('shown.bs.modal', function () {
+            $(this).find('.flatpickr-date').each(function () { initFlatpickr(this); });
+            $('#ev_doctype').val('').trigger('change');
+            $('#ev_date').val('');
+            $('#ev_description').val('');
+            $('#ev_file').val('');
+            $('#ev_remark').val('');
+        });
+
+        // Tooltips
+        if (window.bootstrap && bootstrap.Tooltip) {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+                new bootstrap.Tooltip(el);
+            });
+        }
+
+        // Evidence row index
+        function reindexEvidence() {
+            $('#evidenceTbody tr:not(#evidenceTableEmpty)').each(function (i) {
+                $(this).find('td:first').text(i + 1);
+            });
+        }
+
+        // Add evidence
+        $('#btnConfirmAddEvidence').on('click', function () {
+            var doctype = $('#ev_doctype').val();
+            var doctypeText = $('#ev_doctype option:selected').text();
+            var desc = $('#ev_description').val().trim();
+            var evDate = $('#ev_date').val().trim();
+            var fileName = '';
+            if ($('#ev_file')[0].files.length > 0) {
+                fileName = $('#ev_file')[0].files[0].name;
+            }
+
+            if (!doctype || !desc) {
+                alert('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
+                return;
+            }
+
+            var rowCount = $('#evidenceTbody tr:not(#evidenceTableEmpty)').length + 1;
+            var fileHtml = fileName
+                ? '<span class="badge bg-label-secondary"><i class="ri ri-file-line me-1"></i>' + fileName + '</span>'
+                : '<span class="text-muted small">-</span>';
+
+            var $row = $('<tr>' +
+                '<td class="text-center text-muted">' + rowCount + '</td>' +
+                '<td><span class="badge bg-label-danger">' + doctypeText + '</span></td>' +
+                '<td>' + desc + '</td>' +
+                '<td class="text-center">' + (evDate || '-') + '</td>' +
+                '<td class="text-center">' + fileHtml + '</td>' +
+                '<td class="text-center">' +
+                '<button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-evidence" title="ลบ">' +
+                '<i class="ri ri-delete-bin-line text-danger"></i></button>' +
+                '</td></tr>');
+
+            $('#evidenceTbody').append($row);
+            bootstrap.Modal.getInstance(document.getElementById('modalAddEvidence')).hide();
+        });
+
+        // Remove evidence
+        $(document).on('click', '.btn-remove-evidence', function () {
+            $(this).closest('tr').remove();
+            reindexEvidence();
+        });
+    });
+</script>
+}

@@ -50,6 +50,14 @@ public class OfficerController : Controller
   {
     return View();
   }
+  public IActionResult ReviewReplacementDeclaration()
+  {
+    return View();
+  }
+  public IActionResult ReviewReplacementProcessing()
+  {
+    return View();
+  }
 
   // 2.7 พิจารณายกเลิกใบรับรอง
   public IActionResult IndexRevoke()
@@ -59,6 +67,10 @@ public class OfficerController : Controller
 
   // 2.8 พิจารณาคืนน้ำหนักสินค้าสัตว์น้ำ
   public IActionResult IndexReturnWeight()
+  {
+    return View();
+  }
+  public IActionResult ReviewReturnWeight()
   {
     return View();
   }

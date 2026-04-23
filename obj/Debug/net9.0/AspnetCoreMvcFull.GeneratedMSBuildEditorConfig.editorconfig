@@ -602,6 +602,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT2ZmaWNlci9JbmRleFVzZXJEYXRhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/Officer/ReviewReplacementDeclaration.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT2ZmaWNlci9SZXZpZXdSZXBsYWNlbWVudERlY2xhcmF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/Officer/ReviewReplacementProcessing.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT2ZmaWNlci9SZXZpZXdSZXBsYWNlbWVudFByb2Nlc3NpbmcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/Officer/ReviewReturnWeight.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT2ZmaWNlci9SZXZpZXdSZXR1cm5XZWlnaHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/Pages/AccountSettings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGFnZXMvQWNjb3VudFNldHRpbmdzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -686,6 +698,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9DcmVhdGVQcm9jZXNzaW5nLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/PSDeclaration/CreateReplacementDeclaration.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9DcmVhdGVSZXBsYWNlbWVudERlY2xhcmF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/PSDeclaration/CreateReplacementProcessing.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9DcmVhdGVSZXBsYWNlbWVudFByb2Nlc3NpbmcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/PSDeclaration/CreateTrackRequestStatus.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9DcmVhdGVUcmFja1JlcXVlc3RTdGF0dXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -706,6 +726,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9JbmRleE1hbmFnZUNlcnRpZmljYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/PSDeclaration/IndexReplacementCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9JbmRleFJlcGxhY2VtZW50Q2VydGlmaWNhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/PSDeclaration/IndexTrackRequestStatus.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9JbmRleFRyYWNrUmVxdWVzdFN0YXR1cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -716,6 +740,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/PSDeclaration/SelectType.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9TZWxlY3RUeXBlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/PSDeclaration/SelectTypeReplacement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUFNEZWNsYXJhdGlvbi9TZWxlY3RUeXBlUmVwbGFjZW1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/adisaip/งาน/2026/FSW_กรมประมง/FSW_Project/Views/Shared/Error.cshtml]

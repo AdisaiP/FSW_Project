@@ -1,0 +1,703 @@
+@{
+    ViewData["Title"] = "พิจารณาคืนนํ้าหนักสินค้าส่งคืน";
+
+    var returnWeightStatus = "อยู่ระหว่างดำเนินการ"; // mock: อยู่ระหว่างดำเนินการ | อนุมัติให้คืนน้ำหนัก | อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข | ไม่อนุมัติให้คืนน้ำหนัก | ยกเลิก
+    var isReadOnly = returnWeightStatus != "อยู่ระหว่างดำเนินการ";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-1">พิจารณาคืนนํ้าหนักสินค้าส่งคืน</h4>
+<p class="mb-1">ตรวจสอบและพิจารณาคำขออนุมัติการคืนนํ้าหนักสินค้าส่งคืนจากผู้ประกอบการ</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="#" class="text-primary fw-semibold">เจ้าหน้าที่</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("IndexReturnWeight", "Officer")" class="text-primary fw-semibold">พิจารณาคืนนํ้าหนักสินค้าส่งคืน</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary">10611280616100005</li>
+    </ol>
+</nav>
+
+<!-- Status Banner -->
+@if (returnWeightStatus == "อนุมัติให้คืนน้ำหนัก")
+{
+    <div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="ri ri-checkbox-circle-line fs-5"></i>
+        <span><strong>อนุมัติให้คืนน้ำหนัก</strong> — คำขอนี้ได้รับการอนุมัติเรียบร้อยแล้ว</span>
+    </div>
+}
+else if (returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข")
+{
+    <div class="alert alert-primary d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="ri ri-check-double-line fs-5"></i>
+        <span><strong>อนุมัติแบบมีเงื่อนไข</strong> — คำขอนี้ได้รับการอนุมัติแบบมีเงื่อนไข กรุณาดูรายละเอียดในส่วนผลการพิจารณา</span>
+    </div>
+}
+else if (returnWeightStatus == "ไม่อนุมัติให้คืนน้ำหนัก")
+{
+    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="ri ri-close-circle-line fs-5"></i>
+        <span><strong>ไม่อนุมัติ</strong> — คำขอนี้ถูกปฏิเสธ กรุณาดูเหตุผลในส่วนผลการพิจารณา</span>
+    </div>
+}
+else if (returnWeightStatus == "ยกเลิก")
+{
+    <div class="alert alert-secondary d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="ri ri-forbid-line fs-5"></i>
+        <span><strong>ยกเลิก</strong> — คำขอนี้ถูกยกเลิกแล้ว</span>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="ri ri-time-line fs-5"></i>
+        <span><strong>อยู่ระหว่างดำเนินการ</strong> — คำขอนี้รอการพิจารณาจากเจ้าหน้าที่</span>
+    </div>
+}
+
+<!-- Request Info Badge -->
+<div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+    <div>
+        <span class="text-muted small">เลขที่เอกสาร</span>
+        <div class="fw-bold text-primary fs-6">10611280616100005</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">เลขที่ใบอนุญาตนำเข้า</span>
+        <div class="fw-bold">23501100116100110</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">เลขที่ใบอายัดสินค้า</span>
+        <div class="fw-bold">23501200816100019</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">ผู้ประกอบการ</span>
+        <div class="fw-bold">Ocean Prime Export Co., Ltd.</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">วันที่เอกสาร</span>
+        <div class="fw-bold">19/04/2026 (08:20:00)</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="nav-align-top nav-tabs-shadow mb-4">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-detail" aria-controls="tab-detail" aria-selected="true">
+                        <i class="ri ri-file-list-2-line me-1"></i> รายละเอียดคำขอ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-production" aria-controls="tab-production" aria-selected="false">
+                        <i class="ri ri-list-check-3 me-1"></i> รายการสินค้า/บัญชีแนบท้าย
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-evidence" aria-controls="tab-evidence" aria-selected="false">
+                        <i class="ri ri-folder-open-line me-1"></i> หลักฐานประกอบ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-review" aria-controls="tab-review" aria-selected="false">
+                        <i class="ri ri-shield-check-line me-1"></i> ผลการพิจารณา
+                        @if (!isReadOnly)
+                        {
+                            <span class="badge bg-warning rounded-pill ms-1" style="font-size:0.65rem;">รอ</span>
+                        }
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+
+                <!-- ==================== TAB 1: รายละเอียดคำขอ ==================== -->
+                <div id="tab-detail" class="tab-pane fade show active" role="tabpanel">
+
+                    <!-- Accordion: รายละเอียดคำขออนุมัติการคืนน้ำหนัก -->
+                    <div class="accordion accordion-custom-button mb-4" id="accordionHeader">
+                        <div class="accordion-item active">
+                            <h2 class="accordion-header" id="headingHeader">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseHeaderContent" aria-expanded="true"
+                                    aria-controls="collapseHeaderContent">
+                                    <i class="icon-base ri ri-file-list-line me-2"></i>
+                                    รายละเอียดคำขออนุมัติการคืนนํ้าหนักสินค้าส่งคืน
+                                </button>
+                            </h2>
+                            <div id="collapseHeaderContent" class="accordion-collapse collapse show"
+                                aria-labelledby="headingHeader">
+                                <div class="accordion-body p-0">
+
+                                    <!-- ข้อมูลใบอนุญาตนำเข้า -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-inbox-archive-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ข้อมูลใบอนุญาตนำเข้า</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-8">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="Ocean Prime Export Co., Ltd. (สำนักงานใหญ่)" readonly />
+                                                    <label>ผู้ประกอบการ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="0305562009812, สำนักงานใหญ่ 00000" readonly />
+                                                    <label>เลขประจำตัวผู้เสียภาษี</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="23501100116100110" readonly />
+                                                    <label>เลขที่ใบอนุญาตนำเข้า</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- รายละเอียดเอกสาร -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-file-text-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">รายละเอียด</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="เอกสารการขอคืนน้ำหนักสินค้าส่งคืน" readonly />
+                                                    <label>ชื่อประเภทเอกสาร</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="บันทึกข้อมูลปกติ" readonly />
+                                                    <label>ที่มาของข้อมูล</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="อยู่ระหว่างดำเนินการ" readonly />
+                                                    <label>สถานะ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="กองตรวจสอบคุณภาพสินค้าประมง" readonly />
+                                                    <label>หน่วยงานอนุมัติเอกสาร</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="19/04/2026" readonly />
+                                                    <label>วันที่เอกสาร</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="10611280616100005" readonly />
+                                                    <label>เลขที่เอกสาร</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ข้อมูลการนำเข้า -->
+                                    <div class="p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-truck-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ข้อมูลการนำเข้า</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="23501200816100019" readonly />
+                                                    <label>เลขที่ใบอายัดสินค้า</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="19 เมษายน 2569" readonly />
+                                                    <label>วันที่ออกเอกสาร</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="23501100116100110" readonly />
+                                                    <label>เลขที่ใบอนุญาตนำเข้า</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="19 เมษายน 2569" readonly />
+                                                    <label>วันที่ออกใบอนุญาต</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="18 มิถุนายน 2569" readonly />
+                                                    <label>วันที่หมดอายุ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="Ocean Prime Export Co., Ltd. (Head Office)" readonly />
+                                                    <label>ชื่อผู้ประกอบการ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="0305562009812" readonly />
+                                                    <label>เลขประจำตัวผู้เสียภาษี</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="เวียดนาม (VIET NAM)" readonly />
+                                                    <label>ชื่อประเทศต้นทางบรรทุกสินค้า</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small text-muted">ที่อยู่</label>
+                                                <textarea class="form-control bg-light" rows="2" readonly>88/2 หมู่ 4 ถนนสุขุมวิท ตำบลสมุทรสาคร อำเภอเมือง จังหวัดสมุทรสาคร 74000</textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="ใช่/สินค้าตีกลับ" readonly />
+                                                    <label>สินค้าตีกลับ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="19 เมษายน 2569" readonly />
+                                                    <label>วันที่นำเข้า</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="ส่งออก (เปลี่ยนฉลากสินค้า)" readonly />
+                                                    <label>วัตถุประสงค์การตีกลับ/ส่งคืน</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small text-muted">เหตุผลการตีกลับ / คืนน้ำหนัก</label>
+                                                <textarea class="form-control bg-light" rows="2" readonly>ปรับปรุงฉลาก เนื่องจากวันหมดอายุผิดพลาด ต้องการคืนน้ำหนักสินค้าตามใบอนุญาตที่ได้รับ</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /TAB 1 -->
+
+                <!-- ==================== TAB 2: รายการสินค้า/บัญชีแนบท้าย ==================== -->
+                <div id="tab-production" class="tab-pane fade" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle mb-0 small">
+                            <thead class="text-center">
+                                <tr>
+                                    <th rowspan="2" style="width:2rem;">#</th>
+                                    <th rowspan="2">สินค้าประมง</th>
+                                    <th rowspan="2">ชื่อทางการค้า</th>
+                                    <th colspan="2">จำนวน/ปริมาณสินค้า</th>
+                                    <th colspan="2">น้ำหนักสุทธิ</th>
+                                    <th colspan="2">มูลค่าสินค้า</th>
+                                    <th rowspan="2">เอกสารอ้างอิงที่ขอคืนน้ำหนัก</th>
+                                </tr>
+                                <tr>
+                                    <th>จำนวน</th>
+                                    <th>หน่วย</th>
+                                    <th>น้ำหนัก</th>
+                                    <th>หน่วย</th>
+                                    <th>มูลค่า</th>
+                                    <th>หน่วย</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center text-muted">1</td>
+                                    <td>
+                                        <div class="fw-semibold">0303.44.00 000/KGM</div>
+                                        <div class="text-muted small">[F020074S03030001/KGM]=ปลาทูน่าตาโต ทั้งตัว แช่แข็ง</div>
+                                    </td>
+                                    <td>ปลาทูน่าตาโต ทั้งตัว แช่แข็ง</td>
+                                    <td class="text-end">100.000</td>
+                                    <td class="text-nowrap">C62 = ตัว, ชิ้น</td>
+                                    <td class="text-end">1,000.000</td>
+                                    <td class="text-nowrap">KGM = กิโลกรัม</td>
+                                    <td class="text-end">250,000.000</td>
+                                    <td class="text-nowrap">THB = บาทไทย</td>
+                                    <td>
+                                        <div class="small">
+                                            <div class="text-muted mb-1">RMBS1: <span class="fw-semibold text-dark">10611280211800011589</span></div>
+                                            <div class="text-muted mb-1">DOF04: <span class="fw-semibold text-dark">23501110316200004</span></div>
+                                            <div class="text-muted">CC: <span class="fw-semibold text-dark">10611180111800116</span></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center text-muted">2</td>
+                                    <td>
+                                        <div class="fw-semibold">0303.89.90 000/KGM</div>
+                                        <div class="text-muted small">[F020074S03030002/KGM]=ปลาแซลมอน ทั้งตัว แช่แข็ง</div>
+                                    </td>
+                                    <td>ปลาแซลมอน ทั้งตัว แช่แข็ง</td>
+                                    <td class="text-end">50.000</td>
+                                    <td class="text-nowrap">C62 = ตัว, ชิ้น</td>
+                                    <td class="text-end">750.000</td>
+                                    <td class="text-nowrap">KGM = กิโลกรัม</td>
+                                    <td class="text-end">187,500.000</td>
+                                    <td class="text-nowrap">THB = บาทไทย</td>
+                                    <td>
+                                        <div class="small">
+                                            <div class="text-muted mb-1">RMBS1: <span class="fw-semibold text-dark">10611280211800011590</span></div>
+                                            <div class="text-muted mb-1">DOF04: <span class="fw-semibold text-dark">23501110316200005</span></div>
+                                            <div class="text-muted">CC: <span class="fw-semibold text-dark">10611180111800117</span></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="table-light fw-semibold text-end">
+                                <tr>
+                                    <td colspan="5" class="text-end">รวมน้ำหนักสุทธิทั้งหมด</td>
+                                    <td>1,750.000</td>
+                                    <td class="text-nowrap text-start">KGM</td>
+                                    <td>437,500.000</td>
+                                    <td class="text-nowrap text-start">THB</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- /TAB 2 -->
+
+                <!-- ==================== TAB 3: หลักฐานประกอบ ==================== -->
+                <div id="tab-evidence" class="tab-pane fade" role="tabpanel">
+                    <div class="d-flex align-items-center mb-3">
+                        <h6 class="mb-0 fw-semibold">หลักฐานประกอบการขอคืนน้ำหนัก</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle mb-0 small">
+                            <thead class="text-center">
+                                <tr>
+                                    <th style="width:2.5rem;">#</th>
+                                    <th>ประเภทเอกสาร</th>
+                                    <th>ชื่อเอกสาร / คำอธิบาย</th>
+                                    <th>วันที่เอกสาร</th>
+                                    <th>ผู้ออกเอกสาร</th>
+                                    <th>ไฟล์แนบ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center text-muted">1</td>
+                                    <td><span class="badge bg-label-primary">ใบส่งคืนสินค้า</span></td>
+                                    <td>ใบส่งคืนสินค้าจากต่างประเทศ</td>
+                                    <td class="text-center text-nowrap">15/04/2026</td>
+                                    <td>Ocean Prime Export Co., Ltd.</td>
+                                    <td class="text-center">
+                                        <a href="#" class="badge bg-label-secondary text-decoration-none">
+                                            <i class="ri ri-file-pdf-line me-1"></i>return_goods_doc.pdf
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center text-muted">2</td>
+                                    <td><span class="badge bg-label-info">เอกสารศุลกากร</span></td>
+                                    <td>หนังสือรับรองการนำเข้าสินค้าตีกลับ</td>
+                                    <td class="text-center text-nowrap">18/04/2026</td>
+                                    <td>กรมศุลกากร</td>
+                                    <td class="text-center">
+                                        <a href="#" class="badge bg-label-secondary text-decoration-none">
+                                            <i class="ri ri-file-pdf-line me-1"></i>customs_cert.pdf
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center text-muted">3</td>
+                                    <td><span class="badge bg-label-warning">รูปภาพ</span></td>
+                                    <td>รูปภาพสินค้าที่ตีกลับ</td>
+                                    <td class="text-center text-nowrap">19/04/2026</td>
+                                    <td>Ocean Prime Export Co., Ltd.</td>
+                                    <td class="text-center">
+                                        <a href="#" class="badge bg-label-secondary text-decoration-none">
+                                            <i class="ri ri-image-line me-1"></i>product_photos.zip
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /TAB 3 -->
+
+                <!-- ==================== TAB 4: ผลการพิจารณา ==================== -->
+                <div id="tab-review" class="tab-pane fade" role="tabpanel">
+                    <div class="accordion accordion-custom-button" id="accordionReview">
+                        <div class="accordion-item active">
+                            <h2 class="accordion-header">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseReviewContent" aria-expanded="true">
+                                    <i class="icon-base ri ri-shield-check-line me-2"></i>
+                                    ผลการพิจารณาของเจ้าหน้าที่
+                                </button>
+                            </h2>
+                            <div id="collapseReviewContent" class="accordion-collapse collapse show">
+                                <div class="accordion-body">
+
+                                    @if (isReadOnly)
+                                    {
+                                        <!-- แสดงผลเท่านั้น -->
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label small text-muted">ผลการพิจารณา</label>
+                                                <div>
+                                                    @if (returnWeightStatus == "อนุมัติให้คืนน้ำหนัก")
+                                                    {
+                                                        <span class="badge bg-label-success px-3 py-2 fs-6">
+                                                            <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติให้คืนน้ำหนัก
+                                                        </span>
+                                                    }
+                                                    else if (returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข")
+                                                    {
+                                                        <span class="badge bg-label-primary px-3 py-2 fs-6">
+                                                            <i class="ri ri-check-double-line me-1"></i> อนุมัติแบบมีเงื่อนไข
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-label-danger px-3 py-2 fs-6">
+                                                            <i class="ri ri-close-circle-line me-1"></i> ไม่อนุมัติให้คืนน้ำหนัก
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small text-muted">เจ้าหน้าที่ผู้พิจารณา</label>
+                                                <div class="fw-semibold">นางสาว วรรณา พิมพ์ทอง</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small text-muted">วันที่พิจารณา</label>
+                                                <div class="fw-semibold">23/04/2026 (09:15:00)</div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small text-muted">หมายเหตุ / เหตุผล</label>
+                                                <textarea class="form-control bg-light" rows="3" readonly>เอกสารครบถ้วน ตรวจสอบแล้วอนุมัติการคืนน้ำหนักสินค้าส่งคืน</textarea>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <!-- ฟอร์มพิจารณา -->
+                                        <div class="row g-4">
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">ผลการพิจารณา <span class="text-danger">●</span></label>
+                                                <div class="border rounded p-3">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="reviewResult"
+                                                            id="resultApprove" value="approve" checked />
+                                                        <label class="form-check-label text-success fw-semibold" for="resultApprove">
+                                                            <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติให้คืนน้ำหนัก
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="reviewResult"
+                                                            id="resultApproveCondition" value="approve_condition" />
+                                                        <label class="form-check-label text-primary fw-semibold" for="resultApproveCondition">
+                                                            <i class="ri ri-check-double-line me-1"></i> อนุมัติแบบมีเงื่อนไข
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="reviewResult"
+                                                            id="resultReject" value="reject" />
+                                                        <label class="form-check-label text-danger fw-semibold" for="resultReject">
+                                                            <i class="ri ri-close-circle-line me-1"></i> ไม่อนุมัติให้คืนน้ำหนัก
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- เงื่อนไข (แสดงเฉพาะเมื่อเลือก "อนุมัติแบบมีเงื่อนไข") -->
+                                            <div class="col-12 d-none" id="conditionSection">
+                                                <label for="reviewCondition" class="form-label fw-semibold">เงื่อนไข <span class="text-danger">●</span></label>
+                                                <textarea id="reviewCondition" class="form-control" rows="3"
+                                                    placeholder="ระบุเงื่อนไขประกอบการอนุมัติ"></textarea>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="นางสาว วรรณา พิมพ์ทอง" readonly />
+                                                    <label>เจ้าหน้าที่ผู้พิจารณา</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="reviewDate" class="form-control flatpickr-date"
+                                                        value="23/04/2026" />
+                                                    <label for="reviewDate">วันที่พิจารณา</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="reviewRemark" class="form-label">หมายเหตุ / เหตุผล <span class="text-danger">●</span></label>
+                                                <textarea id="reviewRemark" class="form-control" rows="4"
+                                                    placeholder="ระบุหมายเหตุหรือเหตุผลประกอบการพิจารณา" required></textarea>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /TAB 4 -->
+
+            </div><!-- /tab-content -->
+        </div><!-- /nav-align-top -->
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <a href="@Url.Action("IndexReturnWeight", "Officer")" class="btn btn-outline-secondary">
+                <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+            </a>
+            @if (!isReadOnly)
+            {
+                <button type="button" class="btn btn-outline-danger" id="btnRejectRequest">
+                    <i class="ri ri-close-circle-line me-1"></i> ไม่อนุมัติ
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="btnApproveConditionRequest">
+                    <i class="ri ri-check-double-line me-1"></i> อนุมัติแบบมีเงื่อนไข
+                </button>
+                <button type="button" class="btn btn-success" id="btnApproveRequest">
+                    <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติให้คืนน้ำหนัก
+                </button>
+            }
+        </div>
+
+    </div><!-- /col -->
+</div><!-- /row -->
+
+@section PageScripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Flatpickr
+            document.querySelectorAll('.flatpickr-date').forEach(function (el) {
+                if (el && !el._flatpickr) {
+                    flatpickr(el, { dateFormat: 'd/m/Y', allowInput: true, locale: { firstDayOfWeek: 1 } });
+                }
+            });
+
+            // Tooltips
+            if (window.bootstrap && bootstrap.Tooltip) {
+                document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+                    new bootstrap.Tooltip(el);
+                });
+            }
+
+            // Toggle condition section
+            document.querySelectorAll('input[name="reviewResult"]').forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    var conditionSection = document.getElementById('conditionSection');
+                    if (conditionSection) {
+                        conditionSection.classList.toggle('d-none', this.value !== 'approve_condition');
+                        var conditionTextarea = document.getElementById('reviewCondition');
+                        if (conditionTextarea) {
+                            conditionTextarea.required = this.value === 'approve_condition';
+                        }
+                    }
+                });
+            });
+
+            function validateAndConfirm(resultValue, confirmMessage, successMessage) {
+                var resultRadio = document.querySelector('input[name="reviewResult"][value="' + resultValue + '"]');
+                if (resultRadio) {
+                    resultRadio.checked = true;
+                    resultRadio.dispatchEvent(new Event('change'));
+                }
+
+                var remark = document.getElementById('reviewRemark');
+                if (!remark || remark.value.trim() === '') {
+                    alert('กรุณาระบุหมายเหตุ/เหตุผลประกอบการพิจารณาก่อนดำเนินการ');
+                    document.querySelector('button[data-bs-target="#tab-review"]').click();
+                    if (remark) { remark.focus(); }
+                    return;
+                }
+
+                if (resultValue === 'approve_condition') {
+                    var condition = document.getElementById('reviewCondition');
+                    if (!condition || condition.value.trim() === '') {
+                        alert('กรุณาระบุเงื่อนไขประกอบการอนุมัติแบบมีเงื่อนไข');
+                        if (condition) { condition.focus(); }
+                        return;
+                    }
+                }
+
+                if (confirm(confirmMessage)) {
+                    alert(successMessage);
+                }
+            }
+
+            var btnApprove = document.getElementById('btnApproveRequest');
+            if (btnApprove) {
+                btnApprove.addEventListener('click', function () {
+                    validateAndConfirm('approve',
+                        'ยืนยันการอนุมัติให้คืนน้ำหนักสินค้าส่งคืนคำขอนี้?',
+                        'บันทึกผลการอนุมัติให้คืนน้ำหนักเรียบร้อย');
+                });
+            }
+
+            var btnApproveCondition = document.getElementById('btnApproveConditionRequest');
+            if (btnApproveCondition) {
+                btnApproveCondition.addEventListener('click', function () {
+                    validateAndConfirm('approve_condition',
+                        'ยืนยันการอนุมัติแบบมีเงื่อนไขสำหรับคำขอนี้?',
+                        'บันทึกผลการอนุมัติแบบมีเงื่อนไขเรียบร้อย');
+                });
+            }
+
+            var btnReject = document.getElementById('btnRejectRequest');
+            if (btnReject) {
+                btnReject.addEventListener('click', function () {
+                    validateAndConfirm('reject',
+                        'ยืนยันการไม่อนุมัติให้คืนน้ำหนักสำหรับคำขอนี้?',
+                        'บันทึกผลการไม่อนุมัติเรียบร้อย');
+                });
+            }
+
+        });
+    </script>
+}
