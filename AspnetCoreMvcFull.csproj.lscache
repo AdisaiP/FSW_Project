@@ -659,14 +659,18 @@ Views/
   ProfileTeams.cshtml
   ProfileUser.cshtml
  PSDeclaration/
+  CreateApproveReturnWeight.cshtml
   CreateDeclaration.cshtml
   CreateManageCertificateNoPS.cshtml
   CreateManageCertificatePS.cshtml
   CreateProcessing.cshtml
   CreateTrackRequestStatus.cshtml
+  CreateUpdateCertificate.cshtml
   Index.cshtml
+  IndexApproveReturnWeight.cshtml
   IndexManageCertificate.cshtml
   IndexTrackRequestStatus.cshtml
+  IndexUpdateCertificate.cshtml
   SelectType.cshtml
  Shared/
   Error.cshtml
@@ -921,14 +925,18 @@ Views/
   ProfileTeams.cshtml
   ProfileUser.cshtml
  PSDeclaration/
+  CreateApproveReturnWeight.cshtml
   CreateDeclaration.cshtml
   CreateManageCertificateNoPS.cshtml
   CreateManageCertificatePS.cshtml
   CreateProcessing.cshtml
   CreateTrackRequestStatus.cshtml
+  CreateUpdateCertificate.cshtml
   Index.cshtml
+  IndexApproveReturnWeight.cshtml
   IndexManageCertificate.cshtml
   IndexTrackRequestStatus.cshtml
+  IndexUpdateCertificate.cshtml
   SelectType.cshtml
  Shared/
   Error.cshtml

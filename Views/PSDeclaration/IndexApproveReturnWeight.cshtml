@@ -1,0 +1,497 @@
+@{
+    ViewData["Title"] = "ขออนุมัติการคืนนํ้าหนักสินค้าส่งคืน";
+
+    var requests = new[]
+    {
+        new
+        {
+            DocumentNumber = "10611280616100003",
+            DocumentDate = new DateTime(2026, 4, 18, 9, 30, 0),
+            ImportPermitNumber = "23501100116100104",
+            SeizureNumber = "23501200816100011",
+            OperatorName = "Alpha Office Automation Co., Ltd. (สำนักงานใหญ่)",
+            ReturnWeightStatusText = "ไม่ระบุ (default)",
+            StatusClass = "bg-label-secondary",
+            StatusIcon = "ri-flag-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100004",
+            DocumentDate = new DateTime(2026, 4, 18, 10, 45, 0),
+            ImportPermitNumber = "23501100116100108",
+            SeizureNumber = "23501200816100017",
+            OperatorName = "Thai Marine Foods Co., Ltd. (สำนักงานใหญ่)",
+            ReturnWeightStatusText = "ร่าง",
+            StatusClass = "bg-label-warning",
+            StatusIcon = "ri-flag-2-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100005",
+            DocumentDate = new DateTime(2026, 4, 19, 8, 20, 0),
+            ImportPermitNumber = "23501100116100110",
+            SeizureNumber = "23501200816100019",
+            OperatorName = "Ocean Prime Export Co., Ltd.",
+            ReturnWeightStatusText = "อยู่ระหว่างดำเนินการ",
+            StatusClass = "bg-label-info",
+            StatusIcon = "ri-flag-2-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100006",
+            DocumentDate = new DateTime(2026, 4, 19, 14, 0, 0),
+            ImportPermitNumber = "23501100116100114",
+            SeizureNumber = "23501200816100022",
+            OperatorName = "Andaman Seafood Processing Co., Ltd.",
+            ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนัก",
+            StatusClass = "bg-label-success",
+            StatusIcon = "ri-check-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100007",
+            DocumentDate = new DateTime(2026, 4, 20, 9, 12, 0),
+            ImportPermitNumber = "23501100116100118",
+            SeizureNumber = "23501200816100025",
+            OperatorName = "Siam Frozen Tuna Co., Ltd.",
+            ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข",
+            StatusClass = "bg-label-primary",
+            StatusIcon = "ri-check-double-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100008",
+            DocumentDate = new DateTime(2026, 4, 20, 16, 35, 0),
+            ImportPermitNumber = "23501100116100121",
+            SeizureNumber = "23501200816100030",
+            OperatorName = "Gulf Catch Exporters Co., Ltd.",
+            ReturnWeightStatusText = "ไม่อนุมัติให้คืนน้ำหนัก",
+            StatusClass = "bg-label-danger",
+            StatusIcon = "ri-close-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100009",
+            DocumentDate = new DateTime(2026, 4, 21, 10, 5, 0),
+            ImportPermitNumber = "23501100116100124",
+            SeizureNumber = "23501200816100034",
+            OperatorName = "Pacific Fishery Group Co., Ltd.",
+            ReturnWeightStatusText = "ยกเลิก",
+            StatusClass = "bg-label-secondary",
+            StatusIcon = "ri-forbid-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100010",
+            DocumentDate = new DateTime(2026, 4, 22, 9, 48, 0),
+            ImportPermitNumber = "23501100116100128",
+            SeizureNumber = "23501200816100039",
+            OperatorName = "Eastern Aqua Trade Co., Ltd.",
+            ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนัก",
+            StatusClass = "bg-label-success",
+            StatusIcon = "ri-check-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100011",
+            DocumentDate = new DateTime(2026, 4, 22, 11, 22, 0),
+            ImportPermitNumber = "23501100116100131",
+            SeizureNumber = "23501200816100044",
+            OperatorName = "Blue Harbor Seafood Co., Ltd.",
+            ReturnWeightStatusText = "ร่าง",
+            StatusClass = "bg-label-warning",
+            StatusIcon = "ri-flag-2-line"
+        },
+        new
+        {
+            DocumentNumber = "10611280616100012",
+            DocumentDate = new DateTime(2026, 4, 23, 15, 40, 18),
+            ImportPermitNumber = "23501100116100136",
+            SeizureNumber = "23501200816100047",
+            OperatorName = "Southern Pelagic Co., Ltd.",
+            ReturnWeightStatusText = "อยู่ระหว่างดำเนินการ",
+            StatusClass = "bg-label-info",
+            StatusIcon = "ri-flag-2-line"
+        }
+    };
+
+    string GetDocumentStatusText(string returnWeightStatus) => returnWeightStatus switch
+    {
+        "ร่าง" => "ฉบับร่าง",
+        "ไม่ระบุ (default)" => "ฉบับร่าง",
+        "อยู่ระหว่างดำเนินการ" => "รออนุมัติ",
+        "อนุมัติให้คืนน้ำหนัก" => "อนุมัติ",
+        "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข" => "อนุมัติ",
+        "ไม่อนุมัติให้คืนน้ำหนัก" => "ไม่อนุมัติ",
+        "ยกเลิก" => "ยกเลิก",
+        _ => "ไม่ระบุ"
+    };
+
+    string GetStatusClassByText(string statusText) => statusText switch
+    {
+        "ฉบับร่าง" => "bg-label-secondary",
+        "รออนุมัติ" => "bg-label-warning",
+        "อนุมัติ" => "bg-label-success",
+        "ไม่อนุมัติ" => "bg-label-danger",
+        "ยกเลิก" => "bg-label-secondary",
+        _ => "bg-label-info"
+    };
+
+    string GetStatusIconByText(string statusText) => statusText switch
+    {
+        "ฉบับร่าง" => "ri-file-3-line",
+        "รออนุมัติ" => "ri-mail-send-line",
+        "อนุมัติ" => "ri-checkbox-circle-line",
+        "ไม่อนุมัติ" => "ri-close-circle-line",
+        "ยกเลิก" => "ri-forbid-line",
+        _ => "ri-information-line"
+    };
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section PageStyles {
+<style>
+    .request-table-compact {
+        font-size: 0.78rem;
+    }
+
+    .request-table-compact th,
+    .request-table-compact td {
+        padding: 0.45rem 0.5rem;
+        vertical-align: middle;
+        line-height: 1.3;
+    }
+
+    .request-table-compact th,
+    .request-table-compact td {
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .request-table-compact thead th {
+        white-space: normal;
+        word-break: keep-all;
+        overflow-wrap: normal;
+    }
+
+    .request-table-compact .badge {
+        font-size: 0.68rem;
+    }
+
+    .request-table-compact .btn.btn-sm {
+        --bs-btn-padding-y: 0.14rem;
+        --bs-btn-padding-x: 0.3rem;
+    }
+
+    .request-table-compact .btn-icon {
+        width: 1.65rem;
+        height: 1.65rem;
+    }
+
+    .request-table-compact .signature-indicator {
+        font-size: 0.68rem;
+    }
+
+    .request-table-compact .signature-indicator .badge {
+        width: 1.2rem;
+        height: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .request-table-compact .signature-indicator i {
+        font-size: 0.72rem;
+    }
+
+    .filter-action-buttons .btn-square {
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageScripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var fromInput = document.getElementById('filterDocumentDateFrom');
+        var toInput = document.getElementById('filterDocumentDateTo');
+
+        if (fromInput) {
+            flatpickr(fromInput, {
+                dateFormat: 'd/m/Y',
+                allowInput: true
+            });
+        }
+
+        if (toInput) {
+            flatpickr(toInput, {
+                dateFormat: 'd/m/Y',
+                allowInput: true
+            });
+        }
+
+        if (window.bootstrap && bootstrap.Tooltip) {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
+                new bootstrap.Tooltip(element);
+            });
+        }
+
+        function parseDateInput(value, endOfDay) {
+            if (!value) {
+                return null;
+            }
+
+            var parts = value.split('/');
+            if (parts.length !== 3) {
+                return null;
+            }
+
+            var day = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10) - 1;
+            var year = parseInt(parts[2], 10);
+            var hours = endOfDay ? 23 : 0;
+            var minutes = endOfDay ? 59 : 0;
+            var seconds = endOfDay ? 59 : 0;
+            var parsed = new Date(year, month, day, hours, minutes, seconds);
+
+            return Number.isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function filterRows() {
+            var documentNumber = (document.getElementById('filterDocumentNumber').value || '').trim().toLowerCase();
+            var importPermitNumber = (document.getElementById('filterImportPermit').value || '').trim().toLowerCase();
+            var seizureNumber = (document.getElementById('filterSeizure').value || '').trim().toLowerCase();
+            var status = (document.getElementById('filterReturnWeightStatus').value || '').trim();
+            var fromDate = parseDateInput(document.getElementById('filterDocumentDateFrom').value, false);
+            var toDate = parseDateInput(document.getElementById('filterDocumentDateTo').value, true);
+            var excludeRange = document.getElementById('filterDateExclude').checked;
+            var rows = document.querySelectorAll('#requestTableBody tr[data-doc-number]');
+            var visibleCount = 0;
+
+            rows.forEach(function (row) {
+                var rowDocumentNumber = (row.dataset.docNumber || '').toLowerCase();
+                var rowImportPermit = (row.dataset.importPermit || '').toLowerCase();
+                var rowSeizureNumber = (row.dataset.seizureNumber || '').toLowerCase();
+                var rowStatus = row.dataset.returnWeightStatus || '';
+                var rowDocumentDate = new Date(row.dataset.docDate || '');
+
+                var documentMatch = !documentNumber || rowDocumentNumber.indexOf(documentNumber) >= 0;
+                var importPermitMatch = !importPermitNumber || rowImportPermit.indexOf(importPermitNumber) >= 0;
+                var seizureMatch = !seizureNumber || rowSeizureNumber.indexOf(seizureNumber) >= 0;
+                var statusMatch = !status || rowStatus === status;
+                var dateMatch;
+                if (!fromDate && !toDate) {
+                    dateMatch = true;
+                } else if (excludeRange) {
+                    var inRange = (!fromDate || rowDocumentDate >= fromDate) && (!toDate || rowDocumentDate <= toDate);
+                    dateMatch = !inRange;
+                } else {
+                    dateMatch = (!fromDate || rowDocumentDate >= fromDate) && (!toDate || rowDocumentDate <= toDate);
+                }
+                var isVisible = documentMatch && importPermitMatch && seizureMatch && statusMatch && dateMatch;
+
+                row.classList.toggle('d-none', !isVisible);
+                if (isVisible) {
+                    visibleCount += 1;
+                }
+            });
+
+            document.getElementById('requestTableEmpty').classList.toggle('d-none', visibleCount !== 0);
+        }
+
+        document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
+        document.getElementById('filterReturnWeightStatus').addEventListener('change', filterRows);
+        document.getElementById('filterDocumentDateFrom').addEventListener('change', filterRows);
+        document.getElementById('filterDocumentDateTo').addEventListener('change', filterRows);
+        document.getElementById('filterDateExclude').addEventListener('change', filterRows);
+        document.querySelectorAll('#filterDocumentNumber, #filterImportPermit, #filterSeizure, #filterReturnWeightStatus, #filterDocumentDateFrom, #filterDocumentDateTo').forEach(function (element) {
+            element.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    filterRows();
+                }
+            });
+        });
+        document.getElementById('btnResetRequests').addEventListener('click', function () {
+            document.getElementById('filterDocumentNumber').value = '';
+            document.getElementById('filterImportPermit').value = '';
+            document.getElementById('filterSeizure').value = '';
+            document.getElementById('filterReturnWeightStatus').value = '';
+            document.getElementById('filterDocumentDateFrom').value = '';
+            document.getElementById('filterDocumentDateTo').value = '';
+            document.getElementById('filterDateExclude').checked = false;
+            filterRows();
+        });
+    });
+</script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-1">ขออนุมัติการคืนนํ้าหนักสินค้าส่งคืน</h4>
+<p class="mb-1">แสดงรายการอนุมัติการคืนนํ้าหนักสินค้าส่งคืน</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("IndexApproveReturnWeight", "PSDeclaration")" class="text-primary fw-semibold">ขออนุมัติการคืนนํ้าหนักสินค้าส่งคืน</a>
+        </li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <h5 class="card-title mb-1">ตัวกรองการค้นหา</h5>
+            <p class="text-muted small mb-0">ค้นหาจากเลขที่เอกสาร เลขที่ใบอนุญาตนำเข้า เลขที่ใบอายัดสินค้า สถานะการคืนน้ำหนัก และวันที่ออกเอกสาร</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-6 col-lg-3">
+                <label for="filterDocumentNumber" class="form-label">เลขที่เอกสาร</label>
+                <input type="text" id="filterDocumentNumber" class="form-control" placeholder="ระบุเลขที่เอกสาร" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="filterImportPermit" class="form-label">เลขที่ใบอนุญาตนำเข้า</label>
+                <input type="text" id="filterImportPermit" class="form-control" placeholder="ระบุเลขที่ใบอนุญาตนำเข้า" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="filterSeizure" class="form-label">เลขที่ใบอายัดสินค้า</label>
+                <input type="text" id="filterSeizure" class="form-control" placeholder="ระบุเลขที่ใบอายัดสินค้า" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="filterReturnWeightStatus" class="form-label">สถานะการคืนน้ำหนัก</label>
+                <select id="filterReturnWeightStatus" class="form-select">
+                    <option value="">-- เลือกข้อมูล --</option>
+                    <option value="ไม่ระบุ (default)">ไม่ระบุ (default)</option>
+                    <option value="ร่าง">ร่าง</option>
+                    <option value="อยู่ระหว่างดำเนินการ">อยู่ระหว่างดำเนินการ</option>
+                    <option value="อนุมัติให้คืนน้ำหนัก">อนุมัติให้คืนน้ำหนัก</option>
+                    <option value="อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข">อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข</option>
+                    <option value="ไม่อนุมัติให้คืนน้ำหนัก">ไม่อนุมัติให้คืนน้ำหนัก</option>
+                    <option value="ยกเลิก">ยกเลิก</option>
+                </select>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="filterDocumentDateFrom" class="form-label">วันที่ออกเอกสาร</label>
+                <input type="text" id="filterDocumentDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="filterDocumentDateTo" class="form-label">ถึงวันที่</label>
+                <input type="text" id="filterDocumentDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-auto">
+                <div class="d-flex gap-2 filter-action-buttons">
+                    <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
+                        <i class="ri ri-search-line"></i>
+                    </button>
+                    <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square" title="ล้างค่า">
+                        <i class="ri ri-refresh-line"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h5 class="card-title mb-1">รายการอนุมัติการคืนนํ้าหนักสินค้าส่งคืน</h5>
+            <p class="text-muted small mb-0">แสดงรายการอนุมัติการคืนนํ้าหนักสินค้าส่งคืน</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+                <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-primary btn-sm">
+                <i class="ri ri-add-line me-1"></i> สร้างคำขอ
+            </a>
+        </div>
+    </div>
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0 request-table-compact">
+            <thead class="text-center">
+                <tr>
+                    <th style="width:2.5rem;"></th>
+                    <th style="min-width:170px;">เลขที่เอกสาร</th>
+                    <th style="min-width:130px;">วันที่ออกเอกสาร</th>
+                    <th style="min-width:180px;">เลขที่ใบอนุญาตนำเข้า</th>
+                    <th style="min-width:180px;">เลขที่ใบอายัดสินค้า</th>
+                    <th style="min-width:220px;">ผู้ประกอบการ</th>
+                    <th style="width:7rem;"></th>
+                </tr>
+            </thead>
+            <tbody id="requestTableBody">
+                @foreach (var request in requests)
+                {
+                    var documentStatusText = GetDocumentStatusText(request.ReturnWeightStatusText);
+                    var documentStatusClass = GetStatusClassByText(documentStatusText);
+                    var documentStatusIcon = GetStatusIconByText(documentStatusText);
+
+                    <tr
+                        data-doc-number="@request.DocumentNumber"
+                        data-import-permit="@request.ImportPermitNumber"
+                        data-seizure-number="@request.SeizureNumber"
+                        data-return-weight-status="@request.ReturnWeightStatusText"
+                        data-doc-date="@request.DocumentDate.ToString("yyyy-MM-ddTHH:mm:ss")">
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" />
+                        </td>
+                        <td>
+                            <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")"
+                               class="fw-semibold text-primary text-decoration-none d-block mb-1">
+                                @request.DocumentNumber
+                            </a>
+                            <div class="d-flex flex-column gap-1">
+                                <div class="d-flex align-items-center gap-1 small text-muted">
+                                    <span class="badge @documentStatusClass rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:1.15rem;height:1.15rem;padding:0;">
+                                        <i class="ri @documentStatusIcon" style="font-size:0.6rem;"></i>
+                                    </span>
+                                    <span>สถานะ: @documentStatusText</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-1 small text-muted">
+                                    <span class="badge @request.StatusClass rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:1.15rem;height:1.15rem;padding:0;">
+                                        <i class="ri @request.StatusIcon" style="font-size:0.6rem;"></i>
+                                    </span>
+                                    <span>สถานะขอคืนน้ำหนัก: @request.ReturnWeightStatusText</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center text-nowrap">@request.DocumentDate.ToString("dd/MM/yyyy")</td>
+                        <td class="text-nowrap">@request.ImportPermitNumber</td>
+                        <td class="text-nowrap">@request.SeizureNumber</td>
+                        <td>@request.OperatorName</td>
+                        <td class="text-center">
+                            <div class="d-flex gap-1 justify-content-center">
+                                <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-sm btn-icon btn-outline-warning" data-bs-toggle="tooltip" title="รายละเอียดการขอคืนน้ำหนัก">
+                                    <i class="ri ri-pencil-line text-warning"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="รายละเอียดใบอนุญาตนำเข้า">
+                                    <i class="ri ri-mail-line text-primary"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-info" data-bs-toggle="tooltip" title="รายละเอียดใบอายัดสินค้า">
+                                    <i class="ri ri-file-list-2-line text-info"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                <tr id="requestTableEmpty" class="d-none">
+                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
