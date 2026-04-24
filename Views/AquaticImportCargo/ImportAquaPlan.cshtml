@@ -1,0 +1,379 @@
+@model AspnetCoreMvcFull.Models.ChangeRequestIndexViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "แผนการขนถ่ายและการคัดแยกสินค้าสัตว์น้ำ";
+
+    // Mock Data จำลองรายการแผนประจำวัน
+    var dailyPlans = new[]
+    {
+        new { PlanNo = "PLN-2569-001", VesselName = "FTY FO-8", Port = "ด่านศุลกากรสมุทรสาคร", Entrepreneur = "บริษัท อัลฟ่า ซีฟู้ด จำกัด", PlanDate = DateTime.Now, IsRisk = false, IsManualOverride = false },
+        new { PlanNo = "PLN-2569-002", VesselName = "OCEAN WAVES", Port = "ด่านศุลกากรสมุทรปราการ", Entrepreneur = "บริษัท โอเชียนฟู้ดส์ จำกัด", PlanDate = DateTime.Now, IsRisk = true, IsManualOverride = false },
+        new { PlanNo = "PLN-2569-003", VesselName = "LUCKY STAR 99", Port = "ด่านศุลกากรสมุทรสาคร", Entrepreneur = "บริษัท มารีนเอ็กซ์เพรส จำกัด", PlanDate = DateTime.Now, IsRisk = true, IsManualOverride = true }
+    };
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+}
+
+@section PageStyles {
+    <style>
+        .vessel-change-table {
+            font-size: 0.8rem;
+        }
+
+        .vessel-change-table th,
+        .vessel-change-table td {
+            padding: 0.45rem 0.5rem;
+            vertical-align: middle;
+            line-height: 1.3;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .vessel-change-table thead th {
+            word-break: keep-all;
+            overflow-wrap: normal;
+        }
+
+        .vessel-change-table .btn-icon {
+            width: 1.65rem;
+            height: 1.65rem;
+        }
+
+        .vessel-change-table .form-check-input {
+            margin-top: 0;
+        }
+
+        .filter-form-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .btn-square {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+    </style>
+}
+
+<h4 class="mb-1">แจ้งเตือนแผนการขนถ่าย/คัดแยกสินค้าสัตว์น้ำรายวัน</h4>
+<p class="mb-1">ตรวจสอบ ควบคุม และสั่งพิมพ์แผนการขนถ่ายในพื้นที่รับผิดชอบ</p>
+
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="#" class="text-primary fw-semibold">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary">แผนการขนถ่ายประจำวัน</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">ค้นหารายการ</h5>
+    </div>
+    <div class="card-body">
+        <form action="#" method="post">
+            <div class="row g-3">
+                <div class="col-md-4 col-lg-4">
+                    <label for="filterDate" class="form-label filter-form-label">วันที่ขนถ่าย (รายวัน) <span class="text-danger">●</span></label>
+                    <input type="text" id="filterDate" class="form-control form-control-sm flatpickr-date" placeholder="วว/ดด/ปปปป" autocomplete="off" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                </div>
+
+                <div class="col-md-4 col-lg-4">
+                    <label for="filterPort" class="form-label filter-form-label">เขตพื้นที่รับผิดชอบ / ด่าน</label>
+                    <select id="filterPort" class="form-select form-select-sm select2">
+                        <option value="">-- ทั้งหมด --</option>
+                        <option value="1" selected>ด่านศุลกากรสมุทรสาคร</option>
+                        <option value="2">ด่านศุลกากรสมุทรปราการ</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 col-lg-4">
+                    <label for="filterStatus" class="form-label filter-form-label">สถานะประเมินความเสี่ยง</label>
+                    <div class="d-flex gap-2 align-items-center">
+                        <select id="filterStatus" class="form-select form-select-sm select2">
+                            <option value="">-- เลือกสถานะ --</option>
+                            <option value="risk">ควบคุม (Control)</option>
+                            <option value="norisk">ไม่ควบคุม (No Control)</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-square" title="สืบค้น">
+                            <i class="ri ri-search-line"></i>
+                        </button>
+                        <button type="button" id="btnReset" class="btn btn-outline-secondary btn-square" title="ล้างค่า">
+                            <i class="ri ri-refresh-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+
+        <div>
+            <h5 class="card-title mb-1">
+                รายการแจ้งแผนการขนส่ง
+            </h5>
+
+            <p class="text-muted small mb-0">
+                แสดงรายการแจ้งแผนการขนส่งสินค้าสัตว์น้ำนำเข้า
+            </p>
+        </div>
+        <a href="@Url.Action("CreateTallySheet", "VesselChange")" class="btn btn-primary btn-sm">
+            <i class="ri ri-add-line me-1"></i> สร้างคำขอ
+        </a>
+    </div>
+
+    <div class="table-responsive p-1">
+        <table class="table table-bordered table-hover align-middle mb-0 vessel-change-table">
+            <thead class="text-center">
+                <tr>
+                    <th style="width: 40px;"><input class="form-check-input" type="checkbox" id="selectAll" /></th>
+                    <th style="width: 40px;"></th>
+                    <th style="min-width: 140px;">เลขที่แผน / วันที่</th>
+                    <th style="min-width: 180px;">ชื่อเรือ / ท่าเรือขนถ่าย</th>
+                    <th style="min-width: 220px;">ผู้ประกอบการ</th>
+                    <th style="min-width: 180px;">ผลประเมินความเสี่ยง</th>
+                    <th style="width: 130px;">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (dailyPlans != null && dailyPlans.Any())
+                {
+                    foreach (var item in dailyPlans)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                <input class="form-check-input row-checkbox" type="checkbox" />
+                            </td>
+                            <td class="text-center"><i class='bx bx-star text-primary'></i></td>
+                            <td class="text-nowrap">
+                                <a href="javascript:void(0);" class="text-primary text-decoration-none fw-semibold">@item.PlanNo</a>
+                                <div class="text-muted mt-1">@item.PlanDate.ToString("dd/MM/yyyy")</div>
+                            </td>
+                            <td class="small">
+                                <div class="fw-semibold text-dark">@item.VesselName</div>
+                                <div class="text-muted mt-1">@item.Port</div>
+                            </td>
+                            <td class="small">@item.Entrepreneur</td>
+                            <td class="text-center">
+                                @if (item.IsRisk)
+                                {
+                                    @if (item.IsManualOverride) { 
+                                        <span class="badge bg-label-danger"><i class="ri ri-error-warning-line me-1"></i> ควบคุม (จนท.)</span> 
+                                    }
+                                    else { 
+                                        <span class="badge bg-label-warning"><i class="ri ri-alert-line me-1"></i> ควบคุม (ระบบ)</span> 
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center justify-content-center gap-1">
+                                        <span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i> ไม่ควบคุม</span>
+                                    </div>
+                                }
+                            </td>
+                            <td class="text-center">
+                            <div class="d-flex gap-1 justify-content-center">
+                                <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-info" title="รายละเอียด" data-bs-toggle="tooltip" data-bs-placement="top">
+                                    <i class="ri ri-eye-line text-info"></i>
+                                </a>
+                                <a href="@Url.Action("CreateTallySheet", "VesselChange")" class="btn btn-sm btn-icon btn-outline-warning" title="บันทึก Tally" data-bs-toggle="tooltip" data-bs-placement="top">
+                                    <i class="ri ri-file-edit-line text-warning"></i>
+                                </a>
+                                
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-primary" title="พิมพ์" data-bs-toggle="tooltip" data-bs-placement="top" onclick="printRow(this);">
+                                    <i class="ri ri-printer-line text-primary"></i>
+                                </button>
+                                
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="ประวัติ Log" data-bs-toggle="tooltip" data-bs-placement="top">
+                                    <i class="ri ri-history-line text-secondary"></i>
+                                </button>
+                            </div>
+                        </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-3 text-muted">ไม่พบข้อมูล</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer bg-white border-top py-2 d-flex justify-content-end">
+        <small class="text-muted">ผลลัพธ์ 1 ถึง @(dailyPlans?.Length ?? 0) จาก @(dailyPlans?.Length ?? 0)</small>
+    </div>
+</div>
+
+@section VendorScripts {
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+    <script src="~/vendor/libs/select2/select2.js"></script>
+}
+
+@section PageScripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Init Select2
+            if (jQuery().select2) {
+                $('.select2').select2();
+            }
+
+            // Init Flatpickr
+            const dateInputs = document.querySelectorAll('.flatpickr-date');
+            dateInputs.forEach(function (input) {
+                if (input && typeof flatpickr !== 'undefined') {
+                    flatpickr(input, {
+                        dateFormat: "d/m/Y",
+                        allowInput: true,
+                        locale: { firstDayOfWeek: 1 }
+                    });
+                }
+            });
+
+            // Init Tooltips เหมือนต้นฉบับเป๊ะ
+            if (window.bootstrap && bootstrap.Tooltip) {
+                document.querySelectorAll("[data-bs-toggle='tooltip']").forEach(function (el) {
+                    new bootstrap.Tooltip(el);
+                });
+            }
+
+            // Logic Checkbox เหมือนต้นฉบับเป๊ะ
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = Array.from(document.querySelectorAll('.row-checkbox'));
+
+            function syncSelectAllState() {
+                if (!selectAll) return;
+                const checkedCount = checkboxes.filter(function (cb) { return cb.checked; }).length;
+                selectAll.checked = checkboxes.length > 0 && checkedCount === checkboxes.length;
+                selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    checkboxes.forEach(function (cb) {
+                        cb.checked = selectAll.checked;
+                    });
+                    syncSelectAllState();
+                });
+            }
+
+            checkboxes.forEach(function (cb) {
+                cb.addEventListener('change', syncSelectAllState);
+            });
+            syncSelectAllState();
+
+            // ปุ่มล้างค่า
+            const btnReset = document.getElementById('btnReset');
+            if (btnReset) {
+                btnReset.addEventListener('click', function () {
+                    ['filterDate', 'filterPort', 'filterStatus'].forEach(function (id) {
+                        const input = document.getElementById(id);
+                        if (input) {
+                            input.value = '';
+                            if($(input).hasClass('select2')) {
+                                $(input).trigger('change');
+                            }
+                        }
+                    });
+
+                    if (selectAll) {
+                        selectAll.checked = false;
+                        selectAll.indeterminate = false;
+                    }
+
+                    checkboxes.forEach(function (cb) {
+                        cb.checked = false;
+                    });
+                });
+            }
+        });
+
+        // ฟังก์ชันปรับสถานะเป็นควบคุม
+        function confirmOverride() {
+            if(confirm("คุณต้องการเปลี่ยนแปลงผลการประเมินความเสี่ยงเป็น 'ควบคุม' ใช่หรือไม่?")) {
+                alert("อัปเดตสถานะเป็น 'ควบคุม (โดยเจ้าหน้าที่)' สำเร็จ ระบบได้บันทึก Log เรียบร้อยแล้ว");
+            }
+        }
+
+        function printRow(btn) {
+    // ดึง Element แถว (tr) ที่ปุ่มนั้นอยู่
+    var row = $(btn).closest('tr');
+    
+    // ดึงข้อมูลแต่ละคอลัมน์ (อ้างอิงลำดับจาก td)
+    var planNo = row.find('td:eq(2) a').text().trim();
+    var planDate = row.find('td:eq(2) div').text().trim();
+    var vesselName = row.find('td:eq(3) .fw-semibold').text().trim();
+    var port = row.find('td:eq(3) .text-muted').text().trim();
+    var entrepreneur = row.find('td:eq(4)').text().trim();
+    
+    // ดึงเฉพาะข้อความสถานะ (เอาแค่ text ใน Badge)
+    var status = row.find('td:eq(5) .badge').text().trim();
+
+    // สร้างเนื้อหา HTML สำหรับปริ้น
+    var printContent = `
+        <div style="font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; padding: 20px;">
+            <h3 style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px;">ข้อมูลแผนการขนถ่ายสินค้าสัตว์น้ำ</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 16px;">
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; width: 35%; font-weight: bold; background-color: #f8f9fa;">เลขที่แผน</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${planNo}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; background-color: #f8f9fa;">วันที่ทำรายการ</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${planDate}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; background-color: #f8f9fa;">ชื่อเรือขนถ่าย</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${vesselName}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; background-color: #f8f9fa;">ด่าน/ท่าเรือ</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${port}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; background-color: #f8f9fa;">ผู้ประกอบการ</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${entrepreneur}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; background-color: #f8f9fa;">ผลประเมินความเสี่ยง</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">${status}</td>
+                </tr>
+            </table>
+        </div>
+    `;
+
+    // เปิดหน้าต่างใหม่สำหรับปริ้น
+    var printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>พิมพ์ข้อมูลแผนการขนถ่าย</title>');
+    printWindow.document.write('<style>body{margin:0;padding:0;}</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(printContent);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    
+    // สั่งปริ้นหลังจากโหลดหน้าเสร็จ
+    printWindow.focus();
+    setTimeout(function() {
+        printWindow.print();
+        printWindow.close(); // ปิดหน้าต่างอัตโนมัติเมื่อปริ้นเสร็จหรือกดยกเลิก
+    }, 250);
+}
+    </script>
+}

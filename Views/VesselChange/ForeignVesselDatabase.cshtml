@@ -1,0 +1,430 @@
+@{
+  ViewData["Title"] = "ฐานข้อมูลเรือประมงต่างประเทศ";
+}
+
+@section PageStyles {
+  <style>
+    .arep-mini-stat {
+      border: 1px dashed rgba(115, 103, 240, 0.35);
+      border-radius: 0.6rem;
+      padding: 0.8rem;
+      background: rgba(115, 103, 240, 0.06);
+    }
+
+    .arep-mini-stat .label {
+      font-size: 0.78rem;
+      color: #6c757d;
+      margin-bottom: 0.15rem;
+    }
+
+    .arep-mini-stat .value {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.15;
+    }
+
+    .criteria-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+
+    .tracking-table {
+      font-size: 0.8rem;
+    }
+
+    .tracking-table th,
+    .tracking-table td {
+      padding: 0.45rem 0.5rem;
+      vertical-align: middle;
+      line-height: 1.35;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .fvdb-panel {
+      border: 1px dashed rgba(34, 166, 179, 0.45);
+      border-radius: 0.55rem;
+      background: rgba(34, 166, 179, 0.08);
+      padding: 0.7rem 0.8rem;
+    }
+
+    .fvdb-header-action .btn {
+      white-space: nowrap;
+    }
+
+    .fvdb-alert-stack .alert {
+      margin-bottom: 0.75rem;
+    }
+
+    @@media (max-width: 991.98px) {
+      .fvdb-header-action .btn {
+        flex: 1 1 auto;
+      }
+    }
+  </style>
+}
+
+<h4 class="mb-1">ฐานข้อมูลเรือประมงต่างประเทศ</h4>
+<p class="mb-1">จัดการข้อมูลเรือประมงต่างประเทศ ตรวจสอบเอกสาร และติดตามการแจ้งแก้ไขจากเจ้าหน้าที่</p>
+
+<nav aria-label="breadcrumb" class="mb-6">
+  <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+    <li class="breadcrumb-item">
+      <a href="@Url.Action("Index", "VesselChange")" class="text-primary fw-semibold">หน้าหลัก</a>
+    </li>
+    <li class="breadcrumb-item active text-secondary">ฐานข้อมูลเรือประมงต่างประเทศ</li>
+  </ol>
+</nav>
+
+<div class="row g-4 mb-4">
+  <div class="col-12 col-md-4">
+    <div class="arep-mini-stat">
+      <div class="label">เรือในฐานข้อมูล</div>
+      <div class="value">2 รายการ</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="arep-mini-stat">
+      <div class="label">เอกสารหมดอายุ</div>
+      <div class="value text-danger">1 รายการ</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="arep-mini-stat">
+      <div class="label">รายการแจ้งให้แก้ไข</div>
+      <div class="value text-warning">1 รายการ</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="alert alert-primary d-flex align-items-start gap-2 mb-4">
+          <i class="ri ri-information-line mt-1"></i>
+          <div class="small mb-0">
+            รองรับการสร้าง แก้ไข บันทึกร่าง บันทึก ส่งคำขอ ขอยกเลิก และยื่นขอปรับปรุงข้อมูล พร้อมเครื่องมือแจ้งเตือนข้อมูลซ้ำ
+            และเอกสารหมดอายุเพื่อช่วยตรวจสอบก่อนดำเนินการ
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-3 fvdb-header-action">
+          <button class="btn btn-primary" type="button" id="btnCreate">
+            <i class="ri ri-add-line me-1"></i> สร้างข้อมูลใหม่
+          </button>
+          <button class="btn btn-secondary" type="button" id="btnEdit">
+            <i class="ri ri-pencil-line me-1"></i> แก้ไขข้อมูล
+          </button>
+          <button class="btn btn-warning" type="button" id="btnSaveDraft">
+            <i class="ri ri-save-line me-1"></i> บันทึกร่าง
+          </button>
+          <button class="btn btn-success" type="button" id="btnSave">
+            <i class="ri ri-checkbox-circle-line me-1"></i> บันทึกข้อมูล
+          </button>
+          <button class="btn btn-success" type="button" id="btnSubmit">
+            <i class="ri ri-send-plane-line me-1"></i> ส่งคำขอ
+          </button>
+          <button class="btn btn-danger" type="button" id="btnCancelRequest">
+            <i class="ri ri-close-circle-line me-1"></i> ขอยกเลิก
+          </button>
+          <button class="btn btn-info" type="button" id="btnImproveData">
+            <i class="ri ri-loop-left-line me-1"></i> ยื่นขอปรับปรุงข้อมูล
+          </button>
+        </div>
+
+        <div class="fvdb-panel mb-3">
+          <div class="small fw-semibold mb-2">เครื่องมือตรวจสอบข้อมูล</div>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-warning btn-sm" type="button" id="btnDuplicateCheck">
+              <i class="ri ri-error-warning-line me-1"></i> ตรวจสอบข้อมูลซ้ำ
+            </button>
+            <button class="btn btn-outline-danger btn-sm" type="button" id="btnExpiryCheck">
+              <i class="ri ri-calendar-event-line me-1"></i> ตรวจสอบวันหมดอายุเอกสาร
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="criteria-label">ชื่อเรือ</label>
+            <input class="form-control" placeholder="เช่น MV OCEANIC" />
+          </div>
+          <div class="col-md-4">
+            <label class="criteria-label">ทะเบียนเรือ</label>
+            <input class="form-control" placeholder="เช่น JP-123456" />
+          </div>
+          <div class="col-md-4">
+            <label class="criteria-label">ประเทศธงเรือ</label>
+            <select class="form-select">
+              <option selected>เลือกประเทศ</option>
+              <option>JAPAN</option>
+              <option>KOREA</option>
+              <option>CHINA</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="criteria-label">เลข IMO</label>
+            <input class="form-control" placeholder="เช่น 9876543" />
+          </div>
+          <div class="col-md-4">
+            <label class="criteria-label">Call Sign</label>
+            <input class="form-control" placeholder="เช่น JPSR" />
+          </div>
+          <div class="col-md-4">
+            <label class="criteria-label">ขนาดเรือ (GT)</label>
+            <input class="form-control" placeholder="เช่น 450" />
+          </div>
+          <div class="col-md-6">
+            <label class="criteria-label">เจ้าของเรือ</label>
+            <input class="form-control" placeholder="ชื่อบริษัท/บุคคล" />
+          </div>
+          <div class="col-md-6">
+            <label class="criteria-label">ผู้แทน/เอเยนต์</label>
+            <input class="form-control" placeholder="ชื่อเอเยนต์" />
+          </div>
+          <div class="col-md-6">
+            <label class="criteria-label">ท่าเรือประจำ</label>
+            <input class="form-control" placeholder="เช่น Tokyo" />
+          </div>
+          <div class="col-md-6">
+            <label class="criteria-label">ท่าเรือปลายทาง</label>
+            <input class="form-control" placeholder="เช่น Bangkok" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 fvdb-alert-stack">
+    <div class="alert" role="alert" style="display:none;" id="actionAlert"></div>
+    <div class="alert alert-warning" role="alert" style="display:none;" id="duplicateAlert">
+      พบข้อมูลซ้ำในระบบ กรุณาตรวจสอบข้อมูลอีกครั้ง
+    </div>
+    <div class="alert alert-info" role="alert" style="display:none;" id="officerEditAlert">
+      เจ้าหน้าที่แจ้งให้แก้ไขข้อมูล โปรดตรวจสอบรายละเอียด
+    </div>
+    <div class="alert alert-danger" role="alert" style="display:none;" id="expiryAlert">
+      เอกสารบางรายการหมดอายุแล้ว กรุณาตรวจสอบ!
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+        <h5 class="mb-0">เอกสารแนบ</h5>
+        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#attachDocModal">
+          <i class="ri ri-attachment-2 me-1"></i> แนบเอกสาร
+        </button>
+      </div>
+      <div class="card-body pt-3">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle mb-0 tracking-table">
+            <thead class="text-center">
+              <tr>
+                <th>ประเภทเอกสาร</th>
+                <th>เลขที่เอกสาร</th>
+                <th>วันหมดอายุ</th>
+                <th>สถานะ</th>
+                <th>พรีวิว</th>
+                <th>ดาวน์โหลด</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ใบจดทะเบียน</td>
+                <td>REG-2026-001</td>
+                <td><span class="text-danger">2026-03-01</span></td>
+                <td class="text-center"><span class="badge bg-label-danger">หมดอายุ</span></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-info">พรีวิว</a></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-secondary">ดาวน์โหลด</a></td>
+              </tr>
+              <tr>
+                <td>ใบอนุญาตทำการประมง</td>
+                <td>FISH-2026-002</td>
+                <td>2026-12-31</td>
+                <td class="text-center"><span class="badge bg-label-success">ปกติ</span></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-info">พรีวิว</a></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-secondary">ดาวน์โหลด</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header pb-2 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+        <h5 class="mb-0">รายการเรือที่บันทึกไว้ในระบบฐานข้อมูลเรือที่เข้าเทียบท่า</h5>
+        <div class="d-flex gap-2">
+          <input class="form-control form-control-sm" placeholder="ค้นหาเรือ" style="width: 200px;" />
+          <button class="btn btn-outline-secondary btn-sm" type="button">
+            <i class="ri ri-search-line me-1"></i> ค้นหา
+          </button>
+        </div>
+      </div>
+      <div class="card-body pt-3">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle mb-0 tracking-table">
+            <thead class="text-center">
+              <tr>
+                <th>ชื่อเรือ</th>
+                <th>ประเทศ</th>
+                <th>ทะเบียนเรือ</th>
+                <th>สถานะข้อมูล</th>
+                <th>พรีวิว</th>
+                <th>ดาวน์โหลด</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>MV OCEANIC</td>
+                <td>JAPAN</td>
+                <td>JP-123456</td>
+                <td class="text-center"><span class="badge bg-label-success">ร่าง</span></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-info">พรีวิว</a></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-secondary">ดาวน์โหลด</a></td>
+              </tr>
+              <tr>
+                <td>FV ATLANTIS</td>
+                <td>KOREA</td>
+                <td>KR-654321</td>
+                <td class="text-center"><span class="badge bg-label-warning">รอตรวจสอบ</span></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-info">พรีวิว</a></td>
+                <td class="text-center"><a href="#" class="btn btn-sm btn-outline-secondary">ดาวน์โหลด</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header pb-2">
+        <h5 class="mb-0">การแจ้งแก้ไขจากเจ้าหน้าที่</h5>
+      </div>
+      <div class="card-body pt-3">
+        <div class="alert alert-warning d-flex align-items-start gap-2 mb-3">
+          <i class="ri ri-notification-3-line mt-1"></i>
+          <div class="small mb-0">
+            ระบบจะแจ้งเตือนเมื่อมีการขอให้แก้ไขข้อมูลจากเจ้าหน้าที่ เพื่อให้ผู้ใช้งานกลับมาอัปเดตข้อมูลก่อนยื่นคำขออีกครั้ง
+          </div>
+        </div>
+        <button class="btn btn-outline-info btn-sm" type="button" id="btnOfficerAlert">
+          <i class="ri ri-alarm-warning-line me-1"></i> แสดงตัวอย่างการแจ้งเตือน
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="attachDocModal" tabindex="-1" aria-labelledby="attachDocModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="attachDocModalLabel">แนบเอกสาร</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="docType" class="criteria-label">ประเภทเอกสาร</label>
+            <select class="form-select" id="docType">
+              <option>ใบจดทะเบียน</option>
+              <option>ใบอนุญาตทำการประมง</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="docNo" class="criteria-label">เลขที่เอกสาร</label>
+            <input class="form-control" id="docNo" placeholder="เช่น REG-2026-001" />
+          </div>
+          <div class="mb-3">
+            <label for="docExpiry" class="criteria-label">วันหมดอายุ</label>
+            <input class="form-control" id="docExpiry" placeholder="YYYY-MM-DD" />
+          </div>
+          <div class="mb-3">
+            <label for="docFile" class="criteria-label">เลือกไฟล์</label>
+            <input class="form-control" type="file" id="docFile" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+        <button type="button" class="btn btn-primary">แนบเอกสาร</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section PageScripts {
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var actionAlert = document.getElementById('actionAlert');
+
+      function showActionAlert(message, alertClass) {
+        if (!actionAlert) {
+          return;
+        }
+
+        actionAlert.className = 'alert ' + alertClass;
+        actionAlert.textContent = message;
+        actionAlert.style.display = 'block';
+      }
+
+      function bindAction(buttonId, message, alertClass) {
+        var button = document.getElementById(buttonId);
+
+        if (!button) {
+          return;
+        }
+
+        button.addEventListener('click', function () {
+          showActionAlert(message, alertClass);
+        });
+      }
+
+      function showAlert(alertId) {
+        var alertElement = document.getElementById(alertId);
+        if (alertElement) {
+          alertElement.style.display = 'block';
+        }
+      }
+
+      bindAction('btnCreate', 'เริ่มสร้างข้อมูลเรือประมงต่างประเทศรายการใหม่แล้ว', 'alert-primary');
+      bindAction('btnEdit', 'เปิดโหมดแก้ไขข้อมูลเรือประมงต่างประเทศแล้ว', 'alert-secondary');
+      bindAction('btnSaveDraft', 'บันทึกร่างข้อมูลเรียบร้อยแล้ว', 'alert-warning');
+      bindAction('btnSave', 'บันทึกข้อมูลเรือประมงต่างประเทศเรียบร้อยแล้ว', 'alert-success');
+      bindAction('btnSubmit', 'ส่งคำขอเรียบร้อยแล้ว โปรดรอการตรวจสอบจากเจ้าหน้าที่', 'alert-success');
+      bindAction('btnCancelRequest', 'ทำรายการขอยกเลิกคำขอเรียบร้อยแล้ว', 'alert-danger');
+      bindAction('btnImproveData', 'ส่งคำขอปรับปรุงข้อมูลเรียบร้อยแล้ว', 'alert-info');
+
+      var duplicateCheckButton = document.getElementById('btnDuplicateCheck');
+      if (duplicateCheckButton) {
+        duplicateCheckButton.addEventListener('click', function () {
+          showAlert('duplicateAlert');
+        });
+      }
+
+      var expiryCheckButton = document.getElementById('btnExpiryCheck');
+      if (expiryCheckButton) {
+        expiryCheckButton.addEventListener('click', function () {
+          showAlert('expiryAlert');
+        });
+      }
+
+      var officerAlertButton = document.getElementById('btnOfficerAlert');
+      if (officerAlertButton) {
+        officerAlertButton.addEventListener('click', function () {
+          showAlert('officerEditAlert');
+        });
+      }
+    });
+  </script>
+}
+
+

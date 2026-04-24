@@ -1,0 +1,933 @@
+@{
+    ViewData["Title"] = "การขออนุญาตนำเรือต่างประเทศเข้าท่า (AREP)";
+
+    var arepTrackingItems = new[]
+    {
+        new
+        {
+            RowNo = 1,
+            ArepNo = "AREP-2026-000145",
+            NotiNo = "NOTI-2026-000077",
+            VesselName = "FV OCEAN STAR",
+            Eta = "26/04/2026 09:00",
+            Status = "เจ้าหน้าที่แจ้งแก้ไข",
+            StatusClass = "bg-label-warning"
+        },
+        new
+        {
+            RowNo = 2,
+            ArepNo = "AREP-2026-000146",
+            NotiNo = "NOTI-2026-000078",
+            VesselName = "FV DEEP BLUE",
+            Eta = "27/04/2026 13:30",
+            Status = "จัดทำ NOTI แล้ว",
+            StatusClass = "bg-label-success"
+        },
+        new
+        {
+            RowNo = 3,
+            ArepNo = "AREP-2026-000147",
+            NotiNo = "-",
+            VesselName = "FV PACIFIC WIND",
+            Eta = "28/04/2026 07:45",
+            Status = "ร่างคำขอ",
+            StatusClass = "bg-label-secondary"
+        }
+    };
+
+    var requirementChecklist = new[]
+    {
+        "กรอกแบบคำร้อง AREP ตามขนาดเรือและข้อมูลที่กรมประมงกำหนด",
+        "ค้นหาข้อมูลเรือจากทะเบียนเรือ/ชื่อเรือจากฐานข้อมูลเรือประมงต่างประเทศ",
+        "ดึงข้อมูลพื้นฐานมาให้เลือกใช้งานในฟอร์ม",
+        "แสดงฟอร์มตามเงื่อนไขวัตถุประสงค์และประเภทเรือ",
+        "รองรับเรือจาก IOTC และส่งข้อมูล AREP ไปยังระบบ IOTC",
+        "ดู แก้ไข ลบ และส่งร่างคำขอ AREP",
+        "บันทึกคำขอใหม่จากร่างเดิม (Save as)",
+        "ตรวจสอบรายชื่อเรือ IUU และแจ้งเตือน",
+        "ตรวจสอบระยะเวลาแจ้งล่วงหน้าเทียบ ETA ก่อนยื่นคำขอ",
+        "แจ้งเตือนเมื่อเจ้าหน้าที่ขอแก้ไขหรือจัดทำ NOTI แล้ว",
+        "รองรับการออกเลขคำขอ AREP ภายหลังการยื่น",
+        "ค้นหารายการคำขอตามเงื่อนไขที่กำหนด",
+        "แนบเอกสารประกอบคำขอ",
+        "พรีวิวฟอร์ม PDF ในสถานะร่าง",
+        "ติดตามสถานะและดูรายละเอียดคำขอพร้อมพรีวิว PDF",
+        "ยกเลิกคำขอได้",
+        "ขอแก้ไขเปลี่ยนแปลงคำขอได้",
+        "ลงลายมือชื่ออิเล็กทรอนิกส์และตราประทับ (ถ้ามี)",
+        "ดูข้อมูล NOTI และพรีวิวฟอร์ม PDF",
+        "เก็บประวัติการดำเนินการเพื่อออกรายงาน",
+        "เลือกได้มากกว่า 1 ข้อมูลและเชื่อมโยงกระบวนงานที่เกี่ยวข้อง",
+        "เชื่อมโยงข้อมูลเพื่อจัดทำ DOF1",
+        "ส่งข้อมูลเชื่อมโยงไปยัง IOTC",
+        "สร้าง/แก้ไข/ลบแบบประเมินปริมาณสัตว์น้ำได้มากกว่า 1 รายการ และเชื่อมโยง PIR",
+        "พรีวิวฟอร์มแบบประเมินปริมาณสัตว์น้ำเป็น PDF"
+    };
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section PageStyles {
+    <style>
+        .arep-mini-stat {
+            border: 1px dashed rgba(115, 103, 240, 0.35);
+            border-radius: 0.6rem;
+            padding: 0.8rem;
+            background: rgba(115, 103, 240, 0.06);
+        }
+
+        .arep-mini-stat .label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            margin-bottom: 0.15rem;
+        }
+
+        .arep-mini-stat .value {
+            font-size: 1.02rem;
+            font-weight: 600;
+            line-height: 1.15;
+        }
+
+        .requirement-list {
+            max-height: 520px;
+            overflow: auto;
+            padding-right: 0.4rem;
+        }
+
+        .requirement-list .list-group-item {
+            border-style: dashed;
+            font-size: 0.82rem;
+            line-height: 1.35;
+        }
+
+        .criteria-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .tracking-table {
+            font-size: 0.8rem;
+        }
+
+        .tracking-table th,
+        .tracking-table td {
+            padding: 0.45rem 0.5rem;
+            vertical-align: middle;
+            line-height: 1.35;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .assessment-table {
+            font-size: 0.8rem;
+        }
+
+        .assessment-table th,
+        .assessment-table td {
+            padding: 0.45rem 0.5rem;
+            vertical-align: middle;
+        }
+
+        .btn-square {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .dynamic-box {
+            border: 1px dashed rgba(34, 166, 179, 0.45);
+            border-radius: 0.55rem;
+            background: rgba(34, 166, 179, 0.08);
+            padding: 0.7rem 0.8rem;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/select2/select2.js"></script>
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+<h4 class="mb-1">การขออนุญาตนำเรือต่างประเทศเข้าท่า </h4>
+<p class="mb-1">จัดการการยื่นคำขอ AREP, การติดตามสถานะ, NOTI และแบบประเมินปริมาณสัตว์น้ำ</p>
+
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "VesselChange")" class="text-primary fw-semibold">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary">การขออนุญาตนำเรือต่างประเทศเข้าท่า</li>
+    </ol>
+</nav>
+
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="arep-mini-stat">
+            <div class="label">คำขอ AREP วันนี้</div>
+            <div class="value">12 รายการ</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="arep-mini-stat">
+            <div class="label">รายการแจ้งแก้ไข</div>
+            <div class="value text-warning">3 รายการ</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="arep-mini-stat">
+            <div class="label">รายการจัดทำ NOTI แล้ว</div>
+            <div class="value text-success">9 รายการ</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-xl-12">
+        <div class="card">
+            <div class="card-header pb-0">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item">
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#tabArepDraft" aria-controls="tabArepDraft" aria-selected="true">
+                            <i class="ri ri-file-list-2-line me-1"></i> ร่างคำขอ AREP
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tabArepTracking" aria-controls="tabArepTracking" aria-selected="false">
+                            <i class="ri ri-time-line me-1"></i> ติดตามสถานะ/NOTI
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tabFishAssessment" aria-controls="tabFishAssessment" aria-selected="false">
+                            <i class="ri ri-scales-3-line me-1"></i> แบบประเมินสัตว์น้ำ
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body tab-content pt-4">
+
+                <div class="tab-pane fade show active" id="tabArepDraft" role="tabpanel">
+                    <div class="alert alert-primary d-flex align-items-start gap-2 mb-4">
+                        <i class="ri ri-information-line mt-1"></i>
+                        <div class="small mb-0">
+                            หน้านี้รองรับการกรอกคำร้อง AREP ตามขนาดเรือ/ประเภทเรือ, ค้นหาเรือจากฐานข้อมูล, ตรวจสอบ IUU,
+                            ตรวจสอบเวลายื่นล่วงหน้า และรองรับการบันทึก-แก้ไข-ลบ-ส่งคำขอรวมถึงพรีวิว PDF
+                        </div>
+                    </div>
+
+                    <form id="arepDraftForm" method="post" action="#">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="arepNo">เลขที่คำขอ AREP</label>
+                                <input type="text" id="arepNo" class="form-control" value="AREP-DRAFT-2026-001" readonly />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="requestDate">วันที่จัดทำคำขอ</label>
+                                <input type="text" id="requestDate" class="form-control flatpickr-date" value="24/04/2026" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="requestStatus">สถานะ</label>
+                                <input type="text" id="requestStatus" class="form-control" value="ร่างคำขอ" readonly />
+                            </div>
+                        </div>
+
+                        <div class="card border shadow-none mb-3">
+                            <div class="card-header pb-2">
+                                <h6 class="mb-1">ค้นหาข้อมูลเรือจากฐานข้อมูลเรือประมงต่างประเทศ</h6>
+                            </div>
+                            <div class="card-body pt-3">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="criteria-label" for="vesselRegNo">ทะเบียนเรือ</label>
+                                        <input type="text" id="vesselRegNo" class="form-control" placeholder="เช่น FV-TH-00911" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="criteria-label" for="vesselNameKeyword">ชื่อเรือ</label>
+                                        <input type="text" id="vesselNameKeyword" class="form-control" placeholder="เช่น OCEAN STAR" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="criteria-label" for="vesselFlagState">รัฐเจ้าของธง</label>
+                                        <input type="text" id="vesselFlagState" class="form-control" placeholder="เช่น Thailand" />
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <button type="button" id="btnSearchVessel" class="btn btn-primary btn-sm">
+                                        <i class="ri ri-search-line me-1"></i> ค้นหาเรือ
+                                    </button>
+                                    <button type="button" id="btnResetVessel" class="btn btn-outline-secondary btn-sm">
+                                        <i class="ri ri-refresh-line me-1"></i> ล้างเงื่อนไข
+                                    </button>
+                                </div>
+
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-bordered table-sm align-middle mb-0 tracking-table">
+                                        <thead class="text-center">
+                                            <tr>
+                                                <th style="width: px;">เลือก</th>
+                                                <th>ทะเบียนเรือ</th>
+                                                <th>ชื่อเรือ</th>
+                                                <th>ธง</th>
+                                                <th>ขนาดเรือ (GT)</th>
+                                                <th>IOTC</th>
+                                                <th>IUU</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="vesselSearchResultBody">
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-3">ยังไม่ค้นหาข้อมูล</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="selectedVessel">เรือที่เลือก</label>
+                                <input type="text" id="selectedVessel" class="form-control" placeholder="ยังไม่ได้เลือกเรือ" readonly />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="shipType">ประเภทเรือ</label>
+                                <select id="shipType" class="form-select select2-single">
+                                    <option value="fishing" selected>เรือประมง</option>
+                                    <option value="carrier">เรือขนถ่าย</option>
+                                    <option value="repair">เรือเข้าเทียบท่าเพื่อซ่อมแซม</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="vesselSizeClass">ขนาดเรือ</label>
+                                <select id="vesselSizeClass" class="form-select select2-single">
+                                    <option value="small">ต่ำกว่า 30 GT</option>
+                                    <option value="medium" selected>30 - 100 GT</option>
+                                    <option value="large">มากกว่า 100 GT</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="criteria-label" for="purposeSelect">วัตถุประสงค์ (เลือกได้มากกว่า 1 รายการ)</label>
+                                <select id="purposeSelect" class="form-select select2-multiple" multiple>
+                                    <option value="unload" selected>ขนถ่ายสัตว์น้ำ</option>
+                                    <option value="land">ท่าขึ้นสัตว์น้ำ</option>
+                                    <option value="repair">เข้าซ่อมแซม</option>
+                                    <option value="supply">เติมเสบียง</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="criteria-label" for="dockSelect">ข้อมูลทำเทียบเรือ/ท่าขึ้นสัตว์น้ำ (หลายค่า)</label>
+                                <select id="dockSelect" class="form-select select2-multiple" multiple>
+                                    <option selected>ท่าเทียบเรือ A-01</option>
+                                    <option selected>ท่าขึ้นสัตว์น้ำ B-02</option>
+                                    <option>ท่าเทียบเรือ C-03</option>
+                                    <option>ท่าขึ้นสัตว์น้ำ D-04</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dynamic-box mb-3">
+                            <div class="small fw-semibold mb-1">เงื่อนไขฟอร์มตามวัตถุประสงค์และประเภทเรือ</div>
+                            <div id="dynamicPurposeHint" class="small text-muted mb-2">
+                                ระบบจะแสดงช่องข้อมูลเฉพาะสำหรับเรือประมงที่แจ้งขนถ่ายสัตว์น้ำ
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-sm" placeholder="ข้อมูลพื้นฐานที่ดึงจากทะเบียนเรือ" value="เลข IMO: 9722109 / เจ้าของเรือ: Blue Sea Co., Ltd." />
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-sm" placeholder="กระบวนงานที่เชื่อมโยง" value="เชื่อมโยงไปกระบวนงาน: ผังเรือ, ท่าขึ้นสัตว์น้ำ" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="etaDateTime">วัน-เวลาคาดว่าจะถึงท่า (ETA)</label>
+                                <input type="datetime-local" id="etaDateTime" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="advanceRuleHours">ระยะเวลาแจ้งล่วงหน้าที่กำหนด (ชั่วโมง)</label>
+                                <input type="number" id="advanceRuleHours" class="form-control" value="72" min="1" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="criteria-label" for="timelineRef">เวลาปัจจุบันอ้างอิงระบบ</label>
+                                <input type="text" id="timelineRef" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                        <div id="leadTimeAlert" class="alert alert-info small mb-3">
+                            กรุณาระบุ ETA เพื่อให้ระบบตรวจสอบว่าผ่านเงื่อนไขระยะเวลาแจ้งล่วงหน้าหรือไม่
+                        </div>
+
+                        <div class="card border shadow-none mb-3">
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="iotcToggle" />
+                                    <label class="form-check-label" for="iotcToggle">
+                                        <i class="ri ri-links-line me-1 text-primary"></i>
+                                        กรณีเรือมาจาก IOTC ให้เปิดใช้งานการส่งข้อมูล AREP ไปยังระบบอิเล็กทรอนิกส์ของ IOTC
+                                    </label>
+                                </div>
+                                <div id="iotcConfigBox" class="row g-3 d-none">
+                                    <div class="col-md-6">
+                                        <label class="criteria-label" for="iotcRefNo">IOTC Reference</label>
+                                        <input type="text" id="iotcRefNo" class="form-control" placeholder="เช่น IOTC-AREP-44782" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="criteria-label" for="iotcPayloadStatus">สถานะการเชื่อมโยง IOTC</label>
+                                        <input type="text" id="iotcPayloadStatus" class="form-control" value="รอส่งข้อมูล" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="iuuAlert" class="alert alert-success small mb-3">
+                            ยังไม่พบรายชื่อเรือ IUU ในข้อมูลที่เลือก
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="criteria-label" for="attachDocs">แนบเอกสารประกอบคำขอ</label>
+                                <input type="file" id="attachDocs" class="form-control" multiple />
+                                <small class="text-muted">รองรับเอกสารหลายไฟล์และใช้สำหรับพรีวิว PDF ในขั้นร่างคำขอ</small>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="criteria-label" for="signatureName">ลงลายมือชื่ออิเล็กทรอนิกส์</label>
+                                <input type="text" id="signatureName" class="form-control" value="นายสมชาย รักษาผล" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="criteria-label" for="stampNo">ตราประทับ (ถ้ามี)</label>
+                                <input type="text" id="stampNo" class="form-control" placeholder="เลขที่ตราประทับ" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-label-secondary btn-sm">
+                                <i class="ri ri-file-pdf-line me-1"></i> พรีวิว PDF (ร่างคำขอ)
+                            </button>
+                            <button type="button" id="btnSaveDraft" class="btn btn-secondary btn-sm">
+                                <i class="ri ri-save-line me-1"></i> บันทึกร่าง
+                            </button>
+                            <button type="button" id="btnSaveAs" class="btn btn-outline-primary btn-sm">
+                                <i class="ri ri-file-copy-line me-1"></i> Save as คำขอใหม่
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm">
+                                <i class="ri ri-pencil-line me-1"></i> แก้ไขร่าง
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm">
+                                <i class="ri ri-delete-bin-line me-1"></i> ลบร่าง
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm">
+                                <i class="ri ri-send-plane-line me-1"></i> ส่งคำขอ AREP
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade" id="tabArepTracking" role="tabpanel">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="criteria-label" for="filterArepNo">เลขที่คำขอ AREP</label>
+                            <input type="text" id="filterArepNo" class="form-control form-control-sm" placeholder="AREP-xxxx" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="criteria-label" for="filterNotiNo">เลขที่ NOTI</label>
+                            <input type="text" id="filterNotiNo" class="form-control form-control-sm" placeholder="NOTI-xxxx" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="criteria-label" for="filterDateFrom">วันที่ทำรายการ (จาก)</label>
+                            <input type="text" id="filterDateFrom" class="form-control form-control-sm flatpickr-date" placeholder="วว/ดด/ปปปป" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="criteria-label" for="filterDateTo">ถึงวันที่</label>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="filterDateTo" class="form-control form-control-sm flatpickr-date" placeholder="วว/ดด/ปปปป" />
+                                <button type="button" class="btn btn-primary btn-square" title="ค้นหา">
+                                    <i class="ri ri-search-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered table-hover align-middle mb-0 tracking-table">
+                            <thead class="text-center">
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>เลขที่ AREP</th>
+                                    <th>เลขที่ NOTI</th>
+                                    <th>ชื่อเรือ</th>
+                                    <th>ETA</th>
+                                    <th>สถานะ</th>
+                                    <th style="width: 220px;">การดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in arepTrackingItems)
+                                {
+                                    <tr>
+                                        <td class="text-center">@item.RowNo</td>
+                                        <td class="text-nowrap">@item.ArepNo</td>
+                                        <td class="text-nowrap">@item.NotiNo</td>
+                                        <td>@item.VesselName</td>
+                                        <td class="text-nowrap">@item.Eta</td>
+                                        <td class="text-center"><span class="badge @item.StatusClass">@item.Status</span></td>
+                                        <td>
+                                            <div class="d-flex gap-1 justify-content-center">
+                                                <button type="button" class="btn btn-sm btn-outline-info" title="ดูรายละเอียด">
+                                                    <i class="ri ri-eye-line"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" title="พรีวิว AREP PDF">
+                                                    <i class="ri ri-file-pdf-line"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" title="พรีวิว NOTI PDF">
+                                                    <i class="ri ri-file-paper-2-line"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning d-flex align-items-start gap-2 mb-3">
+                        <i class="ri ri-notification-3-line mt-1"></i>
+                        <div class="small mb-0">
+                            การแจ้งเตือนล่าสุด: เจ้าหน้าที่แจ้งแก้ไขคำขอเลขที่ <strong>AREP-2026-000145</strong> และเจ้าหน้าที่จัดทำ
+                            <strong>NOTI-2026-000078</strong> เรียบร้อยแล้ว
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-danger btn-sm">
+                            <i class="ri ri-close-circle-line me-1"></i> ยกเลิกคำขอ
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm">
+                            <i class="ri ri-loop-left-line me-1"></i> ขอแก้ไขเปลี่ยนแปลงคำขอ
+                        </button>
+                        <button type="button" class="btn btn-outline-dark btn-sm">
+                            <i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm">
+                            <i class="ri ri-file-chart-line me-1"></i> ส่งข้อมูลเพื่อจัดทำ DOF1
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tabFishAssessment" role="tabpanel">
+                    <div class="alert alert-info small mb-3">
+                        รองรับการสร้าง/แก้ไข/ลบข้อมูลแบบประเมินปริมาณสัตว์น้ำมากกว่า 1 รายการ และเชื่อมโยงข้อมูลต่อไปยังกระบวนงาน PIR
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="criteria-label" for="fishSpecies">ชนิดสัตว์น้ำ</label>
+                            <input type="text" id="fishSpecies" class="form-control" placeholder="เช่น Skipjack Tuna" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="criteria-label" for="estimatedWeight">ปริมาณที่ประเมิน</label>
+                            <input type="number" id="estimatedWeight" class="form-control" min="0" step="0.01" placeholder="เช่น 2500" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="criteria-label" for="estimatedUnit">หน่วย</label>
+                            <select id="estimatedUnit" class="form-select select2-single">
+                                <option value="kg" selected>กิโลกรัม</option>
+                                <option value="ton">ตัน</option>
+                                <option value="box">ลัง</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="criteria-label" for="assessmentRemark">หมายเหตุ</label>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="assessmentRemark" class="form-control" placeholder="หมายเหตุ" />
+                                <button type="button" id="btnAddAssessment" class="btn btn-primary btn-square" title="เพิ่มรายการ">
+                                    <i class="ri ri-add-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle mb-0 assessment-table">
+                            <thead class="text-center">
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>ชนิดสัตว์น้ำ</th>
+                                    <th>ปริมาณที่ประเมิน</th>
+                                    <th>หน่วย</th>
+                                    <th>หมายเหตุ</th>
+                                    <th style="width: 120px;">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assessmentBody">
+                                <tr>
+                                    <td class="text-center">1</td>
+                                    <td>Skipjack Tuna</td>
+                                    <td class="text-end">2,500.00</td>
+                                    <td>kg</td>
+                                    <td>ลำดับท้องเรือ 1</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-warning btn-edit-assessment" title="แก้ไข">
+                                            <i class="ri ri-pencil-line"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-assessment" title="ลบ">
+                                            <i class="ri ri-delete-bin-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="ri ri-file-pdf-line me-1"></i> พรีวิว PDF แบบประเมิน
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm">
+                            <i class="ri ri-link me-1"></i> เชื่อมโยงไปกระบวนงาน PIR
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm">
+                            <i class="ri ri-send-plane-line me-1"></i> ส่งข้อมูลประเมินเข้าระบบ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section PageScripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var timelineRef = document.getElementById("timelineRef");
+            var etaDateTime = document.getElementById("etaDateTime");
+            var advanceRuleHours = document.getElementById("advanceRuleHours");
+            var leadTimeAlert = document.getElementById("leadTimeAlert");
+            var iotcToggle = document.getElementById("iotcToggle");
+            var iotcConfigBox = document.getElementById("iotcConfigBox");
+            var purposeSelect = document.getElementById("purposeSelect");
+            var shipType = document.getElementById("shipType");
+            var dynamicPurposeHint = document.getElementById("dynamicPurposeHint");
+            var arepNo = document.getElementById("arepNo");
+
+            var vesselSearchResultBody = document.getElementById("vesselSearchResultBody");
+            var selectedVessel = document.getElementById("selectedVessel");
+            var iuuAlert = document.getElementById("iuuAlert");
+            var btnSearchVessel = document.getElementById("btnSearchVessel");
+            var btnResetVessel = document.getElementById("btnResetVessel");
+
+            var btnSaveAs = document.getElementById("btnSaveAs");
+
+            var btnAddAssessment = document.getElementById("btnAddAssessment");
+            var assessmentBody = document.getElementById("assessmentBody");
+
+            var mockVessels = [
+                { regNo: "FV-TH-00911", name: "FV OCEAN STAR", flag: "Thailand", grossTon: 85, iotc: true, iuu: false },
+                { regNo: "FV-TH-00912", name: "FV DEEP BLUE", flag: "Thailand", grossTon: 125, iotc: true, iuu: false },
+                { regNo: "FV-TH-00913", name: "FV RISK VESSEL", flag: "Unknown", grossTon: 67, iotc: false, iuu: true }
+            ];
+
+            function initSelect2() {
+                if (!window.jQuery || !window.jQuery.fn.select2) {
+                    return;
+                }
+
+                window.jQuery(".select2-single").select2({
+                    width: "100%",
+                    minimumResultsForSearch: Infinity
+                });
+
+                window.jQuery(".select2-multiple").select2({
+                    width: "100%"
+                });
+            }
+
+            function initFlatpickr() {
+                document.querySelectorAll(".flatpickr-date").forEach(function (input) {
+                    flatpickr(input, {
+                        dateFormat: "d/m/Y",
+                        allowInput: true
+                    });
+                });
+            }
+
+            function updateTimelineRef() {
+                if (!timelineRef) {
+                    return;
+                }
+
+                var now = new Date();
+                timelineRef.value = now.toLocaleString("th-TH");
+            }
+
+            function evaluateLeadTime() {
+                if (!etaDateTime || !advanceRuleHours || !leadTimeAlert) {
+                    return;
+                }
+
+                if (!etaDateTime.value) {
+                    leadTimeAlert.className = "alert alert-info small mb-3";
+                    leadTimeAlert.textContent = "กรุณาระบุ ETA เพื่อให้ระบบตรวจสอบว่าผ่านเงื่อนไขระยะเวลาแจ้งล่วงหน้าหรือไม่";
+                    return;
+                }
+
+                var eta = new Date(etaDateTime.value);
+                var now = new Date();
+                var diffHours = (eta.getTime() - now.getTime()) / 3600000;
+                var threshold = Number(advanceRuleHours.value || "72");
+
+                if (diffHours < threshold) {
+                    leadTimeAlert.className = "alert alert-danger small mb-3";
+                    leadTimeAlert.textContent = "ไม่ผ่านเงื่อนไขเวลายื่นล่วงหน้า: ETA เหลือ " + diffHours.toFixed(1) + " ชั่วโมง (< " + threshold + " ชั่วโมง) ระบบจะไม่อนุญาตให้ยื่นคำขอ AREP";
+                    return;
+                }
+
+                leadTimeAlert.className = "alert alert-success small mb-3";
+                leadTimeAlert.textContent = "ผ่านเงื่อนไขเวลายื่นล่วงหน้า: ETA เหลือ " + diffHours.toFixed(1) + " ชั่วโมง (>= " + threshold + " ชั่วโมง) สามารถยื่นคำขอ AREP ได้";
+            }
+
+            function updateDynamicHint() {
+                if (!dynamicPurposeHint || !shipType || !purposeSelect) {
+                    return;
+                }
+
+                var selectedPurpose = Array.from(purposeSelect.selectedOptions).map(function (x) { return x.text; });
+                var shipTypeText = shipType.options[shipType.selectedIndex].text;
+
+                dynamicPurposeHint.textContent = "ฟอร์มปัจจุบัน: " + shipTypeText + " | วัตถุประสงค์: " + (selectedPurpose.length ? selectedPurpose.join(", ") : "ไม่ได้เลือก") + " | ระบบจะแสดงช่องข้อมูลเฉพาะตามเงื่อนไขนี้";
+            }
+
+            function renderVesselResults(vessels) {
+                if (!vesselSearchResultBody) {
+                    return;
+                }
+
+                if (!vessels.length) {
+                    vesselSearchResultBody.innerHTML = "<tr><td colspan='7' class='text-center text-muted py-3'>ไม่พบข้อมูลเรือตามเงื่อนไข</td></tr>";
+                    return;
+                }
+
+                vesselSearchResultBody.innerHTML = vessels.map(function (vessel) {
+                    return "<tr>" +
+                        "<td class='text-center'><button type='button' class='btn btn-sm btn-outline-primary btn-pick-vessel' data-reg='" + vessel.regNo + "'>เลือก</button></td>" +
+                        "<td>" + vessel.regNo + "</td>" +
+                        "<td>" + vessel.name + "</td>" +
+                        "<td>" + vessel.flag + "</td>" +
+                        "<td class='text-end'>" + vessel.grossTon + "</td>" +
+                        "<td class='text-center'>" + (vessel.iotc ? "<i class='ri ri-check-line text-success'></i>" : "<i class='ri ri-close-line text-muted'></i>") + "</td>" +
+                        "<td class='text-center'>" + (vessel.iuu ? "<span class='badge bg-label-danger'>พบ</span>" : "<span class='badge bg-label-success'>ไม่พบ</span>") + "</td>" +
+                        "</tr>";
+                }).join("");
+
+                Array.from(document.querySelectorAll(".btn-pick-vessel")).forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        var reg = button.getAttribute("data-reg");
+                        var vessel = mockVessels.find(function (x) { return x.regNo === reg; });
+                        if (!vessel) {
+                            return;
+                        }
+
+                        if (selectedVessel) {
+                            selectedVessel.value = vessel.regNo + " - " + vessel.name + " (" + vessel.grossTon + " GT)";
+                        }
+
+                        if (shipType && window.jQuery && window.jQuery.fn.select2) {
+                            if (vessel.grossTon > 100) {
+                                shipType.value = "carrier";
+                            } else {
+                                shipType.value = "fishing";
+                            }
+                            window.jQuery(shipType).trigger("change.select2");
+                        }
+
+                        if (iuuAlert) {
+                            if (vessel.iuu) {
+                                iuuAlert.className = "alert alert-danger small mb-3";
+                                iuuAlert.textContent = "พบเรือใน IUU Vessel List: " + vessel.name + " โปรดตรวจสอบก่อนดำเนินการยื่นคำขอ";
+                            } else {
+                                iuuAlert.className = "alert alert-success small mb-3";
+                                iuuAlert.textContent = "ยังไม่พบรายชื่อเรือ IUU ในข้อมูลที่เลือก";
+                            }
+                        }
+
+                        if (iotcToggle && vessel.iotc) {
+                            iotcToggle.checked = true;
+                            iotcToggle.dispatchEvent(new Event("change"));
+                        }
+                    });
+                });
+            }
+
+            function applyIotcToggle() {
+                if (!iotcToggle || !iotcConfigBox) {
+                    return;
+                }
+
+                iotcConfigBox.classList.toggle("d-none", !iotcToggle.checked);
+            }
+
+            function bindTrackingActions() {
+                Array.from(document.querySelectorAll(".btn-delete-assessment")).forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        var row = button.closest("tr");
+                        if (row) {
+                            row.remove();
+                            renumberAssessmentRows();
+                        }
+                    });
+                });
+
+                Array.from(document.querySelectorAll(".btn-edit-assessment")).forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        var row = button.closest("tr");
+                        if (!row) {
+                            return;
+                        }
+
+                        var cells = row.querySelectorAll("td");
+                        var fishSpecies = document.getElementById("fishSpecies");
+                        var estimatedWeight = document.getElementById("estimatedWeight");
+                        var estimatedUnit = document.getElementById("estimatedUnit");
+                        var assessmentRemark = document.getElementById("assessmentRemark");
+
+                        if (fishSpecies && estimatedWeight && estimatedUnit && assessmentRemark && cells.length >= 5) {
+                            fishSpecies.value = cells[1].textContent.trim();
+                            estimatedWeight.value = cells[2].textContent.replace(/,/g, "").trim();
+                            estimatedUnit.value = cells[3].textContent.trim();
+                            assessmentRemark.value = cells[4].textContent.trim();
+                        }
+                    });
+                });
+            }
+
+            function renumberAssessmentRows() {
+                Array.from(assessmentBody.querySelectorAll("tr")).forEach(function (row, index) {
+                    var firstCell = row.querySelector("td");
+                    if (firstCell) {
+                        firstCell.textContent = (index + 1).toString();
+                    }
+                });
+            }
+
+            if (btnSearchVessel) {
+                btnSearchVessel.addEventListener("click", function () {
+                    var regNo = (document.getElementById("vesselRegNo") || {}).value || "";
+                    var vesselName = (document.getElementById("vesselNameKeyword") || {}).value || "";
+                    var flag = (document.getElementById("vesselFlagState") || {}).value || "";
+
+                    var result = mockVessels.filter(function (vessel) {
+                        var byReg = !regNo || vessel.regNo.toLowerCase().includes(regNo.toLowerCase());
+                        var byName = !vesselName || vessel.name.toLowerCase().includes(vesselName.toLowerCase());
+                        var byFlag = !flag || vessel.flag.toLowerCase().includes(flag.toLowerCase());
+                        return byReg && byName && byFlag;
+                    });
+
+                    renderVesselResults(result);
+                });
+            }
+
+            if (btnResetVessel) {
+                btnResetVessel.addEventListener("click", function () {
+                    ["vesselRegNo", "vesselNameKeyword", "vesselFlagState"].forEach(function (id) {
+                        var el = document.getElementById(id);
+                        if (el) {
+                            el.value = "";
+                        }
+                    });
+
+                    if (selectedVessel) {
+                        selectedVessel.value = "";
+                    }
+
+                    if (vesselSearchResultBody) {
+                        vesselSearchResultBody.innerHTML = "<tr><td colspan='7' class='text-center text-muted py-3'>ยังไม่ค้นหาข้อมูล</td></tr>";
+                    }
+                });
+            }
+
+            if (etaDateTime) {
+                etaDateTime.addEventListener("change", evaluateLeadTime);
+            }
+
+            if (advanceRuleHours) {
+                advanceRuleHours.addEventListener("input", evaluateLeadTime);
+            }
+
+            if (iotcToggle) {
+                iotcToggle.addEventListener("change", applyIotcToggle);
+            }
+
+            if (shipType) {
+                shipType.addEventListener("change", updateDynamicHint);
+            }
+
+            if (purposeSelect) {
+                purposeSelect.addEventListener("change", updateDynamicHint);
+            }
+
+            if (btnSaveAs) {
+                btnSaveAs.addEventListener("click", function () {
+                    var newNo = "AREP-DRAFT-" + new Date().getFullYear() + "-" + String(Math.floor(Math.random() * 900) + 100);
+                    if (arepNo) {
+                        arepNo.value = newNo;
+                    }
+                });
+            }
+
+            if (btnAddAssessment) {
+                btnAddAssessment.addEventListener("click", function () {
+                    var fishSpecies = document.getElementById("fishSpecies");
+                    var estimatedWeight = document.getElementById("estimatedWeight");
+                    var estimatedUnit = document.getElementById("estimatedUnit");
+                    var assessmentRemark = document.getElementById("assessmentRemark");
+
+                    if (!fishSpecies || !estimatedWeight || !estimatedUnit || !assessmentRemark) {
+                        return;
+                    }
+
+                    if (!fishSpecies.value.trim() || !estimatedWeight.value.trim()) {
+                        return;
+                    }
+
+                    var row = document.createElement("tr");
+                    row.innerHTML = "<td class='text-center'></td>" +
+                        "<td>" + fishSpecies.value.trim() + "</td>" +
+                        "<td class='text-end'>" + Number(estimatedWeight.value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "</td>" +
+                        "<td>" + estimatedUnit.value + "</td>" +
+                        "<td>" + assessmentRemark.value.trim() + "</td>" +
+                        "<td class='text-center'>" +
+                        "<button type='button' class='btn btn-sm btn-outline-warning btn-edit-assessment' title='แก้ไข'><i class='ri ri-pencil-line'></i></button> " +
+                        "<button type='button' class='btn btn-sm btn-outline-danger btn-delete-assessment' title='ลบ'><i class='ri ri-delete-bin-line'></i></button>" +
+                        "</td>";
+
+                    assessmentBody.appendChild(row);
+                    renumberAssessmentRows();
+                    bindTrackingActions();
+
+                    fishSpecies.value = "";
+                    estimatedWeight.value = "";
+                    assessmentRemark.value = "";
+                });
+            }
+
+            initSelect2();
+            initFlatpickr();
+            updateTimelineRef();
+            updateDynamicHint();
+            applyIotcToggle();
+            evaluateLeadTime();
+            bindTrackingActions();
+
+            window.setInterval(updateTimelineRef, 60000);
+        });
+    </script>
+}

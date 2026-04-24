@@ -1,0 +1,311 @@
+@{
+    ViewData["Title"] = "บันทึก Tally Sheet";
+}
+
+<h4 class="mb-1">สร้างข้อมูลการขนถ่ายสินค้า</h4>
+<p class="mb-1">จัดการข้อมูลการขนถ่ายสินค้า</p>
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("ImportAquaPlan", "VesselChange")" class="text-primary fw-semibold">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("CreateLayoutChange", "VesselChange")" class="text-primary fw-semibold">สร้างข้อมูลการขนถ่ายสินค้า</a>
+        </li>
+    </ol>
+</nav>
+
+<h4 class="mb-3">บันทึก รายการสินค้า</h4>
+
+<div class="card mb-4">
+<div class="card-header">
+<h5 class="mb-0">ข้อมูลใบอนุญาตนำเข้า</h5>
+</div>
+
+<div class="card-body">
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<label class="form-label">เลขที่ใบอนุญาตนำเข้า</label>
+<input class="form-control"
+value="@(ViewBag.DocumentNo ?? "IMP-2569-0001")"
+readonly>
+</div>
+
+<div class="col-md-6">
+<label class="form-label">วันที่รับเข้า</label>
+<input type="date"
+class="form-control"
+value="2024-01-15">
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="card mb-4">
+
+<div class="card-header">
+<h5 class="mb-0">ข้อมูล Notification</h5>
+</div>
+
+<div class="card-body">
+
+<div class="row g-3">
+
+<div class="col-md-4">
+<label class="form-label">เลขที่ Notification</label>
+<input class="form-control"
+value="NTF-2569-0012">
+</div>
+
+<div class="col-md-4">
+<label class="form-label">วันที่แจ้ง</label>
+<input type="date"
+class="form-control"
+value="2024-01-10">
+</div>
+
+<div class="col-md-4">
+<label class="form-label">ชื่อเรือ</label>
+<input class="form-control"
+value="SEIN SKY">
+</div>
+
+<div class="col-md-4">
+<label class="form-label">ประเทศเรือ</label>
+<input class="form-control"
+value="KOREA, REPUBLIC OF">
+</div>
+
+<div class="col-md-4">
+<label class="form-label">IMO</label>
+<input class="form-control"
+value="8813623">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card mb-4">
+
+<div class="card-header">
+<h5 class="mb-0">ข้อมูล Tally Sheet</h5>
+</div>
+
+<div class="card-body">
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<label class="form-label">ท่าเรือขนถ่าย</label>
+<input class="form-control"
+value="ศูนย์บริการตรวจสอบการขนถ่ายสัตว์น้ำ เขต 2">
+</div>
+
+<div class="col-md-6">
+<label class="form-label">เลขที่เอกสาร</label>
+<input class="form-control"
+value="DOC-2569-7788">
+</div>
+
+<div class="col-md-6">
+<label class="form-label">บริษัทตัวแทน</label>
+<input class="form-control"
+value="Alpha Office Automation Co., Ltd.">
+</div>
+
+<div class="col-md-6">
+<label class="form-label">เลขทะเบียนผู้ประกอบการ</label>
+<input class="form-control"
+value="0215536001424">
+</div>
+
+<div class="col-md-6">
+<label class="form-label">ผู้รับมอบอำนาจ</label>
+<input class="form-control"
+value="นางสาววิไล จริงจัง">
+</div>
+
+<div class="col-md-6">
+<label class="form-label">หมายเหตุ</label>
+<input class="form-control"
+value="ตรวจสอบเอกสารครบถ้วน">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card mb-4">
+
+<div class="card-header d-flex justify-content-between">
+
+<h5 class="mb-0">รายการสินค้า</h5>
+
+<button class="btn btn-success btn-sm"
+onclick="addRow()">
+
++ เพิ่มรายการ
+
+</button>
+
+</div>
+
+
+<div class="card-body p-0">
+
+<table class="table table-bordered mb-0" id="cargoTable">
+
+<thead class="table-light">
+
+<tr>
+
+<th>ชนิดสินค้า</th>
+
+<th>น้ำหนัก</th>
+
+<th>หน่วย</th>
+
+<th width="80">ลบ</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>
+<input class="form-control"
+value="Frozen Tuna">
+</td>
+
+<td>
+<input class="form-control"
+value="30000">
+</td>
+
+<td>
+<input class="form-control"
+value="KGM">
+</td>
+
+<td class="text-center">
+
+<button class="btn btn-danger btn-sm"
+onclick="removeRow(this)">
+
+ลบ
+
+</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+<input class="form-control"
+value="Frozen Squid">
+</td>
+
+<td>
+<input class="form-control"
+value="12500">
+</td>
+
+<td>
+<input class="form-control"
+value="KGM">
+</td>
+
+<td class="text-center">
+
+<button class="btn btn-danger btn-sm"
+onclick="removeRow(this)">
+
+ลบ
+
+</button>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<div class="text-end">
+
+<button class="btn btn-primary">
+
+บันทึกข้อมูล
+
+</button>
+
+</div>
+
+
+<script>
+
+function addRow() {
+
+let table =
+document
+.getElementById("cargoTable")
+.getElementsByTagName("tbody")[0];
+
+let row = table.insertRow();
+
+row.innerHTML = `
+
+<td><input class="form-control"></td>
+
+<td><input class="form-control"></td>
+
+<td><input class="form-control"></td>
+
+<td class="text-center">
+
+<button class="btn btn-danger btn-sm"
+onclick="removeRow(this)">
+
+ลบ
+
+</button>
+
+</td>
+
+`;
+
+}
+
+
+function removeRow(btn) {
+
+btn
+.closest("tr")
+.remove();
+
+}
+
+</script>

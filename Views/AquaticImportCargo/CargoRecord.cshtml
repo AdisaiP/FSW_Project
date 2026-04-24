@@ -1,0 +1,298 @@
+@model AspnetCoreMvcFull.Models.ChangeRequestIndexViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "บันทึกข้อมูลการขนถ่ายสินค้า";
+
+    var requestItems = new[]
+    {
+        new {
+            DocumentNo = "IMP-2569-0001",
+            DocumentName = "ใบอนุญาตนำเข้าสัตว์น้ำ",
+            EntrepreneurDetails = "บริษัท ไทยซีฟู้ด จำกัด",
+            Subject = "แจ้งแผนการขนส่งปลาทูน่าแช่แข็ง",
+            TransactionDate = DateTime.Now.AddDays(-2)
+        },
+        new {
+            DocumentNo = "IMP-2569-0002",
+            DocumentName = "ใบอนุญาตนำเข้าสัตว์น้ำ",
+            EntrepreneurDetails = "บริษัท โอเชียนฟู้ดส์ จำกัด",
+            Subject = "แจ้งแผนการขนส่งกุ้งขาว",
+            TransactionDate = DateTime.Now.AddDays(-1)
+        },
+        new {
+            DocumentNo = "IMP-2569-0003",
+            DocumentName = "ใบอนุญาตนำเข้าสัตว์น้ำ",
+            EntrepreneurDetails = "บริษัท มารีนเอ็กซ์เพรส จำกัด",
+            Subject = "แจ้งแผนการขนส่งปลาแซลมอน",
+            TransactionDate = DateTime.Now
+        }
+    };
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section PageStyles {
+    <style>
+        .vessel-change-table {
+            font-size: 0.8rem;
+        }
+
+        .vessel-change-table th,
+        .vessel-change-table td {
+            padding: 0.45rem 0.5rem;
+            vertical-align: middle;
+            line-height: 1.3;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .filter-form-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .btn-square {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+}
+
+<h4 class="mb-1">บันทึกข้อมูลการขนถ่ายสินค้า</h4>
+<p class="mb-1">จัดการบันทึกข้อมูลการขนถ่ายสินค้า</p>
+
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("ImportAquaPlan","VesselChange")" class="text-primary fw-semibold">
+               หน้าหลัก
+            </a>
+        </li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">ค้นหารายการ</h5>
+    </div>
+
+    <div class="card-body">
+
+        <form method="post">
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label filter-form-label">
+                        เลขที่ใบอนุญาตินำเข้า
+                        <span class="text-danger">●</span>
+                    </label>
+
+                    <input type="text" id="filterAgency" class="form-control form-control-sm"
+                           placeholder="กรอกเลขที่ใบอนุญาตนำเข้า" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label filter-form-label">
+                        วันที่ใบอนุญาตินำเข้า
+                    </label>
+
+                    <input type="text" id="startDatePicker" class="form-control form-control-sm"
+                           placeholder="วว/ดด/ปปปป" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label filter-form-label">
+                        ถึงวันที่
+                    </label>
+
+                    <div class="d-flex gap-2">
+
+                        <input type="text" id="endDatePicker" class="form-control form-control-sm"
+                               placeholder="วว/ดด/ปปปป" />
+
+                        <button type="submit" class="btn btn-primary btn-square">
+
+                            <i class="ri ri-search-line"></i>
+
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between">
+
+        <div>
+            <h5 class="card-title mb-1">
+                รายการแจ้งแผนการขนส่ง
+            </h5>
+
+            <p class="text-muted small mb-0">
+                แสดงรายการแจ้งแผนการขนส่งสินค้าสัตว์น้ำนำเข้า
+            </p>
+        </div>
+        <a href="@Url.Action("CreateCargoRecord", "VesselChange")" class="btn btn-primary btn-sm">
+            <i class="ri ri-add-line me-1"></i> สร้างคำขอ
+        </a>
+    </div>
+
+    <div class="table-responsive p-1">
+
+        <table class="table table-bordered table-hover vessel-change-table">
+
+            <thead class="text-center">
+
+                <tr>
+
+                    <th width="40">
+                        <input class="form-check-input" type="checkbox" id="selectAll">
+                    </th>
+
+                    <th width="40">#</th>
+
+                    <th>เลขที่เอกสาร</th>
+
+                    <th>ชื่อเอกสาร</th>
+
+                    <th>ผู้ประกอบการ</th>
+
+                    <th>เรื่อง</th>
+
+                    <th width="130">วันที่ทำรายการ</th>
+
+                    <th width="130">จัดการ</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+                @{
+                    var index = 1;
+                }
+
+                @foreach (var item in requestItems)
+                {
+                    <tr>
+
+                        <td class="text-center">
+                            <input class="form-check-input row-checkbox" type="checkbox">
+                        </td>
+
+                        <td class="text-center">
+                            @index
+                        </td>
+
+                        <td class="text-nowrap">
+                            <a href="@Url.Action("CargoRecord","VesselChange",
+                                new { documentNo = item.DocumentNo })" class="text-primary fw-semibold">
+                                @item.DocumentNo
+
+                            </a>
+                        </td>
+
+                        <td>@item.DocumentName</td>
+
+                        <td>@item.EntrepreneurDetails</td>
+
+                        <td>
+                            <a href="#" class="text-primary">
+                                @item.Subject
+                            </a>
+                        </td>
+
+                        <td class="text-center">
+                            @item.TransactionDate.ToString("dd/MM/yyyy")
+                        </td>
+
+                        <td class="text-center">
+
+                            <div class="d-flex gap-1 justify-content-center">
+
+                                <button class="btn btn-sm btn-outline-info">
+                                    <i class="ri ri-eye-line"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-outline-warning">
+                                    <i class="ri ri-pencil-line"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-outline-success">
+                                    <i class="ri ri-send-plane-line"></i>
+                                </button>
+
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="ri ri-delete-bin-line"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                    index++;
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="card-footer text-end">
+
+        <small class="text-muted">
+
+            ผลลัพธ์ 1 ถึง @requestItems.Length
+            จาก @requestItems.Length
+
+        </small>
+
+    </div>
+
+</div>
+
+@section VendorScripts {
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageScripts {
+<script src="~/js/modal-edit-user.js"></script>
+<script src="~/js/app-user-view.js"></script>
+}
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+    flatpickr("#startDatePicker", { dateFormat: "d/m/Y" });
+    flatpickr("#endDatePicker", { dateFormat: "d/m/Y" });
+
+    const selectAll = document.getElementById("selectAll");
+
+    const checkboxes = document.querySelectorAll(".row-checkbox");
+
+    selectAll.addEventListener("change", function () {
+
+    checkboxes.forEach(cb => cb.checked = this.checked);
+
+    });
+
+    });
+</script>

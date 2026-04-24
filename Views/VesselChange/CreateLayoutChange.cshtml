@@ -1,0 +1,471 @@
+@{
+    ViewData["Title"] = "บันทึกรายการสินค้า (Cargo Record)";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+<h4 class="mb-1">ออกใบแจ้งอนุญาตเข้าเทียบท่าของเรือประมงต่างประเทศ</h4>
+<p class="text-muted mb-1" style="font-size:0.85rem;">สร้างใบออกใบแจ้งอนุญาตเข้าเทียบท่าของเรือประมงต่างประเทศ</p>
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("ImportAquaPlan", "VesselChange")" class="text-primary fw-semibold">หน้าหลัก</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("CargoRecord", "VesselChange")" class="text-primary fw-semibold">สร้างใบออกใบแจ้งอนุญาต</a>
+        </li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge bg-label-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width:2rem;height:2rem;">
+            <i class="ri ri-file-text-line"></i>
+        </span>
+        <h5 class="mb-0">ข้อมูลใบอนุญาตนำเข้า</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">เลขที่ใบอนุญาตนำเข้า <span class="text-danger">●</span></label>
+                <input class="form-control bg-light" value="@(ViewBag.DocumentNo ?? "IMP-2569-0001")" readonly>
+                <small class="text-muted">ดึงจากระบบ NOTI อัตโนมัติ</small>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">วันที่ใบอนุญาต</label>
+                <input type="text" class="form-control flatpickr-date bg-light" value="15/01/2569" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">วันที่บันทึกรายการ <span class="text-danger">●</span></label>
+                <input type="text" class="form-control flatpickr-date" id="recordDate" placeholder="วว/ดด/ปปปป">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge bg-label-info rounded-circle d-inline-flex align-items-center justify-content-center" style="width:2rem;height:2rem;">
+            <i class="ri ri-ship-line"></i>
+        </span>
+        <h5 class="mb-0">ข้อมูลเรือและ Notification อ้างอิง</h5>
+        <span class="badge bg-label-secondary ms-auto" style="font-size:0.7rem;">ดึงจากระบบ NOTI โดยอัตโนมัติ</span>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">เลขที่ Notification</label>
+                <input class="form-control bg-light" value="NTF-2569-0012" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">วันที่แจ้ง</label>
+                <input class="form-control bg-light" value="10/01/2569" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">ชื่อเรือ (Vessel Name)</label>
+                <input class="form-control bg-light" value="SEIN SKY" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">IMO No.</label>
+                <input class="form-control bg-light" value="8813623" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Flag State (ธงเรือ)</label>
+                <input class="form-control bg-light" value="KOREA, REPUBLIC OF" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">ท่าเรือขนถ่าย</label>
+                <input class="form-control bg-light" value="ศูนย์บริการตรวจสอบการขนถ่ายสัตว์น้ำ เขต 2" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">วันที่เรือเข้าท่า</label>
+                <input class="form-control bg-light" value="14/01/2569" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">วันที่เรือออกท่า (Port Clearance)</label>
+                <input class="form-control bg-light" value="-" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge bg-label-warning rounded-circle d-inline-flex align-items-center justify-content-center" style="width:2rem;height:2rem;">
+            <i class="ri ri-building-2-line"></i>
+        </span>
+        <h5 class="mb-0">ข้อมูลผู้ประกอบการและเอกสาร</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">บริษัทตัวแทน (Importer) <span class="text-danger">●</span></label>
+                <input class="form-control" value="Alpha Office Automation Co., Ltd.">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">เลขทะเบียนผู้ประกอบการ</label>
+                <input class="form-control" value="0215536001424">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">เลขที่ Invoice <span class="text-danger">●</span></label>
+                <input class="form-control" placeholder="เช่น INV-2569-0001">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">วันที่ Invoice</label>
+                <input type="text" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">เลขที่ BL</label>
+                <input class="form-control" placeholder="เช่น BL-2569-0001">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">ผู้รับมอบอำนาจ</label>
+                <input class="form-control" value="นางสาววิไล จริงจัง">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Hold No. (เลขระวางเรือ)</label>
+                <input class="form-control" placeholder="เช่น A1-1">
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">
+                    <i class="ri ri-attachment-2 me-1"></i>แนบเอกสารประกอบ
+                </label>
+                <div class="input-group">
+                    <input type="file" class="form-control" id="attachFile" multiple accept=".pdf,.jpg,.png,.xlsx">
+                    <button class="btn btn-outline-primary" type="button" onclick="document.getElementById('attachFile').click()">
+                        <i class="ri ri-upload-2-line me-1"></i> เลือกไฟล์
+                    </button>
+                </div>
+                <small class="text-muted">รองรับไฟล์ PDF, JPG, PNG, Excel — สามารถแนบได้มากกว่า 1 ไฟล์</small>
+                <div id="fileList" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-label-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width:2rem;height:2rem;">
+                <i class="ri ri-box-3-line"></i>
+            </span>
+            <div>
+                <h5 class="mb-0">รายการชนิดและปริมาณสัตว์น้ำ</h5>
+            </div>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="input-group input-group-sm" style="width:180px;" title="TOR 2.2(15): Buffer ปริมาณสัตว์น้ำ">
+                <span class="input-group-text"><i class="ri ri-percent-line"></i> Buffer</span>
+                <input type="number" id="bufferPct" class="form-control" value="5" min="0" max="100" oninput="recalcAll()">
+                <span class="input-group-text">%</span>
+            </div>
+            <button class="btn btn-success btn-sm" onclick="addCargoRow()">
+                <i class="ri ri-add-line me-1"></i> เพิ่มรายการ
+            </button>
+        </div>
+    </div>
+
+    <div id="bufferAlert" class="alert alert-danger mx-3 mt-3 mb-0 d-none" role="alert">
+        <i class="ri ri-error-warning-line me-2"></i>
+        <strong>แจ้งเตือน:</strong> มีรายการสัตว์น้ำที่ปริมาณจริงเกินกว่าที่แจ้งใน Notification เกินค่า Buffer ที่กำหนด กรุณาตรวจสอบ
+    </div>
+
+    <div class="card-body p-0 mt-3">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0" id="cargoTable" style="font-size:0.83rem;">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th width="30">#</th>
+                        <th>ชนิดสัตว์น้ำ <span class="text-danger">●</span></th>
+                        <th>ประเภท / Product Form</th>
+                        <th>Catch Area</th>
+                        <th>ปริมาณตาม Notification (กก.)</th>
+                        <th>ปริมาณจริง (กก.) <span class="text-danger">●</span></th>
+                        <th>หน่วย</th>
+                        <th>ผลต่าง (กก.)</th>
+                        <th>สถานะ</th>
+                        <th width="60">ลบ</th>
+                    </tr>
+                </thead>
+                <tbody id="cargoTbody">
+                    <tr>
+                        <td class="text-center row-num">1</td>
+                        <td><input class="form-control form-control-sm" value="ปลาทูน่าครีบเหลือง (Yellowfin Tuna)"></td>
+                        <td>
+                            <select class="form-select form-select-sm">
+                                <option selected>03=แช่แข็ง (Frozen)</option>
+                                <option>01=สด (Fresh)</option>
+                                <option>02=แช่เย็น (Chilled)</option>
+                                <option>04=แปรรูป (Processed)</option>
+                            </select>
+                        </td>
+                        <td><input class="form-control form-control-sm" value="Area 71"></td>
+                        <td><input class="form-control form-control-sm text-end notify-weight" value="30000" oninput="calcRow(this)"></td>
+                        <td><input class="form-control form-control-sm text-end actual-weight" value="29800" oninput="calcRow(this)"></td>
+                        <td>
+                            <select class="form-select form-select-sm">
+                                <option selected>KGM</option>
+                                <option>MTQ</option>
+                                <option>TON</option>
+                            </select>
+                        </td>
+                        <td class="text-end fw-semibold diff-cell text-danger">-200</td>
+                        <td class="text-center status-cell"><span class="badge bg-success">ปกติ</span></td>
+                        <td class="text-center"><button class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="ri ri-delete-bin-line"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center row-num">2</td>
+                        <td><input class="form-control form-control-sm" value="หมึกกล้วยแช่แข็ง (Frozen Squid)"></td>
+                        <td>
+                            <select class="form-select form-select-sm">
+                                <option selected>03=แช่แข็ง (Frozen)</option>
+                                <option>01=สด (Fresh)</option>
+                                <option>02=แช่เย็น (Chilled)</option>
+                                <option>04=แปรรูป (Processed)</option>
+                            </select>
+                        </td>
+                        <td><input class="form-control form-control-sm" value="Area 61"></td>
+                        <td><input class="form-control form-control-sm text-end notify-weight" value="12500" oninput="calcRow(this)"></td>
+                        <td><input class="form-control form-control-sm text-end actual-weight" value="12500" oninput="calcRow(this)"></td>
+                        <td>
+                            <select class="form-select form-select-sm">
+                                <option selected>KGM</option>
+                                <option>MTQ</option>
+                                <option>TON</option>
+                            </select>
+                        </td>
+                        <td class="text-end fw-semibold diff-cell text-success">0</td>
+                        <td class="text-center status-cell"><span class="badge bg-success">ปกติ</span></td>
+                        <td class="text-center"><button class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="ri ri-delete-bin-line"></i></button></td>
+                    </tr>
+                </tbody>
+                <tfoot class="table-light fw-semibold">
+                    <tr>
+                        <td colspan="4" class="text-end">รวมทั้งหมด</td>
+                        <td class="text-end" id="totalNotify">42,500</td>
+                        <td class="text-end" id="totalActual">42,300</td>
+                        <td></td>
+                        <td class="text-end text-danger" id="totalDiff">-200</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge bg-label-secondary rounded-circle d-inline-flex align-items-center justify-content-center" style="width:2rem;height:2rem;">
+            <i class="ri ri-sticky-note-line"></i>
+        </span>
+        <h5 class="mb-0">หมายเหตุ / การดำเนินการเพิ่มเติม</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">หมายเหตุ</label>
+                <textarea class="form-control" rows="3" placeholder="ระบุหมายเหตุ (ถ้ามี)"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">การดำเนินการ
+                    <small class="text-muted">(TOR 2.2 ข้อ 10 — ระบุการดำเนินการ)</small>
+                </label>
+                <select class="form-select">
+                    <option value="">-- เลือกการดำเนินการ --</option>
+                    <option>อนุญาตให้ขนถ่ายสัตว์น้ำ</option>
+                    <option>ระงับการขนถ่าย</option>
+                    <option>ขอข้อมูลเพิ่มเติม</option>
+                    <option>ส่งเรื่องให้เจ้าหน้าที่ กบร. ตรวจสอบ</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#logSection">
+        <span class="badge bg-label-secondary rounded-circle d-inline-flex align-items-center justify-content-center" style="width:2rem;height:2rem;">
+            <i class="ri ri-history-line"></i>
+        </span>
+        <h5 class="mb-0">ประวัติการดำเนินการ (Log)</h5>
+        <i class="ri ri-arrow-down-s-line ms-2"></i>
+    </div>
+    <div id="logSection" class="collapse show">
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover mb-0" style="font-size:0.8rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th width="160">วันที่/เวลา</th>
+                        <th width="160">ผู้ดำเนินการ</th>
+                        <th>การดำเนินการ</th>
+                        <th>หมายเหตุ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-muted">23/04/2569 09:15</td>
+                        <td>นางสาววิไล จริงจัง</td>
+                        <td><span class="badge bg-label-primary">สร้างรายการ</span></td>
+                        <td>สร้างคำขอบันทึก Cargo Record ครั้งแรก</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end gap-2 mb-4">
+    <a href="@Url.Action("CargoRecord", "VesselChange")" class="btn btn-outline-secondary">
+        <i class="ri ri-arrow-left-line me-1"></i> ยกเลิก
+    </a>
+    <button class="btn btn-outline-primary" onclick="saveDraft()">
+        <i class="ri ri-draft-line me-1"></i> บันทึกร่าง
+    </button>
+    <button class="btn btn-primary" onclick="submitForm()">
+        <i class="ri ri-save-line me-1"></i> บันทึกข้อมูล
+    </button>
+</div>
+
+@section PageScripts {
+<script>
+// ── Init Flatpickr ──
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".flatpickr-date").forEach(el => {
+        flatpickr(el, { dateFormat: "d/m/Y", allowInput: true });
+    });
+    recalcAll();
+});
+
+
+document.getElementById("attachFile").addEventListener("change", function () {
+    const list = document.getElementById("fileList");
+    list.innerHTML = "";
+    Array.from(this.files).forEach(f => {
+        list.innerHTML += `<span class="badge bg-label-secondary me-1 mt-1"><i class="ri ri-file-line me-1"></i>${f.name}</span>`;
+    });
+});
+
+
+function calcRow(input) {
+    const row = input.closest("tr");
+    const notify = parseFloat(row.querySelector(".notify-weight").value) || 0;
+    const actual = parseFloat(row.querySelector(".actual-weight").value) || 0;
+    const diff = actual - notify;
+    const buffer = parseFloat(document.getElementById("bufferPct").value) || 0;
+    const threshold = notify * (buffer / 100);
+
+    const diffCell = row.querySelector(".diff-cell");
+    diffCell.textContent = diff.toLocaleString("th-TH");
+
+    const statusCell = row.querySelector(".status-cell");
+    if (Math.abs(diff) > threshold && diff !== 0) {
+        diffCell.className = "text-end fw-semibold diff-cell text-danger";
+        statusCell.innerHTML = `<span class="badge bg-danger">เกิน Buffer</span>`;
+    } else if (diff < 0) {
+        diffCell.className = "text-end fw-semibold diff-cell text-warning";
+        statusCell.innerHTML = `<span class="badge bg-warning text-dark">น้อยกว่า Notification</span>`;
+    } else {
+        diffCell.className = "text-end fw-semibold diff-cell text-success";
+        statusCell.innerHTML = `<span class="badge bg-success">ปกติ</span>`;
+    }
+    recalcTotals();
+    checkBuffer();
+}
+
+// ── คำนวณใหม่ทุกแถว (เมื่อเปลี่ยน Buffer %) ──
+function recalcAll() {
+    document.querySelectorAll("#cargoTbody tr").forEach(row => {
+        const input = row.querySelector(".notify-weight");
+        if (input) calcRow(input);
+    });
+}
+
+// ── คำนวณ Footer รวม ──
+function recalcTotals() {
+    let sumNotify = 0, sumActual = 0;
+    document.querySelectorAll("#cargoTbody tr").forEach(row => {
+        sumNotify += parseFloat(row.querySelector(".notify-weight")?.value) || 0;
+        sumActual += parseFloat(row.querySelector(".actual-weight")?.value) || 0;
+    });
+    const diff = sumActual - sumNotify;
+    document.getElementById("totalNotify").textContent = sumNotify.toLocaleString("th-TH");
+    document.getElementById("totalActual").textContent = sumActual.toLocaleString("th-TH");
+    const el = document.getElementById("totalDiff");
+    el.textContent = diff.toLocaleString("th-TH");
+    el.className = diff < 0 ? "text-end text-danger" : diff > 0 ? "text-end text-warning" : "text-end text-success";
+}
+
+// ── แจ้งเตือน Buffer (TOR 2.2 ข้อ 15) ──
+function checkBuffer() {
+    const hasOverBuffer = Array.from(document.querySelectorAll("#cargoTbody .status-cell")).some(
+        cell => cell.querySelector(".badge.bg-danger")
+    );
+    document.getElementById("bufferAlert").classList.toggle("d-none", !hasOverBuffer);
+}
+
+// ── เพิ่มแถว ──
+function addCargoRow() {
+    const tbody = document.getElementById("cargoTbody");
+    const rowNum = tbody.rows.length + 1;
+    const row = tbody.insertRow();
+    row.innerHTML = `
+        <td class="text-center row-num">${rowNum}</td>
+        <td><input class="form-control form-control-sm" placeholder="ระบุชนิดสัตว์น้ำ"></td>
+        <td>
+            <select class="form-select form-select-sm">
+                <option>03=แช่แข็ง (Frozen)</option>
+                <option>01=สด (Fresh)</option>
+                <option>02=แช่เย็น (Chilled)</option>
+                <option>04=แปรรูป (Processed)</option>
+            </select>
+        </td>
+        <td><input class="form-control form-control-sm" placeholder="เช่น Area 71"></td>
+        <td><input class="form-control form-control-sm text-end notify-weight" value="0" oninput="calcRow(this)"></td>
+        <td><input class="form-control form-control-sm text-end actual-weight" value="0" oninput="calcRow(this)"></td>
+        <td>
+            <select class="form-select form-select-sm">
+                <option>KGM</option><option>MTQ</option><option>TON</option>
+            </select>
+        </td>
+        <td class="text-end fw-semibold diff-cell text-success">0</td>
+        <td class="text-center status-cell"><span class="badge bg-success">ปกติ</span></td>
+        <td class="text-center"><button class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="ri ri-delete-bin-line"></i></button></td>
+    `;
+    recalcTotals();
+}
+
+// ── ลบแถว ──
+function removeRow(btn) {
+    btn.closest("tr").remove();
+    // อัปเดตลำดับ
+    document.querySelectorAll("#cargoTbody .row-num").forEach((el, i) => el.textContent = i + 1);
+    recalcTotals();
+    checkBuffer();
+}
+
+// ── บันทึกร่าง ──
+function saveDraft() {
+    alert("บันทึกร่างเรียบร้อย — ระบบจะเก็บข้อมูลชั่วคราว");
+}
+
+// ── Submit ──
+function submitForm() {
+    const hasOverBuffer = Array.from(document.querySelectorAll("#cargoTbody .status-cell")).some(
+        cell => cell.querySelector(".badge.bg-danger")
+    );
+    if (hasOverBuffer) {
+        if (!confirm("มีรายการสัตว์น้ำที่ปริมาณเกิน Buffer ที่กำหนด\nต้องการบันทึกข้อมูลต่อหรือไม่?")) return;
+    }
+    alert("บันทึกข้อมูลสำเร็จ");
+}
+</script>
+}

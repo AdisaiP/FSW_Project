@@ -99,7 +99,7 @@
         </li>
         <li class='menu-item@(currentPage == "/PSDeclaration/Index" ? " active" : "")'>
           <a asp-controller="PSDeclaration" asp-action="Index" class="menu-link">
-            <div data-i18n="ใบรับรอง">ใบรับรอง</div>
+            <div data-i18n="ใบรับรอง">ขออุนุญาต</div>
           </a>
         </li>
         <li class='menu-item@(currentPage == "/PSDeclaration/Index" ? " active" : "")'>
@@ -109,6 +109,64 @@
         </li>
       </ul>
     </li>
+
+    <li class='menu-item@(currentPage.StartsWith("/VesselChange") ? " active open" : "")'>
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon icon-base ri ri-file-list-2-line"></i>
+        <div data-i18n="แจ้งเรือเข้าและตวจสอบ">แจ้งเรือเข้าและตวจสอบ</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/VesselChange/Index" ? " active" : "")'>
+          <a asp-controller="VesselChange" asp-action="Index" class="menu-link">
+            <div data-i18n="สร้างคำขอ">สร้างคำขอ</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/PSDeclaration/Index" ? " active" : "")'>
+          <a asp-controller="PSDeclaration" asp-action="Index" class="menu-link">
+            <div data-i18n="ติดตามสถานะ">ติดตามสถานะ</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/VesselChange/ForeignVesselPortEntry" ? " active" : "")'>
+          <a asp-controller="VesselChange" asp-action="ForeignVesselPortEntry" class="menu-link">
+            <div data-i18n="ขออนุญาต">ขออนุญาต</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/VesselChange/ForeignVesselDatabase" ? " active" : "")'>
+          <a asp-controller="VesselChange" asp-action="ForeignVesselDatabase" class="menu-link">
+            <div data-i18n="ฐานข้อมูลเรือประมงต่างประเทศ">ฐานข้อมูลเรือประมงต่างประเทศ</div>
+          </a>
+        </li>
+      </ul>
+      </li>
+
+      <li class='menu-item@(currentPage.StartsWith("/VesselChange") ? " active open" : "")'>
+      <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <i class="menu-icon icon-base ri ri-file-list-2-line"></i>
+        <div data-i18n="การขนถ่ายสินค้าสัตว์น้านาเข้า">การขนถ่ายสินค้าสัตว์น้านาเข้า</div>
+      </a>
+      <ul class="menu-sub">
+        <li class='menu-item@(currentPage == "/VesselChange/ImportAquaPlan" ? " active" : "")'>
+          <a asp-controller="VesselChange" asp-action="ImportAquaPlan" class="menu-link">
+            <div data-i18n="แจ้งแผน">แจ้งแผน</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/VesselChange/CargoRecord" ? " active" : "")'>
+          <a asp-controller="VesselChange" asp-action="CargoRecord" class="menu-link">
+            <div data-i18n="บันทึก">บันทึก</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/PSDeclaration/Index" ? " active" : "")'>
+          <a asp-controller="PSDeclaration" asp-action="Index" class="menu-link">
+            <div data-i18n="ใบรับรอง">ใบรับรอง</div>
+          </a>
+        </li>
+        <li class='menu-item@(currentPage == "/PSDeclaration/Index" ? " active" : "")'>
+          <a asp-controller="PSDeclaration" asp-action="Index" class="menu-link">
+            <div data-i18n="ขอคืนน้ำหนัก">ขอคืนน้ำหนัก</div>
+          </a>
+        </li>
+        </ul>
+        </li>
   </ul>
 
 </aside>

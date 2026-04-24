@@ -1,0 +1,197 @@
+@model AspnetCoreMvcFull.Models.ChangeRequestIndexViewModel
+@{
+    ViewData["Title"] = "บันทึก Tally Sheet";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/select2/select2.js"></script>
+    <script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+<h4 class="mb-1">บันทึกแผนการขนถ่ายสิยค้า</h4>
+<p class="mb-1">บันทึกการขนถ่ายและคัดแยกสินค้าหน้าท่าเทียบเรือ</p>
+
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="@Url.Action("ImportAquaPlan", "VesselChange")" class="text-primary fw-semibold">หน้าหลัก</a></li>
+        <li class="breadcrumb-item active text-secondary">แผนการขนถ่ายประจำวัน</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-12">
+        <form method="post" action="#">
+            <div class="nav-align-top nav-tabs-shadow mb-4">
+                
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#tab-tally1" aria-selected="true">
+                            <i class="ri ri-file-list-2-line me-1"></i> 1. ข้อมูลอ้างอิงแผน
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-tally2" aria-selected="false">
+                            <i class="ri ri-truck-line me-1"></i> 2. บันทึกจดนับหน้างาน
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    
+                    <div id="tab-tally1" class="tab-pane fade show active">
+                        <div class="accordion accordion-custom-button mb-4" id="accTally1">
+                            <div class="accordion-item active">
+                                <h2 class="accordion-header" id="headTally1">
+                                    <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#colTally1" aria-expanded="true">
+                                        <i class="icon-base ri ri-links-line me-2"></i> ข้อมูลอ้างอิง (ดึงจากระบบ)
+                                    </button>
+                                </h2>
+                                <div id="colTally1" class="accordion-collapse collapse show">
+                                    <div class="accordion-body p-0">
+                                        <div class="p-4 border-bottom">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                    <i class="ri ri-ship-line fs-5"></i>
+                                                </span>
+                                                <h6 class="mb-0 fw-semibold">ข้อมูลเรือขนถ่าย</h6>
+                                            </div>
+                                            <div class="row g-4">
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="text" class="form-control " value="PLN-2569-001" readonly />
+                                                        <label>เลขที่แผน</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="text" class="form-control " value="FTY FO-8" readonly />
+                                                        <label>ชื่อเรือ</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="text" class="form-control " value="บริษัท อัลฟ่า ซีฟู้ด จำกัด" readonly />
+                                                        <label>ผู้ประกอบการ</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-4">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <span class="badge bg-label-primary rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                    <i class="ri ri-user-location-line fs-5"></i>
+                                                </span>
+                                                <h6 class="mb-0 fw-semibold ">เวลาขนถ่ายจริงหน้างาน</h6>
+                                            </div>
+                                            <div class="row g-4">
+                                                <div class="col-md-4">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="text" class="form-control  flatpickr-datetime" placeholder="ระบุวันเวลา" />
+                                                        <label>วันเวลาที่เปิดตู้ (Actual Date) <span class="text-danger">●</span></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="text" class="form-control " placeholder="ชื่อพนักงานจดนับ" />
+                                                        <label>ผู้ควบคุมการขนถ่าย (Tally Clerk) <span class="text-danger">●</span></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-tally2" class="tab-pane fade">
+                        <div class="accordion accordion-custom-button mb-4" id="accTally2">
+                            <div class="accordion-item active">
+                                <h2 class="accordion-header" id="headTally2">
+                                    <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#colTally2" aria-expanded="true">
+                                        <i class="icon-base ri ri-list-check me-2"></i> บันทึกรายการจดนับสินค้า (โหลดขึ้นรถ)
+                                    </button>
+                                </h2>
+                                <div id="colTally2" class="accordion-collapse collapse show">
+                                    <div class="accordion-body p-0">
+                                        <div class="d-flex justify-content-end p-3  border-bottom">
+                                            <button type="button" class="btn btn-sm btn-primary"><i class="ri ri-add-line me-1"></i> เพิ่มทะเบียนรถ</button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle mb-0">
+                                                <thead class="text-center table-light">
+                                                    <tr>
+                                                        <th width="50">#</th>
+                                                        <th width="150">ทะเบียนรถ</th>
+                                                        <th>ชนิดสินค้า</th>
+                                                        <th width="100">จำนวน(กล่อง)</th>
+                                                        <th width="100">อุณหภูมิ(°C)</th>
+                                                        <th width="150">สภาพ</th>
+                                                        <th width="80">ลบ</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-center text-muted">1</td>
+                                                        <td><input type="text" class="form-control form-control-sm" value="70-1234 กทม" /></td>
+                                                        <td><input type="text" class="form-control form-control-sm" value="Frozen Yellowfin Tuna" /></td>
+                                                        <td><input type="number" class="form-control form-control-sm text-end" value="150" /></td>
+                                                        <td><input type="number" class="form-control form-control-sm text-end" value="-18" /></td>
+                                                        <td>
+                                                            <select class="form-select form-select-sm">
+                                                                <option selected>ปกติ</option>
+                                                                <option>ชำรุด</option>
+                                                            </select>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger"><i class="ri ri-delete-bin-line"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a href="@Url.Action("ImportAquaPlan", "VesselChange")" class="btn btn-outline-secondary">
+                    <i class="ri ri-arrow-left-line me-1"></i> ยกเลิก
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri ri-save-line me-1"></i> บันทึก Tally Sheet
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section PageScripts {
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({ width: '100%' });
+        
+        document.querySelectorAll('.flatpickr-datetime').forEach(function(el) {
+            flatpickr(el, { enableTime: true, dateFormat: "d/m/Y H:i", time_24hr: true });
+        });
+
+        $('.accordion-button').on('click', function() {
+            var $icon = $(this).find('i.icon-base');
+            setTimeout(() => {
+                $icon.toggleClass('ri-arrow-down-s-line ri-arrow-right-s-line');
+            }, 100);
+        });
+    });
+</script>
+}
