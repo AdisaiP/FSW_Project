@@ -1,37 +1,189 @@
 @{
   Layout = "_BlankLayout";
-  ViewData["Title"] = "Verify Email Basic - Pages";
-}
-@section PageStyles {
-<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+  ViewData["Title"] = "ยืนยัน Email — DPIM Portal";
 }
 
-@* ************** Content ************** *@
+@section PageStyles {
+<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  .otp-box {
+    width: 52px;
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid var(--bs-border-color);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .otp-box:focus { border-color: var(--bs-primary); box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb),.15); }
+  .otp-box.filled { border-color: var(--bs-success); }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ---- OTP Boxes ----
+  const boxes = document.querySelectorAll('.otp-box');
+
+  boxes.forEach(function (box, idx) {
+    box.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 1);
+      if (this.value) {
+        this.classList.add('filled');
+        if (idx < boxes.length - 1) boxes[idx + 1].focus();
+      }
+    });
+
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !this.value && idx > 0) {
+        boxes[idx - 1].value = '';
+        boxes[idx - 1].classList.remove('filled');
+        boxes[idx - 1].focus();
+      }
+    });
+
+    box.addEventListener('paste', function (e) {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+      pasted.split('').forEach(function (ch, i) {
+        if (boxes[i]) {
+          boxes[i].value = ch;
+          boxes[i].classList.add('filled');
+        }
+      });
+      if (boxes[Math.min(pasted.length, boxes.length - 1)]) {
+        boxes[Math.min(pasted.length, boxes.length - 1)].focus();
+      }
+    });
+  });
+
+  // ---- Countdown Timer ----
+  const TOTAL = 150; // 2:30
+  let remaining = TOTAL;
+  const timerEl = document.getElementById('countdownTimer');
+  const resendBtn = document.getElementById('btnResend');
+  resendBtn.disabled = true;
+
+  function fmtTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return m + ':' + sec;
+  }
+
+  timerEl.textContent = fmtTime(remaining);
+
+  const interval = setInterval(function () {
+    remaining--;
+    timerEl.textContent = fmtTime(remaining);
+    if (remaining <= 0) {
+      clearInterval(interval);
+      timerEl.textContent = '00:00';
+      resendBtn.disabled = false;
+      resendBtn.classList.remove('btn-outline-secondary');
+      resendBtn.classList.add('btn-primary');
+    }
+  }, 1000);
+
+  // ---- Resend ----
+  resendBtn.addEventListener('click', function () {
+    if (this.disabled) return;
+    // Mock resend
+    remaining = TOTAL;
+    this.disabled = true;
+    this.classList.remove('btn-primary');
+    this.classList.add('btn-outline-secondary');
+    boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+    boxes[0].focus();
+    // Restart interval
+    const newInterval = setInterval(function () {
+      remaining--;
+      timerEl.textContent = fmtTime(remaining);
+      if (remaining <= 0) {
+        clearInterval(newInterval);
+        timerEl.textContent = '00:00';
+        resendBtn.disabled = false;
+        resendBtn.classList.remove('btn-outline-secondary');
+        resendBtn.classList.add('btn-primary');
+      }
+    }, 1000);
+    timerEl.textContent = fmtTime(remaining);
+  });
+
+  // ---- Verify Button ----
+  document.getElementById('btnVerify')?.addEventListener('click', function () {
+    const otp = Array.from(boxes).map(b => b.value).join('');
+    if (otp.length < 6) {
+      alert('กรุณากรอก OTP ให้ครบ 6 หลัก');
+      return;
+    }
+    // Mock verify -> redirect
+    window.location.href = '/Auth/RegisterComplete';
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
 <div class="position-relative">
   <div class="authentication-wrapper authentication-basic container-p-y p-4 p-sm-0">
     <div class="authentication-inner py-6">
-      <div class="card p-md-7 p-1">
+      <div class="card p-md-7 p-3">
+
         <!-- Logo -->
-        <div class="app-brand justify-content-center mt-5">
-          <a href="/" class="app-brand-link gap-2">
-            <span class="app-brand-logo demo">@await Html.PartialAsync("../_Partials/_Macros")</span>
-            <span class="app-brand-text demo text-heading fw-semibold">@TempData.Peek("appName")</span>
+        <div class="app-brand justify-content-center mt-4 mb-3">
+          <a href="/" class="d-flex align-items-center gap-2">
+            <img src="~/img/dpim-logo.png" alt="DPIM Logo" style="width:56px;height:56px;object-fit:contain;" />
           </a>
         </div>
-        <!-- /Logo -->
-        <!-- Verify Email -->
-        <div class="card-body mt-1">
-          <h4 class="mb-1">Verify your email ✉️</h4>
-          <p class="text-start mb-0">Account activation link sent to your email address: <span class="h6">hello&#64;example.com</span> Please follow the link inside to continue.</p>
-          <a class="btn btn-primary w-100 my-5" href="/"> Skip for now </a>
+
+        <div class="card-body text-center">
+          <h4 class="fw-bold mb-1">ยืนยัน Email ✉️</h4>
+          <p class="text-muted mb-2">ระบบส่งรหัส OTP ไปยัง</p>
+          <p class="fw-semibold text-primary mb-1">user@example.com</p>
+          <p class="text-muted small mb-5">กรุณากรอกรหัส 6 หลักที่ได้รับ</p>
+
+          <!-- OTP Boxes -->
+          <div class="d-flex justify-content-center gap-2 mb-4">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" />
+          </div>
+
+          <!-- Countdown -->
+          <p class="text-muted small mb-4">
+            ส่งรหัสใหม่ได้ใน <span id="countdownTimer" class="fw-bold text-primary">02:30</span>
+          </p>
+
+          <!-- Verify Button -->
+          <button id="btnVerify" class="btn btn-primary w-100 mb-3">
+            <i class="ri ri-shield-check-line me-1"></i> ยืนยันรหัส OTP
+          </button>
+
+          <!-- Resend -->
+          <button id="btnResend" class="btn btn-outline-secondary w-100 mb-3" disabled>
+            <i class="ri ri-mail-send-line me-1"></i> ส่งรหัสอีกครั้ง
+          </button>
+
+          <!-- Change email -->
           <p class="text-center mb-0">
-            Didn't get the mail?
-            <a href="javascript:void(0);"> Resend </a>
+            <a href="/Auth/RegisterMultiSteps" class="text-muted small">
+              <i class="ri ri-arrow-left-line me-1"></i> เปลี่ยนอีเมล
+            </a>
           </p>
         </div>
       </div>
-      <img alt="mask" src="~/img/illustrations/auth-basic-login-mask-light.png" class="authentication-image d-none d-lg-block" data-app-light-img="illustrations/auth-basic-login-mask-light.png" data-app-dark-img="illustrations/auth-basic-login-mask-dark.png" />
-      <!-- /Verify Email -->
+
+      <img alt="mask" src="~/img/illustrations/auth-basic-login-mask-light.png"
+           class="authentication-image d-none d-lg-block"
+           data-app-light-img="illustrations/auth-basic-login-mask-light.png"
+           data-app-dark-img="illustrations/auth-basic-login-mask-dark.png" />
     </div>
   </div>
 </div>

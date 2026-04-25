@@ -1,0 +1,167 @@
+@{
+  Layout = "_BlankLayout";
+  ViewData["Title"] = "เลือกช่องทางลงทะเบียน — DPIM Portal";
+}
+
+@section PageStyles {
+<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  html, body { height: 100%; }
+  .authentication-wrapper.authentication-cover {
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+  .authentication-inner { height: 100vh; }
+
+  /* Cards */
+  .dpim-channel-card {
+    border: 2px solid var(--bs-border-color);
+    border-radius: 10px;
+    padding: .65rem 1rem;
+    cursor: pointer;
+    transition: all .2s ease;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+  }
+  .dpim-channel-card:hover {
+    border-color: var(--bs-primary);
+    box-shadow: 0 2px 12px rgba(var(--bs-primary-rgb), .18);
+    color: inherit;
+  }
+  .dpim-channel-card .channel-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  .dpim-channel-card .channel-text { flex: 1; text-align: left; }
+
+  /* Logo header */
+  .dpim-logo-header { width: 52px; height: 52px; object-fit: contain; }
+
+  /* Banner */
+  .dpim-banner-left {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% center;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  .dpim-cover-left { position: relative; overflow: hidden; }
+  .dpim-cover-left::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(0,0,0,.05) 0%,
+      rgba(0,0,0,.18) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* Right panel branding */
+  .dpim-brand-logo { width: 80px; height: 80px; object-fit: contain; }
+  .dpim-brand-divider {
+    width: 40px;
+    height: 3px;
+    background: var(--bs-primary);
+    border-radius: 2px;
+    margin: .6rem auto .75rem;
+  }
+</style>
+}
+
+@* ************** Content ************** *@
+<div class="authentication-wrapper authentication-cover">
+  <!-- Logo Top-left -->
+  <a href="/" class="auth-cover-brand d-flex align-items-center gap-2">
+    <img src="~/img/dpim-logo.png" alt="DPIM Logo" class="dpim-logo-header" />
+    <span class="app-brand-text demo text-heading fw-semibold d-none d-sm-inline">DPIM Portal</span>
+  </a>
+
+  <div class="authentication-inner row m-0">
+
+    <!-- Left: DPIM Banner -->
+    <div class="d-none d-lg-flex col-lg-7 col-xl-8 p-0 dpim-cover-left">
+      <img src="~/img/dpim-banner.jpg"
+           alt="Mining for the Community"
+           class="dpim-banner-left" />
+    </div>
+    <!-- /Left -->
+
+    <!-- Right: Channel Selection -->
+    <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative px-4 px-sm-5">
+      <div class="w-100 mx-auto" style="max-width:380px;">
+
+        <!-- Header: Logo ใหญ่ + ชื่อ + tagline -->
+        <div class="text-center mb-4">
+          <img src="~/img/dpim-logo.png" alt="กพร." class="dpim-brand-logo mb-2" />
+          <h5 class="fw-bold mb-0">กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่</h5>
+          <div class="dpim-brand-divider"></div>
+          <div class="fw-semibold text-primary" style="font-size:.85rem;letter-spacing:.5px;">MINING FOR THE COMMUNITY</div>
+          <p class="text-muted small mt-2 mb-0">เลือกช่องทางลงทะเบียนที่ต้องการ</p>
+        </div>
+
+        <!-- Channel Cards -->
+        <div class="d-flex flex-column gap-2 mb-4">
+
+          <!-- Self-Service -->
+          <a href="/Auth/RegisterMultiSteps" class="dpim-channel-card">
+            <div class="channel-icon bg-label-primary">
+              <i class="ri ri-user-add-line text-primary"></i>
+            </div>
+            <div class="channel-text">
+              <div class="fw-semibold" style="font-size:.9rem;">ลงทะเบียนด้วยตนเอง (Self-Service)</div>
+              <div class="text-muted" style="font-size:.78rem;">กรอกข้อมูลและแนบเอกสารผ่านระบบออนไลน์</div>
+            </div>
+            <span class="badge bg-label-primary" style="font-size:.7rem;">แนะนำ</span>
+          </a>
+
+          <!-- ThaiID -->
+          <a href="/Auth/RegisterThaiID" class="dpim-channel-card">
+            <div class="channel-icon bg-label-success">
+              <i class="ri ri-shield-check-line text-success"></i>
+            </div>
+            <div class="channel-text">
+              <div class="fw-semibold" style="font-size:.9rem;">ลงทะเบียนผ่าน ThaiID</div>
+              <div class="text-muted" style="font-size:.78rem;">ยืนยันตัวตนด้วย Application ThaiID (DOPA)</div>
+            </div>
+            <span class="badge bg-label-success" style="font-size:.7rem;">ปลอดภัยสูง</span>
+          </a>
+
+          <!-- Walk-In -->
+          <div class="dpim-channel-card" style="cursor:default; opacity:.75;">
+            <div class="channel-icon bg-label-warning">
+              <i class="ri ri-building-2-line text-warning"></i>
+            </div>
+            <div class="channel-text">
+              <div class="fw-semibold" style="font-size:.9rem;">ลงทะเบียนผ่านเจ้าหน้าที่ (Walk-In)</div>
+              <div class="text-muted" style="font-size:.78rem;">ติดต่อยื่นเอกสารที่ กพร. โดยตรง</div>
+            </div>
+            <span class="badge bg-label-secondary" style="font-size:.7rem;">ติดต่อสาขา</span>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center mb-0 small">
+          <span class="text-muted">มีบัญชีแล้ว? </span>
+          <a href="/Auth/LoginBasic" class="fw-semibold">เข้าสู่ระบบ</a>
+        </p>
+
+      </div>
+    </div>
+    <!-- /Right -->
+
+  </div>
+</div>

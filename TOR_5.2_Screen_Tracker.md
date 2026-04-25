@@ -9,23 +9,23 @@
 ## ๕.๒.๑. ส่วนการลงทะเบียนสมัครและบริหารจัดการข้อมูลสมาชิก
 
 **๕.๒.๑.๑.** รองรับการลงทะเบียนสมาชิกได้หลายช่องทาง เช่น ลงทะเบียน Online ผ่านเว็บไซต์ด้วยตนเอง (Self Service) หรือลงทะเบียนข้อมูลโดยเจ้าหน้าที่ดำเนินการให้ (Walk In) หรือผ่านระบบ ThaiID  
-หน้าจอตาม TOR : ยังไม่มี
+หน้าจอตาม TOR : ✅ `http://localhost:5055/Auth/RegisterChannel` (แสดง 3 ช่องทาง: Self-Service, ThaiID, Walk-In)
 
 ---
 
 **๕.๒.๑.๒.** สามารถตรวจสอบการลงทะเบียนข้อมูลซ้ำกับที่มีระบบได้  
-หน้าจอตาม TOR : ยังไม่มี
+หน้าจอตาม TOR : ✅ `http://localhost:5055/Auth/RegisterMultiSteps` (Step 1 — ตรวจสอบเลขบัตรซ้ำ mock [`1234567890123`] แจ้งเตือนทันที)
 
 ---
 
 **๕.๒.๑.๓.** สามารถแนบเอกสารเพิ่มเติมที่เกี่ยวข้องตามประเภทของสมาชิกได้  
-หน้าจอตาม TOR : ยังไม่มี
+หน้าจอตาม TOR : ✅ `http://localhost:5055/Auth/RegisterMultiSteps` (Step 2 — Dropzone + docHint แสดงรายการเอกสารตามประเภทสมาชิก)
 
 ---
 
 ## ๕.๒.๒. รองรับการแจ้งลิงก์หรือรหัสยืนยันการลงทะเบียนสมาชิก (Activate) ผ่านอีเมล
 
-หน้าจอตาม TOR : ยังไม่มี
+หน้าจอตาม TOR : ✅ `http://localhost:5055/Auth/VerifyEmailBasic` (OTP 6 หลัก, นับถอยหลัง 150 วิ, ส่งรหัสใหม่) + `http://localhost:5055/Auth/RegisterComplete` (หน้า Success + timeline)
 
 ---
 
@@ -57,7 +57,7 @@
 
 ### ๕.๒.๓.๓. รองรับการยืนยันตัวตนสมาชิกผ่านระบบ ThaiID
 
-หน้าจอตาม TOR : ยังไม่มี
+หน้าจอตาม TOR : ✅ `http://localhost:5055/Auth/RegisterThaiID` (Redirect + spinner countdown) + `http://localhost:5055/Auth/RegisterThaiIDCallback` (แสดงข้อมูลจาก ThaiID + กรอก email/phone/ประเภทสมาชิก)
 
 ---
 
@@ -144,7 +144,7 @@
 ---
 
 **๕.๒.๓.๔(๑๗)** กำหนดวันใช้งานล่วงหน้า (Activate Date) สำหรับบัญชีที่สร้างไว้แล้ว  
-หน้าจอตาม TOR : ยังไม่มี
+หน้าจอตาม TOR : ✅ `http://localhost:5055/Officer/RegisterUser` (ฟิลด์ "วันที่เปิดใช้งาน" — flatpickr date picker)
 
 ---
 

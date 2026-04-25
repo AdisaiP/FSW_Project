@@ -1,0 +1,97 @@
+@{
+  Layout = "_BlankLayout";
+  ViewData["Title"] = "เชื่อมต่อ ThaiID — DPIM Portal";
+}
+
+@section PageStyles {
+<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  .thaiid-logo-box {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #003F87, #0066CC);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 8px 24px rgba(0,63,135,.35);
+  }
+  .spinner-thaiid {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #dee2e6;
+    border-top-color: var(--bs-primary);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+    margin: 0 auto;
+  }
+  @@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Mock countdown then redirect
+  let sec = 3;
+  const el = document.getElementById('countdownMsg');
+  const timer = setInterval(function () {
+    sec--;
+    if (el) el.textContent = 'กำลังเชื่อมต่อ... (' + sec + ')';
+    if (sec <= 0) {
+      clearInterval(timer);
+      // Mock: redirect to callback page
+      window.location.href = '/Auth/RegisterThaiIDCallback';
+    }
+  }, 1000);
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="authentication-wrapper authentication-cover">
+  <a href="/" class="auth-cover-brand d-flex align-items-center gap-2">
+    <img src="~/img/dpim-logo.png" alt="DPIM Logo" style="width:48px;height:48px;object-fit:contain;" />
+    <span class="app-brand-text demo text-heading fw-semibold d-none d-sm-inline">DPIM Portal</span>
+  </a>
+
+  <div class="authentication-inner row m-0">
+
+    <!-- Left: Banner -->
+    <div class="d-none d-lg-flex col-lg-7 col-xl-8 p-0 position-relative" style="min-height:100vh;overflow:hidden;">
+      <img src="~/img/dpim-banner.jpg" alt="Mining for the Community" style="width:100%;height:100%;object-fit:cover;" />
+      <div style="position:absolute;bottom:2rem;left:2rem;right:2rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);">
+        <div class="fw-bold" style="font-size:1.4rem;">MINING FOR THE COMMUNITY</div>
+        <div>เหมืองแร่เพื่อชุมชน — กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่</div>
+      </div>
+    </div>
+
+    <!-- Right: ThaiID redirect -->
+    <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg py-sm-12 px-12 py-6">
+      <div class="w-100 mx-auto text-center" style="max-width:360px;">
+
+        <!-- ThaiID Logo Box -->
+        <div class="thaiid-logo-box mb-4">
+          <div style="color:#fff;font-size:.8rem;font-weight:700;letter-spacing:1px;">ThaiID</div>
+        </div>
+
+        <h5 class="fw-bold mb-2">เชื่อมต่อ ThaiID</h5>
+        <p class="text-muted mb-5">กำลังส่งคำขอยืนยันตัวตนไปยังระบบ DOPA ThaiID</p>
+
+        <!-- Spinner -->
+        <div class="spinner-thaiid mb-4"></div>
+
+        <p id="countdownMsg" class="text-muted small mb-5">กำลังเชื่อมต่อ... (3)</p>
+
+        <hr class="my-4">
+
+        <a href="/Auth/RegisterChannel" class="btn btn-outline-secondary w-100">
+          <i class="ri ri-arrow-left-line me-1"></i> ยกเลิก
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>

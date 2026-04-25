@@ -1,380 +1,480 @@
 @{
   Layout = "_BlankLayout";
-
-  ViewData["Title"] = "Multi-Steps Register - Pages";
+  ViewData["Title"] = "ลงทะเบียนสมาชิก — DPIM Portal";
 }
 
 @section VendorStyles {
-<!-- Vendor -->
 <link rel="stylesheet" href="~/vendor/libs/bs-stepper/bs-stepper.css" />
-<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.css" />
 <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
-<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+<link rel="stylesheet" href="~/vendor/libs/dropzone/dropzone.css" />
+<link rel="stylesheet" href="~/vendor/libs/@@form-validation/form-validation.css" />
 }
 
 @section VendorScripts {
 <script src="~/vendor/libs/cleave-zen/cleave-zen.js"></script>
 <script src="~/vendor/libs/bs-stepper/bs-stepper.js"></script>
 <script src="~/vendor/libs/select2/select2.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+<script src="~/vendor/libs/dropzone/dropzone.js"></script>
+<script src="~/vendor/libs/@@form-validation/popular.js"></script>
+<script src="~/vendor/libs/@@form-validation/bootstrap5.js"></script>
+<script src="~/vendor/libs/@@form-validation/auto-focus.js"></script>
 }
 
 @section PageStyles {
 <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  .dropzone-dpim {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bs-body-bg);
+    transition: border-color .2s;
+  }
+  .dropzone-dpim:hover, .dropzone-dpim.dz-drag-hover { border-color: var(--bs-primary); background: rgba(var(--bs-primary-rgb),.04); }
+  .dropzone-dpim .dz-message { margin: 0; }
+  .dpim-logo-sm { width: 48px; height: 48px; object-fit: contain; }
+  .dpim-banner-left { width:100%; height:100%; object-fit:cover; }
+  .banner-overlay { position:absolute; bottom:2rem; left:2rem; right:2rem; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.6); }
+  .doc-hint { background: var(--bs-light); border-left: 3px solid var(--bs-primary); padding: .75rem 1rem; border-radius: 4px; font-size:.875rem; }
+</style>
 }
 
 @section PageScripts {
-<script src="~/js/pages-auth-multisteps.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ---- bs-stepper ----
+  const stepperEl = document.querySelector('#dpimRegStepper');
+  const stepper = new Stepper(stepperEl, { linear: false, animation: true });
+
+  // ---- Member type conditional ----
+  const memberTypeSelect = document.getElementById('memberType');
+  const prefixWrap = document.getElementById('prefixWrap');
+  const docHintEl = document.getElementById('docHint');
+
+  const docHints = {
+    'บุคคลธรรมดา': '<strong>เอกสารที่ต้องแนบ:</strong><ul class="mb-0 ps-3 mt-1"><li>สำเนาบัตรประชาชน</li><li>สำเนาทะเบียนบ้าน</li></ul>',
+    'นิติบุคคล': '<strong>เอกสารที่ต้องแนบ:</strong><ul class="mb-0 ps-3 mt-1"><li>หนังสือรับรองบริษัท (ไม่เกิน 3 เดือน)</li><li>สำเนาบัตรประชาชนผู้มีอำนาจ</li><li>หนังสือมอบอำนาจ (ถ้ามี)</li></ul>',
+    'วิสาหกิจชุมชน': '<strong>เอกสารที่ต้องแนบ:</strong><ul class="mb-0 ps-3 mt-1"><li>หนังสือรับรองวิสาหกิจ</li><li>สำเนาบัตรประชาชนประธาน</li></ul>'
+  };
+
+  function updateMemberType(val) {
+    prefixWrap.style.display = val === 'บุคคลธรรมดา' ? '' : 'none';
+    docHintEl.innerHTML = docHints[val] || '<span class="text-muted">กรุณาเลือกประเภทสมาชิกก่อน</span>';
+  }
+
+  if (memberTypeSelect) {
+    memberTypeSelect.addEventListener('change', function () { updateMemberType(this.value); });
+    if (typeof $ !== 'undefined') {
+      $(memberTypeSelect).on('select2:select', function (e) { updateMemberType(e.params.data.text); });
+    }
+  }
+
+  // ---- Duplicate ID check (mock) ----
+  const idInput = document.getElementById('idNumber');
+  const idAlert = document.getElementById('idDuplicateAlert');
+  const MOCK_DUPLICATES = ['1234567890123'];
+  if (idInput) {
+    idInput.addEventListener('blur', function () {
+      const v = this.value.replace(/\D/g, '');
+      if (v.length === 13 && MOCK_DUPLICATES.includes(v)) {
+        idAlert.classList.remove('d-none');
+      } else {
+        idAlert.classList.add('d-none');
+      }
+    });
+  }
+
+  // ---- Step navigation ----
+  document.querySelectorAll('.btn-dpim-next').forEach(btn => {
+    btn.addEventListener('click', function () { stepper.next(); updateReview(); });
+  });
+  document.querySelectorAll('.btn-dpim-prev').forEach(btn => {
+    btn.addEventListener('click', function () { stepper.previous(); });
+  });
+
+  // ---- Dropzone ----
+  if (typeof Dropzone !== 'undefined') {
+    Dropzone.autoDiscover = false;
+    new Dropzone('#dropzoneArea', {
+      url: '#',
+      maxFilesize: 5,
+      acceptedFiles: '.pdf,.jpg,.jpeg,.png',
+      dictDefaultMessage: '<i class="ri ri-upload-cloud-2-line ri-2x text-primary mb-2 d-block"></i><span class="fw-semibold">ลากไฟล์มาวางที่นี่</span><br><small class="text-muted">หรือ <span class="text-primary">คลิกเพื่อเลือกไฟล์</span><br>รองรับ PDF, JPG, PNG ขนาดไม่เกิน 5 MB</small>',
+      autoProcessQueue: false
+    });
+  }
+
+  // ---- Review summary ----
+  function updateReview() {
+    const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+    const typeEl = document.getElementById('memberType');
+    document.getElementById('rv-memberType').textContent = typeEl ? typeEl.options[typeEl.selectedIndex]?.text || '' : '';
+    const prefixEl = document.getElementById('prefix');
+    const prefixText = prefixEl ? (prefixEl.options[prefixEl.selectedIndex]?.text || '') : '';
+    document.getElementById('rv-name').textContent = prefixText + ' ' + g('firstName') + ' ' + g('lastName');
+    document.getElementById('rv-idNumber').textContent = g('idNumber');
+    document.getElementById('rv-email').textContent = g('email');
+    document.getElementById('rv-phone').textContent = g('phone');
+  }
+
+  // ---- Submit (mock) ----
+  document.getElementById('btnSubmitReg')?.addEventListener('click', function () {
+    stepper.next();
+  });
+
+  // ---- Copy ref number ----
+  document.getElementById('btnCopyRef')?.addEventListener('click', function () {
+    navigator.clipboard?.writeText('REG-2569-00001');
+    this.textContent = 'คัดลอกแล้ว!';
+    setTimeout(() => { this.textContent = 'คัดลอก'; }, 2000);
+  });
+
+  // ---- Select2 init ----
+  if (typeof $ !== 'undefined' && $.fn.select2) {
+    $('#memberType, #prefix').select2({ dropdownParent: document.body });
+  }
+});
+</script>
 }
-@* ************** Content ************** *@
+
+@* ============================================================ *@
+@* Content                                                       *@
+@* ============================================================ *@
 <div class="authentication-wrapper authentication-cover">
   <!-- Logo -->
   <a href="/" class="auth-cover-brand d-flex align-items-center gap-2">
-    <span class="app-brand-logo demo">@await Html.PartialAsync("../_Partials/_Macros")</span>
-    <span class="app-brand-text demo text-heading fw-semibold">@TempData.Peek("appName")</span>
+    <img src="~/img/dpim-logo.png" alt="DPIM Logo" style="width:48px;height:48px;object-fit:contain;" />
+    <span class="app-brand-text demo text-heading fw-semibold d-none d-sm-inline">DPIM Portal</span>
   </a>
-  <!-- /Logo -->
-  <div class="authentication-inner row m-0">
-    <!-- Left Text -->
-    <div class="d-none d-lg-flex col-lg-3 align-items-center justify-content-center p-12 mt-12 mt-xxl-0">
-      <img alt="register-multi-steps-illustration" src="~/img/illustrations/auth-register-multi-steps-illustration.png" class="h-auto mh-100 w-px-200" />
-    </div>
-    <!-- /Left Text -->
 
-    <!--  Multi Steps Registration -->
-    <div class="d-flex col-lg-9 align-items-center justify-content-center authentication-bg p-5">
-      <div class="w-px-700 mt-12 mt-lg-0 pt-lg-0 pt-4">
-        <div id="multiStepsValidation" class="bs-stepper wizard-numbered shadow-none">
-          <div class="bs-stepper-header border-bottom-0 mb-2">
-            <div class="step" data-target="#accountDetailsValidation">
+  <div class="authentication-inner row m-0">
+
+    <!-- Left: Banner -->
+    <div class="d-none d-lg-flex col-lg-3 p-0 position-relative" style="min-height:100vh;overflow:hidden;">
+      <img src="~/img/dpim-banner.jpg" alt="Mining for the Community" style="width:100%;height:100%;object-fit:cover;" />
+      <div style="position:absolute;bottom:2rem;left:1.5rem;right:1.5rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);">
+        <div class="fw-bold" style="font-size:1.1rem;">MINING FOR THE COMMUNITY</div>
+        <div class="small">เหมืองแร่เพื่อชุมชน</div>
+      </div>
+    </div>
+
+    <!-- Right: Stepper -->
+    <div class="d-flex col-12 col-lg-9 align-items-start authentication-bg p-5 pt-12">
+      <div class="w-100 mt-8 mt-lg-0" style="max-width:750px;margin:0 auto;">
+
+        <div class="text-center mb-6">
+          <img src="~/img/dpim-logo.png" alt="กพร." style="width:56px;height:56px;object-fit:contain;" class="mb-2" />
+          <h4 class="mb-0 fw-bold">ลงทะเบียนสมาชิก</h4>
+          <p class="text-muted small">กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ (กพร.)</p>
+        </div>
+
+        <div id="dpimRegStepper" class="bs-stepper wizard-numbered shadow-none">
+
+          <!-- Step Headers -->
+          <div class="bs-stepper-header border-bottom-0 mb-4">
+            <div class="step" data-target="#step1">
               <button type="button" class="step-trigger ps-0">
                 <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
                 <span class="bs-stepper-label">
                   <span class="bs-stepper-number">01</span>
                   <span class="d-flex flex-column ms-2">
-                    <span class="bs-stepper-title">Account</span>
-                    <span class="bs-stepper-subtitle">Account Details</span>
+                    <span class="bs-stepper-title">ข้อมูลพื้นฐาน</span>
+                    <span class="bs-stepper-subtitle">กรอกข้อมูลสมาชิก</span>
                   </span>
                 </span>
               </button>
             </div>
             <div class="line"></div>
-            <div class="step" data-target="#personalInfoValidation">
+            <div class="step" data-target="#step2">
               <button type="button" class="step-trigger">
                 <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
                 <span class="bs-stepper-label">
                   <span class="bs-stepper-number">02</span>
                   <span class="d-flex flex-column ms-2">
-                    <span class="bs-stepper-title">Personal</span>
-                    <span class="bs-stepper-subtitle">Enter Information</span>
+                    <span class="bs-stepper-title">แนบเอกสาร</span>
+                    <span class="bs-stepper-subtitle">อัปโหลดเอกสารประกอบ</span>
                   </span>
                 </span>
               </button>
             </div>
             <div class="line"></div>
-            <div class="step" data-target="#billingLinksValidation">
+            <div class="step" data-target="#step3">
               <button type="button" class="step-trigger">
                 <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
                 <span class="bs-stepper-label">
                   <span class="bs-stepper-number">03</span>
                   <span class="d-flex flex-column ms-2">
-                    <span class="bs-stepper-title">Billing</span>
-                    <span class="bs-stepper-subtitle">Payment Details</span>
+                    <span class="bs-stepper-title">ตรวจสอบ</span>
+                    <span class="bs-stepper-subtitle">ทบทวนและยืนยัน</span>
+                  </span>
+                </span>
+              </button>
+            </div>
+            <div class="line"></div>
+            <div class="step" data-target="#step4">
+              <button type="button" class="step-trigger">
+                <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
+                <span class="bs-stepper-label">
+                  <span class="bs-stepper-number">04</span>
+                  <span class="d-flex flex-column ms-2">
+                    <span class="bs-stepper-title">สำเร็จ</span>
+                    <span class="bs-stepper-subtitle">การลงทะเบียนเสร็จสิ้น</span>
                   </span>
                 </span>
               </button>
             </div>
           </div>
+
+          <!-- Step Content -->
           <div class="bs-stepper-content">
-            <form id="multiStepsForm" onSubmit="return false">
-              <!-- Account Details -->
-              <div id="accountDetailsValidation" class="content">
-                <div class="content-header mb-5">
-                  <h4 class="mb-1">Account Information</h4>
-                  <span>Enter Your Account Details</span>
+
+            <!-- ====== Step 1: ข้อมูลพื้นฐาน ====== -->
+            <div id="step1" class="content">
+              <div class="content-header mb-5">
+                <h5 class="mb-1"><i class="ri ri-user-line me-2 text-primary"></i>ข้อมูลพื้นฐาน</h5>
+                <p class="text-muted mb-0">กรอกข้อมูลสำหรับสร้างบัญชีสมาชิก</p>
+              </div>
+              <div class="row gx-4">
+
+                <!-- ประเภทสมาชิก -->
+                <div class="col-12 mb-4">
+                  <label class="form-label" for="memberType">ประเภทสมาชิก <span class="text-danger">*</span></label>
+                  <select id="memberType" name="memberType" class="form-select form-select-lg">
+                    <option value="">-- กรุณาเลือกประเภทสมาชิก --</option>
+                    <option value="บุคคลธรรมดา">บุคคลธรรมดา</option>
+                    <option value="นิติบุคคล">นิติบุคคล</option>
+                    <option value="วิสาหกิจชุมชน">วิสาหกิจชุมชน</option>
+                  </select>
                 </div>
-                <div class="row gx-5">
-                  <div class="col-sm-6 mb-5 form-control-validation">
+
+                <!-- คำนำหน้า (บุคคลธรรมดาเท่านั้น) -->
+                <div id="prefixWrap" class="col-md-4 mb-4" style="display:none;">
+                  <label class="form-label" for="prefix">คำนำหน้าชื่อ <span class="text-danger">*</span></label>
+                  <select id="prefix" name="prefix" class="form-select">
+                    <option value="">-- คำนำหน้า --</option>
+                    <option>นาย</option>
+                    <option>นาง</option>
+                    <option>นางสาว</option>
+                  </select>
+                </div>
+
+                <!-- ชื่อ -->
+                <div class="col-md-4 mb-4">
+                  <label class="form-label" for="firstName">ชื่อ <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="text" id="firstName" name="firstName" class="form-control" placeholder="ชื่อ" />
+                    <label for="firstName">ชื่อ</label>
+                  </div>
+                </div>
+
+                <!-- นามสกุล -->
+                <div class="col-md-4 mb-4">
+                  <label class="form-label" for="lastName">นามสกุล <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="text" id="lastName" name="lastName" class="form-control" placeholder="นามสกุล" />
+                    <label for="lastName">นามสกุล</label>
+                  </div>
+                </div>
+
+                <!-- เลขบัตร -->
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="idNumber">เลขบัตรประชาชน / เลขทะเบียนนิติบุคคล <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="text" id="idNumber" name="idNumber" class="form-control" placeholder="X-XXXX-XXXXX-XX-X" maxlength="13" />
+                    <label for="idNumber">เลข 13 หลัก (ไม่ต้องใส่เครื่องหมาย)</label>
+                  </div>
+                  <div id="idDuplicateAlert" class="alert alert-danger mt-2 p-2 d-none small">
+                    <i class="ri ri-error-warning-line me-1"></i>หมายเลขบัตรนี้มีในระบบแล้ว กรุณาติดต่อเจ้าหน้าที่
+                  </div>
+                </div>
+
+                <!-- อีเมล -->
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="email">อีเมล <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" />
+                    <label for="email">อีเมล</label>
+                  </div>
+                </div>
+
+                <!-- เบอร์โทร -->
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="phone">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="0XX-XXX-XXXX" maxlength="10" />
+                    <label for="phone">เบอร์โทรศัพท์ 10 หลัก</label>
+                  </div>
+                </div>
+
+                <!-- รหัสผ่าน -->
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="password">รหัสผ่าน <span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
                     <div class="form-floating form-floating-outline">
-                      <input type="text" name="multiStepsUsername" id="multiStepsUsername" class="form-control" placeholder="johndoe" />
-                      <label for="multiStepsUsername">Username</label>
+                      <input type="password" id="password" name="password" class="form-control" placeholder="รหัสผ่าน" />
+                      <label for="password">≥8 ตัว (ตัวอักษร+ตัวเลข+สัญลักษณ์)</label>
                     </div>
+                    <span class="input-group-text cursor-pointer" onclick="this.previousElementSibling.querySelector('input').type = this.previousElementSibling.querySelector('input').type === 'password' ? 'text' : 'password'">
+                      <i class="icon-base ri ri-eye-off-line"></i>
+                    </span>
                   </div>
-                  <div class="col-sm-6 mb-5 form-control-validation">
+                </div>
+
+                <!-- ยืนยันรหัสผ่าน -->
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="confirmPassword">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
                     <div class="form-floating form-floating-outline">
-                      <input type="email" name="multiStepsEmail" id="multiStepsEmail" class="form-control" placeholder="john.doe&#64;email.com" aria-label="john.doe" />
-                      <label for="multiStepsEmail">Email</label>
+                      <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="ยืนยันรหัสผ่าน" />
+                      <label for="confirmPassword">ยืนยันรหัสผ่านอีกครั้ง</label>
                     </div>
+                    <span class="input-group-text cursor-pointer" onclick="this.previousElementSibling.querySelector('input').type = this.previousElementSibling.querySelector('input').type === 'password' ? 'text' : 'password'">
+                      <i class="icon-base ri ri-eye-off-line"></i>
+                    </span>
                   </div>
-                  <div class="col-sm-6 form-password-toggle mb-5 form-control-validation">
-                    <div class="input-group input-group-merge">
-                      <div class="form-floating form-floating-outline">
-                        <input type="password" id="multiStepsPass" name="multiStepsPass" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="multiStepsPass2" />
-                        <label for="multiStepsPass">Password</label>
-                      </div>
-                      <span class="input-group-text cursor-pointer" id="multiStepsPass2"><i class="icon-base ri ri-eye-off-line ri-20px"></i></span>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 form-password-toggle mb-5 form-control-validation">
-                    <div class="input-group input-group-merge">
-                      <div class="form-floating form-floating-outline">
-                        <input type="password" id="multiStepsConfirmPass" name="multiStepsConfirmPass" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="multiStepsConfirmPass2" />
-                        <label for="multiStepsConfirmPass">Confirm Password</label>
-                      </div>
-                      <span class="input-group-text cursor-pointer" id="multiStepsConfirmPass2"><i class="icon-base ri ri-eye-off-line ri-20px"></i></span>
-                    </div>
-                  </div>
-                  <div class="col-md-12 mb-5">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" name="multiStepsURL" id="multiStepsURL" class="form-control" placeholder="johndoe/profile" aria-label="johndoe" />
-                      <label for="multiStepsURL">Profile Link</label>
-                    </div>
-                  </div>
-                  <div class="col-12 d-flex justify-content-between">
-                    <button class="btn btn-outline-secondary btn-prev" disabled>
-                      <i class="icon-base ri ri-arrow-left-line icon-16px me-sm-1_5 me-0"></i>
-                      <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                    </button>
-                    <button class="btn btn-primary btn-next"><span class="align-middle d-sm-inline-block d-none me-sm-1_5 me-0">Next</span> <i class="icon-base ri ri-arrow-right-line icon-16px"></i></button>
-                  </div>
+                </div>
+
+              </div>
+              <div class="d-flex justify-content-between mt-2">
+                <a href="/Auth/RegisterChannel" class="btn btn-outline-secondary">
+                  <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </a>
+                <button type="button" class="btn btn-primary btn-dpim-next">
+                  ถัดไป <i class="ri ri-arrow-right-line ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- ====== Step 2: แนบเอกสาร ====== -->
+            <div id="step2" class="content">
+              <div class="content-header mb-4">
+                <h5 class="mb-1"><i class="ri ri-attachment-2 me-2 text-primary"></i>แนบเอกสารประกอบ</h5>
+                <p class="text-muted mb-0">อัปโหลดเอกสารตามประเภทสมาชิกที่เลือก</p>
+              </div>
+
+              <!-- Doc Hint -->
+              <div id="docHint" class="doc-hint mb-4">
+                <span class="text-muted">กรุณาเลือกประเภทสมาชิกก่อน</span>
+              </div>
+
+              <!-- Dropzone -->
+              <div id="dropzoneArea" class="dropzone-dpim mb-4">
+                <div class="dz-message">
+                  <i class="ri ri-upload-cloud-2-line ri-2x text-primary mb-2 d-block"></i>
+                  <span class="fw-semibold">ลากไฟล์มาวางที่นี่</span><br>
+                  <small class="text-muted">หรือ <span class="text-primary">คลิกเพื่อเลือกไฟล์</span></small><br>
+                  <small class="text-muted">รองรับ PDF, JPG, PNG ขนาดไม่เกิน 5 MB ต่อไฟล์</small>
                 </div>
               </div>
-              <!-- Personal Info -->
-              <div id="personalInfoValidation" class="content">
-                <div class="content-header mb-5">
-                  <h4 class="mb-1">Personal Information</h4>
-                  <span>Enter Your Personal Information</span>
-                </div>
-                <div class="row gx-5">
-                  <div class="col-sm-6 mb-5 form-control-validation">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsFirstName" name="multiStepsFirstName" class="form-control" placeholder="John" />
-                      <label for="multiStepsFirstName">First Name</label>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 mb-5">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsLastName" name="multiStepsLastName" class="form-control" placeholder="Doe" />
-                      <label for="multiStepsLastName">Last Name</label>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 mb-5">
-                    <div class="input-group input-group-merge">
-                      <span class="input-group-text">US (+1)</span>
-                      <div class="form-floating form-floating-outline">
-                        <input type="text" id="multiStepsMobile" name="multiStepsMobile" class="form-control multi-steps-mobile" placeholder="202 555 0111" />
-                        <label for="multiStepsMobile">Mobile</label>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 mb-5">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsPincode" name="multiStepsPincode" class="form-control multi-steps-pincode" placeholder="Postal Code" maxlength="6" />
-                      <label for="multiStepsPincode">Pincode</label>
-                    </div>
-                  </div>
-                  <div class="col-md-12 mb-5 form-control-validation">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsAddress" name="multiStepsAddress" class="form-control" placeholder="Address" />
-                      <label for="multiStepsAddress">Address</label>
-                    </div>
-                  </div>
-                  <div class="col-md-12 mb-5">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsArea" name="multiStepsArea" class="form-control" placeholder="Area/Landmark" />
-                      <label for="multiStepsArea">Landmark</label>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 mb-5 form-control-validation">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsCity" class="form-control" placeholder="Jackson" />
-                      <label for="multiStepsCity">City</label>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 mb-5 form-control-validation">
-                    <div class="form-floating form-floating-outline">
-                      <select id="multiStepsState" class="select2 form-select" data-allow-clear="true">
-                        <option value="">Select</option>
-                        <option value="AL">Alabama</option>
-                        <option value="AK">Alaska</option>
-                        <option value="AZ">Arizona</option>
-                        <option value="AR">Arkansas</option>
-                        <option value="CA">California</option>
-                        <option value="CO">Colorado</option>
-                        <option value="CT">Connecticut</option>
-                        <option value="DE">Delaware</option>
-                        <option value="DC">District Of Columbia</option>
-                        <option value="FL">Florida</option>
-                        <option value="GA">Georgia</option>
-                        <option value="HI">Hawaii</option>
-                        <option value="ID">Idaho</option>
-                        <option value="IL">Illinois</option>
-                        <option value="IN">Indiana</option>
-                        <option value="IA">Iowa</option>
-                        <option value="KS">Kansas</option>
-                        <option value="KY">Kentucky</option>
-                        <option value="LA">Louisiana</option>
-                        <option value="ME">Maine</option>
-                        <option value="MD">Maryland</option>
-                        <option value="MA">Massachusetts</option>
-                        <option value="MI">Michigan</option>
-                        <option value="MN">Minnesota</option>
-                        <option value="MS">Mississippi</option>
-                        <option value="MO">Missouri</option>
-                        <option value="MT">Montana</option>
-                        <option value="NE">Nebraska</option>
-                        <option value="NV">Nevada</option>
-                        <option value="NH">New Hampshire</option>
-                        <option value="NJ">New Jersey</option>
-                        <option value="NM">New Mexico</option>
-                        <option value="NY">New York</option>
-                        <option value="NC">North Carolina</option>
-                        <option value="ND">North Dakota</option>
-                        <option value="OH">Ohio</option>
-                        <option value="OK">Oklahoma</option>
-                        <option value="OR">Oregon</option>
-                        <option value="PA">Pennsylvania</option>
-                        <option value="RI">Rhode Island</option>
-                        <option value="SC">South Carolina</option>
-                        <option value="SD">South Dakota</option>
-                        <option value="TN">Tennessee</option>
-                        <option value="TX">Texas</option>
-                        <option value="UT">Utah</option>
-                        <option value="VT">Vermont</option>
-                        <option value="VA">Virginia</option>
-                        <option value="WA">Washington</option>
-                        <option value="WV">West Virginia</option>
-                        <option value="WI">Wisconsin</option>
-                        <option value="WY">Wyoming</option>
-                      </select>
-                      <label for="multiStepsState">State</label>
-                    </div>
-                  </div>
-                  <div class="col-12 d-flex justify-content-between">
-                    <button class="btn btn-outline-secondary btn-prev">
-                      <i class="icon-base ri ri-arrow-left-line icon-16px me-sm-1_5 me-0"></i>
-                      <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                    </button>
-                    <button class="btn btn-primary btn-next"><span class="align-middle d-sm-inline-block d-none me-sm-1_5 me-0">Next</span> <i class="icon-base ri ri-arrow-right-line icon-16px"></i></button>
-                  </div>
+
+              <div class="d-flex justify-content-between mt-2">
+                <button type="button" class="btn btn-outline-secondary btn-dpim-prev">
+                  <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </button>
+                <button type="button" class="btn btn-primary btn-dpim-next">
+                  ถัดไป <i class="ri ri-arrow-right-line ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- ====== Step 3: ตรวจสอบข้อมูล ====== -->
+            <div id="step3" class="content">
+              <div class="content-header mb-4">
+                <h5 class="mb-1"><i class="ri ri-file-list-3-line me-2 text-primary"></i>ตรวจสอบข้อมูล</h5>
+                <p class="text-muted mb-0">กรุณาตรวจสอบข้อมูลก่อนยืนยัน</p>
+              </div>
+
+              <div class="card border mb-4">
+                <div class="card-body">
+                  <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">ประเภทสมาชิก</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-memberType">—</dd>
+                    <dt class="col-sm-4 text-muted">ชื่อ-นามสกุล</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-name">—</dd>
+                    <dt class="col-sm-4 text-muted">เลขบัตร</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-idNumber">—</dd>
+                    <dt class="col-sm-4 text-muted">อีเมล</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-email">—</dd>
+                    <dt class="col-sm-4 text-muted mb-0">เบอร์โทร</dt>
+                    <dd class="col-sm-8 fw-semibold mb-0" id="rv-phone">—</dd>
+                  </dl>
                 </div>
               </div>
-              <!-- Billing Links -->
-              <div id="billingLinksValidation" class="content">
-                <div class="content-header mb-5">
-                  <h4 class="mb-1">Select Plan</h4>
-                  <span>Select plan as per your requirement</span>
-                </div>
-                <!-- Custom plan options -->
-                <div class="row gap-md-0 gap-4 mb-12 gx-5">
-                  <div class="col-md">
-                    <div class="form-check custom-option custom-option-icon">
-                      <label class="form-check-label custom-option-content" for="basicOption">
-                        <span class="custom-option-body">
-                          <span class="fs-6 d-block fw-medium text-heading mb-2">Basic</span>
-                          <small>A simple start for start ups & Students</small>
-                          <span class="d-flex justify-content-center py-2">
-                            <sup class="text-primary small lh-1 mt-3">$</sup>
-                            <span class="h4 mb-0 text-primary">0</span>
-                            <sub class="lh-1 mt-auto mb-3 text-body-secondary small">/month</sub>
-                          </span>
-                        </span>
-                        <input name="customRadioIcon" class="form-check-input" type="radio" value="" id="basicOption" />
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md">
-                    <div class="form-check custom-option custom-option-icon">
-                      <label class="form-check-label custom-option-content" for="standardOption">
-                        <span class="custom-option-body">
-                          <span class="fs-6 d-block fw-medium text-heading mb-2">Standard</span>
-                          <small>For small to medium businesses</small>
-                          <span class="d-flex justify-content-center py-2">
-                            <sup class="text-primary small lh-1 mt-3">$</sup>
-                            <span class="h4 mb-0 text-primary">99</span>
-                            <sub class="lh-1 mt-auto mb-3 text-body-secondary small">/month</sub>
-                          </span>
-                        </span>
-                        <input name="customRadioIcon" class="form-check-input" type="radio" value="" id="standardOption" checked />
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md">
-                    <div class="form-check custom-option custom-option-icon">
-                      <label class="form-check-label custom-option-content" for="enterpriseOption">
-                        <span class="custom-option-body">
-                          <span class="fs-6 d-block fw-medium text-heading mb-2">Enterprise</span>
-                          <small>Solution for enterprise & organizations</small>
-                          <span class="d-flex justify-content-center py-2">
-                            <sup class="text-primary small lh-1 mt-3">$</sup>
-                            <span class="h4 mb-0 text-primary">499</span>
-                            <sub class="lh-1 mt-auto mb-3 text-body-secondary small">/month</sub>
-                          </span>
-                        </span>
-                        <input name="customRadioIcon" class="form-check-input" type="radio" value="" id="enterpriseOption" />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <!--/ Custom plan options -->
-                <div class="content-header mb-5">
-                  <h4 class="mb-1">Payment Information</h4>
-                  <span>Enter your card information</span>
-                </div>
-                <!-- Credit Card Details -->
-                <div class="row gx-5">
-                  <div class="col-md-12 mb-5 form-control-validation">
-                    <div class="input-group input-group-merge">
-                      <div class="form-floating form-floating-outline">
-                        <input id="multiStepsCard" class="form-control multi-steps-card" name="multiStepsCard" type="text" placeholder="1356 3215 6548 7898" aria-describedby="multiStepsCardImg" />
-                        <label for="multiStepsCard">Card Number</label>
-                      </div>
-                      <span class="input-group-text cursor-pointer" id="multiStepsCardImg"><span class="card-type"></span></span>
-                    </div>
-                  </div>
-                  <div class="col-md-5 mb-5">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsName" class="form-control" name="multiStepsName" placeholder="John Doe" />
-                      <label for="multiStepsName">Name On Card</label>
-                    </div>
-                  </div>
-                  <div class="col-6 col-md-4 mb-5">
-                    <div class="form-floating form-floating-outline">
-                      <input type="text" id="multiStepsExDate" class="form-control multi-steps-exp-date" name="multiStepsExDate" placeholder="MM/YY" />
-                      <label for="multiStepsExDate">Expiry Date</label>
-                    </div>
-                  </div>
-                  <div class="col-6 col-md-3 mb-5">
-                    <div class="input-group input-group-merge">
-                      <div class="form-floating form-floating-outline">
-                        <input type="text" id="multiStepsCvv" class="form-control multi-steps-cvv" name="multiStepsCvv" maxlength="3" placeholder="654" />
-                        <label for="multiStepsCvv">CVV Code</label>
-                      </div>
-                      <span class="input-group-text cursor-pointer" id="multiStepsCvvHelp"><i class="icon-base ri ri-question-line" data-bs-toggle="tooltip" data-bs-placement="top" title="Card Verification Value"></i></span>
-                    </div>
-                  </div>
-                  <div class="col-12 d-flex justify-content-between form-control-validation">
-                    <button class="btn btn-outline-secondary btn-prev">
-                      <i class="icon-base ri ri-arrow-left-line icon-16px me-sm-1_5 me-0"></i>
-                      <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                    </button>
-                    <button type="submit" class="btn btn-success btn-next btn-submit">Submit <i class="icon-base ri ri-check-line icon-16px ms-1_5"></i></button>
-                  </div>
-                </div>
-                <!--/ Credit Card Details -->
+
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="agreePolicy" />
+                <label class="form-check-label" for="agreePolicy">
+                  ฉันได้อ่านและยอมรับ
+                  <a href="#" class="text-primary">นโยบายความเป็นส่วนตัว</a>
+                  และ <a href="#" class="text-primary">ข้อตกลงการใช้งาน</a>
+                </label>
               </div>
-            </form>
-          </div>
-        </div>
+
+              <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary btn-dpim-prev">
+                  <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </button>
+                <button type="button" class="btn btn-success" id="btnSubmitReg">
+                  <i class="ri ri-check-line me-1"></i> ยืนยันการลงทะเบียน
+                </button>
+              </div>
+            </div>
+
+            <!-- ====== Step 4: สำเร็จ ====== -->
+            <div id="step4" class="content">
+              <div class="text-center py-6">
+                <div class="mb-4">
+                  <span class="avatar avatar-xl bg-label-success rounded-circle" style="width:88px;height:88px;font-size:2.5rem;">
+                    <i class="ri ri-check-double-line"></i>
+                  </span>
+                </div>
+                <h4 class="fw-bold text-success mb-2">ลงทะเบียนสำเร็จ!</h4>
+                <p class="text-muted mb-4">ระบบ DPIM ได้ส่งลิงก์ยืนยันไปยังอีเมลของท่านแล้ว<br>กรุณาตรวจสอบอีเมลเพื่อเปิดใช้งานบัญชี</p>
+
+                <div class="card border d-inline-block px-5 py-3 mb-5">
+                  <p class="text-muted small mb-1">หมายเลขอ้างอิง</p>
+                  <h5 class="fw-bold text-primary mb-0">REG-2569-00001
+                    <button id="btnCopyRef" class="btn btn-sm btn-outline-primary ms-2 py-0">คัดลอก</button>
+                  </h5>
+                </div>
+
+                <!-- Progress Timeline -->
+                <div class="d-flex justify-content-center mb-5">
+                  <ul class="list-unstyled text-start" style="max-width:280px;">
+                    <li class="d-flex align-items-center mb-2">
+                      <span class="badge bg-success rounded-circle p-1 me-3" style="width:28px;height:28px;line-height:1.4;"><i class="ri ri-check-line"></i></span>
+                      <span>ลงทะเบียนสมาชิก</span>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                      <span class="badge bg-label-secondary rounded-circle p-1 me-3" style="width:28px;height:28px;line-height:1.4;">2</span>
+                      <span class="text-muted">ยืนยัน Email</span>
+                    </li>
+                    <li class="d-flex align-items-center mb-2">
+                      <span class="badge bg-label-secondary rounded-circle p-1 me-3" style="width:28px;height:28px;line-height:1.4;">3</span>
+                      <span class="text-muted">รอการอนุมัติ</span>
+                    </li>
+                    <li class="d-flex align-items-center">
+                      <span class="badge bg-label-secondary rounded-circle p-1 me-3" style="width:28px;height:28px;line-height:1.4;">4</span>
+                      <span class="text-muted">เข้าใช้งานระบบ</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center">
+                  <a href="/Auth/VerifyEmailBasic" class="btn btn-primary">
+                    <i class="ri ri-mail-check-line me-1"></i> ยืนยัน Email
+                  </a>
+                  <a href="/" class="btn btn-outline-secondary">กลับหน้าหลัก</a>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /bs-stepper-content -->
+        </div><!-- /bs-stepper -->
       </div>
-    </div>
-    <!-- / Multi Steps Registration -->
+    </div><!-- /Right -->
   </div>
 </div>
-
-<script>
-  // Check selected custom option
-  window.Helpers.initCustomOptionCheck();
-</script>

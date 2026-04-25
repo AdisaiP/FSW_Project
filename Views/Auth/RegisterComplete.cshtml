@@ -1,0 +1,124 @@
+@{
+  Layout = "_BlankLayout";
+  ViewData["Title"] = "ลงทะเบียนสำเร็จ — DPIM Portal";
+}
+
+@section PageStyles {
+<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  .success-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  .progress-timeline { list-style: none; padding: 0; margin: 0; text-align: left; max-width: 260px; }
+  .progress-timeline li { display: flex; align-items: center; gap: .85rem; margin-bottom: .85rem; }
+  .progress-timeline li:last-child { margin-bottom: 0; }
+  .tl-badge { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('btnCopyRef')?.addEventListener('click', function () {
+    navigator.clipboard?.writeText('REG-2569-00001');
+    this.textContent = 'คัดลอกแล้ว!';
+    setTimeout(() => { this.textContent = 'คัดลอก'; }, 2000);
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="position-relative">
+  <div class="authentication-wrapper authentication-basic container-p-y p-4 p-sm-0">
+    <div class="authentication-inner py-6">
+      <div class="card p-md-7 p-3">
+
+        <!-- Logo -->
+        <div class="app-brand justify-content-center mt-4 mb-4">
+          <a href="/" class="d-flex align-items-center gap-2">
+            <img src="~/img/dpim-logo.png" alt="DPIM Logo" style="width:56px;height:56px;object-fit:contain;" />
+          </a>
+        </div>
+
+        <div class="card-body text-center">
+
+          <!-- Success Avatar -->
+          <div class="mb-4">
+            <div class="success-avatar bg-label-success">
+              <i class="ri ri-check-double-line text-success"></i>
+            </div>
+          </div>
+
+          <h4 class="fw-bold text-success mb-2">ลงทะเบียนสำเร็จ!</h4>
+          <p class="text-muted mb-4">
+            ขอบคุณที่ลงทะเบียนกับ DPIM Portal<br>
+            กรุณาดำเนินการตามขั้นตอนด้านล่าง
+          </p>
+
+          <!-- Ref Number -->
+          <div class="card border bg-light d-inline-block px-5 py-3 mb-5">
+            <p class="text-muted small mb-1">หมายเลขอ้างอิง</p>
+            <h5 class="fw-bold text-primary mb-0">
+              REG-2569-00001
+              <button id="btnCopyRef" class="btn btn-sm btn-outline-primary ms-2 py-0 px-2">คัดลอก</button>
+            </h5>
+          </div>
+
+          <!-- Progress Timeline -->
+          <div class="d-flex justify-content-center mb-5">
+            <ul class="progress-timeline">
+              <li>
+                <span class="tl-badge bg-success text-white"><i class="ri ri-check-line"></i></span>
+                <span>ลงทะเบียนสมาชิก</span>
+              </li>
+              <li>
+                <span class="tl-badge bg-label-warning text-warning fw-bold">2</span>
+                <span class="text-muted">ยืนยัน Email</span>
+              </li>
+              <li>
+                <span class="tl-badge bg-label-secondary fw-bold">3</span>
+                <span class="text-muted">รอการอนุมัติจากเจ้าหน้าที่</span>
+              </li>
+              <li>
+                <span class="tl-badge bg-label-secondary fw-bold">4</span>
+                <span class="text-muted">เข้าใช้งานระบบ</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="alert alert-warning text-start small p-3 mb-5">
+            <i class="ri ri-information-line me-1"></i>
+            ระบบส่งลิงก์ยืนยันไปยังอีเมลของท่านแล้ว กรุณาตรวจสอบอีเมล (รวมถึงกล่องสแปม) และคลิกลิงก์เพื่อเปิดใช้งานบัญชี
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex flex-column gap-3">
+            <a href="/Auth/VerifyEmailBasic" class="btn btn-primary">
+              <i class="ri ri-mail-check-line me-1"></i> ยืนยัน Email ทันที
+            </a>
+            <a href="/Auth/LoginBasic" class="btn btn-outline-secondary">
+              <i class="ri ri-login-box-line me-1"></i> เข้าสู่ระบบ
+            </a>
+            <a href="/" class="btn btn-link text-muted">
+              <i class="ri ri-home-4-line me-1"></i> กลับหน้าหลัก
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <img alt="mask" src="~/img/illustrations/auth-basic-login-mask-light.png"
+           class="authentication-image d-none d-lg-block"
+           data-app-light-img="illustrations/auth-basic-login-mask-light.png"
+           data-app-dark-img="illustrations/auth-basic-login-mask-dark.png" />
+    </div>
+  </div>
+</div>
