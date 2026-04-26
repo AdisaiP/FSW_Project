@@ -23,6 +23,31 @@
 
 @section PageStyles {
 <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  .dpim-banner-left {
+    width:100%; height:100%; object-fit:cover; object-position:70% center;
+    image-rendering:crisp-edges;
+  }
+  .dpim-cover-left { position:relative; overflow:hidden; }
+  .dpim-cover-left::after {
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to right, rgba(0,0,0,.05) 0%, rgba(0,0,0,.18) 100%);
+    pointer-events:none;
+  }
+  .thaiid-logo-box {
+    width: 140px;
+    height: 140px;
+    border-radius: 20px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 8px 24px rgba(0,63,135,.2);
+    padding: 10px;
+  }
+  .thaiid-logo-box img { width:100%; height:100%; object-fit:contain; border-radius:14px; }
+  </style>
 }
 
 @section PageScripts {
@@ -45,13 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
   <div class="authentication-inner row m-0">
 
     <!-- Left: Banner -->
-    <div class="d-none d-lg-flex col-lg-7 col-xl-8 p-0 position-relative" style="min-height:100vh;overflow:hidden;">
-      <img src="~/img/dpim-banner.jpg" alt="Mining for the Community" style="width:100%;height:100%;object-fit:cover;" />
-      <div style="position:absolute;bottom:2rem;left:2rem;right:2rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);">
-        <div class="fw-bold" style="font-size:1.4rem;">MINING FOR THE COMMUNITY</div>
-        <div>เหมืองแร่เพื่อชุมชน — กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่</div>
-      </div>
+    <div class="d-none d-lg-flex col-lg-7 col-xl-8 p-0 dpim-cover-left">
+      <img src="~/img/dpim-banner.jpg" alt="Mining for the Community" class="dpim-banner-left" />
     </div>
+    <!-- /Left -->
 
     <!-- Right: Form -->
     <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-start authentication-bg position-relative py-sm-12 px-12 py-6" style="overflow-y:auto;">

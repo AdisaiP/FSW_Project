@@ -30,7 +30,7 @@
     transition:all .18s ease; font-size:.88rem; font-weight:500;
   }
   .dpim-sso-btn:hover { border-color:var(--dpim-blue); box-shadow:0 2px 8px rgba(35,64,143,.15); color:inherit; }
-  .dpim-sso-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+  .dpim-sso-icon { width:36px; height:36px; border-radius:6px; object-fit:contain; flex-shrink:0; display:block; }
   .btn-dpim-primary { background:var(--dpim-blue) !important; border-color:var(--dpim-blue) !important; color:#fff !important; }
   .btn-dpim-primary:hover { background:#1b3175 !important; border-color:#1b3175 !important; }
 </style>
@@ -110,29 +110,23 @@
         <!-- SSO Buttons -->
         <div class="d-flex flex-column gap-2">
           <a href="/Auth/SSORedirectIndustry" class="dpim-sso-btn">
-            <div class="dpim-sso-icon" style="background:#e8f0fe;">
-              <i class="ri ri-home-office-line" style="color:#23408F;"></i>
-            </div>
+            <img src="~/img/i-industry-logo.png" alt="i-Industry" class="dpim-sso-icon" />
             <div>
-              <div class="fw-semibold" style="font-size:.83rem;color:#23408F;">i-Industry</div>
+              <div class="fw-semibold" style="font-size:.83rem;">i-Industry</div>
               <div class="text-muted" style="font-size:.75rem;">สำหรับผู้ประกอบการ</div>
             </div>
           </a>
           <a href="/Auth/SSORedirectOfficer" class="dpim-sso-btn">
-            <div class="dpim-sso-icon" style="background:#fff3e0;">
-              <i class="ri ri-user-follow-line" style="color:#e65100;"></i>
-            </div>
+            <img src="~/img/i-industry-logo.png" alt="i-Industry Officer" class="dpim-sso-icon" />
             <div>
-              <div class="fw-semibold" style="font-size:.83rem;color:#e65100;">i-Industry Officer</div>
+              <div class="fw-semibold" style="font-size:.83rem;">i-Industry Officer</div>
               <div class="text-muted" style="font-size:.75rem;">สำหรับเจ้าหน้าที่</div>
             </div>
           </a>
           <a href="/Auth/SSORedirectThaiID" class="dpim-sso-btn">
-            <div class="dpim-sso-icon" style="background:#e3f2fd;">
-              <i class="ri ri-id-card-line" style="color:#0277bd;"></i>
-            </div>
+            <img src="~/img/thaiD-logo.webp" alt="ThaiID" class="dpim-sso-icon" style="border-radius:8px;" />
             <div>
-              <div class="fw-semibold" style="font-size:.83rem;color:#0277bd;">ThaiID</div>
+              <div class="fw-semibold" style="font-size:.83rem;">ThaiID</div>
               <div class="text-muted" style="font-size:.75rem;">ยืนยันตัวตนด้วย ThaiID</div>
             </div>
           </a>
