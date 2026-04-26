@@ -1,0 +1,204 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "ใบรับรองอิเล็กทรอนิกส์";
+
+  // Mock data
+  var certSerial = "DPIM-2569-0012345";
+  var certIssued = "01/01/2569";
+  var certExpiry = "31/12/2569";
+  var certStatus = "Active"; // Active | Expired | None
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .cert-card {
+    border:2px solid var(--dpim-blue); border-radius:12px;
+    background:linear-gradient(135deg, rgba(35,64,143,.04) 0%, rgba(65,173,73,.04) 100%);
+    padding:2rem;
+  }
+  .cert-seal {
+    width:90px; height:90px; border-radius:50%;
+    background:linear-gradient(135deg, var(--dpim-blue), #3a5fc0);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 16px rgba(35,64,143,.35);
+  }
+  .cert-field { margin-bottom:.85rem; }
+  .cert-field-label { font-size:.78rem; color:#6c757d; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .cert-field-value { font-size:.95rem; font-weight:500; color:var(--bs-body-color); }
+  .badge-active { background:#d1f2d1; color:#155724; }
+  .badge-expired { background:#f8d7da; color:#842029; }
+  .badge-none { background:#e9ecef; color:#495057; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+  .timeline-cert { border-left:2px solid var(--bs-border-color); padding-left:1.25rem; }
+  .timeline-cert-item { position:relative; margin-bottom:1.25rem; }
+  .timeline-cert-item::before {
+    content:""; position:absolute; left:-1.44rem; top:.35rem;
+    width:10px; height:10px; border-radius:50%;
+    background:var(--dpim-blue); border:2px solid #fff;
+    box-shadow:0 0 0 2px var(--dpim-blue);
+  }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('btnRequest')?.addEventListener('click', function () {
+    if (confirm('ยืนยันการขอออกใบรับรองอิเล็กทรอนิกส์ใหม่?')) {
+      alert('ส่งคำขอสำเร็จ! ระบบจะดำเนินการออกใบรับรองภายใน 1-3 วันทำการ\nหมายเลขคำขอ: CERT-REQ-2569-' + Math.floor(Math.random()*9999).toString().padStart(4,'0'));
+    }
+  });
+
+  document.getElementById('btnDownload')?.addEventListener('click', function () {
+    alert('(Mock) กำลังดาวน์โหลดใบรับรอง...');
+  });
+
+  document.getElementById('btnRevoke')?.addEventListener('click', function () {
+    if (confirm('ยืนยันการยกเลิกใบรับรองนี้?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้')) {
+      alert('ยกเลิกใบรับรองสำเร็จ');
+      location.reload();
+    }
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item"><a href="/Users/ViewAccount">บัญชีผู้ใช้</a></li>
+      <li class="breadcrumb-item active">ใบรับรองอิเล็กทรอนิกส์</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">ใบรับรองอิเล็กทรอนิกส์ของฉัน</h4>
+
+  <div class="row g-4">
+    <!-- Left: Certificate Card -->
+    <div class="col-lg-7">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="cert-card">
+            <div class="d-flex align-items-center gap-3 mb-4">
+              <div class="cert-seal">
+                <i class="ri ri-award-line text-white" style="font-size:2.5rem;"></i>
+              </div>
+              <div>
+                <h5 class="mb-1 fw-bold" style="color:var(--dpim-blue);">ใบรับรองอิเล็กทรอนิกส์</h5>
+                <p class="mb-0 text-muted" style="font-size:.85rem;">กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ (กพร.)</p>
+                <span class="badge badge-active mt-1">
+                  <i class="ri ri-checkbox-circle-line me-1"></i>Active
+                </span>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <div class="cert-field">
+                  <div class="cert-field-label">ชื่อผู้ถือใบรับรอง</div>
+                  <div class="cert-field-value">นายอดิสัย พัฒนการ</div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="cert-field">
+                  <div class="cert-field-label">Serial Number</div>
+                  <div class="cert-field-value fw-semibold" style="font-family:monospace;">@certSerial</div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="cert-field">
+                  <div class="cert-field-label">วันที่ออกใบรับรอง</div>
+                  <div class="cert-field-value">@certIssued</div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="cert-field">
+                  <div class="cert-field-label">วันหมดอายุ</div>
+                  <div class="cert-field-value fw-semibold" style="color:var(--dpim-green);">@certExpiry</div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="cert-field">
+                  <div class="cert-field-label">ออกโดย</div>
+                  <div class="cert-field-value">DPIM CA Root</div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="cert-field">
+                  <div class="cert-field-label">อัลกอริทึม</div>
+                  <div class="cert-field-value">RSA-2048 / SHA-256</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-2 flex-wrap">
+        <button id="btnDownload" class="btn btn-dpim">
+          <i class="ri ri-download-line me-1"></i>ดาวน์โหลดใบรับรอง
+        </button>
+        <button id="btnRequest" class="btn btn-dpim-green">
+          <i class="ri ri-refresh-line me-1"></i>ขอออกใหม่
+        </button>
+        <button id="btnRevoke" class="btn btn-outline-danger">
+          <i class="ri ri-forbid-line me-1"></i>ยกเลิกใบรับรอง
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: ประวัติ + Info -->
+    <div class="col-lg-5">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0" style="color:var(--dpim-blue);">ประวัติใบรับรอง</h5>
+        </div>
+        <div class="card-body">
+          <div class="timeline-cert">
+            <div class="timeline-cert-item">
+              <div class="fw-semibold" style="font-size:.88rem;">ออกใบรับรองสำเร็จ</div>
+              <div class="text-muted" style="font-size:.8rem;">01/01/2569 09:15</div>
+            </div>
+            <div class="timeline-cert-item">
+              <div class="fw-semibold" style="font-size:.88rem;">ยื่นคำขอออกใบรับรอง</div>
+              <div class="text-muted" style="font-size:.8rem;">28/12/2568 14:30</div>
+            </div>
+            <div class="timeline-cert-item">
+              <div class="fw-semibold" style="font-size:.88rem;">ใบรับรองฉบับเก่าหมดอายุ</div>
+              <div class="text-muted" style="font-size:.8rem;">31/12/2568 23:59</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-start gap-2">
+            <i class="ri ri-information-line mt-1" style="color:var(--dpim-blue);font-size:1.1rem;flex-shrink:0;"></i>
+            <div style="font-size:.83rem;">
+              <p class="mb-2">ใบรับรองอิเล็กทรอนิกส์ใช้สำหรับ:</p>
+              <ul class="mb-0 ps-3">
+                <li>ลงนามเอกสารดิจิทัล</li>
+                <li>ยืนยันตัวตนในระบบ DPIM</li>
+                <li>การแลกเปลี่ยนข้อมูลที่เข้ารหัส</li>
+              </ul>
+              <p class="mt-2 mb-0 text-muted">
+                ใบรับรองจะหมดอายุใน <strong style="color:var(--dpim-blue);">251 วัน</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,227 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "Audit Log";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .badge-success { background:#d1f2d1; color:#155724; }
+  .badge-failed { background:#f8d7da; color:#842029; }
+  .stat-mini { text-align:center; padding:1rem; border-right:1px solid var(--bs-border-color); }
+  .stat-mini:last-child { border-right:none; }
+  .stat-mini-val { font-size:1.5rem; font-weight:700; color:var(--dpim-blue); }
+  .stat-mini-label { font-size:.78rem; color:#6c757d; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  td code { font-size:.8rem; background:var(--bs-gray-100); padding:.1rem .35rem; border-radius:4px; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  flatpickr('#dateRange', {
+    mode: 'range', dateFormat: 'd/m/Y',
+    defaultDate: [new Date(Date.now() - 10*24*60*60*1000), new Date()],
+  });
+
+  var dt = new DataTable('#tableAuditLog', {
+    language: {
+      search: 'ค้นหา:', lengthMenu: 'แสดง _MENU_ รายการ',
+      info: 'แสดง _START_-_END_ จาก _TOTAL_ รายการ',
+      paginate: { first:'แรก', last:'สุดท้าย', next:'ถัดไป', previous:'ก่อนหน้า' }
+    },
+    order: [[0, 'desc']],
+    pageLength: 20,
+    responsive: true,
+  });
+
+  // Filter by action type
+  document.getElementById('actionFilter')?.addEventListener('change', function () {
+    dt.column(3).search(this.value).draw();
+  });
+
+  // Filter by result
+  document.getElementById('resultFilter')?.addEventListener('change', function () {
+    dt.column(5).search(this.value).draw();
+  });
+
+  // Export mock
+  document.getElementById('btnExportExcel')?.addEventListener('click', function () {
+    alert('(Mock) กำลัง Export Excel...');
+  });
+  document.getElementById('btnExportPdf')?.addEventListener('click', function () {
+    alert('(Mock) กำลัง Export PDF...');
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">Audit Log</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <h4 class="page-title-dpim mb-0">Audit Log — ประวัติการใช้งานระบบ</h4>
+    <div class="d-flex gap-2">
+      <button id="btnExportExcel" class="btn btn-outline-success btn-sm">
+        <i class="ri ri-file-line me-1"></i>Export Excel
+      </button>
+      <button id="btnExportPdf" class="btn btn-outline-danger btn-sm">
+        <i class="bx bxs-file-pdf me-1"></i>Export PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Stats -->
+  <div class="card mb-4">
+    <div class="card-body p-0">
+      <div class="d-flex">
+        <div class="stat-mini flex-fill">
+          <div class="stat-mini-val">2,481</div>
+          <div class="stat-mini-label">เหตุการณ์ทั้งหมด (10 วัน)</div>
+        </div>
+        <div class="stat-mini flex-fill">
+          <div class="stat-mini-val" style="color:var(--dpim-green);">2,314</div>
+          <div class="stat-mini-label">สำเร็จ</div>
+        </div>
+        <div class="stat-mini flex-fill">
+          <div class="stat-mini-val" style="color:#dc3545;">167</div>
+          <div class="stat-mini-label">ล้มเหลว</div>
+        </div>
+        <div class="stat-mini flex-fill">
+          <div class="stat-mini-val">89</div>
+          <div class="stat-mini-label">ผู้ใช้ที่ active</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label" style="font-size:.85rem;font-weight:600;">ช่วงวันที่ (ย้อนหลังได้ ≥ 10 วัน)</label>
+          <input type="text" id="dateRange" class="form-control" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" style="font-size:.85rem;font-weight:600;">ประเภท Action</label>
+          <select id="actionFilter" class="form-select">
+            <option value="">ทั้งหมด</option>
+            <option>Login</option>
+            <option>Logout</option>
+            <option>Register</option>
+            <option>ChangePassword</option>
+            <option>AccessRequest</option>
+            <option>ViewCertificate</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" style="font-size:.85rem;font-weight:600;">ผลลัพธ์</label>
+          <select id="resultFilter" class="form-select">
+            <option value="">ทั้งหมด</option>
+            <option>Success</option>
+            <option>Failed</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" style="font-size:.85rem;font-weight:600;">ค้นหาผู้ใช้</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="ri ri-search-line"></i></span>
+            <input type="text" class="form-control" placeholder="Username / Email" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DataTable -->
+  <div class="card">
+    <div class="card-datatable table-responsive">
+      <table id="tableAuditLog" class="table table-hover" style="font-size:.85rem;">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>ผู้ใช้</th>
+            <th>IP Address</th>
+            <th>Action</th>
+            <th>Resource</th>
+            <th>ผลลัพธ์</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-size:.78rem;white-space:nowrap;">25/04/2569 09:45:12</td>
+            <td>somchai&#64;dpim.go.th</td>
+            <td><code>203.154.1.10</code></td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">Login</span></td>
+            <td>/Auth/LoginBasic</td>
+            <td><span class="badge badge-success">Success</span></td>
+          </tr>
+          <tr>
+            <td style="font-size:.78rem;white-space:nowrap;">25/04/2569 09:30:05</td>
+            <td>pimjai&#64;mining.co.th</td>
+            <td><code>101.109.20.55</code></td>
+            <td><span class="badge" style="background:#e8f5e9;color:#2e7d32;">Register</span></td>
+            <td>/Auth/RegisterMultiSteps</td>
+            <td><span class="badge badge-success">Success</span></td>
+          </tr>
+          <tr>
+            <td style="font-size:.78rem;white-space:nowrap;">25/04/2569 08:15:33</td>
+            <td>hacker&#64;unknown.net</td>
+            <td><code>91.234.55.77</code></td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">Login</span></td>
+            <td>/Auth/LoginBasic</td>
+            <td><span class="badge badge-failed">Failed</span></td>
+          </tr>
+          <tr>
+            <td style="font-size:.78rem;white-space:nowrap;">24/04/2569 16:20:00</td>
+            <td>officer&#64;dpim.go.th</td>
+            <td><code>10.0.0.12</code></td>
+            <td><span class="badge" style="background:#fff3e0;color:#e65100;">ChangePassword</span></td>
+            <td>/Users/ViewSecurity</td>
+            <td><span class="badge badge-success">Success</span></td>
+          </tr>
+          <tr>
+            <td style="font-size:.78rem;white-space:nowrap;">24/04/2569 14:05:44</td>
+            <td>admin&#64;dpim.go.th</td>
+            <td><code>10.0.0.1</code></td>
+            <td><span class="badge" style="background:#fce4ec;color:#880e4f;">AccessRequest</span></td>
+            <td>/Officer/ReviewAccessRequest/1</td>
+            <td><span class="badge badge-success">Success</span></td>
+          </tr>
+          <tr>
+            <td style="font-size:.78rem;white-space:nowrap;">24/04/2569 11:30:10</td>
+            <td>weerachai&#64;mine.co.th</td>
+            <td><code>171.7.8.90</code></td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">Login</span></td>
+            <td>/Auth/LoginBasic</td>
+            <td><span class="badge badge-failed">Failed</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

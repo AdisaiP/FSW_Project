@@ -1,0 +1,267 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "จัดการนโยบายความเป็นส่วนตัว";
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .badge-draft { background:#fff3e0;color:#e65100; }
+  .badge-published { background:#d1f2d1;color:#155724; }
+  .nav-tabs .nav-link.active { border-bottom-color:var(--dpim-blue); color:var(--dpim-blue); font-weight:600; }
+  .nav-tabs .nav-link:hover { color:var(--dpim-blue); }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+  .rich-editor {
+    border:1px solid var(--bs-border-color); border-radius:8px;
+    min-height:300px; padding:1rem; background:var(--bs-body-bg);
+    font-size:.9rem; line-height:1.7;
+  }
+  .rich-toolbar {
+    border:1px solid var(--bs-border-color); border-bottom:none;
+    border-radius:8px 8px 0 0; padding:.5rem .75rem;
+    background:var(--bs-gray-100); display:flex; gap:.25rem; flex-wrap:wrap;
+  }
+  .rich-toolbar button {
+    border:1px solid var(--bs-border-color); background:#fff; border-radius:4px;
+    padding:.2rem .5rem; font-size:.8rem; cursor:pointer; transition:.15s ease;
+  }
+  .rich-toolbar button:hover { background:var(--dpim-blue); color:#fff; border-color:var(--dpim-blue); }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Tab switch
+  document.querySelectorAll('[data-bs-toggle="tab"]').forEach(function (t) {
+    t.addEventListener('shown.bs.tab', function () {});
+  });
+
+  // Save draft
+  document.getElementById('btnSaveDraft')?.addEventListener('click', function () {
+    alert('บันทึก Draft สำเร็จ!');
+  });
+
+  // Publish
+  document.getElementById('btnPublish')?.addEventListener('click', function () {
+    if (confirm('ยืนยันการ Publish นโยบายนี้?\n\nผู้ใช้ทั้งหมดจะถูกแจ้งให้ยอมรับนโยบายใหม่')) {
+      alert('Publish สำเร็จ! ผู้ใช้ทั้งหมดจะได้รับการแจ้งเตือน');
+    }
+  });
+
+  // Rich text toolbar (mock)
+  document.querySelectorAll('.rich-toolbar button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.execCommand(this.dataset.cmd, false, this.dataset.val || null);
+      document.getElementById('richEditor').focus();
+    });
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">นโยบายความเป็นส่วนตัว</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">จัดการนโยบายความเป็นส่วนตัว (Privacy Policy)</h4>
+
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabVersions">
+        <i class="ri ri-list-unordered me-1"></i>รายการ Version
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabEdit">
+        <i class="ri ri-edit-line me-1"></i>แก้ไขเนื้อหา
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabConsent">
+        <i class="ri ri-shield-check-line me-1"></i>ประวัติ Consent
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- Tab 1: Versions -->
+    <div class="tab-pane fade show active" id="tabVersions">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">รายการนโยบายทั้งหมด</h5>
+          <button class="btn btn-dpim btn-sm" data-bs-toggle="tab" data-bs-target="#tabEdit">
+            <i class="ri ri-add-line me-1"></i>สร้าง Version ใหม่
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Version</th>
+                <th>ชื่อเอกสาร</th>
+                <th>วันที่บังคับใช้</th>
+                <th>สถานะ</th>
+                <th>ผู้สร้าง</th>
+                <th>การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>v3.0</strong></td>
+                <td>นโยบายความเป็นส่วนตัว DPIM Portal 2569</td>
+                <td>01/01/2569</td>
+                <td><span class="badge badge-published">Published</span></td>
+                <td>ผู้ดูแลระบบ</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary me-1">
+                    <i class="ri ri-eye-line"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary">
+                    <i class="ri ri-file-copy-line"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>v2.1</td>
+                <td>นโยบายความเป็นส่วนตัว DPIM Portal 2568</td>
+                <td>01/04/2568</td>
+                <td><span class="badge" style="background:#e9ecef;color:#495057;">Archived</span></td>
+                <td>ผู้ดูแลระบบ</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary me-1">
+                    <i class="ri ri-eye-line"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>v3.1-draft</td>
+                <td>นโยบายความเป็นส่วนตัว (ร่างปรับปรุง)</td>
+                <td>-</td>
+                <td><span class="badge badge-draft">Draft</span></td>
+                <td>ผู้ดูแลระบบ</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="tab" data-bs-target="#tabEdit">
+                    <i class="ri ri-edit-line"></i>
+                  </button>
+                  <button class="btn btn-sm btn-dpim-green btn-sm">
+                    <i class="ri ri-upload-line"></i> Publish
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Edit -->
+    <div class="tab-pane fade" id="tabEdit">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">แก้ไขนโยบายความเป็นส่วนตัว</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input type="text" class="form-control" id="policyName"
+                       value="นโยบายความเป็นส่วนตัว DPIM Portal" />
+                <label for="policyName">ชื่อเอกสาร <span class="text-danger">*</span></label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-floating form-floating-outline">
+                <input type="text" class="form-control" id="policyVersion" value="v3.1" />
+                <label for="policyVersion">Version</label>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-floating form-floating-outline">
+                <input type="text" class="form-control" id="policyEffDate" placeholder="วันที่บังคับใช้" />
+                <label for="policyEffDate">วันที่บังคับใช้</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rich Text Editor (mock) -->
+          <div class="rich-toolbar mb-0">
+            <button data-cmd="bold"><b>B</b></button>
+            <button data-cmd="italic"><i>I</i></button>
+            <button data-cmd="underline"><u>U</u></button>
+            <button data-cmd="insertUnorderedList">• List</button>
+            <button data-cmd="insertOrderedList">1. List</button>
+            <button data-cmd="justifyLeft">⬅</button>
+            <button data-cmd="justifyCenter">⬛</button>
+            <button data-cmd="justifyRight">➡</button>
+          </div>
+          <div id="richEditor" class="rich-editor" contenteditable="true"
+               style="border-top-left-radius:0;border-top-right-radius:0;">
+            <h4>1. การเก็บรวบรวมข้อมูลส่วนบุคคล</h4>
+            <p>กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ (กพร.) เก็บรวบรวมข้อมูลส่วนบุคคลของท่านเพื่อวัตถุประสงค์ในการให้บริการระบบ DPIM Portal...</p>
+            <h4>2. การใช้ข้อมูลส่วนบุคคล</h4>
+            <p>ข้อมูลส่วนบุคคลที่เก็บรวบรวมจะถูกนำไปใช้เพื่อ...</p>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end mt-3">
+            <button id="btnSaveDraft" class="btn btn-outline-secondary">
+              <i class="ri ri-save-line me-1"></i>บันทึก Draft
+            </button>
+            <button id="btnPublish" class="btn btn-dpim-green">
+              <i class="ri ri-upload-line me-1"></i>Publish
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Consent History -->
+    <div class="tab-pane fade" id="tabConsent">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">ประวัติการยินยอม (Consent Log)</h5>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>ผู้ใช้</th>
+                <th>อีเมล</th>
+                <th>Version ที่ยินยอม</th>
+                <th>วันที่ยินยอม</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>นายสมชาย ใจดี</td>
+                <td>somchai&#64;example.com</td>
+                <td><span class="badge" style="background:#e8f0fe;color:#23408F;">v3.0</span></td>
+                <td>20/04/2569 10:30</td>
+                <td style="font-family:monospace;font-size:.83rem;">192.168.1.10</td>
+              </tr>
+              <tr>
+                <td>นางสาวพิมพ์ใจ สุขใส</td>
+                <td>pimjai&#64;example.com</td>
+                <td><span class="badge" style="background:#e8f0fe;color:#23408F;">v3.0</span></td>
+                <td>18/04/2569 14:22</td>
+                <td style="font-family:monospace;font-size:.83rem;">10.0.0.45</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

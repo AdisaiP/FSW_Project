@@ -1,0 +1,236 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "บัญชีที่อยู่";
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .address-card {
+    border:1.5px solid var(--bs-border-color); border-radius:10px;
+    padding:1.25rem; height:100%; transition:box-shadow .18s ease;
+    position:relative;
+  }
+  .address-card:hover { box-shadow:0 4px 12px rgba(0,0,0,.1); }
+  .address-card.is-primary { border-color:var(--dpim-blue); }
+  .address-add-card {
+    border:2px dashed var(--bs-border-color); border-radius:10px;
+    height:100%; min-height:180px; display:flex; align-items:center;
+    justify-content:center; flex-direction:column; gap:.5rem;
+    cursor:pointer; transition:all .18s ease; text-decoration:none; color:inherit;
+  }
+  .address-add-card:hover { border-color:var(--dpim-blue); color:var(--dpim-blue); }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Open modal for add/edit
+  document.querySelectorAll('[data-address-id]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = this.dataset.addressId;
+      document.getElementById('modalTitle').textContent = id ? 'แก้ไขที่อยู่' : 'เพิ่มที่อยู่ใหม่';
+      var modal = new bootstrap.Modal(document.getElementById('modalAddress'));
+      modal.show();
+    });
+  });
+
+  // Set primary
+  document.querySelectorAll('.btn-set-primary').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      alert('ตั้งเป็นที่อยู่หลักสำเร็จ');
+      location.reload();
+    });
+  });
+
+  // Delete
+  document.querySelectorAll('.btn-delete-addr').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (confirm('ยืนยันลบที่อยู่นี้?')) {
+        alert('ลบที่อยู่สำเร็จ');
+      }
+    });
+  });
+
+  // Save modal
+  document.getElementById('btnSaveAddress').addEventListener('click', function () {
+    var modal = bootstrap.Modal.getInstance(document.getElementById('modalAddress'));
+    modal.hide();
+    alert('บันทึกที่อยู่สำเร็จ');
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item"><a href="/Users/ViewAccount">บัญชีผู้ใช้</a></li>
+      <li class="breadcrumb-item active">บัญชีที่อยู่</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="page-title-dpim mb-0">บัญชีที่อยู่</h4>
+    <button class="btn btn-dpim" data-address-id="">
+      <i class="ri ri-add-line me-1"></i>เพิ่มที่อยู่
+    </button>
+  </div>
+
+  <div class="row g-4">
+    <!-- Address Card 1 (Primary) -->
+    <div class="col-md-6 col-xl-4">
+      <div class="address-card is-primary">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="fw-bold" style="color:var(--dpim-blue);">ที่อยู่บ้าน</span>
+            <span class="badge ms-2" style="background:var(--dpim-blue);color:#fff;font-size:.72rem;">หลัก</span>
+          </div>
+          <span class="badge" style="background:#e8f5e9;color:#2e7d32;font-size:.72rem;">ที่อยู่ติดต่อ</span>
+        </div>
+        <p class="text-muted mb-3" style="font-size:.85rem;">
+          123/45 ถนนพหลโยธิน แขวงพญาไท เขตพญาไท กรุงเทพมหานคร 10400
+        </p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary" data-address-id="1">
+            <i class="ri ri-edit-line me-1"></i>แก้ไข
+          </button>
+          <button class="btn btn-sm btn-outline-danger btn-delete-addr">
+            <i class="ri ri-delete-bin-line me-1"></i>ลบ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address Card 2 -->
+    <div class="col-md-6 col-xl-4">
+      <div class="address-card">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="fw-bold" style="color:var(--dpim-blue);">ที่อยู่สำนักงาน</span>
+          </div>
+          <span class="badge" style="background:#fff3e0;color:#e65100;font-size:.72rem;">ที่อยู่จัดส่ง</span>
+        </div>
+        <p class="text-muted mb-3" style="font-size:.85rem;">
+          88/9 อาคารธนาคารกสิกรไทย ชั้น 12 ถนนสีลม แขวงสีลม เขตบางรัก กรุงเทพมหานคร 10500
+        </p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary btn-set-primary">
+            <i class="ri ri-star-line me-1"></i>ตั้งเป็นหลัก
+          </button>
+          <button class="btn btn-sm btn-outline-primary" data-address-id="2">
+            <i class="ri ri-edit-line me-1"></i>แก้ไข
+          </button>
+          <button class="btn btn-sm btn-outline-danger btn-delete-addr">
+            <i class="ri ri-delete-bin-line me-1"></i>ลบ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New -->
+    <div class="col-md-6 col-xl-4">
+      <a href="javascript:;" class="address-add-card" data-address-id="">
+        <i class="ri ri-add-circle-line" style="font-size:2.5rem;color:#adb5bd;"></i>
+        <span class="fw-semibold text-muted">เพิ่มที่อยู่ใหม่</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: เพิ่ม/แก้ไขที่อยู่ -->
+<div class="modal fade" id="modalAddress" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom-color:var(--dpim-blue);">
+        <h5 class="modal-title" id="modalTitle" style="color:var(--dpim-blue);">เพิ่มที่อยู่ใหม่</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="addrLabel" placeholder="ชื่อที่อยู่" />
+              <label for="addrLabel">ชื่อที่อยู่ (Label) <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating form-floating-outline">
+              <select class="form-select" id="addrType">
+                <option>ที่อยู่จัดส่ง</option>
+                <option>ที่อยู่ออกใบกำกับ</option>
+                <option>ที่อยู่ติดต่อ</option>
+              </select>
+              <label for="addrType">ประเภทที่อยู่ <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="addrNo" placeholder="บ้านเลขที่" />
+              <label for="addrNo">บ้านเลขที่ <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="addrStreet" placeholder="หมู่/ซอย/ถนน" />
+              <label for="addrStreet">หมู่ที่ / ซอย / ถนน</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="addrSubdistrict" placeholder="ตำบล/แขวง" />
+              <label for="addrSubdistrict">ตำบล/แขวง <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="addrDistrict" placeholder="อำเภอ/เขต" />
+              <label for="addrDistrict">อำเภอ/เขต <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating form-floating-outline">
+              <select class="form-select" id="addrProvince">
+                <option value="">เลือกจังหวัด</option>
+                <option>กรุงเทพมหานคร</option>
+                <option>เชียงใหม่</option>
+                <option>ขอนแก่น</option>
+                <option>สงขลา</option>
+                <option>นครราชสีมา</option>
+              </select>
+              <label for="addrProvince">จังหวัด <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="addrPostcode" placeholder="รหัสไปรษณีย์" maxlength="5" />
+              <label for="addrPostcode">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-8 d-flex align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="addrSetPrimary" />
+              <label class="form-check-label" for="addrSetPrimary">ตั้งเป็นที่อยู่หลัก</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSaveAddress" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>บันทึก
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

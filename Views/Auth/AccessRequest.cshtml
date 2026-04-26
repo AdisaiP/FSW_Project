@@ -1,0 +1,208 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "ยื่นคำขอสิทธิ์การเข้าใช้งาน";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/dropzone/dropzone.css" />
+<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/dropzone/dropzone.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
+<script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .system-check-card {
+    border:1.5px solid var(--bs-border-color); border-radius:8px;
+    padding:.75rem 1rem; cursor:pointer; transition:all .18s ease;
+  }
+  .system-check-card:has(input:checked) { border-color:var(--dpim-blue); background:rgba(35,64,143,.04); }
+  .dropzone-access {
+    border:2px dashed var(--bs-border-color); border-radius:8px;
+    padding:1.5rem; text-align:center; cursor:pointer;
+    background:var(--bs-body-bg); transition:border-color .2s ease;
+  }
+  .dropzone-access:hover { border-color:var(--dpim-blue); }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Dropzone
+  Dropzone.autoDiscover = false;
+  var dz = new Dropzone('#docDropzone', {
+    url: '/upload-mock',
+    maxFilesize: 5,
+    acceptedFiles: '.pdf,.jpg,.jpeg,.png',
+    addRemoveLinks: true,
+    dictDefaultMessage: '<i class="ri ri-upload-cloud-line" style="font-size:2rem;color:#23408F;"></i><br>ลากไฟล์มาวางที่นี่ หรือ <strong>คลิกเพื่อเลือกไฟล์</strong><br><small class="text-muted">รองรับ PDF, JPG, PNG ขนาดไม่เกิน 5 MB</small>',
+    dictRemoveFile: 'ลบ',
+  });
+
+  // Form validation
+  var fv = FormValidation.formValidation(document.getElementById('formAccessRequest'), {
+    fields: {
+      position: { validators: { notEmpty: { message: 'กรุณากรอกตำแหน่ง' } } },
+      department: { validators: { notEmpty: { message: 'กรุณากรอกหน่วยงาน' } } },
+      reason: { validators: { notEmpty: { message: 'กรุณากรอกเหตุผลการขอ' } } },
+    },
+    plugins: {
+      trigger: new FormValidation.plugins.Trigger(),
+      bootstrap5: new FormValidation.plugins.Bootstrap5({ rowSelector: '.fv-row' }),
+      autoFocus: new FormValidation.plugins.AutoFocus(),
+    }
+  });
+
+  document.getElementById('btnSubmit').addEventListener('click', function () {
+    fv.validate().then(function (status) {
+      if (status === 'Valid') {
+        // Mock submission
+        alert('ส่งคำขอสำเร็จ! หมายเลขอ้างอิง: ACC-2569-' + Math.floor(Math.random()*99999).toString().padStart(5,'0'));
+        window.location.href = '/';
+      }
+    });
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">ยื่นคำขอสิทธิ์การเข้าใช้งาน</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">ยื่นคำขอสิทธิ์การเข้าใช้งานระบบ</h4>
+
+  <form id="formAccessRequest" method="post">
+
+    <!-- Card 1: เลือกระบบงาน -->
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge rounded-circle" style="background:var(--dpim-blue);width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;">1</span>
+        <h5 class="card-title mb-0">เลือกระบบงานที่ต้องการขอสิทธิ์</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3" style="font-size:.88rem;">เลือกได้มากกว่า 1 ระบบ</p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="system-check-card d-flex align-items-start gap-3 w-100">
+              <input class="form-check-input mt-1" type="checkbox" name="systems" value="rmbs1" />
+              <div>
+                <div class="fw-semibold">ระบบตรวจสอบ RMBS1</div>
+                <div class="text-muted" style="font-size:.8rem;">ระบบควบคุมปริมาณวัตถุดิบในกระบวนการผลิต</div>
+              </div>
+            </label>
+          </div>
+          <div class="col-md-6">
+            <label class="system-check-card d-flex align-items-start gap-3 w-100">
+              <input class="form-check-input mt-1" type="checkbox" name="systems" value="ps" />
+              <div>
+                <div class="fw-semibold">ระบบประกาศ PS/NoPS</div>
+                <div class="text-muted" style="font-size:.8rem;">Processing Statement / Non-Manipulation Document</div>
+              </div>
+            </label>
+          </div>
+          <div class="col-md-6">
+            <label class="system-check-card d-flex align-items-start gap-3 w-100">
+              <input class="form-check-input mt-1" type="checkbox" name="systems" value="import" />
+              <div>
+                <div class="fw-semibold">ระบบนำเข้า/ส่งออกแร่</div>
+                <div class="text-muted" style="font-size:.8rem;">จัดการใบอนุญาตนำเข้าและส่งออกแร่ธาตุ</div>
+              </div>
+            </label>
+          </div>
+          <div class="col-md-6">
+            <label class="system-check-card d-flex align-items-start gap-3 w-100">
+              <input class="form-check-input mt-1" type="checkbox" name="systems" value="scrap" />
+              <div>
+                <div class="fw-semibold">ระบบซื้อขายเศษโลหะ</div>
+                <div class="text-muted" style="font-size:.8rem;">การซื้อขายและการควบคุมเศษโลหะ</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: ข้อมูลผู้ยื่นคำขอ -->
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge rounded-circle" style="background:var(--dpim-blue);width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;">2</span>
+        <h5 class="card-title mb-0">ข้อมูลผู้ยื่นคำขอ</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="fullname" value="นายอดิสัย พัฒนการ" readonly
+                     style="background:var(--bs-gray-100);" />
+              <label for="fullname">ชื่อ-นามสกุล</label>
+            </div>
+          </div>
+          <div class="col-md-6 fv-row">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="position" name="position" placeholder="ตำแหน่ง" />
+              <label for="position">ตำแหน่ง <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6 fv-row">
+            <div class="form-floating form-floating-outline">
+              <input type="text" class="form-control" id="department" name="department" placeholder="หน่วยงาน" />
+              <label for="department">หน่วยงาน <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-12 fv-row">
+            <div class="form-floating form-floating-outline">
+              <textarea class="form-control" id="reason" name="reason" placeholder="เหตุผล" style="height:100px;"></textarea>
+              <label for="reason">เหตุผลการขอสิทธิ์ <span class="text-danger">*</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: แนบเอกสาร -->
+    <div class="card mb-4">
+      <div class="card-header d-flex align-items-center gap-2">
+        <span class="badge rounded-circle" style="background:var(--dpim-blue);width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;">3</span>
+        <h5 class="card-title mb-0">แนบเอกสารประกอบ</h5>
+      </div>
+      <div class="card-body">
+        <div id="docDropzone" class="dropzone-access"></div>
+        <p class="text-muted mt-2 mb-0" style="font-size:.8rem;">
+          <i class="ri ri-information-line me-1"></i>
+          เช่น สำเนาบัตรประชาชน, หนังสือมอบอำนาจ, หรือเอกสารอื่น ๆ ที่เกี่ยวข้อง
+        </p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-3 justify-content-end">
+      <a href="/" class="btn btn-outline-secondary">
+        <i class="ri ri-close-line me-1"></i>ยกเลิก
+      </a>
+      <button type="button" id="btnSubmit" class="btn btn-dpim-green">
+        <i class="ri ri-send-plane-line me-1"></i>ส่งคำขอ
+      </button>
+    </div>
+
+  </form>
+</div>

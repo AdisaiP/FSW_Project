@@ -1,0 +1,473 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "บริหารจัดการผู้ใช้งาน";
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+  .stat-card { border-radius:.75rem; border:none; }
+  .stat-card .stat-icon { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+  .role-badge { font-size:.72rem; padding:.2em .55em; border-radius:.4em; }
+  .user-avatar-sm { width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid #e0e7ef; }
+  .group-check-item { display:flex; align-items:center; gap:.5rem; padding:.4rem .5rem; border-radius:.4rem; cursor:pointer; }
+  .group-check-item:hover { background:rgba(35,64,143,.06); }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  /* ── DataTable ── */
+  var dt = $('#userTable').DataTable({
+    language: { url: '/json/datatable-th.json', sEmptyTable: 'ไม่พบข้อมูล', sZeroRecords: 'ไม่พบผลการค้นหา' },
+    pageLength: 10,
+    order: [[0, 'asc']],
+    columnDefs: [{ orderable: false, targets: [-1] }]
+  });
+
+  /* Filter status */
+  document.getElementById('fStatus').addEventListener('change', function () {
+    dt.column(6).search(this.value).draw();
+  });
+  document.getElementById('fType').addEventListener('change', function () {
+    dt.column(3).search(this.value).draw();
+  });
+
+  /* ── Modal: เพิ่มผู้ใช้ ── */
+  document.getElementById('btnAddUser').addEventListener('click', function () {
+    document.getElementById('modalUserTitle').textContent = 'เพิ่มผู้ใช้งาน';
+    document.getElementById('formUser').reset();
+    new bootstrap.Modal(document.getElementById('modalUser')).show();
+  });
+
+  /* ── Modal: แก้ไข ── */
+  document.querySelectorAll('.btn-edit-user').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById('modalUserTitle').textContent = 'แก้ไขผู้ใช้งาน';
+      document.getElementById('uFirstname').value = this.dataset.fname || '';
+      document.getElementById('uLastname').value = this.dataset.lname || '';
+      document.getElementById('uEmail').value = this.dataset.email || '';
+      document.getElementById('uType').value = this.dataset.type || '';
+      document.getElementById('uRole').value = this.dataset.role || '';
+      document.getElementById('uStatus').value = this.dataset.status || 'Active';
+      new bootstrap.Modal(document.getElementById('modalUser')).show();
+    });
+  });
+
+  /* ── Modal: กำหนดกลุ่ม ── */
+  document.querySelectorAll('.btn-assign-group').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById('assignUserName').textContent = this.dataset.name || '';
+      new bootstrap.Modal(document.getElementById('modalAssignGroup')).show();
+    });
+  });
+
+  /* ── Reset Password ── */
+  document.querySelectorAll('.btn-reset-pwd').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var name = this.closest('tr').querySelector('.user-name').textContent;
+      if (confirm('รีเซ็ตรหัสผ่านให้ ' + name + '?\nระบบจะส่งรหัสผ่านชั่วคราวทางอีเมล')) {
+        alert('ส่งรหัสผ่านชั่วคราวไปยังอีเมลสำเร็จ');
+      }
+    });
+  });
+
+  /* ── Suspend / Revoke ── */
+  document.querySelectorAll('.btn-suspend-user').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var name = this.closest('tr').querySelector('.user-name').textContent;
+      if (confirm('ระงับการใช้งานบัญชี ' + name + '?')) {
+        alert('ระงับบัญชีสำเร็จ');
+      }
+    });
+  });
+
+  /* Save User */
+  document.getElementById('btnSaveUser').addEventListener('click', function () {
+    var form = document.getElementById('formUser');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    bootstrap.Modal.getInstance(document.getElementById('modalUser')).hide();
+    alert('บันทึกข้อมูลผู้ใช้งานสำเร็จ');
+  });
+
+  /* Save Group Assignment */
+  document.getElementById('btnSaveGroup').addEventListener('click', function () {
+    bootstrap.Modal.getInstance(document.getElementById('modalAssignGroup')).hide();
+    alert('บันทึกกลุ่มและบทบาทสำเร็จ');
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">บริหารจัดการผู้ใช้งาน</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">บริหารจัดการผู้ใช้งาน</h4>
+
+  <!-- Summary Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon" style="background:rgba(35,64,143,.12);">
+            <i class="ri ri-group-line" style="color:var(--dpim-blue);"></i>
+          </div>
+          <div>
+            <div class="text-muted" style="font-size:.78rem;">ผู้ใช้ทั้งหมด</div>
+            <div class="fw-bold fs-4" style="color:var(--dpim-blue);">284</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon" style="background:rgba(65,173,73,.12);">
+            <i class="ri ri-user-follow-line" style="color:var(--dpim-green);"></i>
+          </div>
+          <div>
+            <div class="text-muted" style="font-size:.78rem;">กำลังใช้งาน</div>
+            <div class="fw-bold fs-4" style="color:var(--dpim-green);">251</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon" style="background:rgba(255,171,0,.12);">
+            <i class="ri ri-time-line" style="color:#e6a800;"></i>
+          </div>
+          <div>
+            <div class="text-muted" style="font-size:.78rem;">รอการเปิดใช้งาน</div>
+            <div class="fw-bold fs-4" style="color:#e6a800;">18</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="stat-icon" style="background:rgba(220,53,69,.12);">
+            <i class="ri ri-user-unfollow-line" style="color:#dc3545;"></i>
+          </div>
+          <div>
+            <div class="text-muted" style="font-size:.78rem;">ถูกระงับ</div>
+            <div class="fw-bold fs-4" style="color:#dc3545;">15</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+      <h5 class="card-title mb-0" style="color:var(--dpim-blue);">รายชื่อผู้ใช้งาน</h5>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <select id="fType" class="form-select form-select-sm" style="width:auto;">
+          <option value="">ประเภทสมาชิก (ทั้งหมด)</option>
+          <option value="บุคคลธรรมดา">บุคคลธรรมดา</option>
+          <option value="นิติบุคคล">นิติบุคคล</option>
+          <option value="เจ้าหน้าที่">เจ้าหน้าที่</option>
+        </select>
+        <select id="fStatus" class="form-select form-select-sm" style="width:auto;">
+          <option value="">สถานะ (ทั้งหมด)</option>
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Suspended">Suspended</option>
+        </select>
+        <button id="btnAddUser" class="btn btn-dpim btn-sm">
+          <i class="ri ri-user-add-line me-1"></i>เพิ่มผู้ใช้
+        </button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table id="userTable" class="table table-hover align-middle mb-0" style="font-size:.83rem;">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>ชื่อ-นามสกุล</th>
+              <th>อีเมล</th>
+              <th>ประเภท</th>
+              <th>กลุ่ม / บทบาท</th>
+              <th>วันที่เปิดใช้งาน</th>
+              <th>สถานะ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <img src="~/img/avatars/1.png" class="user-avatar-sm" alt="" />
+                  <span class="user-name fw-semibold">นายอดิสัย พัฒนการ</span>
+                </div>
+              </td>
+              <td>adisaip@dpim.go.th</td>
+              <td>ผู้ประกอบการ</td>
+              <td>
+                <span class="badge bg-label-primary role-badge">ผู้ประกอบการ</span>
+                <span class="badge bg-label-info role-badge">DPIM-Portal</span>
+              </td>
+              <td>01/01/2569</td>
+              <td><span class="badge bg-label-success">Active</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-user"
+                    title="แก้ไข"
+                    data-fname="อดิสัย" data-lname="พัฒนการ"
+                    data-email="adisaip@dpim.go.th" data-type="ผู้ประกอบการ"
+                    data-role="ผู้ประกอบการ" data-status="Active">
+                    <i class="ri ri-edit-line"></i>
+                  </button>
+                  <button class="btn btn-icon btn-sm btn-outline-primary btn-assign-group"
+                    title="กำหนดกลุ่ม" data-name="นายอดิสัย พัฒนการ">
+                    <i class="ri ri-group-line"></i>
+                  </button>
+                  <button class="btn btn-icon btn-sm btn-outline-warning btn-reset-pwd"
+                    title="รีเซ็ตรหัสผ่าน">
+                    <i class="ri ri-key-line"></i>
+                  </button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-suspend-user"
+                    title="ระงับบัญชี">
+                    <i class="ri ri-forbid-line"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <img src="~/img/avatars/2.png" class="user-avatar-sm" alt="" />
+                  <span class="user-name fw-semibold">นางสาวสมหญิง รักไทย</span>
+                </div>
+              </td>
+              <td>somying@example.com</td>
+              <td>บุคคลธรรมดา</td>
+              <td>
+                <span class="badge bg-label-success role-badge">บุคคลธรรมดา</span>
+              </td>
+              <td>15/02/2569</td>
+              <td><span class="badge bg-label-success">Active</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-user" title="แก้ไข"
+                    data-fname="สมหญิง" data-lname="รักไทย"
+                    data-email="somying@example.com" data-type="บุคคลธรรมดา"
+                    data-role="บุคคลธรรมดา" data-status="Active">
+                    <i class="ri ri-edit-line"></i>
+                  </button>
+                  <button class="btn btn-icon btn-sm btn-outline-primary btn-assign-group" title="กำหนดกลุ่ม" data-name="นางสาวสมหญิง รักไทย"><i class="ri ri-group-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-warning btn-reset-pwd" title="รีเซ็ตรหัสผ่าน"><i class="ri ri-key-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-suspend-user" title="ระงับบัญชี"><i class="ri ri-forbid-line"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <img src="~/img/avatars/3.png" class="user-avatar-sm" alt="" />
+                  <span class="user-name fw-semibold">นายวิชัย มั่นคง</span>
+                </div>
+              </td>
+              <td>wichai@dpim.go.th</td>
+              <td>เจ้าหน้าที่</td>
+              <td>
+                <span class="badge bg-label-warning role-badge">เจ้าหน้าที่</span>
+                <span class="badge bg-label-secondary role-badge">Officer-Level2</span>
+              </td>
+              <td>01/03/2569</td>
+              <td><span class="badge bg-label-warning">Pending</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-user" title="แก้ไข"
+                    data-fname="วิชัย" data-lname="มั่นคง"
+                    data-email="wichai@dpim.go.th" data-type="เจ้าหน้าที่"
+                    data-role="เจ้าหน้าที่" data-status="Pending">
+                    <i class="ri ri-edit-line"></i>
+                  </button>
+                  <button class="btn btn-icon btn-sm btn-outline-primary btn-assign-group" title="กำหนดกลุ่ม" data-name="นายวิชัย มั่นคง"><i class="ri ri-group-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-warning btn-reset-pwd" title="รีเซ็ตรหัสผ่าน"><i class="ri ri-key-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-suspend-user" title="ระงับบัญชี"><i class="ri ri-forbid-line"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <img src="~/img/avatars/4.png" class="user-avatar-sm" alt="" />
+                  <span class="user-name fw-semibold">บริษัท แร่ไทย จำกัด</span>
+                </div>
+              </td>
+              <td>contact@raethai.co.th</td>
+              <td>นิติบุคคล</td>
+              <td>
+                <span class="badge bg-label-info role-badge">นิติบุคคล</span>
+              </td>
+              <td>10/04/2569</td>
+              <td><span class="badge bg-label-danger">Suspended</span></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-user" title="แก้ไข"
+                    data-fname="แร่ไทย" data-lname=""
+                    data-email="contact@raethai.co.th" data-type="นิติบุคคล"
+                    data-role="นิติบุคคล" data-status="Suspended">
+                    <i class="ri ri-edit-line"></i>
+                  </button>
+                  <button class="btn btn-icon btn-sm btn-outline-primary btn-assign-group" title="กำหนดกลุ่ม" data-name="บริษัท แร่ไทย จำกัด"><i class="ri ri-group-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-warning btn-reset-pwd" title="รีเซ็ตรหัสผ่าน"><i class="ri ri-key-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-suspend-user" title="ระงับบัญชี"><i class="ri ri-forbid-line"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: เพิ่ม/แก้ไขผู้ใช้งาน -->
+<div class="modal fade" id="modalUser" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:2px solid var(--dpim-green);">
+        <h5 class="modal-title" id="modalUserTitle" style="color:var(--dpim-blue);"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formUser">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">ชื่อ <span class="text-danger">*</span></label>
+              <input type="text" id="uFirstname" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">นามสกุล <span class="text-danger">*</span></label>
+              <input type="text" id="uLastname" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">อีเมล <span class="text-danger">*</span></label>
+              <input type="email" id="uEmail" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">เบอร์โทรศัพท์</label>
+              <input type="tel" class="form-control" maxlength="10" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">ประเภทสมาชิก <span class="text-danger">*</span></label>
+              <select id="uType" class="form-select" required>
+                <option value="">-- เลือก --</option>
+                <option value="บุคคลธรรมดา">บุคคลธรรมดา</option>
+                <option value="นิติบุคคล">นิติบุคคล</option>
+                <option value="วิสาหกิจชุมชน">วิสาหกิจชุมชน</option>
+                <option value="เจ้าหน้าที่">เจ้าหน้าที่</option>
+                <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">บทบาทหลัก</label>
+              <select id="uRole" class="form-select">
+                <option value="">-- เลือก --</option>
+                <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+                <option value="เจ้าหน้าที่">เจ้าหน้าที่</option>
+                <option value="Admin">Admin</option>
+                <option value="Viewer">Viewer</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">วันที่เปิดใช้งาน (Activate Date)</label>
+              <input type="date" id="uActivate" class="form-control" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">สถานะ</label>
+              <select id="uStatus" class="form-select">
+                <option value="Active">Active</option>
+                <option value="Pending">Pending</option>
+                <option value="Suspended">Suspended</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">หมายเหตุ (เจ้าหน้าที่)</label>
+              <textarea class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSaveUser" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>บันทึก
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: กำหนดกลุ่มและบทบาท -->
+<div class="modal fade" id="modalAssignGroup" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:2px solid var(--dpim-green);">
+        <h5 class="modal-title" style="color:var(--dpim-blue);">กำหนดกลุ่มและบทบาท</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3 text-muted" style="font-size:.87rem;">
+          ผู้ใช้: <strong id="assignUserName"></strong>
+        </p>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">บทบาทหลัก</label>
+          <select class="form-select">
+            <option value="">-- เลือก --</option>
+            <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+            <option value="เจ้าหน้าที่">เจ้าหน้าที่</option>
+            <option value="Admin">Admin</option>
+            <option value="Viewer">Viewer</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">กลุ่มผู้ใช้ (เลือกได้หลายกลุ่ม)</label>
+          <div class="border rounded p-2" style="max-height:200px;overflow-y:auto;">
+            @foreach (var g in new[] { "DPIM-Portal", "Mining-System", "Officer-Level1", "Officer-Level2", "Admin-Group", "Report-Viewer", "Certificate-Manager", "SSO-Integration" })
+            {
+              <label class="group-check-item">
+                <input type="checkbox" class="form-check-input" />
+                <span style="font-size:.87rem;">@g</span>
+              </label>
+            }
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label fw-semibold">วันที่เริ่มใช้งาน</label>
+          <input type="date" class="form-control" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSaveGroup" class="btn btn-dpim-green">
+          <i class="ri ri-save-line me-1"></i>บันทึกกลุ่ม
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

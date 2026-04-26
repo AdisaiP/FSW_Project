@@ -1,0 +1,273 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "จัดการ FAQ";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; color:#fff; }
+  /* Mock rich-text toolbar */
+  .rte-toolbar { display:flex; gap:.25rem; padding:.5rem; border:1px solid var(--bs-border-color); border-bottom:none; border-radius:6px 6px 0 0; background:#f8f9fa; flex-wrap:wrap; }
+  .rte-toolbar button { border:none; background:none; padding:.25rem .4rem; border-radius:4px; cursor:pointer; font-size:.9rem; }
+  .rte-toolbar button:hover { background:var(--bs-gray-200); }
+  .rte-body { min-height:160px; border:1px solid var(--bs-border-color); border-radius:0 0 6px 6px; padding:.75rem; outline:none; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  new DataTable('#tableFAQ', {
+    language: {
+      search: 'ค้นหา:', lengthMenu: 'แสดง _MENU_ รายการ',
+      info: 'แสดง _START_-_END_ จาก _TOTAL_ รายการ',
+      paginate: { first:'แรก', last:'สุดท้าย', next:'ถัดไป', previous:'ก่อนหน้า' }
+    },
+    columnDefs: [{ orderable: false, targets: [-1] }],
+    order: [[0, 'asc']],
+    responsive: true,
+  });
+
+  // Open edit modal with row data (mock)
+  document.querySelectorAll('.btn-edit-faq').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById('modalFAQLabel').textContent = 'แก้ไขคำถาม';
+      document.getElementById('faqCategory').value = this.dataset.cat || '';
+      document.getElementById('faqQuestion').value = this.dataset.q || '';
+      document.getElementById('faqAnswer').textContent = this.dataset.a || '';
+      document.getElementById('faqStatus').value = this.dataset.status || 'active';
+      var modal = new bootstrap.Modal(document.getElementById('modalFAQ'));
+      modal.show();
+    });
+  });
+
+  // Add new
+  document.getElementById('btnAddFAQ')?.addEventListener('click', function () {
+    document.getElementById('modalFAQLabel').textContent = 'เพิ่มคำถามใหม่';
+    document.getElementById('faqCategory').value = '';
+    document.getElementById('faqQuestion').value = '';
+    document.getElementById('faqAnswer').textContent = '';
+    document.getElementById('faqStatus').value = 'active';
+    var modal = new bootstrap.Modal(document.getElementById('modalFAQ'));
+    modal.show();
+  });
+
+  // Save
+  document.getElementById('btnSaveFAQ')?.addEventListener('click', function () {
+    alert('บันทึกคำถาม FAQ สำเร็จ!');
+    bootstrap.Modal.getInstance(document.getElementById('modalFAQ'))?.hide();
+  });
+
+  // RTE toolbar mock
+  document.querySelectorAll('.rte-toolbar button').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.getElementById('faqAnswer')?.focus();
+    });
+  });
+
+  // Delete confirm
+  document.querySelectorAll('.btn-del-faq').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (confirm('ต้องการลบคำถามนี้ใช่หรือไม่?')) alert('ลบคำถามสำเร็จ!');
+    });
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">จัดการ FAQ</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <h4 class="page-title-dpim mb-0">คำถามที่พบบ่อย (FAQ)</h4>
+    <button id="btnAddFAQ" class="btn btn-dpim-green">
+      <i class="ri ri-add-line me-1"></i>เพิ่มคำถามใหม่
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-datatable table-responsive">
+      <table id="tableFAQ" class="table table-hover" style="font-size:.85rem;">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>หมวดหมู่</th>
+            <th>คำถาม</th>
+            <th>สถานะ</th>
+            <th class="text-center" style="width:120px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">การลงทะเบียน</span></td>
+            <td>วิธีการสมัครสมาชิก DPIM Portal ทำอย่างไร?</td>
+            <td><span class="badge bg-label-success">Active</span></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-icon btn-outline-primary btn-edit-faq"
+                      data-cat="การลงทะเบียน"
+                      data-q="วิธีการสมัครสมาชิก DPIM Portal ทำอย่างไร?"
+                      data-a="สามารถสมัครได้โดยคลิกที่ปุ่ม สมัครสมาชิก บนหน้า Login"
+                      data-status="active" title="แก้ไข">
+                <i class="ri ri-edit-line"></i>
+              </button>
+              <button class="btn btn-sm btn-icon btn-outline-danger btn-del-faq ms-1" title="ลบ">
+                <i class="ri ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">การลงทะเบียน</span></td>
+            <td>ต้องเตรียมเอกสารอะไรบ้างในการลงทะเบียน?</td>
+            <td><span class="badge bg-label-success">Active</span></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-icon btn-outline-primary btn-edit-faq"
+                      data-cat="การลงทะเบียน"
+                      data-q="ต้องเตรียมเอกสารอะไรบ้างในการลงทะเบียน?"
+                      data-a="ต้องเตรียมสำเนาทะเบียนการค้า, หนังสือมอบอำนาจ"
+                      data-status="active" title="แก้ไข">
+                <i class="ri ri-edit-line"></i>
+              </button>
+              <button class="btn btn-sm btn-icon btn-outline-danger btn-del-faq ms-1" title="ลบ">
+                <i class="ri ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><span class="badge" style="background:#fff3e0;color:#e65100;">การเข้าสู่ระบบ</span></td>
+            <td>ลืมรหัสผ่านต้องทำอย่างไร?</td>
+            <td><span class="badge bg-label-success">Active</span></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-icon btn-outline-primary btn-edit-faq"
+                      data-cat="การเข้าสู่ระบบ"
+                      data-q="ลืมรหัสผ่านต้องทำอย่างไร?"
+                      data-a="คลิก ลืมรหัสผ่าน บนหน้า Login แล้วกรอก Email ที่ลงทะเบียนไว้"
+                      data-status="active" title="แก้ไข">
+                <i class="ri ri-edit-line"></i>
+              </button>
+              <button class="btn btn-sm btn-icon btn-outline-danger btn-del-faq ms-1" title="ลบ">
+                <i class="ri ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><span class="badge" style="background:#e8f5e9;color:#2e7d32;">ใบอนุญาต</span></td>
+            <td>ใบอนุญาตนำเข้าแร่มีอายุกี่ปี?</td>
+            <td><span class="badge bg-label-secondary">Inactive</span></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-icon btn-outline-primary btn-edit-faq"
+                      data-cat="ใบอนุญาต"
+                      data-q="ใบอนุญาตนำเข้าแร่มีอายุกี่ปี?"
+                      data-a="ใบอนุญาตนำเข้าแร่มีอายุ 1 ปี นับจากวันที่ออก"
+                      data-status="inactive" title="แก้ไข">
+                <i class="ri ri-edit-line"></i>
+              </button>
+              <button class="btn btn-sm btn-icon btn-outline-danger btn-del-faq ms-1" title="ลบ">
+                <i class="ri ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><span class="badge" style="background:#fce4ec;color:#880e4f;">MFA / ความปลอดภัย</span></td>
+            <td>ทำไมระบบถึงขอ OTP ทุกครั้งที่เข้าสู่ระบบ?</td>
+            <td><span class="badge bg-label-success">Active</span></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-icon btn-outline-primary btn-edit-faq"
+                      data-cat="MFA / ความปลอดภัย"
+                      data-q="ทำไมระบบถึงขอ OTP ทุกครั้งที่เข้าสู่ระบบ?"
+                      data-a="ระบบเปิดใช้งาน MFA เพื่อความปลอดภัยของบัญชีของท่าน"
+                      data-status="active" title="แก้ไข">
+                <i class="ri ri-edit-line"></i>
+              </button>
+              <button class="btn btn-sm btn-icon btn-outline-danger btn-del-faq ms-1" title="ลบ">
+                <i class="ri ri-delete-bin-line"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Add/Edit FAQ -->
+<div class="modal fade" id="modalFAQ" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background:var(--dpim-blue);">
+        <h5 class="modal-title text-white" id="modalFAQLabel">เพิ่มคำถามใหม่</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">หมวดหมู่ <span class="text-danger">*</span></label>
+            <select class="form-select" id="faqCategory">
+              <option value="">-- เลือกหมวดหมู่ --</option>
+              <option>การลงทะเบียน</option>
+              <option>การเข้าสู่ระบบ</option>
+              <option>ใบอนุญาต</option>
+              <option>MFA / ความปลอดภัย</option>
+              <option>อื่น ๆ</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">สถานะ</label>
+            <select class="form-select" id="faqStatus">
+              <option value="active">Active (แสดง)</option>
+              <option value="inactive">Inactive (ซ่อน)</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">คำถาม <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="faqQuestion" placeholder="พิมพ์คำถาม..." />
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">คำตอบ <span class="text-danger">*</span></label>
+            <div class="rte-toolbar">
+              <button title="Bold"><b>B</b></button>
+              <button title="Italic"><i>I</i></button>
+              <button title="Underline"><u>U</u></button>
+              <button title="List">&#9776;</button>
+              <button title="Link">&#128279;</button>
+            </div>
+            <div id="faqAnswer" class="rte-body" contenteditable="true"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button id="btnSaveFAQ" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>บันทึก
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

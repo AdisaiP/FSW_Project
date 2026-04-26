@@ -1,0 +1,165 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "รายการคำขอสิทธิ์การเข้าใช้งาน";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .badge-pending { background:#fff3cd; color:#856404; }
+  .badge-approved { background:#d1f2d1; color:#155724; }
+  .badge-rejected { background:#f8d7da; color:#842029; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Date range
+  flatpickr('#dateRange', { mode:'range', dateFormat:'d/m/Y', locale:'th' });
+
+  // DataTable
+  var dt = new DataTable('#tableAccessRequest', {
+    language: {
+      search: 'ค้นหา:', lengthMenu: 'แสดง _MENU_ รายการ',
+      info: 'แสดง _START_-_END_ จาก _TOTAL_ รายการ',
+      paginate: { first:'แรก', last:'สุดท้าย', next:'ถัดไป', previous:'ก่อนหน้า' }
+    },
+    order: [[4, 'desc']],
+    responsive: true,
+  });
+
+  // Status filter
+  document.getElementById('statusFilter').addEventListener('change', function () {
+    dt.column(5).search(this.value).draw();
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">รายการคำขอสิทธิ์</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <h4 class="page-title-dpim mb-0">รายการคำขอสิทธิ์การเข้าใช้งาน</h4>
+    <div class="text-muted" style="font-size:.85rem;">
+      <i class="ri ri-time-line me-1"></i>อัปเดตล่าสุด: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label" style="font-size:.85rem;font-weight:600;">สถานะ</label>
+          <select id="statusFilter" class="form-select">
+            <option value="">ทั้งหมด</option>
+            <option value="รอพิจารณา">รอพิจารณา</option>
+            <option value="อนุมัติ">อนุมัติ</option>
+            <option value="ปฏิเสธ">ปฏิเสธ</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" style="font-size:.85rem;font-weight:600;">ช่วงวันที่ยื่น</label>
+          <input type="text" id="dateRange" class="form-control" placeholder="เลือกช่วงวันที่" />
+        </div>
+        <div class="col-md-5">
+          <label class="form-label" style="font-size:.85rem;font-weight:600;">ค้นหา</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="ri ri-search-line"></i></span>
+            <input type="text" class="form-control" placeholder="ชื่อผู้ขอ หรือ หมายเลขอ้างอิง" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DataTable -->
+  <div class="card">
+    <div class="card-datatable table-responsive">
+      <table id="tableAccessRequest" class="table table-hover">
+        <thead>
+          <tr>
+            <th>หมายเลขอ้างอิง</th>
+            <th>ชื่อผู้ขอ</th>
+            <th>ระบบงานที่ขอ</th>
+            <th>หน่วยงาน</th>
+            <th>วันที่ยื่น</th>
+            <th>สถานะ</th>
+            <th>การจัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="fw-semibold" style="color:var(--dpim-blue);">ACC-2569-00001</span></td>
+            <td>นายสมชาย ใจดี</td>
+            <td>
+              <span class="badge" style="background:#e8f0fe;color:#23408F;">RMBS1</span>
+              <span class="badge" style="background:#e8f5e9;color:#2e7d32;">PS/NoPS</span>
+            </td>
+            <td>บริษัท ทดสอบ จำกัด</td>
+            <td>20/04/2569</td>
+            <td><span class="badge badge-pending">รอพิจารณา</span></td>
+            <td>
+              <a href="/Officer/ReviewAccessRequest/1" class="btn btn-sm btn-outline-primary me-1">
+                <i class="ri ri-eye-line me-1"></i>รีวิว
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="fw-semibold" style="color:var(--dpim-blue);">ACC-2569-00002</span></td>
+            <td>นางสาวพิมพ์ใจ สุขใส</td>
+            <td>
+              <span class="badge" style="background:#e8f0fe;color:#23408F;">นำเข้า/ส่งออกแร่</span>
+            </td>
+            <td>บริษัท แร่ทอง จำกัด</td>
+            <td>18/04/2569</td>
+            <td><span class="badge badge-approved">อนุมัติ</span></td>
+            <td>
+              <a href="/Officer/ReviewAccessRequest/2" class="btn btn-sm btn-outline-secondary me-1">
+                <i class="ri ri-eye-line me-1"></i>ดูรายละเอียด
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="fw-semibold" style="color:var(--dpim-blue);">ACC-2569-00003</span></td>
+            <td>นายวีระ แกร่งกล้า</td>
+            <td>
+              <span class="badge" style="background:#fce4ec;color:#880e4f;">ซื้อขายเศษโลหะ</span>
+            </td>
+            <td>ห้างหุ้นส่วน เศษเหล็ก</td>
+            <td>15/04/2569</td>
+            <td><span class="badge badge-rejected">ปฏิเสธ</span></td>
+            <td>
+              <a href="/Officer/ReviewAccessRequest/3" class="btn btn-sm btn-outline-secondary me-1">
+                <i class="ri ri-eye-line me-1"></i>ดูรายละเอียด
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

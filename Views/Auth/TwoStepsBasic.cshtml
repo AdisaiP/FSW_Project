@@ -1,72 +1,172 @@
 @{
   Layout = "_BlankLayout";
-
-  ViewData["Title"] = "TwoSteps Basic - Pages";
-}
-
-@section VendorStyles {
-  <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
-}
-
-@section VendorScripts {
-  <script src="~/vendor/libs/cleave-zen/cleave-zen.js"></script>
-  <script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
-  <script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
-  <script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+  ViewData["Title"] = "ยืนยันตัวตนสองชั้น (MFA) — DPIM Portal";
 }
 
 @section PageStyles {
-  <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  html, body { height:100%; }
+  .authentication-wrapper.authentication-cover { min-height:100vh; max-height:100vh; overflow:hidden; }
+  .authentication-inner { height:100vh; }
+  .dpim-banner-left { width:100%; height:100%; object-fit:cover; object-position:70% center; }
+  .dpim-cover-left { position:relative; overflow:hidden; }
+  .dpim-cover-left::after {
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to right, rgba(35,64,143,.55) 0%, rgba(35,64,143,.15) 100%);
+    pointer-events:none;
+  }
+  .dpim-brand-logo { width:80px; height:80px; object-fit:contain; }
+  .dpim-brand-divider { width:40px; height:3px; background:var(--dpim-green); border-radius:2px; margin:.5rem auto .65rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  /* OTP boxes */
+  .otp-input { width:48px; height:52px; text-align:center; font-size:1.3rem; font-weight:700; border:2px solid #dee2e6; border-radius:10px; transition:border-color .18s; }
+  .otp-input:focus { border-color:var(--dpim-blue); box-shadow:0 0 0 .15rem rgba(35,64,143,.18); outline:none; }
+  /* Tabs */
+  .mfa-tab { border:none; background:none; padding:.55rem 1.25rem; border-radius:30px; font-size:.88rem; font-weight:500; color:#6c757d; cursor:pointer; transition:all .18s; }
+  .mfa-tab.active { background:var(--dpim-blue); color:#fff; }
+  .mfa-pane { display:none; }
+  .mfa-pane.active { display:block; }
+  #resendBtn:disabled { opacity:.5; cursor:not-allowed; }
+</style>
 }
 
 @section PageScripts {
-  <script src="~/js/pages-auth.js"></script>
-  <script src="~/js/pages-auth-two-steps.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ── Tab switch ──────────────────────────────────────────────
+  document.querySelectorAll('.mfa-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.mfa-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.mfa-pane').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById(this.dataset.target).classList.add('active');
+    });
+  });
+
+  // ── OTP auto-advance ────────────────────────────────────────
+  document.querySelectorAll('.otp-input').forEach(function (inp, i, all) {
+    inp.addEventListener('input', function () {
+      if (this.value.length >= 1 && i < all.length - 1) all[i + 1].focus();
+    });
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !this.value && i > 0) all[i - 1].focus();
+    });
+  });
+
+  // ── Countdown timer ─────────────────────────────────────────
+  var sec = 150;
+  var timerEl = document.getElementById('countdown');
+  var resendBtn = document.getElementById('resendBtn');
+  function tick() {
+    var m = Math.floor(sec / 60), s = sec % 60;
+    timerEl.textContent = ('0' + m).slice(-2) + ':' + ('0' + s).slice(-2);
+    if (sec > 0) { sec--; setTimeout(tick, 1000); }
+    else { resendBtn.disabled = false; timerEl.textContent = ''; }
+  }
+  tick();
+  resendBtn.addEventListener('click', function () {
+    if (this.disabled) return;
+    sec = 150; this.disabled = true; tick();
+    alert('(Mock) ส่งรหัสใหม่ไปยัง email ของท่านแล้ว');
+  });
+
+  // ── Verify ──────────────────────────────────────────────────
+  document.getElementById('btnVerifyMFA')?.addEventListener('click', function () {
+    alert('(Mock) ยืนยันตัวตนสำเร็จ! กำลังเข้าสู่ระบบ...');
+    window.location.href = '/';
+  });
+});
+</script>
 }
-@* ************** Content ************** *@
-<div class="positive-relative">
-  <div class="authentication-wrapper authentication-basic p-4 p-sm-0">
-    <div class="authentication-inner py-6">
-      <!--  Two Steps Verification -->
-      <div class="card p-md-7 p-1">
-        <!-- Logo -->
-        <div class="app-brand justify-content-center mt-5">
-          <a href="/" class="app-brand-link gap-2">
-            <span class="app-brand-logo demo">@await Html.PartialAsync("../_Partials/_Macros")</span>
-            <span class="app-brand-text demo text-heading fw-semibold">@TempData.Peek("appName")</span>
+@* ============================================================ *@
+<div class="authentication-wrapper authentication-cover">
+  <a href="/" class="auth-cover-brand d-flex align-items-center gap-2">
+    <img src="~/img/dpim-logo.png" alt="DPIM Logo" style="width:48px;height:48px;object-fit:contain;" />
+    <span class="fw-semibold d-none d-sm-inline" style="color:var(--dpim-blue);">DPIM Portal</span>
+  </a>
+
+  <div class="authentication-inner row m-0">
+    <!-- Left: Banner -->
+    <div class="d-none d-lg-flex col-lg-7 col-xl-8 p-0 dpim-cover-left">
+      <img src="~/img/dpim-banner.jpg" alt="Mining for the Community" class="dpim-banner-left" />
+    </div>
+
+    <!-- Right: MFA Form -->
+    <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative px-4 px-sm-5" style="overflow-y:auto;">
+      <div class="w-100 mx-auto py-4" style="max-width:400px;">
+
+        <div class="text-center mb-4">
+          <img src="~/img/dpim-logo.png" alt="กพร." class="dpim-brand-logo mb-2" />
+          <h5 class="fw-bold mb-0" style="color:var(--dpim-blue);">กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่</h5>
+          <div class="dpim-brand-divider"></div>
+          <p class="text-muted mb-0" style="font-size:.78rem;">MINING FOR THE COMMUNITY</p>
+        </div>
+
+        <h6 class="fw-bold mb-1 text-center">ยืนยันตัวตนสองชั้น (MFA)</h6>
+        <div class="alert mb-3 d-flex align-items-center gap-2" style="background:#e8f0fe;border:none;border-radius:8px;padding:.6rem .9rem;font-size:.82rem;">
+          <i class="ri ri-user-line" style="font-size:1.2rem;color:var(--dpim-blue);"></i>
+          <span>กำลังยืนยันสำหรับบัญชี: <strong>somchai&#64;dpim.go.th</strong></span>
+        </div>
+
+        <!-- Method Tabs -->
+        <div class="d-flex gap-2 mb-4 p-1" style="background:#f1f5fb;border-radius:30px;">
+          <button class="mfa-tab active flex-fill" data-target="paneEmail">
+            <i class="ri ri-mail-line me-1"></i>Email OTP
+          </button>
+          <button class="mfa-tab flex-fill" data-target="paneTOTP">
+            <i class="ri ri-qr-scan-line me-1"></i>Authenticator
+          </button>
+        </div>
+
+        <!-- Email OTP Pane -->
+        <div id="paneEmail" class="mfa-pane active">
+          <p class="text-muted mb-3" style="font-size:.83rem;">กรุณากรอกรหัส 6 หลักที่ส่งไปยัง <strong>s*****&#64;dpim.go.th</strong></p>
+          <div class="d-flex justify-content-center gap-2 mb-3">
+            <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" />
+            <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" />
+            <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" />
+            <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" />
+            <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" />
+            <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" />
+          </div>
+          <div class="text-center mb-3" style="font-size:.83rem;color:#6c757d;">
+            ส่งรหัสใหม่ได้ใน <span id="countdown" class="fw-bold" style="color:var(--dpim-blue);"></span>
+            <button id="resendBtn" class="btn btn-sm btn-link p-0 ms-1" disabled>ส่งรหัสใหม่</button>
+          </div>
+        </div>
+
+        <!-- TOTP Pane -->
+        <div id="paneTOTP" class="mfa-pane">
+          <p class="text-muted mb-3" style="font-size:.83rem;">กรุณากรอกรหัส 6 หลักจาก Google Authenticator / Microsoft Authenticator</p>
+          <div class="form-floating form-floating-outline mb-3">
+            <input type="tel" class="form-control text-center fw-bold" style="font-size:1.4rem;letter-spacing:.3rem;" id="totpCode" maxlength="6" inputmode="numeric" placeholder="000000" />
+            <label for="totpCode">รหัส Authenticator</label>
+          </div>
+        </div>
+
+        <!-- Trusted Device -->
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="trustedDevice" />
+          <label class="form-check-label" for="trustedDevice" style="font-size:.85rem;">
+            จดจำอุปกรณ์นี้ (ไม่ต้อง MFA อีก 30 วัน)
+          </label>
+        </div>
+
+        <button id="btnVerifyMFA" class="btn btn-dpim w-100 mb-3">
+          <i class="ri ri-shield-check-line me-1"></i>ยืนยันตัวตน
+        </button>
+
+        <div class="text-center">
+          <a href="/Auth/LoginBasic" class="d-flex align-items-center justify-content-center gap-1" style="font-size:.85rem;color:var(--dpim-blue);">
+            <i class="ri ri-arrow-left-line"></i>กลับหน้าเข้าสู่ระบบ
           </a>
         </div>
-        <!-- /Logo -->
-        <div class="card-body mt-1">
-          <h4 class="mb-1">Two Step Verification 💬</h4>
-          <p class="text-start mb-5">
-            We sent a verification code to your mobile. Enter the code from the mobile in the field below.
-            <span class="d-block mt-1 h6">*****1234</span>
-          </p>
-          <p class="mb-0">Type your 6 digit security code</p>
-          <form id="twoStepsForm" action="/" method="POST">
-            <div class="mb-5 form-control-validation">
-              <div class="auth-input-wrapper d-flex align-items-center justify-content-between numeral-mask-wrapper">
-                <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1" autofocus />
-                <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1" />
-                <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1" />
-                <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1" />
-                <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1" />
-                <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1" />
-              </div>
-              <!-- Create a hidden field which is combined by 3 fields above -->
-              <input type="hidden" name="otp" />
-            </div>
-            <button class="btn btn-primary d-grid w-100 mb-5">Verify my account</button>
-            <div class="text-center">
-              Didn't get the code?
-              <a href="javascript:void(0);"> Resend </a>
-            </div>
-          </form>
-        </div>
+
       </div>
-      <!-- / Two Steps Verification -->
-      <img alt="mask" src="~/img/illustrations/auth-basic-register-mask-light.png" class="authentication-image d-none d-lg-block" data-app-light-img="illustrations/auth-basic-register-mask-light.png" data-app-dark-img="illustrations/auth-basic-register-mask-dark.png" />
     </div>
+    <!-- /Right -->
   </div>
 </div>

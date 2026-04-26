@@ -1,0 +1,101 @@
+@{
+  Layout = "_BlankLayout";
+  ViewData["Title"] = "กำลังเชื่อมต่อ i-Industry Officer — DPIM Portal";
+}
+
+@section PageStyles {
+<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  html, body { height:100%; }
+  .authentication-wrapper.authentication-cover { min-height:100vh; max-height:100vh; overflow:hidden; }
+  .authentication-inner { height:100vh; }
+  .sso-logo-box {
+    width:120px; height:120px; border-radius:20px;
+    background:linear-gradient(135deg, #bf360c, #e64a19);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto; box-shadow:0 8px 24px rgba(191,54,12,.35);
+  }
+  .spinner-dpim {
+    width:48px; height:48px;
+    border:4px solid #dee2e6;
+    border-top-color:#e64a19;
+    border-radius:50%;
+    animation:spin .9s linear infinite;
+    margin:0 auto;
+  }
+  @@keyframes spin { to { transform:rotate(360deg); } }
+  .dpim-banner-left {
+    width:100%; height:100%; object-fit:cover; object-position:70% center;
+    image-rendering:crisp-edges;
+  }
+  .dpim-cover-left { position:relative; overflow:hidden; }
+  .dpim-cover-left::after {
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to right, rgba(35,64,143,.55) 0%, rgba(35,64,143,.1) 100%);
+    pointer-events:none;
+  }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var sec = 3;
+  var el = document.getElementById('countdownMsg');
+  var timer = setInterval(function () {
+    sec--;
+    if (el) el.textContent = 'กำลังเชื่อมต่อ i-Industry Officer... (' + sec + ')';
+    if (sec <= 0) {
+      clearInterval(timer);
+      window.location.href = '/Auth/LoginBasic';
+    }
+  }, 1000);
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="authentication-wrapper authentication-cover">
+  <a href="/" class="auth-cover-brand d-flex align-items-center gap-2">
+    <img src="~/img/dpim-logo.png" alt="DPIM Logo" style="width:48px;height:48px;object-fit:contain;" />
+    <span class="app-brand-text demo text-heading fw-semibold d-none d-sm-inline">DPIM Portal</span>
+  </a>
+
+  <div class="authentication-inner row m-0">
+    <!-- Left: Banner -->
+    <div class="d-none d-lg-flex col-lg-7 col-xl-8 p-0 dpim-cover-left">
+      <img src="~/img/dpim-banner.jpg" alt="Mining for the Community" class="dpim-banner-left" />
+    </div>
+    <!-- /Left -->
+
+    <!-- Right -->
+    <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative px-4 px-sm-5">
+      <div class="w-100 mx-auto text-center" style="max-width:340px;">
+
+        <!-- Officer Logo Box -->
+        <div class="sso-logo-box mb-4">
+          <i class="ri ri-user-follow-line text-white" style="font-size:3rem;"></i>
+        </div>
+
+        <h5 class="fw-bold mb-1" style="color:#e64a19;">i-Industry Officer</h5>
+        <p class="text-muted mb-4" style="font-size:.9rem;">ระบบสำหรับเจ้าหน้าที่กรมอุตสาหกรรมพื้นฐาน</p>
+
+        <div class="spinner-dpim mb-4"></div>
+
+        <p id="countdownMsg" class="fw-semibold mb-3" style="color:#e64a19;">
+          กำลังเชื่อมต่อ i-Industry Officer... (3)
+        </p>
+        <p class="text-muted mb-4" style="font-size:.82rem;">
+          ระบบกำลังนำท่านไปยังหน้ายืนยันตัวตนของ i-Industry Officer<br>กรุณารอสักครู่...
+        </p>
+
+        <a href="/Auth/LoginBasic" class="btn btn-outline-secondary btn-sm">
+          <i class="ri ri-close-line me-1"></i>ยกเลิก
+        </a>
+
+      </div>
+    </div>
+    <!-- /Right -->
+  </div>
+</div>

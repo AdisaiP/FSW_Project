@@ -136,4 +136,10 @@ public class OfficerController : Controller
   {
     return View();
   }
+
+  // C2: Access Request List (officer review)
+  public IActionResult AccessRequestList() => View();
+
+  // C3: Review Access Request
+  public IActionResult ReviewAccessRequest(int id = 0) => View();
 }

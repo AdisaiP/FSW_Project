@@ -1,0 +1,165 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "จัดการ Cookie Consent Banner";
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+  /* Cookie banner preview */
+  .cookie-preview-wrapper {
+    position:relative; width:100%; height:220px;
+    background:#f8f9fa; border:1px solid var(--bs-border-color);
+    border-radius:10px; overflow:hidden;
+  }
+  .cookie-preview-content {
+    position:absolute; width:100%;
+    background:#23408F; color:#fff;
+    padding:.75rem 1.25rem; display:flex;
+    align-items:center; justify-content:space-between;
+    gap:1rem; flex-wrap:wrap;
+    box-shadow:0 -4px 12px rgba(0,0,0,.15);
+  }
+  .cookie-preview-content.pos-bottom { bottom:0; }
+  .cookie-preview-content.pos-top { top:0; }
+  .cookie-btn-accept { background:#41AD49; border:none; color:#fff; border-radius:6px; padding:.4rem 1rem; font-size:.85rem; cursor:pointer; }
+  .cookie-btn-reject { background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; border-radius:6px; padding:.4rem 1rem; font-size:.85rem; cursor:pointer; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var fields = ['cookieText', 'acceptLabel', 'rejectLabel', 'policyUrl', 'bannerPos'];
+
+  function updatePreview() {
+    var text = document.getElementById('cookieText').value;
+    var accept = document.getElementById('acceptLabel').value;
+    var reject = document.getElementById('rejectLabel').value;
+    var pos = document.getElementById('bannerPos').value;
+
+    document.getElementById('previewText').textContent = text;
+    document.getElementById('previewAccept').textContent = accept;
+    document.getElementById('previewReject').textContent = reject;
+
+    var banner = document.getElementById('previewBanner');
+    banner.className = 'cookie-preview-content pos-' + (pos.includes('top') ? 'top' : 'bottom');
+  }
+
+  fields.forEach(function (id) {
+    document.getElementById(id)?.addEventListener('input', updatePreview);
+    document.getElementById(id)?.addEventListener('change', updatePreview);
+  });
+
+  document.getElementById('btnSaveCookie')?.addEventListener('click', function () {
+    alert('บันทึกการตั้งค่า Cookie Consent สำเร็จ!');
+  });
+
+  updatePreview();
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">Cookie Consent Banner</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">จัดการ Cookie Consent Banner</h4>
+
+  <div class="row g-4">
+    <!-- Left: Form -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">ตั้งค่า Banner</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">ข้อความ Banner <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="cookieText" rows="3">เว็บไซต์ DPIM Portal ใช้คุกกี้เพื่อปรับปรุงประสบการณ์การใช้งานของท่าน โดยการใช้งานเว็บไซต์นี้ถือว่าท่านยินยอมให้มีการใช้คุกกี้ตาม นโยบายความเป็นส่วนตัว ของเรา</textarea>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input type="text" class="form-control" id="acceptLabel" value="ยอมรับทั้งหมด" />
+                <label for="acceptLabel">Label ปุ่ม ยอมรับ</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input type="text" class="form-control" id="rejectLabel" value="ปฏิเสธ" />
+                <label for="rejectLabel">Label ปุ่ม ปฏิเสธ</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-floating form-floating-outline">
+                <input type="url" class="form-control" id="policyUrl" value="/Privacy" />
+                <label for="policyUrl">ลิงก์ Privacy Policy</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">ตำแหน่ง Banner</label>
+              <select class="form-select" id="bannerPos">
+                <option value="bottom" selected>Bottom (ด้านล่าง)</option>
+                <option value="top">Top (ด้านบน)</option>
+                <option value="bottom-left">Bottom-Left</option>
+                <option value="bottom-right">Bottom-Right</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end mt-4">
+            <button class="btn btn-outline-secondary">
+              <i class="ri ri-close-line me-1"></i>รีเซ็ต
+            </button>
+            <button id="btnSaveCookie" class="btn btn-dpim">
+              <i class="ri ri-save-line me-1"></i>บันทึกการตั้งค่า
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Preview -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Preview</h5>
+        </div>
+        <div class="card-body">
+          <div class="cookie-preview-wrapper">
+            <!-- Mock page content -->
+            <div style="padding:1.5rem;opacity:.3;">
+              <div style="height:12px;background:#dee2e6;border-radius:4px;width:70%;margin-bottom:.5rem;"></div>
+              <div style="height:10px;background:#dee2e6;border-radius:4px;width:50%;margin-bottom:.5rem;"></div>
+              <div style="height:10px;background:#dee2e6;border-radius:4px;width:60%;"></div>
+            </div>
+            <!-- Banner -->
+            <div id="previewBanner" class="cookie-preview-content pos-bottom">
+              <p id="previewText" class="mb-0 flex-grow-1" style="font-size:.8rem;"></p>
+              <div class="d-flex gap-2 flex-shrink-0">
+                <button id="previewReject" class="cookie-btn-reject"></button>
+                <button id="previewAccept" class="cookie-btn-accept"></button>
+              </div>
+            </div>
+          </div>
+          <p class="text-muted mt-2 mb-0" style="font-size:.78rem;">
+            <i class="ri ri-information-line me-1"></i>Preview แสดงผลแบบ approximation เท่านั้น
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

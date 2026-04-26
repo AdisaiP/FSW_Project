@@ -1,0 +1,351 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "ระบบแจ้งเตือนอีเมล";
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; color:#fff; }
+  .nav-pills .nav-link.active { background:var(--dpim-blue); color:#fff; }
+  .template-card { border:1px solid var(--bs-border-color); border-radius:.75rem; padding:1rem; cursor:pointer; transition:.2s; }
+  .template-card:hover, .template-card.selected { border-color:var(--dpim-blue); background:rgba(35,64,143,.04); }
+  .event-badge { font-size:.72rem; padding:.2em .55em; }
+  .stat-mini { border-radius:.5rem; padding:.6rem 1rem; background:var(--bs-card-bg); border:1px solid var(--bs-border-color); }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ── Nav pills ── */
+  document.querySelectorAll('[data-email-tab]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('[data-email-tab]').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.email-tab-content').forEach(function (c) { c.classList.add('d-none'); });
+      this.classList.add('active');
+      document.getElementById('emailtab-' + this.dataset.emailTab).classList.remove('d-none');
+    });
+  });
+
+  /* ── Test SMTP ── */
+  document.getElementById('btnTestSmtp').addEventListener('click', function () {
+    var email = document.getElementById('testEmail').value;
+    if (!email) { alert('กรุณากรอกอีเมลที่ต้องการทดสอบ'); return; }
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>กำลังส่ง...';
+    var self = this;
+    setTimeout(function () {
+      self.disabled = false;
+      self.innerHTML = '<i class="ri ri-send-plane-line me-1"></i>ส่งอีเมลทดสอบ';
+      alert('ส่งอีเมลทดสอบไปยัง ' + email + ' สำเร็จ!');
+    }, 2000);
+  });
+
+  /* ── Save SMTP ── */
+  document.getElementById('btnSaveSmtp').addEventListener('click', function () {
+    alert('บันทึกการตั้งค่า SMTP สำเร็จ');
+  });
+
+  /* ── Template select ── */
+  document.querySelectorAll('.template-card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      document.querySelectorAll('.template-card').forEach(function (c) { c.classList.remove('selected'); });
+      this.classList.add('selected');
+    });
+  });
+
+  /* ── Edit Template ── */
+  document.querySelectorAll('.btn-edit-template').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById('tplName').value = this.dataset.name || '';
+      document.getElementById('tplSubject').value = this.dataset.subject || '';
+      new bootstrap.Modal(document.getElementById('modalTemplate')).show();
+    });
+  });
+
+  document.getElementById('btnSaveTemplate').addEventListener('click', function () {
+    bootstrap.Modal.getInstance(document.getElementById('modalTemplate')).hide();
+    alert('บันทึก Template อีเมลสำเร็จ');
+  });
+
+  /* ── DataTable Log ── */
+  if (document.getElementById('emailLogTable')) {
+    $('#emailLogTable').DataTable({
+      language: { sEmptyTable: 'ไม่พบข้อมูล', sZeroRecords: 'ไม่พบผลการค้นหา' },
+      order: [[0,'desc']], pageLength: 10,
+      columnDefs: [{ orderable: false, targets: -1 }]
+    });
+  }
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">ระบบแจ้งเตือนอีเมล</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">ระบบรับ-ส่งอีเมลและแจ้งเตือน</h4>
+
+  <!-- Mini stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-mini text-center">
+        <div class="fw-bold fs-5" style="color:var(--dpim-blue);">1,248</div>
+        <div class="text-muted" style="font-size:.78rem;">ส่งทั้งหมด (30 วัน)</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-mini text-center">
+        <div class="fw-bold fs-5" style="color:var(--dpim-green);">1,201</div>
+        <div class="text-muted" style="font-size:.78rem;">ส่งสำเร็จ</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-mini text-center">
+        <div class="fw-bold fs-5" style="color:#e6a800;">38</div>
+        <div class="text-muted" style="font-size:.78rem;">รอส่ง</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-mini text-center">
+        <div class="fw-bold fs-5" style="color:#dc3545;">9</div>
+        <div class="text-muted" style="font-size:.78rem;">ส่งไม่สำเร็จ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab nav pills -->
+  <ul class="nav nav-pills mb-4 gap-1">
+    <li class="nav-item">
+      <button class="nav-link active" data-email-tab="smtp">
+        <i class="ri ri-settings-line me-1"></i>ตั้งค่า SMTP
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-email-tab="templates">
+        <i class="ri ri-mail-line me-1"></i>Template อีเมล
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-email-tab="log">
+        <i class="ri ri-history-line me-1"></i>ประวัติการส่ง
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab 1: SMTP Settings -->
+  <div id="emailtab-smtp" class="email-tab-content">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="card-title mb-0" style="color:var(--dpim-blue);">การตั้งค่า SMTP Server</h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">SMTP Host</label>
+            <input type="text" class="form-control" value="smtp.dpim.go.th" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Port</label>
+            <input type="number" class="form-control" value="587" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Encryption</label>
+            <select class="form-select">
+              <option value="tls">STARTTLS (587)</option>
+              <option value="ssl">SSL/TLS (465)</option>
+              <option value="none">None (25)</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Username</label>
+            <input type="text" class="form-control" value="noreply@dpim.go.th" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Password</label>
+            <input type="password" class="form-control" value="••••••••••••" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">From Email</label>
+            <input type="email" class="form-control" value="noreply@dpim.go.th" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">From Name</label>
+            <input type="text" class="form-control" value="กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ (กพร.)" />
+          </div>
+          <div class="col-12">
+            <div class="alert alert-info d-flex gap-2 py-2" style="font-size:.85rem;">
+              <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+              ส่งอีเมลทดสอบเพื่อตรวจสอบการเชื่อมต่อ SMTP ก่อนบันทึก
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">อีเมลที่ต้องการทดสอบ</label>
+            <div class="input-group">
+              <input type="email" id="testEmail" class="form-control" placeholder="test@example.com" />
+              <button id="btnTestSmtp" class="btn btn-outline-secondary">
+                <i class="ri ri-send-plane-line me-1"></i>ส่งอีเมลทดสอบ
+              </button>
+            </div>
+          </div>
+          <div class="col-12 d-flex gap-2 pt-2">
+            <button id="btnSaveSmtp" class="btn btn-dpim">
+              <i class="ri ri-save-line me-1"></i>บันทึกการตั้งค่า SMTP
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Email Templates -->
+  <div id="emailtab-templates" class="email-tab-content d-none">
+    <div class="row g-3">
+      @foreach (var tpl in new[] {
+        new { name="ยืนยันการลงทะเบียน", event_="Register", subject="ยืนยันการลงทะเบียน DPIM Portal" },
+        new { name="รีเซ็ตรหัสผ่าน", event_="ResetPassword", subject="คำขอรีเซ็ตรหัสผ่าน" },
+        new { name="OTP ยืนยันตัวตน", event_="OTP", subject="รหัส OTP สำหรับเข้าสู่ระบบ" },
+        new { name="แจ้งเตือนคำขอสิทธิ์", event_="AccessRequest", subject="มีคำขอสิทธิ์ระบบรออนุมัติ" },
+        new { name="ผลการอนุมัติสิทธิ์", event_="AccessResult", subject="ผลการพิจารณาคำขอสิทธิ์ระบบ" },
+        new { name="ใบรับรองใกล้หมดอายุ", event_="CertExpiry", subject="ใบรับรองดิจิทัลของคุณใกล้หมดอายุ" }
+      })
+      {
+        <div class="col-md-4">
+          <div class="template-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <div class="fw-semibold" style="color:var(--dpim-blue);">@tpl.name</div>
+                <span class="badge bg-label-primary event-badge mt-1">@tpl.event_</span>
+              </div>
+              <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-template"
+                data-name="@tpl.name" data-subject="@tpl.subject" title="แก้ไข">
+                <i class="ri ri-edit-line"></i>
+              </button>
+            </div>
+            <div class="text-muted" style="font-size:.78rem;">Subject: @tpl.subject</div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Tab 3: Email Log -->
+  <div id="emailtab-log" class="email-tab-content d-none">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="card-title mb-0" style="color:var(--dpim-blue);">ประวัติการส่งอีเมล</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table id="emailLogTable" class="table table-hover align-middle mb-0" style="font-size:.83rem;">
+            <thead class="table-light">
+              <tr>
+                <th>วันที่-เวลา</th>
+                <th>ผู้รับ</th>
+                <th>หัวเรื่อง</th>
+                <th>เหตุการณ์</th>
+                <th>ผลลัพธ์</th>
+                <th>รายละเอียด</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>26/04/2569 09:15</td>
+                <td>adisaip@dpim.go.th</td>
+                <td>รหัส OTP สำหรับเข้าสู่ระบบ</td>
+                <td><span class="badge bg-label-info event-badge">OTP</span></td>
+                <td><span class="badge bg-label-success">สำเร็จ</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-secondary"><i class="ri ri-information-line"></i></button></td>
+              </tr>
+              <tr>
+                <td>25/04/2569 14:32</td>
+                <td>somying@example.com</td>
+                <td>ยืนยันการลงทะเบียน DPIM Portal</td>
+                <td><span class="badge bg-label-primary event-badge">Register</span></td>
+                <td><span class="badge bg-label-success">สำเร็จ</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-secondary"><i class="ri ri-information-line"></i></button></td>
+              </tr>
+              <tr>
+                <td>25/04/2569 10:05</td>
+                <td>wichai@dpim.go.th</td>
+                <td>ผลการพิจารณาคำขอสิทธิ์ระบบ</td>
+                <td><span class="badge bg-label-warning event-badge">AccessResult</span></td>
+                <td><span class="badge bg-label-success">สำเร็จ</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-secondary"><i class="ri ri-information-line"></i></button></td>
+              </tr>
+              <tr>
+                <td>24/04/2569 16:00</td>
+                <td>contact@raethai.co.th</td>
+                <td>คำขอรีเซ็ตรหัสผ่าน</td>
+                <td><span class="badge bg-label-danger event-badge">ResetPassword</span></td>
+                <td><span class="badge bg-label-danger">ล้มเหลว</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-secondary"><i class="ri ri-information-line"></i></button></td>
+              </tr>
+              <tr>
+                <td>24/04/2569 08:30</td>
+                <td>adisaip@dpim.go.th</td>
+                <td>ใบรับรองดิจิทัลของคุณใกล้หมดอายุ</td>
+                <td><span class="badge bg-label-secondary event-badge">CertExpiry</span></td>
+                <td><span class="badge bg-label-success">สำเร็จ</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-secondary"><i class="ri ri-information-line"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Edit Email Template -->
+<div class="modal fade" id="modalTemplate" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:2px solid var(--dpim-green);">
+        <h5 class="modal-title" style="color:var(--dpim-blue);">แก้ไข Template อีเมล</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">ชื่อ Template</label>
+            <input type="text" id="tplName" class="form-control" readonly style="background:var(--bs-gray-100);" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">หัวเรื่อง (Subject) <span class="text-danger">*</span></label>
+            <input type="text" id="tplSubject" class="form-control" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">เนื้อหาอีเมล (HTML)</label>
+            <div class="border rounded p-2" style="min-height:150px;background:var(--bs-card-bg);font-family:monospace;font-size:.82rem;">
+              &lt;p&gt;เรียนคุณ {{full_name}}&lt;/p&gt;<br/>
+              &lt;p&gt;รหัส OTP ของคุณคือ: &lt;strong&gt;{{otp_code}}&lt;/strong&gt;&lt;/p&gt;<br/>
+              &lt;p&gt;รหัสจะหมดอายุใน 5 นาที&lt;/p&gt;<br/>
+              &lt;p&gt;กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ (กพร.)&lt;/p&gt;
+            </div>
+            <div class="form-text">ตัวแปรที่ใช้ได้: {{full_name}} {{email}} {{otp_code}} {{ref_no}} {{link}} {{expire_date}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSaveTemplate" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>บันทึก Template
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -23,4 +23,12 @@ public class AuthController : Controller
   public IActionResult TwoStepsCover() => View();
   public IActionResult VerifyEmailBasic() => View();
   public IActionResult VerifyEmailCover() => View();
+
+  // B2-B4: SSO Redirect pages
+  public IActionResult SSORedirectIndustry() => View();
+  public IActionResult SSORedirectOfficer() => View();
+  public IActionResult SSORedirectThaiID() => View();
+
+  // C1: Access Request
+  public IActionResult AccessRequest() => View();
 }

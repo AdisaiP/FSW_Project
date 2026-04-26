@@ -1,294 +1,489 @@
 @{
-  ViewData["Title"] = "User View - Account";
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "โปรไฟล์ผู้ใช้งาน";
 }
 
-@section VendorStyles {
-<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
-<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
-<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css" />
-<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.css" />
-<link rel="stylesheet" href="~/vendor/libs/sweetalert2/sweetalert2.css" />
-<link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
-<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
-<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .avatar-wrapper { position:relative; width:96px; height:96px; margin:0 auto; }
+  .avatar-wrapper img { width:96px; height:96px; border-radius:50%; border:3px solid var(--dpim-blue); object-fit:cover; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+</style>
 }
 
-@section VendorScripts {
-<script src="~/vendor/libs/moment/moment.js"></script>
-<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
-<script src="~/vendor/libs/sweetalert2/sweetalert2.js"></script>
-<script src="~/vendor/libs/cleave-zen/cleave-zen.js"></script>
-<script src="~/vendor/libs/select2/select2.js"></script>
-<script src="~/vendor/libs/tagify/tagify.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
-}
 @section PageScripts {
-<script src="~/js/modal-edit-user.js"></script>
-<script src="~/js/app-user-view.js"></script>
-<script src="~/js/app-user-view-account.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var btnEdit = document.getElementById('btnEditGeneral');
+  if (btnEdit) {
+    btnEdit.addEventListener('click', function () {
+      var fields = document.querySelectorAll('.general-field');
+      var isEditing = this.dataset.editing === 'true';
+      if (isEditing) {
+        this.innerHTML = '<i class="ri ri-edit-line me-1"></i>แก้ไขข้อมูล';
+        this.classList.replace('btn-dpim-green', 'btn-outline-secondary');
+        this.dataset.editing = 'false';
+        fields.forEach(function(f) { f.setAttribute('readonly', ''); });
+        alert('บันทึกข้อมูลสำเร็จ');
+      } else {
+        this.innerHTML = '<i class="ri ri-save-line me-1"></i>บันทึก';
+        this.classList.replace('btn-outline-secondary', 'btn-dpim-green');
+        this.dataset.editing = 'true';
+        fields.forEach(function(f) { f.removeAttribute('readonly'); });
+      }
+    });
+  }
+
+  document.querySelectorAll('.btn-edit-sensitive').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      new bootstrap.Modal(document.getElementById('modalVerifyPassword')).show();
+    });
+  });
+
+  var btnVerify = document.getElementById('btnVerifyPwd');
+  if (btnVerify) {
+    btnVerify.addEventListener('click', function () {
+      var pwd = document.getElementById('verifyPassword').value;
+      if (!pwd) { alert('กรุณากรอกรหัสผ่าน'); return; }
+      bootstrap.Modal.getInstance(document.getElementById('modalVerifyPassword')).hide();
+      new bootstrap.Modal(document.getElementById('modalEditSensitive')).show();
+    });
+  }
+
+  var btnSave = document.getElementById('btnSaveSensitive');
+  if (btnSave) {
+    btnSave.addEventListener('click', function () {
+      bootstrap.Modal.getInstance(document.getElementById('modalEditSensitive')).hide();
+      alert('บันทึกข้อมูลสำคัญสำเร็จ ระบบจะส่งการแจ้งเตือนไปยังอีเมลของคุณ');
+    });
+  }
+
+  /* ── Favorite Menu Tab (F10) ── */
+  var tabFav = document.getElementById('tabFavoriteMenu');
+  var mainContent = document.querySelector('.row.g-4');
+  var favSection = document.getElementById('section-favorite-menu');
+
+  function updateFavCount() {
+    var checked = document.querySelectorAll('.fav-check:checked');
+    document.getElementById('favCount').textContent = checked.length + ' เมนูที่เลือก';
+    var preview = document.getElementById('favPreview');
+    preview.innerHTML = '';
+    checked.forEach(function (c) {
+      var div = document.createElement('div');
+      div.innerHTML = '<i class="ri ri-arrow-right-s-line me-1"></i>' + c.dataset.menu;
+      preview.appendChild(div);
+    });
+  }
+
+  if (tabFav) {
+    tabFav.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelectorAll('.nav-link').forEach(function (l) { l.classList.remove('active'); });
+      this.classList.add('active');
+      if (mainContent) mainContent.style.display = 'none';
+      if (favSection) favSection.style.display = '';
+      updateFavCount();
+    });
+  }
+
+  document.querySelectorAll('.fav-check').forEach(function (c) {
+    c.addEventListener('change', updateFavCount);
+  });
+
+  if (document.getElementById('btnSaveFavorite')) {
+    document.getElementById('btnSaveFavorite').addEventListener('click', function () {
+      alert('บันทึกเมนูโปรดสำเร็จ');
+    });
+  }
+
+});
+</script>
 }
 
-@* ************** Content ************** *@
-<div class="row">
-  <!-- User Sidebar -->
-  <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
-    <!-- User Card -->
-    <div class="card mb-6">
-      <div class="card-body pt-12">
-        <div class="user-avatar-section">
-          <div class=" d-flex align-items-center flex-column">
-            <img class="img-fluid rounded-3 mb-4" src="~/img/avatars/1.png" height="120" width="120" alt="User avatar" />
-            <div class="user-info text-center">
-              <h5>Violet Mendoza</h5>
-              <span class="badge bg-label-danger rounded-pill">Subscriber</span>
-            </div>
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">โปรไฟล์ผู้ใช้งาน</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">โปรไฟล์ผู้ใช้งาน</h4>
+
+  <ul class="nav nav-pills mb-4 flex-wrap gap-2">
+    <li class="nav-item">
+      <a class="nav-link active" href="/Users/ViewAccount">
+        <i class="ri ri-user-line me-1"></i>ข้อมูลส่วนตัว
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewSecurity">
+        <i class="ri ri-shield-line me-1"></i>ความปลอดภัย
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewAddresses">
+        <i class="ri ri-map-line me-1"></i>บัญชีที่อยู่
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewAccount#favorite-menu" id="tabFavoriteMenu">
+        <i class="ri ri-star-line me-1"></i>เมนูโปรด
+      </a>
+    </li>
+  </ul>
+
+  <div class="row g-4">
+
+    <!-- Left: Profile Card -->
+    <div class="col-lg-4">
+      <div class="card text-center p-3">
+        <div class="card-body">
+          <div class="avatar-wrapper mb-3">
+            <img src="~/img/avatars/1.png" alt="Avatar" />
           </div>
-        </div>
-        <div class="d-flex justify-content-around flex-wrap my-6 gap-0 gap-md-3 gap-lg-4">
-          <div class="d-flex align-items-center me-5 gap-4">
-            <div class="avatar">
-              <div class="avatar-initial bg-label-primary rounded-3">
-                <i class="icon-base ri ri-check-line icon-24px"></i>
-              </div>
-            </div>
-            <div>
-              <h5 class="mb-0">1.23k</h5>
-              <span>Task Done</span>
-            </div>
+          <h5 class="mb-1">นายอดิสัย พัฒนการ</h5>
+          <span class="badge mb-3" style="background:var(--dpim-blue);">ผู้ประกอบการ</span>
+          <div class="d-grid gap-2 mt-2">
+            <a href="#" class="btn btn-sm btn-outline-secondary">
+              <i class="ri ri-camera-line me-1"></i>เปลี่ยนรูปโปรไฟล์
+            </a>
           </div>
-          <div class="d-flex align-items-center gap-4">
-            <div class="avatar">
-              <div class="avatar-initial bg-label-primary rounded-3">
-                <i class="icon-base ri ri-briefcase-line icon-24px"></i>
-              </div>
+          <hr />
+          <div class="text-start" style="font-size:.87rem;">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ri ri-user-line text-muted"></i>
+              <span class="text-muted">ชื่อผู้ใช้:</span>
+              <span class="fw-semibold">adisaip</span>
             </div>
-            <div>
-              <h5 class="mb-0">568</h5>
-              <span>Project Done</span>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ri ri-mail-line text-muted"></i>
+              <span class="text-muted">อีเมล:</span>
+              <span class="fw-semibold">adisaip@dpim.go.th</span>
             </div>
-          </div>
-        </div>
-        <h5 class="pb-4 border-bottom mb-4">Details</h5>
-        <div class="info-container">
-          <ul class="list-unstyled mb-6">
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Username:</span>
-              <span>violet.dev</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Email:</span>
-              <span>vafgot&#64;vultukir.org</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Status:</span>
-              <span class="badge bg-label-success rounded-pill">Active</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Role:</span>
-              <span>Author</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Tax id:</span>
-              <span>Tax-8965</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Contact:</span>
-              <span>(123) 456-7890</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Languages:</span>
-              <span>French</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Country:</span>
-              <span>England</span>
-            </li>
-          </ul>
-          <div class="d-flex justify-content-center">
-            <a href="javascript:;" class="btn btn-primary me-4" data-bs-target="#editUser" data-bs-toggle="modal">Edit</a>
-            <a href="javascript:;" class="btn btn-outline-danger suspend-user">Suspend</a>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ri ri-building-line text-muted"></i>
+              <span class="text-muted">หน่วยงาน:</span>
+              <span class="fw-semibold">กองบริหารทั่วไป</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ri ri-calendar-line text-muted"></i>
+              <span class="text-muted">สมาชิกตั้งแต่:</span>
+              <span class="fw-semibold">01/01/2569</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- /User Card -->
-    <!-- Plan Card -->
-    <div class="card mb-6 border border-2 border-primary">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-          <span class="badge bg-label-primary rounded-pill">Standard</span>
-          <div class="d-flex justify-content-center">
-            <sup class="h5 pricing-currency mt-5 mb-0 me-1 text-primary">$</sup>
-            <h1 class="mb-0 text-primary">99</h1>
-            <sub class="h6 pricing-duration mt-auto mb-3 fw-normal">month</sub>
-          </div>
-        </div>
-        <ul class="list-unstyled g-2 my-6">
-          <li class="mb-2 d-flex align-items-center"><i class="icon-base ri ri-circle-fill icon-10px text-body me-2"></i><span>10 Users</span></li>
-          <li class="mb-2 d-flex align-items-center"><i class="icon-base ri ri-circle-fill icon-10px text-body me-2"></i><span>Up to 10 GB storage</span></li>
-          <li class="mb-2 d-flex align-items-center"><i class="icon-base ri ri-circle-fill icon-10px text-body me-2"></i><span>Basic Support</span></li>
-        </ul>
-        <div class="d-flex justify-content-between align-items-center mb-1 fw-medium text-heading">
-          <span>Days</span>
-          <span>26 of 30 Days</span>
-        </div>
-        <div class="progress mb-1 bg-label-primary rounded" style="height: 6px;">
-          <div class="progress-bar rounded" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <small>4 days remaining</small>
-        <div class="d-grid w-100 mt-6">
-          <button class="btn btn-primary" data-bs-target="#upgradePlanModal" data-bs-toggle="modal">Upgrade Plan</button>
+
+      <!-- Quick Links -->
+      <div class="card mt-4">
+        <div class="card-header"><h6 class="card-title mb-0">เมนูด่วน</h6></div>
+        <div class="list-group list-group-flush">
+          <a href="/Users/Certificate" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+            <i class="ri ri-medal-line text-success"></i>ใบรับรองอิเล็กทรอนิกส์
+          </a>
+          <a href="/Auth/AccessRequest" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+            <i class="ri ri-key-line" style="color:var(--dpim-blue);"></i>ยื่นคำขอสิทธิ์ระบบ
+          </a>
+          <a href="/Users/ViewSecurity" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+            <i class="ri ri-shield-line" style="color:var(--dpim-blue);"></i>ตั้งค่าความปลอดภัย
+          </a>
         </div>
       </div>
     </div>
-    <!-- /Plan Card -->
+
+    <!-- Right: Form -->
+    <div class="col-lg-8">
+
+      <!-- Section 1: ข้อมูลทั่วไป -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="ri ri-information-line me-2" style="color:var(--dpim-blue);"></i>ข้อมูลทั่วไป
+          </h5>
+          <button id="btnEditGeneral" type="button" class="btn btn-sm btn-outline-secondary" data-editing="false">
+            <i class="ri ri-edit-line me-1"></i>แก้ไขข้อมูล
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">ชื่อ</label>
+              <input type="text" class="form-control general-field" value="อดิสัย" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">นามสกุล</label>
+              <input type="text" class="form-control general-field" value="พัฒนการ" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">เบอร์โทรศัพท์</label>
+              <input type="tel" class="form-control general-field" value="081-234-5678" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">หน่วยงาน / ตำแหน่ง</label>
+              <input type="text" class="form-control general-field" value="กองบริหารทั่วไป" readonly />
+            </div>
+            <div class="col-12">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">อีเมลสำรอง</label>
+              <input type="email" class="form-control general-field" value="adisaip.backup@gmail.com" readonly />
+              <div class="form-text text-muted">ใช้สำหรับรับ OTP กรณีฉุกเฉิน</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: ข้อมูลสำคัญ -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="ri ri-lock-line me-2 text-warning"></i>ข้อมูลสำคัญ
+          </h5>
+          <button type="button" class="btn btn-sm btn-outline-warning btn-edit-sensitive">
+            <i class="ri ri-edit-line me-1"></i>แก้ไข (ต้องยืนยันตัวตน)
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-3" style="font-size:.85rem;">
+            <i class="ri ri-shield-cross-line"></i>
+            ข้อมูลในส่วนนี้ต้องยืนยันรหัสผ่านก่อนทำการแก้ไข
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">เลขบัตรประชาชน</label>
+              <div class="input-group">
+                <input type="text" class="form-control" value="x-xxxx-xxxxx-xx-x" readonly
+                       style="background:var(--bs-gray-100);letter-spacing:.1em;" />
+                <span class="input-group-text"><i class="ri ri-lock-line text-warning"></i></span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">วันเกิด</label>
+              <div class="input-group">
+                <input type="text" class="form-control" value="01/01/2510" readonly
+                       style="background:var(--bs-gray-100);" />
+                <span class="input-group-text"><i class="ri ri-lock-line text-warning"></i></span>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" style="font-size:.85rem;font-weight:600;">อีเมลหลัก (สำหรับเข้าสู่ระบบ)</label>
+              <div class="input-group">
+                <input type="email" class="form-control" value="adisaip@dpim.go.th" readonly
+                       style="background:var(--bs-gray-100);" />
+                <span class="input-group-text"><i class="ri ri-lock-line text-warning"></i></span>
+              </div>
+              <div class="form-text text-muted">หากต้องการเปลี่ยนอีเมลหลัก ระบบจะส่ง OTP ยืนยันไปยังอีเมลเดิมก่อน</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-  <!--/ User Sidebar -->
-
-  <!-- User Content -->
-  <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-    <!-- User Tabs -->
-    <div class="nav-align-top">
-      <ul class="nav nav-pills flex-column flex-md-row flex-wrap mb-6 row-gap-2">
-        <li class="nav-item">
-          <a class="nav-link active" href="javascript:void(0);"><i class="icon-base ri ri-group-line icon-sm me-2"></i>Account</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="ViewSecurity"><i class="icon-base ri ri-lock-2-line icon-sm me-2"></i>Security</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="ViewBilling"><i class="icon-base ri ri-bookmark-line icon-sm me-2"></i>Billing & Plans</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="ViewNotifications"><i class="icon-base ri ri-notification-4-line icon-sm me-2"></i>Notifications</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="ViewConnections"><i class="icon-base ri ri-link-m icon-sm me-2"></i>Connections</a>
-        </li>
-      </ul>
-    </div>
-    <!--/ User Tabs -->
-
-    <!-- Project table -->
-    <div class="card mb-6">
-      <div class="card-datatable table-responsive mb-n8">
-        <table class="table datatable-project table-border-bottom-0 mb-2">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Project</th>
-              <th class="text-nowrap">Total Task</th>
-              <th>Progress</th>
-              <th>Hours</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-    </div>
-    <!-- /Project table -->
-
-    <!-- Activity Timeline -->
-    <div class="card mb-6">
-      <h5 class="card-header">User Activity Timeline</h5>
-      <div class="card-body pt-0">
-        <ul class="timeline mb-0 mt-2">
-          <li class="timeline-item timeline-item-transparent">
-            <span class="timeline-point timeline-point-primary"></span>
-            <div class="timeline-event">
-              <div class="timeline-header mb-3">
-                <h6 class="mb-0">12 Invoices have been paid</h6>
-                <small class="text-body-secondary">12 min ago</small>
-              </div>
-              <p class="mb-2">Invoices have been paid to the company</p>
-              <div class="d-flex align-items-center mb-1">
-                <div class="badge bg-lightest rounded-3 mb-1_5">
-                  <img src="~/img/icons/misc/pdf.png" alt="img" width="20" class="me-2" />
-                  <span class="h6 mb-0 text-secondary">invoices.pdf</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="timeline-item timeline-item-transparent">
-            <span class="timeline-point timeline-point-success"></span>
-            <div class="timeline-event">
-              <div class="timeline-header mb-3">
-                <h6 class="mb-0">Client Meeting</h6>
-                <small class="text-body-secondary">45 min ago</small>
-              </div>
-              <p class="mb-2">Project meeting with john &#64;10:15am</p>
-              <div class="d-flex justify-content-between flex-wrap gap-2 mb-1_5">
-                <div class="d-flex flex-wrap align-items-center">
-                  <div class="avatar avatar-sm me-2">
-                    <img src="~/img/avatars/4.png" alt="Avatar" class="rounded-circle" />
-                  </div>
-                  <div>
-                    <p class="mb-0 small fw-medium">Lester McCarthy (Client)</p>
-                    <small>CEO of @TempData.Peek("authorName")</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="timeline-item timeline-item-transparent">
-            <span class="timeline-point timeline-point-info"></span>
-            <div class="timeline-event">
-              <div class="timeline-header mb-3">
-                <h6 class="mb-0">Create a new project for client</h6>
-                <small class="text-body-secondary">2 Day Ago</small>
-              </div>
-              <p class="mb-2">6 team members in a project</p>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-top-0 p-0">
-                  <div class="d-flex flex-wrap align-items-center">
-                    <ul class="list-unstyled users-list d-flex align-items-center avatar-group m-0 me-2">
-                      <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" title="Vinnie Mostowy" class="avatar pull-up">
-                        <img class="rounded-circle" src="~/img/avatars/5.png" alt="Avatar" />
-                      </li>
-                      <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" title="Allen Rieske" class="avatar pull-up">
-                        <img class="rounded-circle" src="~/img/avatars/12.png" alt="Avatar" />
-                      </li>
-                      <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" title="Julee Rossignol" class="avatar pull-up">
-                        <img class="rounded-circle" src="~/img/avatars/6.png" alt="Avatar" />
-                      </li>
-                      <li class="avatar">
-                        <span class="avatar-initial rounded-circle pull-up text-heading" data-bs-toggle="tooltip" data-bs-placement="bottom" title="3 more">+3</span>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <!-- /Activity Timeline -->
-
-    <!-- Invoice table -->
-    <div class="card mb-4 pb-5">
-      <div class="table-responsive">
-        <table class="table datatable-invoice">
-          <thead>
-            <tr>
-              <th></th>
-              <th>#</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Issued Date</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-    </div>
-    <!-- /Invoice table -->
-  </div>
-  <!--/ User Content -->
 </div>
 
-<!-- Modal -->
-@await Html.PartialAsync("../_Partials/_Modals/ModalEditUser")
-@await Html.PartialAsync("../_Partials/_Modals/ModalUpgradePlan")
-<!-- /Modal -->
+<!-- Favorite Menu Section (F10 - TOR 5.2.3.4(22)) -->
+<div id="section-favorite-menu" style="display:none;">
+  <div class="card mt-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0" style="color:var(--dpim-blue);">
+        <i class="ri ri-star-line me-2" style="color:var(--dpim-green);"></i>จัดการเมนูโปรด
+      </h5>
+      <span class="badge bg-label-primary" id="favCount">0 เมนูที่เลือก</span>
+    </div>
+    <div class="card-body">
+      <p class="text-muted mb-3" style="font-size:.87rem;">
+        เลือกเมนูที่ต้องการแสดงใน Sidebar "เมนูโปรด" เพื่อเข้าถึงได้รวดเร็ว
+      </p>
+      <div class="row g-2" id="favMenuGrid">
+        <!-- จัดการบัญชี -->
+        <div class="col-12 mb-1">
+          <div class="fw-semibold" style="font-size:.82rem;color:var(--dpim-blue);border-bottom:1px solid var(--bs-border-color);padding-bottom:.3rem;">บัญชีผู้ใช้</div>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="โปรไฟล์ผู้ใช้" checked />
+            <i class="ri ri-user-line text-muted"></i>
+            <span style="font-size:.85rem;">โปรไฟล์ผู้ใช้</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="ความปลอดภัย" checked />
+            <i class="ri ri-shield-line text-muted"></i>
+            <span style="font-size:.85rem;">ความปลอดภัย</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="ที่อยู่" />
+            <i class="ri ri-map-line text-muted"></i>
+            <span style="font-size:.85rem;">บัญชีที่อยู่</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="ใบรับรอง" checked />
+            <i class="ri ri-medal-line text-muted"></i>
+            <span style="font-size:.85rem;">ใบรับรองอิเล็กทรอนิกส์</span>
+          </label>
+        </div>
+        <!-- ระบบงาน -->
+        <div class="col-12 mt-2 mb-1">
+          <div class="fw-semibold" style="font-size:.82rem;color:var(--dpim-blue);border-bottom:1px solid var(--bs-border-color);padding-bottom:.3rem;">ระบบงาน</div>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="คำขอสิทธิ์" checked />
+            <i class="ri ri-key-line text-muted"></i>
+            <span style="font-size:.85rem;">ยื่นคำขอสิทธิ์</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="คำขอสิทธิ์รายการ" />
+            <i class="ri ri-list-check text-muted"></i>
+            <span style="font-size:.85rem;">รายการคำขอสิทธิ์</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="แจ้งเตือน" />
+            <i class="ri ri-notification-line text-muted"></i>
+            <span style="font-size:.85rem;">การแจ้งเตือน</span>
+          </label>
+        </div>
+        <!-- รายงาน -->
+        <div class="col-12 mt-2 mb-1">
+          <div class="fw-semibold" style="font-size:.82rem;color:var(--dpim-blue);border-bottom:1px solid var(--bs-border-color);padding-bottom:.3rem;">รายงาน & ข้อมูล</div>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="รายงาน" />
+            <i class="ri ri-bar-chart-2-line text-muted"></i>
+            <span style="font-size:.85rem;">รายงาน</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="Todo" />
+            <i class="ri ri-checkbox-multiple-line text-muted"></i>
+            <span style="font-size:.85rem;">รายการ Todo</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="Audit Log" />
+            <i class="ri ri-file-line text-muted"></i>
+            <span style="font-size:.85rem;">Audit Log</span>
+          </label>
+        </div>
+        <!-- Admin -->
+        <div class="col-12 mt-2 mb-1">
+          <div class="fw-semibold" style="font-size:.82rem;color:var(--dpim-blue);border-bottom:1px solid var(--bs-border-color);padding-bottom:.3rem;">จัดการระบบ (Admin)</div>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="จัดการผู้ใช้" />
+            <i class="ri ri-group-line text-muted"></i>
+            <span style="font-size:.85rem;">จัดการผู้ใช้งาน</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="SSO Settings" />
+            <i class="ri ri-lock-unlock-line text-muted"></i>
+            <span style="font-size:.85rem;">ตั้งค่า SSO</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-6">
+          <label class="d-flex align-items-center gap-2 p-2 border rounded fav-menu-item" style="cursor:pointer;border-radius:.5rem !important;">
+            <input type="checkbox" class="form-check-input fav-check" data-menu="นโยบายรหัสผ่าน" />
+            <i class="ri ri-shield-line text-muted"></i>
+            <span style="font-size:.85rem;">นโยบายรหัสผ่าน</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="mt-4 p-3 border rounded" style="background:rgba(35,64,143,.04);border-radius:.75rem !important;">
+        <div class="fw-semibold mb-2" style="font-size:.85rem;color:var(--dpim-blue);">
+          <i class="ri ri-star-line me-1" style="color:var(--dpim-green);"></i>ตัวอย่างเมนูโปรดใน Sidebar
+        </div>
+        <div id="favPreview" class="d-flex flex-column gap-1" style="font-size:.83rem;"></div>
+      </div>
+
+      <div class="mt-3">
+        <button id="btnSaveFavorite" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>บันทึกเมนูโปรด
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Verify Password -->
+<div class="modal fade" id="modalVerifyPassword" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ri ri-lock-line me-2 text-warning"></i>ยืนยันตัวตน</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted mb-3" style="font-size:.88rem;">กรุณากรอกรหัสผ่านเพื่อยืนยันการแก้ไขข้อมูลสำคัญ</p>
+        <div class="mb-3">
+          <label class="form-label">รหัสผ่านปัจจุบัน <span class="text-danger">*</span></label>
+          <input type="password" id="verifyPassword" class="form-control" placeholder="กรอกรหัสผ่าน" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnVerifyPwd" class="btn btn-dpim">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit Sensitive Info -->
+<div class="modal fade" id="modalEditSensitive" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ri ri-edit-line me-2"></i>แก้ไขข้อมูลสำคัญ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">เลขบัตรประชาชน</label>
+            <input type="text" class="form-control" maxlength="13" placeholder="1234567890123" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">วันเกิด</label>
+            <input type="date" class="form-control" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">อีเมลหลัก</label>
+            <input type="email" class="form-control" value="adisaip@dpim.go.th" />
+            <div class="form-text text-warning">
+              <i class="ri ri-information-line me-1"></i>ระบบจะส่ง OTP ยืนยันไปยังอีเมลเดิมและอีเมลใหม่
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSaveSensitive" class="btn btn-dpim-green">
+          <i class="ri ri-save-line me-1"></i>บันทึก
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

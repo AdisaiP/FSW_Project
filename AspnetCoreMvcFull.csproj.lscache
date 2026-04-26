@@ -512,28 +512,47 @@ Views/Access/
  Permission.cshtml
  Roles.cshtml
 Views/Admin/
+ AuditLog.cshtml
  CertificateTemplate.cshtml
+ CookieConsent.cshtml
+ DataAnalyzer.cshtml
  DofList.cshtml
+ EmailNotification.cshtml
+ FAQ.cshtml
  IssueReason.cshtml
+ MFAPolicy.cshtml
  NotificationReason.cshtml
  Organization.cshtml
+ PasswordPolicy.cshtml
+ PrivacyPolicy.cshtml
  Reports.cshtml
+ SSOSettings.cshtml
+ TodoList.cshtml
  TraceabilityList.cshtml
+ UserManagement.cshtml
 Views/Apps/
  Calendar.cshtml
  Chat.cshtml
  Email.cshtml
  Kanban.cshtml
 Views/Auth/
+ AccessRequest.cshtml
  ForgotPasswordBasic.cshtml
  ForgotPasswordCover.cshtml
  LoginBasic.cshtml
  LoginCover.cshtml
  RegisterBasic.cshtml
+ RegisterChannel.cshtml
+ RegisterComplete.cshtml
  RegisterCover.cshtml
  RegisterMultiSteps.cshtml
+ RegisterThaiID.cshtml
+ RegisterThaiIDCallback.cshtml
  ResetPasswordBasic.cshtml
  ResetPasswordCover.cshtml
+ SSORedirectIndustry.cshtml
+ SSORedirectOfficer.cshtml
+ SSORedirectThaiID.cshtml
  TwoStepsBasic.cshtml
  TwoStepsCover.cshtml
  VerifyEmailBasic.cshtml
@@ -653,6 +672,7 @@ Views/
  Maps/Leaflet.cshtml
  Modals/Examples.cshtml
  Officer/
+  AccessRequestList.cshtml
   IndexApproveYield.cshtml
   IndexCertTemplate.cshtml
   IndexIssueCertificate.cshtml
@@ -669,6 +689,7 @@ Views/
   IndexStatistics.cshtml
   IndexUserData.cshtml
   RegisterUser.cshtml
+  ReviewAccessRequest.cshtml
   ReviewDeclaration.cshtml
   ReviewReplacementDeclaration.cshtml
   ReviewReplacementProcessing.cshtml
@@ -774,8 +795,10 @@ Views/
   TooltipsPopovers.cshtml
   Typography.cshtml
  Users/
+  Certificate.cshtml
   List.cshtml
   ViewAccount.cshtml
+  ViewAddresses.cshtml
   ViewBilling.cshtml
   ViewConnections.cshtml
   ViewNotifications.cshtml
@@ -819,28 +842,47 @@ Views/Access/
  Permission.cshtml
  Roles.cshtml
 Views/Admin/
+ AuditLog.cshtml
  CertificateTemplate.cshtml
+ CookieConsent.cshtml
+ DataAnalyzer.cshtml
  DofList.cshtml
+ EmailNotification.cshtml
+ FAQ.cshtml
  IssueReason.cshtml
+ MFAPolicy.cshtml
  NotificationReason.cshtml
  Organization.cshtml
+ PasswordPolicy.cshtml
+ PrivacyPolicy.cshtml
  Reports.cshtml
+ SSOSettings.cshtml
+ TodoList.cshtml
  TraceabilityList.cshtml
+ UserManagement.cshtml
 Views/Apps/
  Calendar.cshtml
  Chat.cshtml
  Email.cshtml
  Kanban.cshtml
 Views/Auth/
+ AccessRequest.cshtml
  ForgotPasswordBasic.cshtml
  ForgotPasswordCover.cshtml
  LoginBasic.cshtml
  LoginCover.cshtml
  RegisterBasic.cshtml
+ RegisterChannel.cshtml
+ RegisterComplete.cshtml
  RegisterCover.cshtml
  RegisterMultiSteps.cshtml
+ RegisterThaiID.cshtml
+ RegisterThaiIDCallback.cshtml
  ResetPasswordBasic.cshtml
  ResetPasswordCover.cshtml
+ SSORedirectIndustry.cshtml
+ SSORedirectOfficer.cshtml
+ SSORedirectThaiID.cshtml
  TwoStepsBasic.cshtml
  TwoStepsCover.cshtml
  VerifyEmailBasic.cshtml
@@ -960,6 +1002,7 @@ Views/
  Maps/Leaflet.cshtml
  Modals/Examples.cshtml
  Officer/
+  AccessRequestList.cshtml
   IndexApproveYield.cshtml
   IndexCertTemplate.cshtml
   IndexIssueCertificate.cshtml
@@ -976,6 +1019,7 @@ Views/
   IndexStatistics.cshtml
   IndexUserData.cshtml
   RegisterUser.cshtml
+  ReviewAccessRequest.cshtml
   ReviewDeclaration.cshtml
   ReviewReplacementDeclaration.cshtml
   ReviewReplacementProcessing.cshtml
@@ -1081,8 +1125,10 @@ Views/
   TooltipsPopovers.cshtml
   Typography.cshtml
  Users/
+  Certificate.cshtml
   List.cshtml
   ViewAccount.cshtml
+  ViewAddresses.cshtml
   ViewBilling.cshtml
   ViewConnections.cshtml
   ViewNotifications.cshtml

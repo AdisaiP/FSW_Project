@@ -1,0 +1,371 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "รายการสิ่งที่ต้องดำเนินการ";
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .stat-todo { border-radius:.75rem; border:none; padding:1rem 1.25rem; }
+  .todo-item { border:1px solid var(--bs-border-color); border-radius:.75rem; padding:1rem 1.25rem; transition:.2s; background:var(--bs-card-bg); }
+  .todo-item:hover { border-color:var(--dpim-blue); box-shadow:0 2px 8px rgba(35,64,143,.1); }
+  .todo-item.is-done { opacity:.55; }
+  .todo-item.is-done .todo-title { text-decoration:line-through; }
+  .todo-priority { width:4px; border-radius:2px; min-height:44px; align-self:stretch; flex-shrink:0; }
+  .todo-priority.high { background:#dc3545; }
+  .todo-priority.medium { background:#e6a800; }
+  .todo-priority.low { background:var(--dpim-green); }
+  .todo-category-badge { font-size:.72rem; padding:.2em .5em; border-radius:.4em; }
+  .filter-btn { border-radius:2rem; font-size:.82rem; padding:.3rem .9rem; }
+  .filter-btn.active { background:var(--dpim-blue); color:#fff; border-color:var(--dpim-blue); }
+  @@keyframes fade-out { to { opacity:0; transform:translateY(-8px); max-height:0; overflow:hidden; padding:0; margin:0; } }
+  .removing { animation:fade-out .3s forwards; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ── Filter tabs ── */
+  document.querySelectorAll('.todo-filter-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.todo-filter-btn').forEach(function (b) {
+        b.classList.remove('active');
+      });
+      this.classList.add('active');
+      var filter = this.dataset.filter;
+      document.querySelectorAll('.todo-item').forEach(function (item) {
+        if (filter === 'all') {
+          item.style.display = '';
+        } else if (filter === 'pending') {
+          item.style.display = item.classList.contains('is-done') ? 'none' : '';
+        } else if (filter === 'done') {
+          item.style.display = item.classList.contains('is-done') ? '' : 'none';
+        } else {
+          item.style.display = item.dataset.category === filter ? '' : 'none';
+        }
+      });
+    });
+  });
+
+  /* ── Mark Done ── */
+  document.querySelectorAll('.btn-mark-done').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = this.closest('.todo-item');
+      item.classList.add('is-done');
+      this.innerHTML = '<i class="ri ri-checkbox-circle-line me-1"></i>เสร็จแล้ว';
+      this.disabled = true;
+      this.className = 'btn btn-sm btn-outline-success btn-mark-done';
+      updateStats();
+    });
+  });
+
+  /* ── Dismiss ── */
+  document.querySelectorAll('.btn-dismiss-todo').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = this.closest('.todo-item');
+      item.classList.add('removing');
+      setTimeout(function () { item.remove(); updateStats(); }, 300);
+    });
+  });
+
+  function updateStats() {
+    var all = document.querySelectorAll('.todo-item').length;
+    var done = document.querySelectorAll('.todo-item.is-done').length;
+    var pending = all - done;
+    document.getElementById('statAll').textContent = all;
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statDone').textContent = done;
+  }
+
+  /* ── Add Todo ── */
+  document.getElementById('btnSaveTodo').addEventListener('click', function () {
+    bootstrap.Modal.getInstance(document.getElementById('modalAddTodo')).hide();
+    alert('เพิ่มรายการสำเร็จ');
+  });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">รายการสิ่งที่ต้องดำเนินการ</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h4 class="page-title-dpim mb-0">รายการสิ่งที่ต้องดำเนินการ (Todo List)</h4>
+    <button class="btn btn-dpim btn-sm" data-bs-toggle="modal" data-bs-target="#modalAddTodo">
+      <i class="ri ri-add-line me-1"></i>เพิ่มรายการ
+    </button>
+  </div>
+
+  <!-- Summary Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-4">
+      <div class="stat-todo card text-center">
+        <div class="fw-bold fs-4" style="color:var(--dpim-blue);" id="statAll">6</div>
+        <div class="text-muted" style="font-size:.78rem;">ทั้งหมด</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="stat-todo card text-center">
+        <div class="fw-bold fs-4" style="color:#e6a800;" id="statPending">4</div>
+        <div class="text-muted" style="font-size:.78rem;">รอดำเนินการ</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="stat-todo card text-center">
+        <div class="fw-bold fs-4" style="color:var(--dpim-green);" id="statDone">2</div>
+        <div class="text-muted" style="font-size:.78rem;">เสร็จสิ้น</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Buttons -->
+  <div class="d-flex gap-2 flex-wrap mb-4">
+    <button class="btn btn-outline-secondary filter-btn todo-filter-btn active" data-filter="all">ทั้งหมด</button>
+    <button class="btn btn-outline-secondary filter-btn todo-filter-btn" data-filter="pending">รอดำเนินการ</button>
+    <button class="btn btn-outline-secondary filter-btn todo-filter-btn" data-filter="done">เสร็จสิ้น</button>
+    <button class="btn btn-outline-secondary filter-btn todo-filter-btn" data-filter="access">คำขอสิทธิ์</button>
+    <button class="btn btn-outline-secondary filter-btn todo-filter-btn" data-filter="cert">ใบรับรอง</button>
+    <button class="btn btn-outline-secondary filter-btn todo-filter-btn" data-filter="system">ระบบ</button>
+    <button class="btn btn-outline-secondary filter-btn todo-filter-btn" data-filter="policy">นโยบาย</button>
+  </div>
+
+  <!-- Todo Items -->
+  <div class="d-flex flex-column gap-3">
+
+    <!-- 1 -->
+    <div class="todo-item d-flex gap-3" data-category="access">
+      <div class="todo-priority high"></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="todo-title fw-semibold">มีคำขอสิทธิ์ระบบรออนุมัติ 3 รายการ</div>
+            <div class="mt-1">
+              <span class="badge bg-label-danger todo-category-badge me-1">สูง</span>
+              <span class="badge bg-label-primary todo-category-badge">คำขอสิทธิ์</span>
+            </div>
+            <div class="text-muted mt-1" style="font-size:.82rem;">
+              มีคำขอสิทธิ์ที่รอการตรวจสอบและอนุมัติจากเจ้าหน้าที่ · 26/04/2569 08:00
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/Officer/AccessRequestList" class="btn btn-sm btn-dpim">
+              <i class="ri ri-external-link-line me-1"></i>ดูรายการ
+            </a>
+            <button class="btn btn-sm btn-outline-success btn-mark-done">
+              <i class="ri ri-check-line me-1"></i>ทำเสร็จ
+            </button>
+            <button class="btn btn-icon btn-sm btn-outline-secondary btn-dismiss-todo" title="ยกเลิก">
+              <i class="ri ri-close-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="todo-item d-flex gap-3" data-category="cert">
+      <div class="todo-priority medium"></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="todo-title fw-semibold">ใบรับรองดิจิทัลหมดอายุในอีก 30 วัน</div>
+            <div class="mt-1">
+              <span class="badge bg-label-warning todo-category-badge me-1">กลาง</span>
+              <span class="badge bg-label-success todo-category-badge">ใบรับรอง</span>
+            </div>
+            <div class="text-muted mt-1" style="font-size:.82rem;">
+              DPIM-2569-0012345 จะหมดอายุ 31/05/2569 · กรุณาขอออกใหม่
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/Users/Certificate" class="btn btn-sm btn-dpim-green">
+              <i class="ri ri-medal-line me-1"></i>จัดการใบรับรอง
+            </a>
+            <button class="btn btn-sm btn-outline-success btn-mark-done">
+              <i class="ri ri-check-line me-1"></i>ทำเสร็จ
+            </button>
+            <button class="btn btn-icon btn-sm btn-outline-secondary btn-dismiss-todo" title="ยกเลิก">
+              <i class="ri ri-close-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="todo-item d-flex gap-3" data-category="policy">
+      <div class="todo-priority medium"></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="todo-title fw-semibold">มีการอัปเดต Privacy Policy ฉบับใหม่ — กรุณายืนยัน</div>
+            <div class="mt-1">
+              <span class="badge bg-label-warning todo-category-badge me-1">กลาง</span>
+              <span class="badge bg-label-info todo-category-badge">นโยบาย</span>
+            </div>
+            <div class="text-muted mt-1" style="font-size:.82rem;">
+              Privacy Policy v2.3 มีผล 01/05/2569 · กรุณาอ่านและยืนยัน
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/Admin/PrivacyPolicy" class="btn btn-sm btn-dpim">
+              <i class="ri ri-file-line me-1"></i>ดู Policy
+            </a>
+            <button class="btn btn-sm btn-outline-success btn-mark-done">
+              <i class="ri ri-check-line me-1"></i>ยืนยันแล้ว
+            </button>
+            <button class="btn btn-icon btn-sm btn-outline-secondary btn-dismiss-todo" title="ยกเลิก">
+              <i class="ri ri-close-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="todo-item d-flex gap-3" data-category="access">
+      <div class="todo-priority high"></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="todo-title fw-semibold">มีคำขอลงทะเบียนสมาชิกรอตรวจสอบ 2 รายการ</div>
+            <div class="mt-1">
+              <span class="badge bg-label-danger todo-category-badge me-1">สูง</span>
+              <span class="badge bg-label-primary todo-category-badge">คำขอสิทธิ์</span>
+            </div>
+            <div class="text-muted mt-1" style="font-size:.82rem;">
+              รอการตรวจสอบเอกสารและอนุมัติสมาชิกใหม่ · 25/04/2569 16:30
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/Admin/UserManagement" class="btn btn-sm btn-dpim">
+              <i class="ri ri-user-follow-line me-1"></i>จัดการผู้ใช้
+            </a>
+            <button class="btn btn-sm btn-outline-success btn-mark-done">
+              <i class="ri ri-check-line me-1"></i>ทำเสร็จ
+            </button>
+            <button class="btn btn-icon btn-sm btn-outline-secondary btn-dismiss-todo" title="ยกเลิก">
+              <i class="ri ri-close-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 (done) -->
+    <div class="todo-item is-done d-flex gap-3" data-category="system">
+      <div class="todo-priority low"></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="todo-title fw-semibold">ตั้งค่า MFA Policy สำหรับ Admin</div>
+            <div class="mt-1">
+              <span class="badge bg-label-success todo-category-badge me-1">ต่ำ</span>
+              <span class="badge bg-label-secondary todo-category-badge">ระบบ</span>
+            </div>
+            <div class="text-muted mt-1" style="font-size:.82rem;">เสร็จสิ้น 24/04/2569</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success btn-mark-done" disabled>
+              <i class="ri ri-checkbox-circle-line me-1"></i>เสร็จแล้ว
+            </button>
+            <button class="btn btn-icon btn-sm btn-outline-secondary btn-dismiss-todo" title="ยกเลิก">
+              <i class="ri ri-close-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 (done) -->
+    <div class="todo-item is-done d-flex gap-3" data-category="system">
+      <div class="todo-priority low"></div>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="todo-title fw-semibold">อัปเดต Cookie Consent Banner ข้อความภาษาไทย</div>
+            <div class="mt-1">
+              <span class="badge bg-label-success todo-category-badge me-1">ต่ำ</span>
+              <span class="badge bg-label-secondary todo-category-badge">ระบบ</span>
+            </div>
+            <div class="text-muted mt-1" style="font-size:.82rem;">เสร็จสิ้น 23/04/2569</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-success btn-mark-done" disabled>
+              <i class="ri ri-checkbox-circle-line me-1"></i>เสร็จแล้ว
+            </button>
+            <button class="btn btn-icon btn-sm btn-outline-secondary btn-dismiss-todo" title="ยกเลิก">
+              <i class="ri ri-close-line"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal: เพิ่มรายการ Todo -->
+<div class="modal fade" id="modalAddTodo" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:2px solid var(--dpim-green);">
+        <h5 class="modal-title" style="color:var(--dpim-blue);">เพิ่มรายการสิ่งที่ต้องดำเนินการ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">ชื่อรายการ <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" placeholder="กรอกชื่อรายการ..." />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">หมวดหมู่</label>
+            <select class="form-select">
+              <option value="access">คำขอสิทธิ์</option>
+              <option value="cert">ใบรับรอง</option>
+              <option value="policy">นโยบาย</option>
+              <option value="system">ระบบ</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">ความสำคัญ</label>
+            <select class="form-select">
+              <option value="high">สูง</option>
+              <option value="medium" selected>กลาง</option>
+              <option value="low">ต่ำ</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">รายละเอียด</label>
+            <textarea class="form-control" rows="2"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">ลิงก์ (ถ้ามี)</label>
+            <input type="url" class="form-control" placeholder="https://..." />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSaveTodo" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>เพิ่มรายการ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

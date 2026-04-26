@@ -1,0 +1,268 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "Data Analyzer";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .stat-card { border-radius:12px; padding:1.25rem 1.5rem; color:#fff; display:flex; align-items:center; gap:1.25rem; }
+  .stat-card-icon { width:54px; height:54px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; }
+  .stat-card-val { font-size:1.75rem; font-weight:800; line-height:1; }
+  .stat-card-label { font-size:.8rem; opacity:.85; margin-top:.2rem; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ── Summary Cards ────────────────────────────────────────────────────────────
+  // (static mock, no JS needed — rendered in HTML below)
+
+  // ── Bar: ผู้ใช้ใหม่รายเดือน ─────────────────────────────────────────────────
+  new ApexCharts(document.getElementById('chartNewUsers'), {
+    chart: { type: 'bar', height: 280, toolbar: { show: false } },
+    series: [{ name: 'ผู้ใช้ใหม่', data: [18,25,32,20,38,45,29,52,44,37,61,55] }],
+    xaxis: { categories: ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'] },
+    colors: ['#23408F'],
+    plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } },
+    dataLabels: { enabled: false },
+    grid: { borderColor: '#e0e0e0', strokeDashArray: 4 },
+    tooltip: { theme: 'light' }
+  }).render();
+
+  // ── Line: Login Activity (7 วัน) ─────────────────────────────────────────────
+  new ApexCharts(document.getElementById('chartLoginActivity'), {
+    chart: { type: 'area', height: 280, toolbar: { show: false }, zoom: { enabled: false } },
+    series: [
+      { name: 'Login สำเร็จ', data: [280,310,295,340,280,315,330] },
+      { name: 'Login ล้มเหลว', data: [12,18,10,22,14,9,16] }
+    ],
+    xaxis: { categories: ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'] },
+    colors: ['#41AD49', '#dc3545'],
+    stroke: { curve: 'smooth', width: 2.5 },
+    fill: { type: 'gradient', gradient: { opacityFrom:.3, opacityTo:.05 } },
+    dataLabels: { enabled: false },
+    grid: { borderColor: '#e0e0e0', strokeDashArray: 4 },
+    legend: { position: 'top' },
+    tooltip: { theme: 'light' }
+  }).render();
+
+  // ── Donut: MFA Adoption ──────────────────────────────────────────────────────
+  new ApexCharts(document.getElementById('chartMFAAdoption'), {
+    chart: { type: 'donut', height: 280 },
+    series: [68, 22, 10],
+    labels: ['ใช้ MFA', 'ไม่ได้ใช้ MFA', 'รอยืนยัน'],
+    colors: ['#23408F','#41AD49','#adb5bd'],
+    dataLabels: { enabled: true, formatter: function(val) { return val.toFixed(0) + '%'; } },
+    legend: { position: 'bottom' },
+    plotOptions: { pie: { donut: { size: '65%', labels: {
+      show: true,
+      total: { show: true, label: 'MFA Rate', color: '#23408F',
+        formatter: function () { return '68%'; } }
+    } } } },
+    tooltip: { theme: 'light' }
+  }).render();
+
+  // ── DataTable: Top Active Users ──────────────────────────────────────────────
+  new DataTable('#tableTopUsers', {
+    language: {
+      search: 'ค้นหา:', lengthMenu: 'แสดง _MENU_ รายการ',
+      info: 'แสดง _START_-_END_ จาก _TOTAL_ รายการ',
+      paginate: { first:'แรก', last:'สุดท้าย', next:'ถัดไป', previous:'ก่อนหน้า' }
+    },
+    order: [[2, 'desc']],
+    pageLength: 5,
+    responsive: true,
+  });
+
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">Data Analyzer</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">Data Analyzer — วิเคราะห์ข้อมูลการใช้งาน</h4>
+
+  <!-- Summary Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card" style="background:linear-gradient(135deg,#23408F,#1b3175);">
+        <div class="stat-card-icon"><i class="ri ri-group-line"></i></div>
+        <div>
+          <div class="stat-card-val">1,284</div>
+          <div class="stat-card-label">ผู้ใช้ทั้งหมด</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card" style="background:linear-gradient(135deg,#41AD49,#369a3a);">
+        <div class="stat-card-icon"><i class="ri ri-user-follow-line"></i></div>
+        <div>
+          <div class="stat-card-val">987</div>
+          <div class="stat-card-label">Active</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card" style="background:linear-gradient(135deg,#e65100,#bf360c);">
+        <div class="stat-card-icon"><i class="ri ri-user-unfollow-line"></i></div>
+        <div>
+          <div class="stat-card-val">156</div>
+          <div class="stat-card-label">Suspended</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+        <div class="stat-card-icon"><i class="ri ri-time-line"></i></div>
+        <div>
+          <div class="stat-card-val">141</div>
+          <div class="stat-card-label">Pending Verify</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">ผู้ใช้ใหม่รายเดือน (ปี 2568)</h5>
+          <select class="form-select form-select-sm" style="width:100px;">
+            <option>2568</option>
+            <option>2567</option>
+          </select>
+        </div>
+        <div class="card-body">
+          <div id="chartNewUsers"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">MFA Adoption</h5>
+        </div>
+        <div class="card-body">
+          <div id="chartMFAAdoption"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Activity Chart -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">Login Activity — 7 วันย้อนหลัง</h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary active">7 วัน</button>
+        <button class="btn btn-sm btn-outline-secondary">30 วัน</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="chartLoginActivity"></div>
+    </div>
+  </div>
+
+  <!-- Top Active Users Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title mb-0">Top Active Users</h5>
+    </div>
+    <div class="card-datatable table-responsive">
+      <table id="tableTopUsers" class="table table-hover" style="font-size:.85rem;">
+        <thead>
+          <tr>
+            <th>ผู้ใช้</th>
+            <th>ประเภท</th>
+            <th>Login (30 วัน)</th>
+            <th>ครั้งสุดท้าย</th>
+            <th>MFA</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="fw-semibold">สมชาย อุตสาหกิจ</div>
+              <div class="text-muted" style="font-size:.78rem;">somchai&#64;mining.co.th</div>
+            </td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">ผู้ประกอบการ</span></td>
+            <td><strong>142</strong></td>
+            <td>25/04/2569 09:45</td>
+            <td><i class="ri ri-checkbox-circle-line" style="color:var(--dpim-green);font-size:1.1rem;"></i></td>
+            <td><span class="badge bg-label-success">Active</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="fw-semibold">พิมพ์ใจ สายแร่</div>
+              <div class="text-muted" style="font-size:.78rem;">pimjai&#64;dpim.go.th</div>
+            </td>
+            <td><span class="badge" style="background:#fff3e0;color:#e65100;">เจ้าหน้าที่</span></td>
+            <td><strong>128</strong></td>
+            <td>25/04/2569 08:30</td>
+            <td><i class="ri ri-checkbox-circle-line" style="color:var(--dpim-green);font-size:1.1rem;"></i></td>
+            <td><span class="badge bg-label-success">Active</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="fw-semibold">วีระชัย แร่ทอง</div>
+              <div class="text-muted" style="font-size:.78rem;">weerachai&#64;mine.co.th</div>
+            </td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">ผู้ประกอบการ</span></td>
+            <td><strong>97</strong></td>
+            <td>24/04/2569 16:15</td>
+            <td><i class="ri ri-close-circle-line" style="color:#adb5bd;font-size:1.1rem;"></i></td>
+            <td><span class="badge bg-label-success">Active</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="fw-semibold">Admin System</div>
+              <div class="text-muted" style="font-size:.78rem;">admin&#64;dpim.go.th</div>
+            </td>
+            <td><span class="badge" style="background:#fce4ec;color:#880e4f;">Admin</span></td>
+            <td><strong>85</strong></td>
+            <td>25/04/2569 07:00</td>
+            <td><i class="ri ri-checkbox-circle-line" style="color:var(--dpim-green);font-size:1.1rem;"></i></td>
+            <td><span class="badge bg-label-success">Active</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="fw-semibold">สุดา นำเข้าแร่</div>
+              <div class="text-muted" style="font-size:.78rem;">suda&#64;import.co.th</div>
+            </td>
+            <td><span class="badge" style="background:#e8f0fe;color:#23408F;">ผู้ประกอบการ</span></td>
+            <td><strong>72</strong></td>
+            <td>23/04/2569 14:50</td>
+            <td><i class="ri ri-checkbox-circle-line" style="color:var(--dpim-green);font-size:1.1rem;"></i></td>
+            <td><span class="badge bg-label-warning">Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

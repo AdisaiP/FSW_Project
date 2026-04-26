@@ -12,4 +12,10 @@ public class UsersController : Controller
   public IActionResult ViewConnections() => View();
   public IActionResult ViewNotifications() => View();
   public IActionResult ViewSecurity() => View();
+
+  // D2: Address Book
+  public IActionResult ViewAddresses() => View();
+
+  // E1: Digital Certificate
+  public IActionResult Certificate() => View();
 }

@@ -1,282 +1,398 @@
 @{
-  ViewData["Title"] = "User View - Security";
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "ความปลอดภัย";
 }
 
-@section VendorStyles {
-<link rel="stylesheet" href="~/vendor/libs/sweetalert2/sweetalert2.css" />
-<link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
-<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.css" />
-<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
-}
-
-@section VendorScripts {
-<script src="~/vendor/libs/sweetalert2/sweetalert2.js"></script>
-<script src="~/vendor/libs/cleave-zen/cleave-zen.js"></script>
-<script src="~/vendor/libs/select2/select2.js"></script>
-<script src="~/vendor/libs/tagify/tagify.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
-<script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; border-color:#369a3a; color:#fff; }
+  .mfa-method-card {
+    border:1.5px solid var(--bs-border-color); border-radius:10px;
+    padding:1.25rem; transition:all .18s ease;
+  }
+  .mfa-method-card.is-active { border-color:var(--dpim-green); background:rgba(65,173,73,.04); }
+  .mfa-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; }
+  .form-check-input:checked { background-color:var(--dpim-green); border-color:var(--dpim-green); }
+  .qr-placeholder { width:160px; height:160px; border:1px solid var(--bs-border-color); border-radius:8px; display:flex; align-items:center; justify-content:center; background:var(--bs-gray-100); }
+</style>
 }
 
 @section PageScripts {
-<script src="~/js/modal-edit-user.js"></script>
-<script src="~/js/modal-enable-otp.js"></script>
-<script src="~/js/app-user-view.js"></script>
-<script src="~/js/app-user-view-security.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.mfa-toggle').forEach(function (toggle) {
+    toggle.addEventListener('change', function () {
+      var card = this.closest('.mfa-method-card');
+      if (this.checked) { card.classList.add('is-active'); }
+      else { card.classList.remove('is-active'); }
+    });
+  });
+
+  var btnSetup = document.getElementById('btnSetupAuthApp');
+  if (btnSetup) {
+    btnSetup.addEventListener('click', function () {
+      new bootstrap.Modal(document.getElementById('modalSetupAuthApp')).show();
+    });
+  }
+
+  var btnBackup = document.getElementById('btnSaveBackupCodes');
+  if (btnBackup) {
+    btnBackup.addEventListener('click', function () {
+      var codes = document.getElementById('backupCodesList').innerText;
+      var blob = new Blob([codes], { type: 'text/plain' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'dpim-backup-codes.txt';
+      a.click();
+    });
+  }
+
+  document.querySelectorAll('.btn-delete-device').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var row = this.closest('tr');
+      var deviceName = row.querySelector('td:first-child').textContent.trim();
+      if (confirm('ลบอุปกรณ์ "' + deviceName + '" ออกจากรายการที่เชื่อถือ?')) {
+        row.remove();
+      }
+    });
+  });
+
+  var btnDeleteAll = document.getElementById('btnDeleteAllDevices');
+  if (btnDeleteAll) {
+    btnDeleteAll.addEventListener('click', function () {
+      if (confirm('ยืนยันลบอุปกรณ์ที่เชื่อถือทั้งหมด? คุณจะต้องยืนยัน MFA ในการ Login ครั้งถัดไปจากทุกอุปกรณ์')) {
+        document.querySelectorAll('#tableDevices tbody tr').forEach(function(r) { r.remove(); });
+      }
+    });
+  }
+
+  var btnChangePwd = document.getElementById('btnChangePassword');
+  if (btnChangePwd) {
+    btnChangePwd.addEventListener('click', function () {
+      new bootstrap.Modal(document.getElementById('modalChangePassword')).show();
+    });
+  }
+
+  var btnSavePwd = document.getElementById('btnSavePassword');
+  if (btnSavePwd) {
+    btnSavePwd.addEventListener('click', function () {
+      var newPwd = document.getElementById('newPassword').value;
+      var confirmPwd = document.getElementById('confirmNewPassword').value;
+      if (!newPwd) { alert('กรุณากรอกรหัสผ่านใหม่'); return; }
+      if (newPwd !== confirmPwd) { alert('รหัสผ่านไม่ตรงกัน'); return; }
+      bootstrap.Modal.getInstance(document.getElementById('modalChangePassword')).hide();
+      alert('เปลี่ยนรหัสผ่านสำเร็จ');
+    });
+  }
+});
+</script>
 }
 
-@* ************** Content ************** *@
-<div class="row">
-  <!-- User Sidebar -->
-  <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
-    <!-- User Card -->
-    <div class="card mb-6">
-      <div class="card-body pt-12">
-        <div class="user-avatar-section">
-          <div class=" d-flex align-items-center flex-column">
-            <img class="img-fluid rounded mb-4" src="~/img/avatars/1.png" height="120" width="120" alt="User avatar" />
-            <div class="user-info text-center">
-              <h5>Violet Mendoza</h5>
-              <span class="badge bg-label-danger rounded-pill">Subscriber</span>
-            </div>
-          </div>
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item"><a href="/Users/ViewAccount">โปรไฟล์ผู้ใช้งาน</a></li>
+      <li class="breadcrumb-item active">ความปลอดภัย</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">ตั้งค่าความปลอดภัย</h4>
+
+  <ul class="nav nav-pills mb-4 flex-wrap gap-2">
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewAccount">
+        <i class="ri ri-user-line me-1"></i>ข้อมูลส่วนตัว
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="/Users/ViewSecurity">
+        <i class="ri ri-shield-line me-1"></i>ความปลอดภัย
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewAddresses">
+        <i class="ri ri-map-line me-1"></i>บัญชีที่อยู่
+      </a>
+    </li>
+  </ul>
+
+  <div class="row g-4">
+
+    <!-- Section: Change Password -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="ri ri-lock-unlock-line me-2" style="color:var(--dpim-blue);"></i>รหัสผ่าน
+          </h5>
+          <button id="btnChangePassword" type="button" class="btn btn-sm btn-outline-secondary">
+            <i class="ri ri-edit-line me-1"></i>เปลี่ยนรหัสผ่าน
+          </button>
         </div>
-        <div class="d-flex justify-content-around flex-wrap my-6 gap-0 gap-md-3 gap-lg-4">
-          <div class="d-flex align-items-center me-5 gap-4">
-            <div class="avatar">
-              <div class="avatar-initial bg-label-primary rounded-3">
-                <i class="icon-base ri ri-check-line icon-24px"></i>
-              </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:40px;height:40px;border-radius:8px;background:rgba(35,64,143,.1);display:flex;align-items:center;justify-content:center;">
+              <i class="ri ri-lock-line" style="color:var(--dpim-blue);font-size:1.2rem;"></i>
             </div>
             <div>
-              <h5 class="mb-0">1.23k</h5>
-              <span>Task Done</span>
+              <div class="fw-semibold">รหัสผ่านถูกเข้ารหัสและจัดเก็บอย่างปลอดภัย</div>
+              <div class="text-muted" style="font-size:.85rem;">เปลี่ยนรหัสผ่านครั้งล่าสุด: 01/01/2569</div>
             </div>
-          </div>
-          <div class="d-flex align-items-center gap-4">
-            <div class="avatar">
-              <div class="avatar-initial bg-label-primary rounded-3">
-                <i class="icon-base ri ri-briefcase-line icon-24px"></i>
-              </div>
-            </div>
-            <div>
-              <h5 class="mb-0">568</h5>
-              <span>Project Done</span>
-            </div>
-          </div>
-        </div>
-        <h5 class="pb-4 border-bottom mb-4">Details</h5>
-        <div class="info-container">
-          <ul class="list-unstyled mb-6">
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Username:</span>
-              <span>violet.dev</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Email:</span>
-              <span>vafgot&#64;vultukir.org</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Status:</span>
-              <span class="badge bg-label-success rounded-pill">Active</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Role:</span>
-              <span>Author</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Tax id:</span>
-              <span>Tax-8965</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Contact:</span>
-              <span>(123) 456-7890</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Languages:</span>
-              <span>French</span>
-            </li>
-            <li class="mb-2">
-              <span class="fw-medium text-heading me-2">Country:</span>
-              <span>England</span>
-            </li>
-          </ul>
-          <div class="d-flex justify-content-center">
-            <a href="javascript:;" class="btn btn-primary me-4" data-bs-target="#editUser" data-bs-toggle="modal">Edit</a>
-            <a href="javascript:;" class="btn btn-outline-danger suspend-user">Suspend</a>
           </div>
         </div>
       </div>
     </div>
-    <!-- /User Card -->
-    <!-- Plan Card -->
-    <div class="card mb-6 border border-2 border-primary">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-          <span class="badge bg-label-primary rounded-pill">Standard</span>
-          <div class="d-flex justify-content-center">
-            <sup class="h5 pricing-currency mt-5 mb-0 me-1 text-primary">$</sup>
-            <h1 class="mb-0 text-primary">99</h1>
-            <sub class="h6 pricing-duration mt-auto mb-3 fw-normal">month</sub>
-          </div>
-        </div>
-        <ul class="list-unstyled g-2 my-6">
-          <li class="mb-2 d-flex align-items-center"><i class="icon-base ri ri-circle-fill icon-10px text-body me-2"></i><span>10 Users</span></li>
-          <li class="mb-2 d-flex align-items-center"><i class="icon-base ri ri-circle-fill icon-10px text-body me-2"></i><span>Up to 10 GB storage</span></li>
-          <li class="mb-2 d-flex align-items-center"><i class="icon-base ri ri-circle-fill icon-10px text-body me-2"></i><span>Basic Support</span></li>
-        </ul>
-        <div class="d-flex justify-content-between align-items-center mb-1 fw-medium text-heading">
-          <span>Days</span>
-          <span>26 of 30 Days</span>
-        </div>
-        <div class="progress mb-1 bg-label-primary rounded" style="height: 6px;">
-          <div class="progress-bar rounded" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        <small>4 days remaining</small>
-        <div class="d-grid w-100 mt-6">
-          <button class="btn btn-primary" data-bs-target="#upgradePlanModal" data-bs-toggle="modal">Upgrade Plan</button>
-        </div>
-      </div>
-    </div>
-    <!-- /Plan Card -->
-  </div>
-  <!--/ User Sidebar -->
 
-  <!-- User Content -->
-  <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-    <!-- User Pills -->
-    <div class="nav-align-top">
-      <ul class="nav nav-pills flex-column flex-md-row flex-wrap mb-6 row-gap-2">
-        <li class="nav-item">
-          <a class="nav-link" href="ViewAccount"><i class="icon-base ri ri-group-line icon-sm me-2"></i>Account</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="javascript:void(0);"><i class="icon-base ri ri-lock-2-line icon-sm me-2"></i>Security</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="ViewBilling"><i class="icon-base ri ri-bookmark-line icon-sm me-2"></i>Billing & Plans</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="ViewNotifications"><i class="icon-base ri ri-notification-4-line icon-sm me-2"></i>Notifications</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="ViewConnections"><i class="icon-base ri ri-link-m icon-sm me-2"></i>Connections</a>
-        </li>
-      </ul>
-    </div>
-    <!--/ User Pills -->
+    <!-- Section: MFA Methods -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="ri ri-shield-line me-2" style="color:var(--dpim-blue);"></i>การยืนยันตัวตนสองขั้นตอน (MFA)
+          </h5>
+          <p class="card-subtitle text-muted mt-1 mb-0" style="font-size:.85rem;">เปิดใช้งาน MFA เพื่อเพิ่มความปลอดภัยในการเข้าสู่ระบบ</p>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
 
-    <!-- Change Password -->
-    <div class="card mb-6">
-      <h5 class="card-header">Change Password</h5>
-      <div class="card-body">
-        <form id="formChangePassword" method="POST" onsubmit="return false">
-          <div class="alert alert-warning alert-dismissible" role="alert">
-            <h5 class="alert-heading mb-1">Ensure that these requirements are met</h5>
-            <span>Minimum 8 characters long, uppercase & symbol</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-          <div class="row gx-5">
-            <div class="mb-3 col-12 col-sm-6 form-password-toggle form-control-validation">
-              <div class="input-group input-group-merge">
-                <div class="form-floating form-floating-outline">
-                  <input class="form-control" type="password" id="newPassword" name="newPassword" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
-                  <label for="newPassword">New Password</label>
+            <!-- Email OTP -->
+            <div class="col-md-6">
+              <div class="mfa-method-card is-active">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="d-flex gap-3 align-items-center">
+                    <div class="mfa-icon" style="background:rgba(35,64,143,.1);">
+                      <i class="ri ri-mail-line" style="color:var(--dpim-blue);"></i>
+                    </div>
+                    <div>
+                      <div class="fw-semibold">Email OTP</div>
+                      <div class="text-muted" style="font-size:.82rem;">adisaip@dpim.go.th</div>
+                    </div>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input mfa-toggle" type="checkbox" checked />
+                  </div>
                 </div>
-                <span class="input-group-text cursor-pointer"><i class="icon-base ri ri-eye-off-line icon-20px"></i></span>
-              </div>
-            </div>
-            <div class="mb-3 col-12 col-sm-6 form-password-toggle form-control-validation">
-              <div class="input-group input-group-merge">
-                <div class="form-floating form-floating-outline">
-                  <input class="form-control" type="password" name="confirmPassword" id="confirmPassword" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
-                  <label for="confirmPassword">Confirm New Password</label>
+                <div class="mt-2">
+                  <span class="badge" style="background:rgba(65,173,73,.15);color:#155724;font-size:.78rem;">
+                    <i class="ri ri-check-line me-1"></i>กำลังใช้งาน
+                  </span>
                 </div>
-                <span class="input-group-text cursor-pointer"><i class="icon-base ri ri-eye-off-line icon-20px"></i></span>
               </div>
             </div>
-            <div>
-              <button type="submit" class="btn btn-primary me-2">Change Password</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-    <!--/ Change Password -->
 
-    <!-- Two-steps verification -->
-    <div class="card mb-6">
-      <div class="card-header">
-        <h5 class="mb-0">Two-steps verification</h5>
-        <span class="card-subtitle">Keep your account secure with authentication step.</span>
-      </div>
-      <div class="card-body pt-0">
-        <h6 class="mb-1">SMS</h6>
-        <div class="mb-4">
-          <div class="d-flex w-100 action-icons">
-            <input id="defaultInput" class="form-control form-control-sm me-5" type="text" placeholder="+1(968) 819-2547" />
-            <a href="javascript:;" class="btn btn-icon btn-outline-secondary me-2" data-bs-target="#enableOTP" data-bs-toggle="modal"><i class="icon-base ri ri-edit-box-line icon-22px"></i></a>
-            <a href="javascript:;" class="btn btn-icon btn-outline-secondary"><i class="icon-base ri ri-user-add-line icon-22px"></i></a>
+            <!-- Authenticator App -->
+            <div class="col-md-6">
+              <div class="mfa-method-card">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="d-flex gap-3 align-items-center">
+                    <div class="mfa-icon" style="background:rgba(65,173,73,.1);">
+                      <i class="ri ri-smartphone-line" style="color:var(--dpim-green);"></i>
+                    </div>
+                    <div>
+                      <div class="fw-semibold">Authenticator App</div>
+                      <div class="text-muted" style="font-size:.82rem;">Google / Microsoft Authenticator</div>
+                    </div>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input mfa-toggle" type="checkbox" />
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <button id="btnSetupAuthApp" type="button" class="btn btn-sm btn-outline-secondary">
+                    <i class="ri ri-qr-code-line me-1"></i>ตั้งค่า / แสดง QR Code
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
-        <p class="mb-0">
-          Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to log in.
-          <a href="javascript:void(0);" class="text-primary">Learn more.</a>
-        </p>
       </div>
     </div>
-    <!--/ Two-steps verification -->
 
-    <!-- Recent Devices -->
-    <div class="card mb-6">
-      <h5 class="card-header">Recent Devices</h5>
-      <div class="table-responsive table-border-bottom-0">
-        <table class="table">
-          <thead>
-            <tr>
-              <th class="text-truncate">Browser</th>
-              <th class="text-truncate">Device</th>
-              <th class="text-truncate">Location</th>
-              <th class="text-truncate">Recent Activities</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-truncate"><img src="~/img/icons/brands/chrome.png" alt="Chrome" class="me-4" width="22" height="22" /><span class="text-heading">Chrome on Windows</span></td>
-              <td class="text-truncate">HP Spectre 360</td>
-              <td class="text-truncate">Switzerland</td>
-              <td class="text-truncate">10, July 2021 20:07</td>
-            </tr>
-            <tr>
-              <td class="text-truncate"><img src="~/img/icons/brands/chrome.png" alt="Chrome" class="me-4" width="22" height="22" /><span class="text-heading">Chrome on iPhone</span></td>
-              <td class="text-truncate">iPhone 12x</td>
-              <td class="text-truncate">Australia</td>
-              <td class="text-truncate">13, July 2021 10:10</td>
-            </tr>
-            <tr>
-              <td class="text-truncate"><img src="~/img/icons/brands/chrome.png" alt="Chrome" class="me-4" width="22" height="22" /><span class="text-heading">Chrome on Android</span></td>
-              <td class="text-truncate">Oneplus 9 Pro</td>
-              <td class="text-truncate">Dubai</td>
-              <td class="text-truncate">14, July 2021 15:15</td>
-            </tr>
-            <tr>
-              <td class="text-truncate"><img src="~/img/icons/brands/chrome.png" alt="Chrome" class="me-4" width="22" height="22" /><span class="text-heading">Chrome on MacOS</span></td>
-              <td class="text-truncate">Apple iMac</td>
-              <td class="text-truncate">India</td>
-              <td class="text-truncate">16, July 2021 16:17</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Section: Trusted Devices -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title mb-0">
+              <i class="ri ri-device-line me-2" style="color:var(--dpim-blue);"></i>อุปกรณ์ที่เชื่อถือ (Trusted Devices)
+            </h5>
+            <p class="card-subtitle text-muted mt-1 mb-0" style="font-size:.85rem;">อุปกรณ์เหล่านี้ไม่ต้องยืนยัน MFA ในการ Login ครั้งถัดไป</p>
+          </div>
+          <button id="btnDeleteAllDevices" type="button" class="btn btn-sm btn-outline-danger">
+            <i class="ri ri-delete-bin-line me-1"></i>ลบทั้งหมด
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table id="tableDevices" class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>อุปกรณ์</th>
+                  <th>Browser / OS</th>
+                  <th>IP Address</th>
+                  <th>วันที่เพิ่ม</th>
+                  <th>หมดอายุ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="ri ri-macbook-line" style="color:var(--dpim-blue);font-size:1.2rem;"></i>
+                      <span class="fw-semibold">MacBook Pro</span>
+                    </div>
+                  </td>
+                  <td><span class="text-muted" style="font-size:.85rem;">Chrome 124 / macOS 14</span></td>
+                  <td><code style="font-size:.82rem;">192.168.1.100</code></td>
+                  <td>01/04/2569</td>
+                  <td><span class="badge bg-label-success">01/05/2569</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-icon btn-outline-danger btn-delete-device" title="ลบ">
+                      <i class="ri ri-delete-bin-line"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="ri ri-smartphone-line" style="color:var(--dpim-green);font-size:1.2rem;"></i>
+                      <span class="fw-semibold">iPhone 15 Pro</span>
+                    </div>
+                  </td>
+                  <td><span class="text-muted" style="font-size:.85rem;">Safari / iOS 17</span></td>
+                  <td><code style="font-size:.82rem;">192.168.1.105</code></td>
+                  <td>15/04/2569</td>
+                  <td><span class="badge bg-label-success">15/05/2569</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-icon btn-outline-danger btn-delete-device" title="ลบ">
+                      <i class="ri ri-delete-bin-line"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="ri ri-computer-line" style="color:#6c757d;font-size:1.2rem;"></i>
+                      <span class="fw-semibold">PC Office</span>
+                    </div>
+                  </td>
+                  <td><span class="text-muted" style="font-size:.85rem;">Edge 124 / Windows 11</span></td>
+                  <td><code style="font-size:.82rem;">10.0.0.50</code></td>
+                  <td>20/04/2569</td>
+                  <td><span class="badge bg-label-warning">20/05/2569</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-icon btn-outline-danger btn-delete-device" title="ลบ">
+                      <i class="ri ri-delete-bin-line"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-    <!--/ Recent Devices -->
+
   </div>
-  <!--/ User Content -->
 </div>
 
-<!-- Modal -->
-@await Html.PartialAsync("../_Partials/_Modals/ModalEditUser")
-@await Html.PartialAsync("../_Partials/_Modals/ModalEnableOtp")
-@await Html.PartialAsync("../_Partials/_Modals/ModalUpgradePlan")
-<!-- /Modal -->
+<!-- Modal: Setup Authenticator App -->
+<div class="modal fade" id="modalSetupAuthApp" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ri ri-qr-code-line me-2"></i>ตั้งค่า Authenticator App</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ol class="mb-4" style="font-size:.9rem;">
+          <li class="mb-2">ดาวน์โหลด <strong>Google Authenticator</strong> หรือ <strong>Microsoft Authenticator</strong></li>
+          <li class="mb-2">เปิดแอปและเลือก "เพิ่มบัญชี" แล้วสแกน QR Code</li>
+          <li class="mb-2">สแกน QR Code ด้านล่าง หรือกรอก Secret Key ด้วยตนเอง</li>
+          <li>กรอก 6-digit OTP เพื่อยืนยันการตั้งค่า</li>
+        </ol>
+        <div class="text-center mb-4">
+          <div class="qr-placeholder mx-auto mb-2">
+            <div class="text-center">
+              <i class="ri ri-qr-code-line" style="font-size:3rem;color:var(--bs-gray-500);"></i>
+              <div class="text-muted" style="font-size:.75rem;">QR Code (Mock)</div>
+            </div>
+          </div>
+          <div class="text-muted" style="font-size:.82rem;">
+            Secret Key: <code>DPIM-XXXX-YYYY-ZZZZ</code>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">กรอก OTP 6 หลักเพื่อยืนยัน</label>
+          <input type="text" class="form-control text-center fs-5 fw-bold" maxlength="6" placeholder="000000"
+                 style="letter-spacing:.3em;" />
+        </div>
+        <div class="mt-3">
+          <div class="fw-semibold mb-2" style="font-size:.88rem;">Backup Codes (บันทึกไว้ในที่ปลอดภัย)</div>
+          <div id="backupCodesList" class="p-3 rounded" style="background:var(--bs-gray-100);font-family:monospace;font-size:.85rem;line-height:2;">
+            DPIM-A1B2-C3D4<br/>
+            DPIM-E5F6-G7H8<br/>
+            DPIM-I9J0-K1L2<br/>
+            DPIM-M3N4-O5P6<br/>
+            DPIM-Q7R8-S9T0
+          </div>
+          <button id="btnSaveBackupCodes" type="button" class="btn btn-sm btn-outline-secondary mt-2">
+            <i class="ri ri-download-line me-1"></i>ดาวน์โหลด Backup Codes
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+        <button type="button" class="btn btn-dpim-green" data-bs-dismiss="modal">
+          <i class="ri ri-check-line me-1"></i>ยืนยันการตั้งค่า
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Change Password -->
+<div class="modal fade" id="modalChangePassword" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="ri ri-lock-unlock-line me-2"></i>เปลี่ยนรหัสผ่าน</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">รหัสผ่านปัจจุบัน <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" placeholder="กรอกรหัสผ่านปัจจุบัน" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">รหัสผ่านใหม่ <span class="text-danger">*</span></label>
+            <input type="password" id="newPassword" class="form-control" placeholder="อย่างน้อย 8 ตัวอักษร" />
+            <div class="form-text text-muted">ต้องมีตัวอักษรพิมพ์ใหญ่, ตัวเลข, และสัญลักษณ์</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">ยืนยันรหัสผ่านใหม่ <span class="text-danger">*</span></label>
+            <input type="password" id="confirmNewPassword" class="form-control" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSavePassword" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>บันทึก
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

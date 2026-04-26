@@ -1,0 +1,480 @@
+@{
+  Layout = "_ContentNavbarLayout";
+  ViewData["Title"] = "ตั้งค่าระบบ SSO";
+}
+
+@section PageStyles {
+<style>
+  :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
+  .page-title-dpim { color:var(--dpim-blue); border-left:4px solid var(--dpim-green); padding-left:.75rem; }
+  .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
+  .btn-dpim:hover { background:#1b3175; color:#fff; }
+  .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
+  .btn-dpim-green:hover { background:#369a3a; color:#fff; }
+  .nav-tabs .nav-link.active { color:var(--dpim-blue); border-bottom:2px solid var(--dpim-blue); font-weight:600; }
+  .provider-card { border:1px solid var(--bs-border-color); border-radius:.75rem; padding:1rem; transition:all .2s; }
+  .provider-card.is-enabled { border-color:var(--dpim-green); background:rgba(65,173,73,.05); }
+  .provider-icon { width:44px; height:44px; border-radius:.5rem; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+  .field-help { font-size:.78rem; color:var(--bs-secondary-color); }
+  .conn-status-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .conn-status-dot.online { background:var(--dpim-green); }
+  .conn-status-dot.offline { background:#dc3545; }
+  .conn-status-dot.unknown { background:#aaa; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ── Tab nav ── */
+  document.querySelectorAll('[data-sso-tab]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('[data-sso-tab]').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.sso-tab-content').forEach(function (c) { c.classList.add('d-none'); });
+      this.classList.add('active');
+      document.getElementById('tab-' + this.dataset.ssoTab).classList.remove('d-none');
+    });
+  });
+
+  /* ── Test LDAP connection ── */
+  document.getElementById('btnTestLdap').addEventListener('click', function () {
+    this.disabled = true;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>กำลังทดสอบ...';
+    var self = this;
+    setTimeout(function () {
+      self.disabled = false;
+      self.innerHTML = '<i class="ri ri-plug-line me-1"></i>ทดสอบการเชื่อมต่อ';
+      alert('เชื่อมต่อ LDAP สำเร็จ! พบผู้ใช้ 128 รายการ');
+    }, 1800);
+  });
+
+  /* ── Provider toggles ── */
+  document.querySelectorAll('.provider-toggle').forEach(function (sw) {
+    sw.addEventListener('change', function () {
+      var card = this.closest('.provider-card');
+      if (this.checked) card.classList.add('is-enabled');
+      else card.classList.remove('is-enabled');
+    });
+  });
+
+  /* ── System Actions ── */
+  document.querySelectorAll('.btn-edit-system').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var name = this.dataset.name;
+      new bootstrap.Modal(document.getElementById('modalEditSystem')).show();
+      document.getElementById('sysName').value = name || '';
+    });
+  });
+  document.querySelectorAll('.btn-delete-system').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (confirm('ลบการเชื่อมต่อนี้?')) alert('ลบสำเร็จ');
+    });
+  });
+
+  /* ── Add System ── */
+  document.getElementById('btnAddSystem').addEventListener('click', function () {
+    document.getElementById('sysName').value = '';
+    new bootstrap.Modal(document.getElementById('modalEditSystem')).show();
+  });
+
+  document.getElementById('btnSaveSystem').addEventListener('click', function () {
+    bootstrap.Modal.getInstance(document.getElementById('modalEditSystem')).hide();
+    alert('บันทึกระบบที่เชื่อมต่อสำเร็จ');
+  });
+
+  /* ── Save buttons ── */
+  document.getElementById('btnSaveLdap').addEventListener('click', function () { alert('บันทึกการตั้งค่า Directory Service สำเร็จ'); });
+  document.getElementById('btnSaveOAuth').addEventListener('click', function () { alert('บันทึกการตั้งค่า OAuth/OIDC สำเร็จ'); });
+  document.getElementById('btnSaveLinked').addEventListener('click', function () { alert('บันทึกการตั้งค่าบัญชีที่เชื่อมโยงสำเร็จ'); });
+});
+</script>
+}
+
+@* ============================================================ *@
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-style1 mb-4">
+      <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+      <li class="breadcrumb-item active">ตั้งค่าระบบ SSO</li>
+    </ol>
+  </nav>
+
+  <h4 class="page-title-dpim mb-4">ตั้งค่าระบบ Single Sign-On (SSO)</h4>
+
+  <!-- Tab Nav -->
+  <div class="d-flex gap-1 flex-wrap mb-4 border-bottom pb-2">
+    <button class="btn btn-sm active" data-sso-tab="systems"
+      style="border:none;background:none;font-weight:600;color:var(--dpim-blue);border-bottom:2px solid var(--dpim-blue);border-radius:0;">
+      <i class="ri ri-server-line me-1"></i>ระบบที่เชื่อมต่อ
+    </button>
+    <button class="btn btn-sm" data-sso-tab="ldap"
+      style="border:none;background:none;color:var(--bs-secondary-color);">
+      <i class="ri ri-database-line me-1"></i>Directory Service
+    </button>
+    <button class="btn btn-sm" data-sso-tab="oauth"
+      style="border:none;background:none;color:var(--bs-secondary-color);">
+      <i class="ri ri-lock-unlock-line me-1"></i>OAuth / OIDC
+    </button>
+    <button class="btn btn-sm" data-sso-tab="linked"
+      style="border:none;background:none;color:var(--bs-secondary-color);">
+      <i class="ri ri-links-line me-1"></i>บัญชีที่เชื่อมโยง
+    </button>
+  </div>
+
+  <!-- Tab 1: ระบบที่เชื่อมต่อ -->
+  <div id="tab-systems" class="sso-tab-content">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="card-title mb-0" style="color:var(--dpim-blue);">ระบบงานที่เชื่อมต่อ SSO</h6>
+        <button id="btnAddSystem" class="btn btn-dpim btn-sm">
+          <i class="ri ri-add-line me-1"></i>เพิ่มระบบ
+        </button>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:.83rem;">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>ชื่อระบบ</th>
+                <th>ประเภท</th>
+                <th>Endpoint / URL</th>
+                <th>สถานะ</th>
+                <th>ทดสอบล่าสุด</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><strong>i-Industry Portal</strong></td>
+                <td><span class="badge bg-label-primary">OAuth 2.0</span></td>
+                <td><span style="font-family:monospace;font-size:.78rem;">https://oauth.i-industry.go.th</span></td>
+                <td><span class="conn-status-dot online me-1"></span><span class="text-success">Online</span></td>
+                <td>26/04/2569 08:15</td>
+                <td>
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-system" data-name="i-Industry Portal" title="แก้ไข"><i class="ri ri-edit-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-delete-system" title="ลบ"><i class="ri ri-delete-bin-line"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><strong>i-Industry Officer</strong></td>
+                <td><span class="badge bg-label-warning">OAuth 2.0</span></td>
+                <td><span style="font-family:monospace;font-size:.78rem;">https://officer-oauth.i-industry.go.th</span></td>
+                <td><span class="conn-status-dot online me-1"></span><span class="text-success">Online</span></td>
+                <td>26/04/2569 08:15</td>
+                <td>
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-system" data-name="i-Industry Officer" title="แก้ไข"><i class="ri ri-edit-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-delete-system" title="ลบ"><i class="ri ri-delete-bin-line"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><strong>ThaiID</strong></td>
+                <td><span class="badge bg-label-info">OIDC</span></td>
+                <td><span style="font-family:monospace;font-size:.78rem;">https://imauth.bora.dopa.go.th</span></td>
+                <td><span class="conn-status-dot online me-1"></span><span class="text-success">Online</span></td>
+                <td>26/04/2569 09:00</td>
+                <td>
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-system" data-name="ThaiID" title="แก้ไข"><i class="ri ri-edit-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-delete-system" title="ลบ"><i class="ri ri-delete-bin-line"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><strong>Microsoft Azure AD (DPIM)</strong></td>
+                <td><span class="badge bg-label-secondary">Azure AD</span></td>
+                <td><span style="font-family:monospace;font-size:.78rem;">https://login.microsoftonline.com/dpim.go.th</span></td>
+                <td><span class="conn-status-dot offline me-1"></span><span class="text-danger">Offline</span></td>
+                <td>25/04/2569 14:30</td>
+                <td>
+                  <button class="btn btn-icon btn-sm btn-outline-secondary btn-edit-system" data-name="Microsoft Azure AD" title="แก้ไข"><i class="ri ri-edit-line"></i></button>
+                  <button class="btn btn-icon btn-sm btn-outline-danger btn-delete-system" title="ลบ"><i class="ri ri-delete-bin-line"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Directory Service -->
+  <div id="tab-ldap" class="sso-tab-content d-none">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="card-title mb-0" style="color:var(--dpim-blue);">Directory Service (AD / LDAP / DB)</h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">ประเภท Directory</label>
+            <select class="form-select">
+              <option value="ldap">OpenLDAP</option>
+              <option value="ad">Microsoft Active Directory</option>
+              <option value="db">Database (SQL)</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Host / Server</label>
+            <input type="text" class="form-control" value="ldap.dpim.go.th" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">Port</label>
+            <input type="number" class="form-control" value="389" />
+            <div class="field-help">LDAP=389, LDAPS=636</div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">SSL/TLS</label>
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" id="ldapTls" />
+              <label class="form-check-label" for="ldapTls">เปิดใช้ TLS</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Base DN</label>
+            <input type="text" class="form-control" value="dc=dpim,dc=go,dc=th" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Bind DN (Service Account)</label>
+            <input type="text" class="form-control" value="cn=svc-dpim,dc=dpim,dc=go,dc=th" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Bind Password</label>
+            <input type="password" class="form-control" value="••••••••" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">User Search Filter</label>
+            <input type="text" class="form-control" value="(objectClass=person)" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">User Attribute (Username)</label>
+            <input type="text" class="form-control" value="sAMAccountName" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Email Attribute</label>
+            <input type="text" class="form-control" value="mail" />
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Group Search Base</label>
+            <input type="text" class="form-control" value="ou=groups,dc=dpim,dc=go,dc=th" />
+          </div>
+          <div class="col-12 d-flex gap-2">
+            <button id="btnTestLdap" class="btn btn-outline-secondary">
+              <i class="ri ri-plug-line me-1"></i>ทดสอบการเชื่อมต่อ
+            </button>
+            <button id="btnSaveLdap" class="btn btn-dpim">
+              <i class="ri ri-save-line me-1"></i>บันทึกการตั้งค่า
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3: OAuth / OIDC Providers -->
+  <div id="tab-oauth" class="sso-tab-content d-none">
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <div class="provider-card is-enabled">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="provider-icon" style="background:rgba(35,64,143,.12);">
+                <i class="ri ri-building-line" style="color:var(--dpim-blue);"></i>
+              </div>
+              <strong>i-Industry</strong>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input provider-toggle" type="checkbox" id="swIndustry" checked />
+            </div>
+          </div>
+          <div style="font-size:.8rem;" class="text-muted">Client ID: dpim-portal-client</div>
+          <div style="font-size:.8rem;" class="text-muted">Scope: openid profile email</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="provider-card is-enabled">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="provider-icon" style="background:rgba(255,171,0,.12);">
+                <i class="ri ri-medal-line" style="color:#e6a800;"></i>
+              </div>
+              <strong>i-Industry Officer</strong>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input provider-toggle" type="checkbox" id="swOfficer" checked />
+            </div>
+          </div>
+          <div style="font-size:.8rem;" class="text-muted">Client ID: dpim-officer-client</div>
+          <div style="font-size:.8rem;" class="text-muted">Scope: openid profile roles</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="provider-card is-enabled">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="provider-icon" style="background:rgba(65,173,73,.12);">
+                <i class="ri ri-id-card-line" style="color:var(--dpim-green);"></i>
+              </div>
+              <strong>ThaiID (DOPA)</strong>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input provider-toggle" type="checkbox" id="swThaiID" checked />
+            </div>
+          </div>
+          <div style="font-size:.8rem;" class="text-muted">Client ID: dpim-thaiid-client</div>
+          <div style="font-size:.8rem;" class="text-muted">Scope: openid personal_info</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3" style="color:var(--dpim-blue);">ตั้งค่า OAuth/OIDC Provider</h6>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Provider</label>
+            <select class="form-select">
+              <option>i-Industry</option>
+              <option>i-Industry Officer</option>
+              <option>ThaiID</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Client ID</label>
+            <input type="text" class="form-control" value="dpim-portal-client" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Client Secret</label>
+            <input type="password" class="form-control" value="••••••••••••••••" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Authorization Endpoint</label>
+            <input type="url" class="form-control" value="https://oauth.i-industry.go.th/authorize" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Token Endpoint</label>
+            <input type="url" class="form-control" value="https://oauth.i-industry.go.th/token" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Callback URL (Redirect URI)</label>
+            <input type="url" class="form-control" value="https://portal.dpim.go.th/auth/callback" readonly style="background:var(--bs-gray-100);" />
+            <div class="field-help">คัดลอก URL นี้ไปกำหนดใน Provider</div>
+          </div>
+          <div class="col-12 d-flex gap-2">
+            <button id="btnSaveOAuth" class="btn btn-dpim">
+              <i class="ri ri-save-line me-1"></i>บันทึกการตั้งค่า OAuth/OIDC
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: บัญชีที่เชื่อมโยง -->
+  <div id="tab-linked" class="sso-tab-content d-none">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="card-title mb-0" style="color:var(--dpim-blue);">บัญชีผู้ใช้ที่เชื่อมโยงกับระบบภายนอก</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:.83rem;">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>ผู้ใช้ DPIM</th>
+                <th>ระบบภายนอก</th>
+                <th>ID ภายนอก</th>
+                <th>วันที่เชื่อมโยง</th>
+                <th>สถานะ</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>adisaip@dpim.go.th</td>
+                <td><span class="badge bg-label-primary">i-Industry</span></td>
+                <td><span style="font-family:monospace;font-size:.78rem;">IND-20569-0001</span></td>
+                <td>01/01/2569</td>
+                <td><span class="badge bg-label-success">เชื่อมโยงแล้ว</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-danger" title="ยกเลิกการเชื่อมโยง"><i class="ri ri-link-unlink"></i></button></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>adisaip@dpim.go.th</td>
+                <td><span class="badge bg-label-success">ThaiID</span></td>
+                <td><span style="font-family:monospace;font-size:.78rem;">1-1234-56789-01-2</span></td>
+                <td>15/01/2569</td>
+                <td><span class="badge bg-label-success">เชื่อมโยงแล้ว</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-danger" title="ยกเลิกการเชื่อมโยง"><i class="ri ri-link-unlink"></i></button></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>somying@example.com</td>
+                <td><span class="badge bg-label-primary">i-Industry</span></td>
+                <td><span style="font-family:monospace;font-size:.78rem;">IND-20569-0088</span></td>
+                <td>20/02/2569</td>
+                <td><span class="badge bg-label-warning">รอยืนยัน</span></td>
+                <td><button class="btn btn-icon btn-sm btn-outline-danger" title="ยกเลิกการเชื่อมโยง"><i class="ri ri-link-unlink"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button id="btnSaveLinked" class="btn btn-dpim btn-sm">
+          <i class="ri ri-save-line me-1"></i>บันทึกการตั้งค่า
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: เพิ่ม/แก้ไขระบบ -->
+<div class="modal fade" id="modalEditSystem" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:2px solid var(--dpim-green);">
+        <h5 class="modal-title" style="color:var(--dpim-blue);">ตั้งค่าระบบที่เชื่อมต่อ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">ชื่อระบบ</label>
+            <input type="text" id="sysName" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">ประเภทการเชื่อมต่อ</label>
+            <select class="form-select">
+              <option>OAuth 2.0</option>
+              <option>OIDC</option>
+              <option>SAML 2.0</option>
+              <option>Azure AD</option>
+              <option>API Key</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Endpoint URL</label>
+            <input type="url" class="form-control" placeholder="https://" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">คำอธิบาย</label>
+            <textarea class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnSaveSystem" class="btn btn-dpim">
+          <i class="ri ri-save-line me-1"></i>บันทึก
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
