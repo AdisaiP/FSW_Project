@@ -191,7 +191,26 @@
                 documents: [
                     { name: 'SPS Guideline Japan 2026', version: 'v2.1', publishDate: '15/01/2569', status: 'ใช้งาน' },
                     { name: 'Checklist Histamine Control', version: 'v1.4', publishDate: '20/02/2569', status: 'ใช้งาน' }
-                ]
+                ],
+                statusLogs: [
+                    { date: '15/01/2569', oldStatus: '-', oldStatusClass: 'bg-label-secondary', newStatus: 'ใช้งาน', newStatusClass: 'bg-label-success', reason: 'สร้างมาตรการใหม่ตาม SPS Guideline Japan 2026 v2.1', operator: 'นายสมชาย รักษ์ทะเล' }
+                ],
+                inspectionConfig: {
+                    sampleFrequency: 'ทุก lot',
+                    samplePercent: 100,
+                    alertDays: 30,
+                    alertUnit: 'วัน',
+                    alertOnStatusChange: true,
+                    alertOnReviewDue: true,
+                    alertOnFactoryIssue: true,
+                    affectedFactories: [
+                        { code: 'DOF-FAC-00128', name: 'สยามมารีนฟูดส์ จำกัด', nameEN: 'Siam Marine Foods Co., Ltd.', province: 'สมุทรสาคร', market: 'EU,JP,US,CN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00449', name: 'กัลฟแคทช์โปรเซสซิ่ง จำกัด', nameEN: 'Gulf Catch Processing Co., Ltd.', province: 'ชลบุรี', market: 'EU,JP,US,CN,KR,AU', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00613', name: 'โอเชียนไพร์มเอกสปอร์ต จำกัด', nameEN: 'Ocean Prime Export Co., Ltd.', province: 'สงขลา', market: 'EU,JP,ASEAN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00772', name: 'อันดามันโคลดสเตอร์เสจ จำกัด', nameEN: 'Andaman Cold Storage Co., Ltd.', province: 'ระนอง', market: 'EU,JP', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00901', name: 'ไทยมารีนแพค จำกัด', nameEN: 'Thai Marine Pack Co., Ltd.', province: 'สมุทรปราการ', market: 'EU,JP,US,CA,ASEAN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' }
+                    ]
+                }
             },
             'SPS-EU-205': {
                 objective: 'กำกับการเฝ้าระวังสารตกค้างให้เป็นไปตามหลักเกณฑ์ EU',
@@ -205,7 +224,27 @@
                 ],
                 documents: [
                     { name: 'EU Residue Monitoring Circular', version: 'v3.0', publishDate: '01/12/2568', status: 'ใช้งาน' }
-                ]
+                ],
+                statusLogs: [
+                    { date: '01/12/2568', oldStatus: '-', oldStatusClass: 'bg-label-secondary', newStatus: 'ใช้งาน', newStatusClass: 'bg-label-success', reason: 'สร้างมาตรการใหม่ตาม EU Residue Monitoring Circular v3.0', operator: 'นางสาวพิมพ์ใจ สุวรรณชาติ' }
+                ],
+                inspectionConfig: {
+                    sampleFrequency: 'ทุก 5 lot',
+                    samplePercent: 20,
+                    alertDays: 45,
+                    alertUnit: 'วัน',
+                    alertOnStatusChange: true,
+                    alertOnReviewDue: true,
+                    alertOnFactoryIssue: true,
+                    affectedFactories: [
+                        { code: 'DOF-FAC-00128', name: 'สยามมารีนฟูดส์ จำกัด', nameEN: 'Siam Marine Foods Co., Ltd.', province: 'สมุทรสาคร', market: 'EU,JP,US,CN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00449', name: 'กัลฟแคทช์โปรเซสซิ่ง จำกัด', nameEN: 'Gulf Catch Processing Co., Ltd.', province: 'ชลบุรี', market: 'EU,JP,US,CN,KR,AU', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00613', name: 'โอเชียนไพร์มเอกสปอร์ต จำกัด', nameEN: 'Ocean Prime Export Co., Ltd.', province: 'สงขลา', market: 'EU,JP,ASEAN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00772', name: 'อันดามันโคลดสเตอร์เสจ จำกัด', nameEN: 'Andaman Cold Storage Co., Ltd.', province: 'ระนอง', market: 'EU,JP', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00818', name: 'ซาวเทิร์นเพลาจิก จำกัด', nameEN: 'Southern Pelagic Co., Ltd.', province: 'ภูเก็ต', market: 'EU,CN', status: 'ระงับชั่วคราว', statusClass: 'bg-label-warning' },
+                        { code: 'DOF-FAC-00901', name: 'ไทยมารีนแพค จำกัด', nameEN: 'Thai Marine Pack Co., Ltd.', province: 'สมุทรปราการ', market: 'EU,JP,US,CA,ASEAN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' }
+                    ]
+                }
             },
             'SPS-US-088': {
                 objective: 'ยืนยันความสอดคล้องระบบ HACCP ของโรงงานส่งออกไปสหรัฐอเมริกา',
@@ -219,7 +258,25 @@
                 ],
                 documents: [
                     { name: 'HACCP Verification Note', version: 'v1.2', publishDate: '20/02/2569', status: 'รอทบทวน' }
-                ]
+                ],
+                statusLogs: [
+                    { date: '20/02/2569', oldStatus: '-', oldStatusClass: 'bg-label-secondary', newStatus: 'ใช้งาน', newStatusClass: 'bg-label-success', reason: 'สร้างมาตรการใหม่ตาม HACCP Verification Note v1.2', operator: 'นายวิรัช คำสัตย์' },
+                    { date: '18/03/2569', oldStatus: 'ใช้งาน', oldStatusClass: 'bg-label-success', newStatus: 'รอทบทวน', newStatusClass: 'bg-label-warning', reason: 'รอผลการปรับปรุงแผนควบคุมจุดวิกฤติจากผู้ประกอบการ', operator: 'นายวิรัช คำสัตย์' }
+                ],
+                inspectionConfig: {
+                    sampleFrequency: 'ทุก 5 lot',
+                    samplePercent: 20,
+                    alertDays: 60,
+                    alertUnit: 'วัน',
+                    alertOnStatusChange: true,
+                    alertOnReviewDue: true,
+                    alertOnFactoryIssue: false,
+                    affectedFactories: [
+                        { code: 'DOF-FAC-00128', name: 'สยามมารีนฟูดส์ จำกัด', nameEN: 'Siam Marine Foods Co., Ltd.', province: 'สมุทรสาคร', market: 'EU,JP,US,CN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00449', name: 'กัลฟแคทช์โปรเซสซิ่ง จำกัด', nameEN: 'Gulf Catch Processing Co., Ltd.', province: 'ชลบุรี', market: 'EU,JP,US,CN,KR,AU', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00901', name: 'ไทยมารีนแพค จำกัด', nameEN: 'Thai Marine Pack Co., Ltd.', province: 'สมุทรปราการ', market: 'EU,JP,US,CA,ASEAN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' }
+                    ]
+                }
             },
             'SPS-AU-041': {
                 objective: 'ควบคุมการระบุสารก่อภูมิแพ้ในผลิตภัณฑ์พร้อมบริโภค',
@@ -232,7 +289,22 @@
                 ],
                 documents: [
                     { name: 'Allergen Labelling Advisory', version: 'v1.1', publishDate: '10/11/2568', status: 'ใช้งาน' }
-                ]
+                ],
+                statusLogs: [
+                    { date: '10/11/2568', oldStatus: '-', oldStatusClass: 'bg-label-secondary', newStatus: 'ใช้งาน', newStatusClass: 'bg-label-success', reason: 'สร้างมาตรการใหม่ตาม Allergen Labelling Advisory FSANZ', operator: 'นายศิริพงษ์ สมุทรกิจ' }
+                ],
+                inspectionConfig: {
+                    sampleFrequency: 'รายเดือน',
+                    samplePercent: 10,
+                    alertDays: 2,
+                    alertUnit: 'เดือน',
+                    alertOnStatusChange: true,
+                    alertOnReviewDue: true,
+                    alertOnFactoryIssue: false,
+                    affectedFactories: [
+                        { code: 'DOF-FAC-00449', name: 'กัลฟแคทช์โปรเซสซิ่ง จำกัด', nameEN: 'Gulf Catch Processing Co., Ltd.', province: 'ชลบุรี', market: 'EU,JP,US,CN,KR,AU', status: 'รับรองแล้ว', statusClass: 'bg-label-success' }
+                    ]
+                }
             },
             'SPS-KR-133': {
                 objective: 'ยกระดับความโปร่งใสของข้อมูลแหล่งที่มาวัตถุดิบในฉลากสินค้า',
@@ -246,7 +318,23 @@
                 ],
                 documents: [
                     { name: 'Korea Trace Label Rule', version: 'v2.0', publishDate: '05/03/2569', status: 'รอทบทวน' }
-                ]
+                ],
+                statusLogs: [
+                    { date: '05/03/2569', oldStatus: '-', oldStatusClass: 'bg-label-secondary', newStatus: 'ใช้งาน', newStatusClass: 'bg-label-success', reason: 'สร้างมาตรการใหม่ตาม Korea Trace Label Rule v2.0', operator: 'นายศิริพงษ์ สมุทรกิจ' },
+                    { date: '09/04/2569', oldStatus: 'ใช้งาน', oldStatusClass: 'bg-label-success', newStatus: 'รอทบทวน', newStatusClass: 'bg-label-warning', reason: 'มีการปรับฟอร์มเอกสารอ้างอิงแหล่งที่มาใหม่ รอการยืนยัน', operator: 'นายศิริพงษ์ สมุทรกิจ' }
+                ],
+                inspectionConfig: {
+                    sampleFrequency: 'ทุก lot',
+                    samplePercent: 100,
+                    alertDays: 30,
+                    alertUnit: 'วัน',
+                    alertOnStatusChange: true,
+                    alertOnReviewDue: true,
+                    alertOnFactoryIssue: true,
+                    affectedFactories: [
+                        { code: 'DOF-FAC-00449', name: 'กัลฟแคทช์โปรเซสซิ่ง จำกัด', nameEN: 'Gulf Catch Processing Co., Ltd.', province: 'ชลบุรี', market: 'EU,JP,US,CN,KR,AU', status: 'รับรองแล้ว', statusClass: 'bg-label-success' }
+                    ]
+                }
             },
             'SPS-CN-052': {
                 objective: 'ทบทวนรูปแบบเอกสารสุขอนามัยให้ตรงตามประกาศล่าสุดของประเทศปลายทาง',
@@ -259,7 +347,26 @@
                 ],
                 documents: [
                     { name: 'CN Health Doc Circular', version: 'v0.9', publishDate: '01/01/2569', status: 'พักใช้ชั่วคราว' }
-                ]
+                ],
+                statusLogs: [
+                    { date: '01/01/2569', oldStatus: '-', oldStatusClass: 'bg-label-secondary', newStatus: 'ใช้งาน', newStatusClass: 'bg-label-success', reason: 'สร้างมาตรการใหม่ตาม CN Health Doc Circular v0.9', operator: 'นายสมชาย รักษ์ทะเล' },
+                    { date: '15/03/2569', oldStatus: 'ใช้งาน', oldStatusClass: 'bg-label-success', newStatus: 'รอทบทวน', newStatusClass: 'bg-label-warning', reason: 'อยู่ระหว่างรอหนังสือเวียนฉบับใหม่จาก GACC', operator: 'นายสมชาย รักษ์ทะเล' },
+                    { date: '01/04/2569', oldStatus: 'รอทบทวน', oldStatusClass: 'bg-label-warning', newStatus: 'พักใช้ชั่วคราว', newStatusClass: 'bg-label-danger', reason: 'ได้รับแจ้งจาก GACC ให้ระงับการออกเอกสารสุขอนามัยชั่วคราว รอประกาศฉบับใหม่', operator: 'นายสมชาย รักษ์ทะเล' }
+                ],
+                inspectionConfig: {
+                    sampleFrequency: 'ทุก lot',
+                    samplePercent: 100,
+                    alertDays: 14,
+                    alertUnit: 'วัน',
+                    alertOnStatusChange: true,
+                    alertOnReviewDue: true,
+                    alertOnFactoryIssue: true,
+                    affectedFactories: [
+                        { code: 'DOF-FAC-00128', name: 'สยามมารีนฟูดส์ จำกัด', nameEN: 'Siam Marine Foods Co., Ltd.', province: 'สมุทรสาคร', market: 'EU,JP,US,CN', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00449', name: 'กัลฟแคทช์โปรเซสซิ่ง จำกัด', nameEN: 'Gulf Catch Processing Co., Ltd.', province: 'ชลบุรี', market: 'EU,JP,US,CN,KR,AU', status: 'รับรองแล้ว', statusClass: 'bg-label-success' },
+                        { code: 'DOF-FAC-00818', name: 'ซาวเทิร์นเพลาจิก จำกัด', nameEN: 'Southern Pelagic Co., Ltd.', province: 'ภูเก็ต', market: 'EU,CN', status: 'ระงับชั่วคราว', statusClass: 'bg-label-warning' }
+                    ]
+                }
             }
         };
 
@@ -325,6 +432,22 @@
             }).join('');
         }
 
+        function renderStatusLogRows(items) {
+            if (!items || items.length === 0) {
+                return '<tr><td colspan="6" class="text-center text-muted py-3">ไม่พบประวัติการเปลี่ยนสถานะ</td></tr>';
+            }
+            return items.map(function (item, index) {
+                return '<tr>' +
+                    '<td class="text-center text-muted small">' + (index + 1) + '</td>' +
+                    '<td class="text-center small">' + item.date + '</td>' +
+                    '<td class="text-center"><span class="badge rounded-pill ' + item.oldStatusClass + '">' + item.oldStatus + '</span></td>' +
+                    '<td class="text-center"><span class="badge rounded-pill ' + item.newStatusClass + '">' + item.newStatus + '</span></td>' +
+                    '<td>' + item.reason + '</td>' +
+                    '<td>' + item.operator + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
         function openMeasureDetail(measureCode) {
             var detail = detailsMap[measureCode];
             var row = document.querySelector('#measureTableBody tr[data-measure-code="' + measureCode + '"]');
@@ -349,6 +472,8 @@
             document.getElementById('detailNote').textContent = detail.note;
             document.getElementById('requirementTableBody').innerHTML = renderRequirementRows(detail.requirements, 'ไม่พบข้อกำหนดหลัก');
             document.getElementById('documentTableBody').innerHTML = renderDocumentRows(detail.documents, 'ไม่พบเอกสารอ้างอิง');
+            document.getElementById('statusLogTableBody').innerHTML = renderStatusLogRows(detail.statusLogs);
+            populateInspectionConfig(measureCode, detail, row);
 
             new bootstrap.Modal(document.getElementById('measureDetailModal')).show();
         }
@@ -381,6 +506,161 @@
         document.querySelectorAll('.btn-view-measure, .btn-edit-measure').forEach(function (button) {
             button.addEventListener('click', function () {
                 openMeasureDetail(this.dataset.measureCode);
+            });
+        });
+
+        document.querySelectorAll('.btn-suspend-measure').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var code = this.dataset.measureCode;
+                var name = this.dataset.measureName;
+                var country = this.dataset.countryName;
+                document.getElementById('suspendMeasureCode').textContent = code;
+                document.getElementById('suspendMeasureName').textContent = name + ' (' + country + ')';
+                document.getElementById('suspendReason').value = '';
+                document.getElementById('suspendReason').classList.remove('is-invalid');
+                document.getElementById('suspendEffectiveDate').value = '';
+                new bootstrap.Modal(document.getElementById('measureSuspendModal')).show();
+            });
+        });
+
+        document.querySelectorAll('.btn-cancel-measure').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var code = this.dataset.measureCode;
+                var name = this.dataset.measureName;
+                document.getElementById('cancelMeasureCode').textContent = code;
+                document.getElementById('cancelMeasureName').textContent = name;
+                document.getElementById('cancelReason').value = '';
+                document.getElementById('cancelReason').classList.remove('is-invalid');
+                document.getElementById('cancelDate').value = '';
+                new bootstrap.Modal(document.getElementById('measureCancelModal')).show();
+            });
+        });
+
+        document.getElementById('btnConfirmSuspend').addEventListener('click', function () {
+            var reason = document.getElementById('suspendReason').value.trim();
+            if (!reason) {
+                document.getElementById('suspendReason').classList.add('is-invalid');
+                return;
+            }
+            document.getElementById('suspendReason').classList.remove('is-invalid');
+            bootstrap.Modal.getInstance(document.getElementById('measureSuspendModal')).hide();
+            showMeasureToast('warning', 'ระงับมาตรการ ' + document.getElementById('suspendMeasureCode').textContent + ' เรียบร้อยแล้ว');
+        });
+
+        document.getElementById('btnConfirmCancel').addEventListener('click', function () {
+            var reason = document.getElementById('cancelReason').value.trim();
+            if (!reason) {
+                document.getElementById('cancelReason').classList.add('is-invalid');
+                return;
+            }
+            document.getElementById('cancelReason').classList.remove('is-invalid');
+            bootstrap.Modal.getInstance(document.getElementById('measureCancelModal')).hide();
+            showMeasureToast('danger', 'ยกเลิกมาตรการ ' + document.getElementById('cancelMeasureCode').textContent + ' เรียบร้อยแล้ว');
+        });
+
+        function showMeasureToast(type, message) {
+            var toastEl = document.getElementById('measureActionToast');
+            toastEl.className = 'toast align-items-center text-white border-0 bg-' + type;
+            document.getElementById('measureToastMessage').textContent = message;
+            new bootstrap.Toast(toastEl, { delay: 3500 }).show();
+        }
+
+        function renderAffectedFactoriesRows(factories, riskLevel) {
+            if (!factories || factories.length === 0) {
+                return '<tr><td colspan="6" class="text-center text-muted py-3">ไม่พบโรงงานที่ได้รับผลกระทบ</td></tr>';
+            }
+            return factories.map(function (f, i) {
+                var markets = f.market.split(',').map(function (m) {
+                    return '<span class="badge bg-label-primary me-1" style="font-size:0.65rem;">' + m.trim() + '</span>';
+                }).join('');
+                return '<tr>' +
+                    '<td class="text-center text-muted small">' + (i + 1) + '</td>' +
+                    '<td class="fw-semibold font-monospace small">' + f.code + '</td>' +
+                    '<td><div class="fw-semibold">' + f.name + '</div><div class="text-muted small fst-italic">' + f.nameEN + '</div></td>' +
+                    '<td class="text-center small">' + f.province + '</td>' +
+                    '<td>' + markets + '</td>' +
+                    '<td class="text-center"><span class="badge rounded-pill ' + f.statusClass + '">' + f.status + '</span></td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        function populateInspectionConfig(measureCode, detail, row) {
+            var cfg = detail.inspectionConfig;
+            if (!cfg) { return; }
+
+            // accordion 1: ความถี่
+            var freqSel = document.getElementById('configSampleFrequency');
+            for (var i = 0; i < freqSel.options.length; i++) {
+                if (freqSel.options[i].value === cfg.sampleFrequency) { freqSel.selectedIndex = i; break; }
+            }
+            document.getElementById('configSamplePercent').value = cfg.samplePercent;
+
+            // accordion 2: แจ้งเตือน
+            document.getElementById('configAlertDays').value = cfg.alertDays;
+            var unitSel = document.getElementById('configAlertUnit');
+            for (var j = 0; j < unitSel.options.length; j++) {
+                if (unitSel.options[j].value === cfg.alertUnit) { unitSel.selectedIndex = j; break; }
+            }
+            document.getElementById('chkAlertStatusChange').checked = cfg.alertOnStatusChange;
+            document.getElementById('chkAlertReviewDue').checked = cfg.alertOnReviewDue;
+            document.getElementById('chkAlertFactoryIssue').checked = cfg.alertOnFactoryIssue;
+
+            // example toast label
+            document.getElementById('configAlertExampleCode').textContent = measureCode;
+            document.getElementById('configAlertExampleDays').textContent = cfg.alertDays + ' ' + cfg.alertUnit + ' (วันที่ทบทวน: ' + row.dataset.reviewDueDate + ')';
+
+            // accordion 3: โรงงาน
+            var riskLevel = row.dataset.risk;
+            var factories = cfg.affectedFactories || [];
+            var n = factories.length;
+            var badgeClass = riskLevel === 'สูง' ? 'bg-danger' : riskLevel === 'กลาง' ? 'bg-warning' : 'bg-success';
+            document.getElementById('configFactoryBadge').innerHTML =
+                '<span class="badge ' + badgeClass + ' rounded-pill px-3 py-2" style="font-size:0.8rem;">' +
+                '<i class="ri ri-building-line me-1"></i>มาตรการนี้ส่งผลกระทบ ' + n + ' โรงงาน</span>' +
+                (riskLevel === 'สูง' ? ' <span class="badge bg-label-danger ms-1">ความเสี่ยงสูง — ต้องตรวจสอบทุก lot</span>' : '');
+            document.getElementById('configFactoryTableBody').innerHTML = renderAffectedFactoriesRows(factories, riskLevel);
+        }
+
+        // wire "บันทึกตั้งค่า"
+        document.getElementById('btnSaveInspConfig').addEventListener('click', function () {
+            var measureCode = document.getElementById('detailMeasureCode').textContent;
+            showMeasureToast('success', 'บันทึกตั้งค่าการตรวจสอบ ' + measureCode + ' เรียบร้อยแล้ว');
+        });
+
+        // Export Excel handlers
+        document.querySelectorAll('.btn-export-measure').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var type = this.dataset.exportType;
+                var allRows = document.querySelectorAll('#measureTableBody tr[data-measure-code]');
+                var filteredRows = Array.from(allRows).filter(function (r) { return !r.classList.contains('d-none'); });
+                var highRiskRows = Array.from(allRows).filter(function (r) { return r.dataset.risk === 'สูง'; });
+
+                var label, count;
+                if (type === 'all') {
+                    label = 'ทั้งหมด (ทุกฟิลด์)';
+                    count = allRows.length;
+                } else if (type === 'filtered') {
+                    label = 'เฉพาะรายการที่กรอง';
+                    count = filteredRows.length;
+                } else if (type === 'region') {
+                    label = 'สรุปตามภูมิภาค';
+                    count = null;
+                } else if (type === 'highrisk') {
+                    label = 'เฉพาะมาตรการความเสี่ยงสูง';
+                    count = highRiskRows.length;
+                }
+
+                var infoMsg = count !== null
+                    ? 'กำลัง Export Excel ' + label + '... (' + count + ' รายการ)'
+                    : 'กำลัง Export Excel ' + label + '...';
+                showMeasureToast('info', infoMsg);
+
+                setTimeout(function () {
+                    var successMsg = count !== null
+                        ? 'Export Excel สำเร็จ ' + count + ' รายการ (' + label + ')'
+                        : 'Export Excel ' + label + ' สำเร็จ';
+                    showMeasureToast('success', successMsg);
+                }, 900);
             });
         });
     });
@@ -463,8 +743,20 @@
             <h5 class="card-title mb-1">รายการมาตรการของประเทศคู่ค้า</h5>
             <p class="text-muted small mb-0">แสดงข้อกำหนดสุขอนามัยที่ใช้ควบคุมการส่งออกตามประเทศปลายทาง</p>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#measureDetailModal">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="dropdown">
+                <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ri ri-file-excel-2-line me-1"></i> Export Excel
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item btn-export-measure" href="javascript:void(0);" data-export-type="all"><i class="ri ri-file-excel-2-line me-2 text-success"></i>Export ทั้งหมด (ทุกฟิลด์)</a></li>
+                    <li><a class="dropdown-item btn-export-measure" href="javascript:void(0);" data-export-type="filtered"><i class="ri ri-filter-line me-2 text-primary"></i>Export เฉพาะรายการที่กรอง</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item btn-export-measure" href="javascript:void(0);" data-export-type="region"><i class="ri ri-earth-line me-2 text-info"></i>Export สรุปตามภูมิภาค</a></li>
+                    <li><a class="dropdown-item btn-export-measure" href="javascript:void(0);" data-export-type="highrisk"><i class="ri ri-alarm-warning-line me-2 text-danger"></i>Export เฉพาะมาตรการความเสี่ยงสูง</a></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addMeasureModal">
                 <i class="ri ri-add-line me-1"></i> เพิ่มมาตรการ
             </button>
         </div>
@@ -519,6 +811,11 @@
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-info btn-view-measure" data-measure-code="@measure.MeasureCode" title="รายละเอียดข้อมูล" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-eye-line text-info"></i></button>
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-warning btn-edit-measure" data-measure-code="@measure.MeasureCode" title="แก้ไขข้อมูล" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-pencil-line text-warning"></i></button>
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="ประวัติการเปลี่ยนแปลง" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-history-line text-secondary"></i></button>
+                                @if (measure.StatusText != "พักใช้ชั่วคราว" && measure.StatusText != "ยกเลิก")
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-suspend-measure" style="color:#ff9f43;border:1px solid #ff9f43;" data-measure-code="@measure.MeasureCode" data-measure-name="@measure.MeasureName" data-country-name="@measure.CountryName" title="ระงับมาตรการ" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-forbid-2-line"></i></button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-cancel-measure" data-measure-code="@measure.MeasureCode" data-measure-name="@measure.MeasureName" title="ยกเลิกมาตรการ" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-close-circle-line text-danger"></i></button>
+                                }
                             </div>
                         </td>
                     </tr>
@@ -546,6 +843,8 @@
                         <li class="nav-item"><button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#tab-measure-detail" aria-selected="true"><i class="ri ri-file-list-2-line me-1"></i> ข้อมูลหลัก</button></li>
                         <li class="nav-item"><button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-measure-requirement" aria-selected="false"><i class="ri ri-list-check-3 me-1"></i> ข้อกำหนดหลัก</button></li>
                         <li class="nav-item"><button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-measure-document" aria-selected="false"><i class="ri ri-file-text-line me-1"></i> เอกสารอ้างอิง</button></li>
+                        <li class="nav-item"><button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-measure-statuslog" aria-selected="false"><i class="ri ri-history-line me-1"></i> ประวัติการเปลี่ยนสถานะ</button></li>
+                        <li class="nav-item"><button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-measure-config" aria-selected="false"><i class="ri ri-settings-3-line me-1"></i> ตั้งค่าการตรวจสอบ</button></li>
                     </ul>
                     <div class="tab-content">
                         <div id="tab-measure-detail" class="tab-pane fade show active">
@@ -620,6 +919,169 @@
                                 </table>
                             </div>
                         </div>
+                        <div id="tab-measure-statuslog" class="tab-pane fade">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm align-middle mb-0 measure-table-compact">
+                                    <thead class="text-center table-light">
+                                        <tr>
+                                            <th style="width:40px;">#</th>
+                                            <th style="width:110px;">วันที่</th>
+                                            <th>สถานะเดิม</th>
+                                            <th>สถานะใหม่</th>
+                                            <th>เหตุผล</th>
+                                            <th>ผู้ดำเนินการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="statusLogTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="tab-measure-config" class="tab-pane fade">
+                            <div class="accordion" id="inspectionConfigAccordion">
+                                <!-- accordion 1: ความถี่การตรวจ -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingInspFreq">
+                                        <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseInspFreq" aria-expanded="true">
+                                            <i class="icon-base ri ri-repeat-line me-2 text-primary"></i> กำหนดความถี่การตรวจ
+                                        </button>
+                                    </h2>
+                                    <div id="collapseInspFreq" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <div class="row g-3 align-items-end">
+                                                <div class="col-md-5">
+                                                    <label class="form-label fw-semibold">ความถี่การสุ่มตรวจ</label>
+                                                    <select id="configSampleFrequency" class="form-select">
+                                                        <option value="ทุก lot">ทุก lot (100%)</option>
+                                                        <option value="ทุก 5 lot">ทุก 5 lot</option>
+                                                        <option value="ทุก 10 lot">ทุก 10 lot</option>
+                                                        <option value="รายเดือน">รายเดือน</option>
+                                                        <option value="ตามเหตุการณ์">ตามเหตุการณ์</option>
+                                                    </select>
+                                                    <div class="form-text">ความถี่การสุ่มตรวจสินค้าขั้นต่ำสุด</div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-semibold">% lot ที่ต้องตรวจสอบ</label>
+                                                    <div class="input-group">
+                                                        <input type="number" id="configSamplePercent" class="form-control" min="1" max="100" value="100" />
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                    <div class="form-text">1 – 100%</div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-semibold">เงื่อนไขในการออกใบรับรอง</label>
+                                                    <div class="alert alert-info py-1 px-2 mb-0" style="font-size:0.75rem;">
+                                                        <i class="ri ri-information-line me-1"></i>ที่กำหนดนี้ใช้ประกอบการพิจารณาออก PS/NMD อัตโนมัติ
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="row g-2 border rounded p-2 bg-light">
+                                                        <div class="col-md-6">
+                                                            <div class="form-label fw-semibold small mb-1">ประเภทวัตถุดิบที่ครอบคลุม</div>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkScopeFish" checked /><label class="form-check-label small" for="chkScopeFish">ปลาสด</label></div>
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkScopeFrozen" checked /><label class="form-check-label small" for="chkScopeFrozen">แช่แข็ง</label></div>
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkScopeCanned" /><label class="form-check-label small" for="chkScopeCanned">กระป๋อง</label></div>
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkScopeProcessed" checked /><label class="form-check-label small" for="chkScopeProcessed">แปรรูป</label></div>
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkScopeRTE" /><label class="form-check-label small" for="chkScopeRTE">พร้อมรับประทาน</label></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-label fw-semibold small mb-1">ขั้นตอนสุ่มตรวจเพิ่มเติม</div>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAddCOA" checked /><label class="form-check-label small" for="chkAddCOA">แนบ COA ห้องแลบ</label></div>
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAddHACCP" /><label class="form-check-label small" for="chkAddHACCP">แนบ HACCP Plan</label></div>
+                                                                <div class="form-check"><input class="form-check-input" type="checkbox" id="chkAddTrace" /><label class="form-check-label small" for="chkAddTrace">ยืนยันบันทึก Traceability</label></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- accordion 2: เงื่อนไขการแจ้งเตือน -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingInspAlert">
+                                        <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseInspAlert" aria-expanded="false">
+                                            <i class="icon-base ri ri-notification-3-line me-2 text-warning"></i> เงื่อนไขการแจ้งเตือน
+                                        </button>
+                                    </h2>
+                                    <div id="collapseInspAlert" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">แจ้งเตือนล่วงหน้าก่อนวันทบทวน (ReviewDueDate)</label>
+                                                    <div class="input-group">
+                                                        <input type="number" id="configAlertDays" class="form-control" min="1" max="365" value="30" />
+                                                        <select id="configAlertUnit" class="form-select" style="max-width:110px;">
+                                                            <option value="วัน">วัน</option>
+                                                            <option value="สัปดาห์">สัปดาห์</option>
+                                                            <option value="เดือน">เดือน</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-text">ระบบจะส่งการแจ้งเตือนผู้รับผิดชอบอัตโนมัติ</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">แจ้งเตือนเมื่อ</label>
+                                                    <div class="d-flex flex-column gap-2 mt-1">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="chkAlertStatusChange" />
+                                                            <label class="form-check-label" for="chkAlertStatusChange">มาตรการเปลี่ยนสถานะ</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="chkAlertReviewDue" />
+                                                            <label class="form-check-label" for="chkAlertReviewDue">ใกล้วันทบทวน</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="chkAlertFactoryIssue" />
+                                                            <label class="form-check-label" for="chkAlertFactoryIssue">โรงงานที่เกี่ยวข้องมีปัญหา</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="alert alert-light border d-flex align-items-start gap-2 py-2 mb-0" style="font-size:0.8rem;">
+                                                        <i class="ri ri-lightbulb-line text-warning mt-1"></i>
+                                                        <span><strong>ตัวอย่าง Toast:</strong> &ldquo;⚠️ มาตรการ <span id="configAlertExampleCode" class="fw-bold text-primary"></span> ใกล้วันทบทวน — เหลือ <span id="configAlertExampleDays"></span>&rdquo;</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- accordion 3: โรงงานที่ได้รับผลกระทบ -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingInspFactory">
+                                        <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseInspFactory" aria-expanded="false">
+                                            <i class="icon-base ri ri-building-line me-2 text-danger"></i> โรงงานที่ได้รับผลกระทบ
+                                        </button>
+                                    </h2>
+                                    <div id="collapseInspFactory" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            <div id="configFactoryBadge" class="mb-3"></div>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm align-middle mb-0 measure-table-compact">
+                                                    <thead class="text-center table-light">
+                                                        <tr>
+                                                            <th style="width:40px;">#</th>
+                                                            <th>รหัสโรงงาน</th>
+                                                            <th>ชื่อโรงงาน</th>
+                                                            <th>จังหวัด</th>
+                                                            <th>ตลาดส่งออก</th>
+                                                            <th>สถานะ</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="configFactoryTableBody"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2 mt-3 px-1">
+                                <button type="button" class="btn btn-outline-secondary btn-sm"><i class="ri ri-arrow-go-back-line me-1"></i>รีเซ็ตค่าเดิม</button>
+                                <button type="button" id="btnSaveInspConfig" class="btn btn-primary btn-sm"><i class="ri ri-save-line me-1"></i>บันทึกตั้งค่า</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -627,6 +1089,174 @@
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="ri ri-close-line me-1"></i> ปิด</button>
                 <button type="button" class="btn btn-primary"><i class="ri ri-save-line me-1"></i> บันทึกข้อมูล</button>
             </div>
+        </div>
+    </div>
+</div>
+
+{{- modal: เพิ่มมาตรการ -}}
+<div class="modal fade" id="addMeasureModal" tabindex="-1" aria-labelledby="addMeasureModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMeasureModalLabel"><i class="ri ri-add-circle-line me-2 text-primary"></i>เพิ่มมาตรการสุขอนามัย</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">ประเทศ <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">-- เลือกประเทศ --</option>
+                            <option>ญี่ปุ่น (JP)</option>
+                            <option>สหภาพยุโรป (EU)</option>
+                            <option>สหรัฐอเมริกา (US)</option>
+                            <option>ออสเตรเลีย (AU)</option>
+                            <option>เกาหลีใต้ (KR)</option>
+                            <option>จีน (CN)</option>
+                            <option>แคนาดา (CA)</option>
+                            <option>อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ภูมิภาค <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">-- เลือกภูมิภาค --</option>
+                            <option>เอเชีย</option>
+                            <option>ยุโรป</option>
+                            <option>อเมริกา</option>
+                            <option>โอเชียเนีย</option>
+                            <option>อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">รหัสมาตรการ <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="เช่น SPS-JP-201" />
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label">ชื่อมาตรการ <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="ระบุชื่อมาตรการ" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">ขอบเขตสินค้า <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="เช่น Tuna / Frozen Fishery Products" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">มีผลบังคับใช้ <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ทบทวนครั้งถัดไป</label>
+                        <input type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ระดับความเสี่ยง <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">-- เลือก --</option>
+                            <option>ต่ำ</option>
+                            <option>กลาง</option>
+                            <option>สูง</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">หน่วยงานรับผิดชอบ</label>
+                        <input type="text" class="form-control" placeholder="เช่น กลุ่มมาตรการสุขอนามัย" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">วัตถุประสงค์</label>
+                        <textarea class="form-control" rows="2" placeholder="ระบุวัตถุประสงค์ของมาตรการ"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">หน่วยงานต้นทาง (Authority)</label>
+                        <input type="text" class="form-control" placeholder="เช่น MHLW, US FDA" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ช่องทางติดต่อ</label>
+                        <input type="text" class="form-control" placeholder="อีเมลผู้รับผิดชอบ" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">หมายเหตุ</label>
+                        <textarea class="form-control" rows="2" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="ri ri-close-line me-1"></i> ยกเลิก</button>
+                <button type="button" class="btn btn-primary"><i class="ri ri-save-line me-1"></i> บันทึกมาตรการ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{- modal: ระงับมาตรการ -}}
+<div class="modal fade" id="measureSuspendModal" tabindex="-1" aria-labelledby="measureSuspendModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background:rgba(255,159,67,.12);">
+                <h5 class="modal-title" id="measureSuspendModalLabel" style="color:#ff9f43;"><i class="ri ri-forbid-2-line me-2"></i>ระงับมาตรการ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1 text-muted small">รหัสมาตรการ</p>
+                <p class="fw-bold mb-1" id="suspendMeasureCode"></p>
+                <p class="mb-3 small text-secondary" id="suspendMeasureName"></p>
+                <div class="mb-3">
+                    <label class="form-label">วันที่มีผล</label>
+                    <input type="date" id="suspendEffectiveDate" class="form-control" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label">เหตุผลการระงับ <span class="text-danger">*</span></label>
+                    <textarea id="suspendReason" class="form-control" rows="3" placeholder="ระบุเหตุผลการระงับมาตรการ (required)"></textarea>
+                    <div class="invalid-feedback">กรุณาระบุเหตุผล</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmSuspend" class="btn text-white fw-semibold" style="background:#ff9f43;border-color:#ff9f43;"><i class="ri ri-forbid-2-line me-1"></i>ยืนยันระงับมาตรการ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{- modal: ยกเลิกมาตรการ -}}
+<div class="modal fade" id="measureCancelModal" tabindex="-1" aria-labelledby="measureCancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-label-danger">
+                <h5 class="modal-title text-danger" id="measureCancelModalLabel"><i class="ri ri-close-circle-line me-2"></i>ยกเลิกมาตรการ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger d-flex gap-2 align-items-start py-2 mb-3">
+                    <i class="ri ri-alert-line mt-1"></i>
+                    <span class="small">การยกเลิกมาตรการจะมีผลถาวร และบันทึกลงในประวัติการดำเนินการ</span>
+                </div>
+                <p class="mb-1 text-muted small">รหัสมาตรการ</p>
+                <p class="fw-bold mb-1" id="cancelMeasureCode"></p>
+                <p class="mb-3 small text-secondary" id="cancelMeasureName"></p>
+                <div class="mb-3">
+                    <label class="form-label">วันที่ยกเลิก</label>
+                    <input type="date" id="cancelDate" class="form-control" />
+                </div>
+                <div class="mb-1">
+                    <label class="form-label">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                    <textarea id="cancelReason" class="form-control" rows="3" placeholder="ระบุเหตุผลการยกเลิกมาตรการ (required)"></textarea>
+                    <div class="invalid-feedback">กรุณาระบุเหตุผล</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmCancel" class="btn btn-danger"><i class="ri ri-close-circle-line me-1"></i>ยืนยันยกเลิกมาตรการ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{- toast container -}}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:1100;">
+    <div id="measureActionToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="measureToastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
 </div>

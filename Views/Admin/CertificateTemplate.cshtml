@@ -15,7 +15,8 @@
             Version = "v2.4",
             IsActive = true,
             UpdatedAt = new DateTime(2026, 3, 10),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "เจ้าหน้าที่จัดทำ"
         },
         new
         {
@@ -29,7 +30,8 @@
             Version = "v1.8",
             IsActive = true,
             UpdatedAt = new DateTime(2026, 2, 28),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "อัตโนมัติหลังรับคำขอ"
         },
         new
         {
@@ -43,7 +45,8 @@
             Version = "v3.1",
             IsActive = true,
             UpdatedAt = new DateTime(2026, 4, 1),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "อัตโนมัติทั้งกระบวนการ"
         },
         new
         {
@@ -57,7 +60,8 @@
             Version = "v1.2",
             IsActive = false,
             UpdatedAt = new DateTime(2025, 11, 15),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "เจ้าหน้าที่จัดทำ"
         },
         new
         {
@@ -71,7 +75,8 @@
             Version = "v1.5",
             IsActive = true,
             UpdatedAt = new DateTime(2026, 1, 20),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "อัตโนมัติหลังการตรวจปล่อย"
         },
         new
         {
@@ -85,7 +90,8 @@
             Version = "v2.0",
             IsActive = true,
             UpdatedAt = new DateTime(2026, 3, 15),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "เจ้าหน้าที่จัดทำ"
         },
         new
         {
@@ -99,7 +105,8 @@
             Version = "v2.3",
             IsActive = true,
             UpdatedAt = new DateTime(2026, 4, 5),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "อัตโนมัติหลังรับคำขอ"
         },
         new
         {
@@ -113,7 +120,8 @@
             Version = "v1.0",
             IsActive = false,
             UpdatedAt = new DateTime(2025, 9, 30),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "เจ้าหน้าที่จัดทำ"
         },
         new
         {
@@ -127,7 +135,8 @@
             Version = "v1.6",
             IsActive = true,
             UpdatedAt = new DateTime(2026, 2, 10),
-            UpdatedBy = "ผู้ดูแลระบบ"
+            UpdatedBy = "ผู้ดูแลระบบ",
+            ProductionMode = "อัตโนมัติทั้งกระบวนการ"
         },
     };
 
@@ -193,6 +202,22 @@
         letter-spacing: 0.08em;
         color: #6c757d;
         font-weight: 600;
+    }
+    .edit-history-table {
+        font-size: 0.79rem;
+    }
+    .edit-history-table th,
+    .edit-history-table td {
+        padding: 0.45rem 0.6rem;
+        vertical-align: middle;
+    }
+    .restriction-table {
+        font-size: 0.79rem;
+    }
+    .restriction-table th,
+    .restriction-table td {
+        padding: 0.45rem 0.6rem;
+        vertical-align: middle;
     }
 </style>
 }
@@ -344,19 +369,45 @@
                     <th>เวอร์ชัน</th>
                     <th>อัปเดตล่าสุด</th>
                     <th>สถานะ</th>
-                    <th style="width:140px;"></th>
+                    <th style="width:175px;"></th>
                 </tr>
             </thead>
             <tbody id="templateTableBody">
                 @foreach (var t in templates)
                 {
                     <tr data-type="@t.CertificateType"
+                        data-id="@t.Id"
                         data-country="@string.Join(" ", t.Countries).ToLower()"
                         data-status="@(t.IsActive ? "active" : "inactive")">
                         <td class="text-center text-muted">@t.Id</td>
                         <td>
-                            <div class="fw-semibold">@t.TemplateName</div>
+                            <div class="fw-semibold">
+                                @t.TemplateName
+                                @if (t.Id == 1 || t.Id == 6)
+                                {
+                                    <span class="badge ms-1" style="background-color:#ff9f43;color:#fff;font-size:0.65rem;">มีข้อจำกัด: @(t.Id == 1 ? 2 : 1) โรงงาน ⚠️</span>
+                                }
+                            </div>
                             <small class="text-muted">แก้ไขโดย @t.UpdatedBy</small>
+                            <div class="mt-1">
+                                @if (t.ProductionMode == "อัตโนมัติหลังการตรวจปล่อย")
+                                {
+                                    <span class="badge" style="background-color:rgba(115,103,240,0.16);color:#7367f0;font-size:0.62rem;">⚙ @t.ProductionMode</span>
+                                }
+                                else if (t.ProductionMode == "อัตโนมัติทั้งกระบวนการ")
+                                {
+                                    <span class="badge bg-label-success" style="font-size:0.62rem;">⚙ @t.ProductionMode</span>
+                                }
+                                else if (t.ProductionMode == "อัตโนมัติหลังรับคำขอ")
+                                {
+                                    <span class="badge bg-label-info" style="font-size:0.62rem;">⚙ @t.ProductionMode</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-label-warning" style="font-size:0.62rem;">⚙ @t.ProductionMode</span>
+                                }
+                            </div>
+                            <div class="mt-1" id="effectiveBadge-@t.Id"></div>
                         </td>
                         <td>
                             @if (t.CertificateType == "declaration")
@@ -416,6 +467,12 @@
                                     aria-label="กำหนดช่องข้อมูล">
                                     <i class="ri ri-layout-column-line text-primary"></i>
                                 </button>
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-set-prod-mode"
+                                    title="กำหนดรูปแบบการจัดทำ" data-bs-toggle="modal" data-bs-target="#modalSetProductionMode"
+                                    data-id="@t.Id" data-name="@t.TemplateName"
+                                    aria-label="กำหนดรูปแบบการจัดทำ">
+                                    <i class="ri ri-settings-4-line" style="color:#7367f0;"></i>
+                                </button>
                                 @if (t.IsActive)
                                 {
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-dark"
@@ -430,6 +487,11 @@
                                         <i class="ri ri-toggle-fill text-success"></i>
                                     </button>
                                 }
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-manage-restriction"
+                                    title="จัดการข้อจำกัด" aria-label="จัดการข้อจำกัด"
+                                    data-id="@t.Id" data-name="@t.TemplateName">
+                                    <i class="ri ri-shield-star-line"></i>
+                                </button>
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
                                     title="ลบรูปแบบ" aria-label="ลบรูปแบบ">
                                     <i class="ri ri-delete-bin-line text-danger"></i>
@@ -539,7 +601,7 @@
 
 <!-- ==================== Modal: แก้ไขรูปแบบใบรับรอง ==================== -->
 <div class="modal fade" id="modalEditTemplate" tabindex="-1" aria-labelledby="modalEditTemplateLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalEditTemplateLabel">
@@ -547,54 +609,144 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-4">
-                    <i class="ri ri-information-line"></i>
-                    <span id="editTemplateNameDisplay" class="fw-semibold">Declaration – สหภาพยุโรป (มาตรฐาน)</span>
+            <div class="modal-body p-0">
+                <div class="px-4 pt-3">
+                    <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-2">
+                        <i class="ri ri-information-line"></i>
+                        <span id="editTemplateNameDisplay" class="fw-semibold">Declaration – สหภาพยุโรป (มาตรฐาน)</span>
+                        <span class="ms-auto badge bg-label-primary version-badge" id="editTemplateVersionBadge">v2.4</span>
+                    </div>
+                    <div class="alert alert-warning d-flex align-items-center justify-content-between gap-2 py-2 mb-2 d-none" id="editApprovalAlert">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="ri ri-error-warning-line text-warning"></i>
+                            <span class="fw-semibold">การเพิ่มเวอร์ชันต้องการการอนุมัติก่อน Activate</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-warning text-white" id="btnSubmitApproval">
+                            <i class="ri ri-send-plane-line me-1"></i>ส่งอนุมัติ
+                        </button>
+                    </div>
                 </div>
-                <div class="row g-4">
-                    <div class="col-md-12">
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="edit_templateName"
-                                value="Declaration – สหภาพยุโรป (มาตรฐาน)" />
-                            <label for="edit_templateName">ชื่อรูปแบบ <span class="text-danger">●</span></label>
+                <ul class="nav nav-tabs px-4" role="tablist">
+                    <li class="nav-item">
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#tab-edit-form">
+                            <i class="ri ri-edit-2-line me-1"></i> แก้ไขข้อมูล
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-edit-history">
+                            <i class="ri ri-history-line me-1"></i> ประวัติการแก้ไข
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content p-4">
+                    <!-- Tab 1: แก้ไขข้อมูล -->
+                    <div class="tab-pane fade show active" id="tab-edit-form" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control" id="edit_templateName" value="Declaration – สหภาพยุโรป (มาตรฐาน)" />
+                                    <label for="edit_templateName">ชื่อรูปแบบ <span class="text-danger">●</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <select id="edit_certType" class="form-select">
+                                        <option value="declaration" selected>ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</option>
+                                        <option value="processing">ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)</option>
+                                    </select>
+                                    <label for="edit_certType">ประเภทใบรับรอง <span class="text-danger">●</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control" id="edit_targetGroup" value="สหภาพยุโรป (EU)" />
+                                    <label for="edit_targetGroup">กลุ่มประเทศ / ชื่อกลุ่ม <span class="text-danger">●</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control" id="edit_hsCode" value="0301–0308" />
+                                    <label for="edit_hsCode">HS Code (ช่วงหรือรายการ)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control" id="edit_version" value="v2.4" />
+                                    <label for="edit_version">เวอร์ชัน <span class="text-danger">●</span></label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">คำอธิบายรูปแบบ</label>
+                                <textarea class="form-control" id="edit_description" rows="2">ใช้สำหรับการส่งออกสัตว์น้ำไม่แปรรูปไปยังกลุ่มประเทศสหภาพยุโรป ตามข้อกำหนด EC No. 1005/2008</textarea>
+                            </div>
+                            <div class="col-12"><hr class="my-0" /></div>
+                            <div class="col-12">
+                                <p class="text-muted small fw-semibold mb-0"><i class="ri ri-edit-2-line me-1"></i>ข้อมูลการแก้ไข (จำเป็นต้องกรอก)</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <select id="edit_reason" class="form-select">
+                                        <option value="">-- เลือกเหตุผล --</option>
+                                        <option value="law">ประเทศปลายทางแก้ไขกฎหมาย</option>
+                                        <option value="format">ปรับปรุง format ใบรับรอง</option>
+                                        <option value="text">แก้ไขข้อความ/ถ้อยคำ</option>
+                                        <option value="hscode">อัปเดต HS Code</option>
+                                        <option value="other">อื่นๆ (ระบุในหมายเหตุ)</option>
+                                    </select>
+                                    <label for="edit_reason">เหตุผลการปรับ <span class="text-danger">●</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="date" class="form-control" id="edit_effectiveDate" />
+                                    <label for="edit_effectiveDate">มีผลบังคับใช้ตั้งแต่ <span class="text-danger">●</span></label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control" id="edit_docRef" placeholder="URL หรือชื่อเอกสารอ้างอิง" />
+                                    <label for="edit_docRef">อ้างอิงเอกสาร / กฎหมาย (URL หรือชื่อไฟล์)</label>
+                                </div>
+                                <small class="text-muted">เช่น https://ec.europa.eu/... หรือ EU-Regulation-2026-0312.pdf</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">หมายเหตุการแก้ไข</label>
+                                <textarea class="form-control" id="edit_changeNote" rows="2" placeholder="รายละเอียดการเปลี่ยนแปลง เช่น เพิ่มฟิลด์ Health Status ตามประกาศ EU 2026/312"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex align-items-center gap-4 flex-wrap">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="edit_isActive" checked />
+                                        <label class="form-check-label" for="edit_isActive">เปิดใช้งาน</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="edit_bumpVersion" />
+                                        <label class="form-check-label" for="edit_bumpVersion">เพิ่มเลขเวอร์ชัน (Bump Version) — ต้องการอนุมัติก่อน Activate</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-floating form-floating-outline">
-                            <select id="edit_certType" class="form-select">
-                                <option value="declaration" selected>ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</option>
-                                <option value="processing">ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)</option>
-                            </select>
-                            <label for="edit_certType">ประเภทใบรับรอง <span class="text-danger">●</span></label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="edit_targetGroup" value="สหภาพยุโรป (EU)" />
-                            <label for="edit_targetGroup">กลุ่มประเทศ / ชื่อกลุ่ม <span class="text-danger">●</span></label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="edit_hsCode" value="0301–0308" />
-                            <label for="edit_hsCode">HS Code (ช่วงหรือรายการ)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="edit_version" value="v2.4" />
-                            <label for="edit_version">เวอร์ชัน <span class="text-danger">●</span></label>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">คำอธิบายรูปแบบ</label>
-                        <textarea class="form-control" id="edit_description" rows="3">ใช้สำหรับการส่งออกสัตว์น้ำไม่แปรรูปไปยังกลุ่มประเทศสหภาพยุโรป ตามข้อกำหนด EC No. 1005/2008</textarea>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="edit_isActive" checked />
-                            <label class="form-check-label" for="edit_isActive">เปิดใช้งาน</label>
+                    <!-- Tab 2: ประวัติการแก้ไข -->
+                    <div class="tab-pane fade" id="tab-edit-history" role="tabpanel">
+                        <p class="text-muted small mb-3">บันทึกการเปลี่ยนแปลงรูปแบบใบรับรอง เรียงจากล่าสุดก่อน</p>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle edit-history-table">
+                                <thead class="text-center table-light">
+                                    <tr>
+                                        <th style="width:44px;">#</th>
+                                        <th>เวอร์ชัน</th>
+                                        <th>วันที่แก้ไข</th>
+                                        <th>เหตุผล / หมายเหตุ</th>
+                                        <th>ผู้แก้ไข</th>
+                                        <th>ผู้อนุมัติ</th>
+                                        <th>สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="editHistoryTableBody">
+                                    <tr><td colspan="7" class="text-center text-muted py-3">กำลังโหลด...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -603,7 +755,7 @@
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="ri ri-close-line me-1"></i>ยกเลิก
                 </button>
-                <button type="button" class="btn btn-warning text-white">
+                <button type="button" class="btn btn-warning text-white" id="btnSaveEditTemplate">
                     <i class="ri ri-save-line me-1"></i>บันทึกการแก้ไข
                 </button>
             </div>
@@ -705,10 +857,68 @@
                                         {
                                             <span class="badge bg-label-danger" style="font-size:0.6rem;">required</span>
                                         }
+                                        @if (sf.Type == "signature")
+                                        {
+                                            <button type="button" class="btn btn-xs btn-outline-warning" title="ตั้งค่าลายมือชื่อ"
+                                                id="btnSigConfig" aria-expanded="true" aria-controls="sigConfigPanel"
+                                                style="font-size:0.65rem;padding:1px 5px;">
+                                                <i class="ri ri-pen-nib-line me-1"></i>ตั้งค่า
+                                            </button>
+                                        }
                                         <button type="button" class="btn btn-xs btn-icon btn-outline-danger" title="ลบออก" style="width:1.3rem;height:1.3rem;">
                                             <i class="ri ri-close-line" style="font-size:0.7rem;"></i>
                                         </button>
                                     </div>
+                                    @if (sf.Type == "signature")
+                                    {
+                                        <!-- Sub-panel: ตั้งค่าลายมือชื่อ -->
+                                        <div id="sigConfigPanel" class="border rounded p-3 ms-4 mt-1" style="background:#fefce8;border-color:#f59e0b!important;">
+                                            <div class="d-flex align-items-center gap-2 mb-3">
+                                                <i class="ri ri-pen-nib-line text-warning"></i>
+                                                <span class="fw-semibold small">ตั้งค่าลายมือชื่ออิเล็กทรอนิกส์</span>
+                                            </div>
+                                            <div class="row g-3">
+                                                <div class="col-12">
+                                                    <label class="form-label small mb-1">ผู้ลงนาม <span class="text-danger">*</span></label>
+                                                    <select id="sigConfig_signer" class="form-select form-select-sm">
+                                                        <option value="">-- เลือกผู้ลงนาม --</option>
+                                                        <option value="SIG-001" selected>นายอภิชาติ วงศ์พันธ์ — ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน</option>
+                                                        <option value="SIG-002">นายวีระ ทองดี — ผู้เชี่ยวชาญด้านการรับรองสินค้าประมง</option>
+                                                        <option value="SIG-003">น.ส.ปรียา ศรีสุข — หัวหน้ากลุ่มออกใบรับรอง</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card border p-2" style="background:#fff;">
+                                                        <div class="small text-muted mb-1">ข้อมูลผู้ลงนาม</div>
+                                                        <div id="sigConfig_signerDetail">
+                                                            <div class="small fw-semibold">นายอภิชาติ วงศ์พันธ์</div>
+                                                            <div class="small text-muted">ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน</div>
+                                                            <div class="small text-muted">กองตรวจสอบรับรองมาตรฐานสินค้าประมง</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="small text-muted mb-1">ตัวอย่างลายมือชื่อ</div>
+                                                    <div class="border rounded d-flex align-items-center justify-content-center"
+                                                        style="height:64px;background:#fff;border-style:dashed!important;">
+                                                        <div class="text-center">
+                                                            <i class="ri ri-image-line text-muted" style="font-size:1.3rem;"></i>
+                                                            <div class="small text-muted" style="font-size:0.65rem;">ลายมือชื่อ (placeholder)</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="sigConfig_autoStamp" checked />
+                                                        <label class="form-check-label small" for="sigConfig_autoStamp">
+                                                            <span class="fw-semibold">ประทับอัตโนมัติเมื่อออกใบรับรอง</span>
+                                                            <small class="d-block text-muted">ใช้สำหรับโหมดอัตโนมัติ (full-auto / auto-after-receive / auto-after-inspection)</small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
                                 }
                             }
                         </div>
@@ -794,12 +1004,51 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- Signature -->
-                    <div class="row mt-4">
-                        <div class="col-6 offset-6 text-center">
-                            <div style="min-height:50px; border-bottom:1px solid #000; margin-bottom:4px;"></div>
-                            <div style="font-size:0.7rem;">Authorized Signature / Official Stamp</div>
+                    <!-- Signature & Stamp footer -->
+                    <div class="row mt-4 pt-3" style="border-top:1px solid #ccc;">
+                        <div class="col-5">
+                            <div class="text-center">
+                                <div class="border rounded d-flex align-items-center justify-content-center mx-auto mb-2"
+                                    style="width:120px;height:55px;background:#f9f9f9;border-style:dashed!important;">
+                                    <div class="text-center">
+                                        <i class="ri ri-image-line text-muted" style="font-size:1.1rem;"></i>
+                                        <div style="font-size:0.6rem;color:#999;">ลายมือชื่อ</div>
+                                    </div>
+                                </div>
+                                <div style="font-size:0.72rem;border-top:1px solid #333;padding-top:3px;">
+                                    <div class="fw-bold">นายอภิชาติ วงศ์พันธ์</div>
+                                    <div class="text-muted" style="font-size:0.68rem;">ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน</div>
+                                    <div class="text-muted" style="font-size:0.65rem;">กรมประมง</div>
+                                </div>
+                            </div>
                         </div>
+                        <div class="col-2 d-flex align-items-center justify-content-center">
+                            <div class="text-center">
+                                <!-- Official stamp placeholder -->
+                                <div class="rounded-circle border d-flex align-items-center justify-content-center mx-auto"
+                                    style="width:64px;height:64px;border-width:2px!important;border-color:#333!important;border-style:dashed!important;background:#f9f9f9;">
+                                    <div class="text-center">
+                                        <i class="ri ri-seal-line text-muted" style="font-size:1.3rem;"></i>
+                                        <div style="font-size:0.55rem;color:#999;">ตราประทับ</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="text-center text-muted" style="font-size:0.7rem;">
+                                <div class="mb-1">Authorized Signature</div>
+                                <div style="border-bottom:1px solid #333;min-height:55px;margin-bottom:4px;"></div>
+                                <div>Official Stamp</div>
+                                <div class="mt-1" style="font-size:0.65rem;">Date: __ / __ / ____</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Auto-stamp indicator -->
+                    <div class="mt-3 d-flex align-items-center gap-2">
+                        <span class="badge bg-label-success" style="font-size:0.65rem;">
+                            <i class="ri ri-checkbox-circle-line me-1"></i>ประทับอัตโนมัติเมื่อออกใบรับรอง (auto-stamp)
+                        </span>
+                        <span class="text-muted" style="font-size:0.68rem;">ผู้ลงนาม: นายอภิชาติ วงศ์พันธ์</span>
                     </div>
                 </div>
             </div>
@@ -815,9 +1064,457 @@
 <!-- /Modal Preview -->
 
 
+<!-- ==================== Modal: ข้อจำกัดการออกใบรับรอง ==================== -->
+<div class="modal fade" id="modalRestriction" tabindex="-1" aria-labelledby="modalRestrictionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRestrictionLabel">
+                    <i class="ri ri-shield-star-line me-2 text-danger"></i>ข้อจำกัดการออกใบรับรอง — <span id="restrictionTemplateName"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="px-4 pt-3 pb-2">
+                    <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-0">
+                        <i class="ri ri-error-warning-line text-warning"></i>
+                        <span>การระงับการออกใบรับรองจะมีผลทันที — คำขอที่อยู่ระหว่างดำเนินการจะต้องได้รับการตรวจสอบอีกครั้ง</span>
+                    </div>
+                </div>
+                <ul class="nav nav-tabs px-4 mt-2" role="tablist">
+                    <li class="nav-item">
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#tab-restriction-factory">
+                            <i class="ri ri-building-line me-1"></i> ระงับตามโรงงาน
+                            <span class="badge bg-danger ms-1" id="restrictionFactoryCount" style="font-size:0.65rem;"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-restriction-country">
+                            <i class="ri ri-earth-line me-1"></i> ประเทศที่ถูกปิดกั้น (global)
+                            <span class="badge bg-warning ms-1" id="restrictionCountryCount" style="font-size:0.65rem;"></span>
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content p-4">
+                    <!-- Tab 1: ระงับตามโรงงาน -->
+                    <div class="tab-pane fade show active" id="tab-restriction-factory" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <p class="text-muted small mb-0">รายการโรงงานที่ถูกระงับการออกใบรับรองตาม template นี้</p>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddFactoryRestriction">
+                                <i class="ri ri-forbid-2-line me-1" style="color:#ff9f43;"></i>เพิ่มข้อจำกัดโรงงาน
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle restriction-table">
+                                <thead class="text-center table-light">
+                                    <tr>
+                                        <th style="width:44px;">#</th>
+                                        <th>โรงงาน</th>
+                                        <th>FactoryCode</th>
+                                        <th>ประเทศที่ระงับ</th>
+                                        <th>เหตุผล</th>
+                                        <th>วันที่ระงับ</th>
+                                        <th>มีผลถึง</th>
+                                        <th>ผู้ดำเนินการ</th>
+                                        <th style="width:70px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="factoryRestrictionTableBody">
+                                    <tr><td colspan="9" class="text-center text-muted py-3">ยังไม่มีข้อจำกัดโรงงาน</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Tab 2: ประเทศที่ถูกปิดกั้น -->
+                    <div class="tab-pane fade" id="tab-restriction-country" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <p class="text-muted small mb-0">ประเทศที่ถูกปิดกั้นการออกใบรับรองจาก template นี้ (ทุกโรงงาน)</p>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="btnBlockCountry">
+                                <i class="ri ri-earth-line me-1"></i>ปิดกั้นประเทศ
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle restriction-table">
+                                <thead class="text-center table-light">
+                                    <tr>
+                                        <th style="width:44px;">#</th>
+                                        <th>ประเทศ</th>
+                                        <th>เหตุผล</th>
+                                        <th>วันที่ปิดกั้น</th>
+                                        <th>วันสิ้นสุด</th>
+                                        <th>ผู้ดำเนินการ</th>
+                                        <th style="width:70px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="blockedCountryTableBody">
+                                    <tr><td colspan="7" class="text-center text-muted py-3">ยังไม่มีประเทศที่ถูกปิดกั้น</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Restriction -->
+
+
+<!-- ==================== Sub-Modal: เพิ่มข้อจำกัดโรงงาน ==================== -->
+<div class="modal fade" id="modalAddFactoryRestriction" tabindex="-1" aria-labelledby="modalAddFactoryRestrictionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddFactoryRestrictionLabel">
+                    <i class="ri ri-forbid-2-line me-2" style="color:#ff9f43;"></i>ระงับการออกใบรับรองระดับโรงงาน
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info py-2 d-flex align-items-center gap-2 mb-4">
+                    <i class="ri ri-information-line"></i>
+                    <span>Template: <strong id="addRestrictionTemplateName"></strong></span>
+                </div>
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label class="form-label">โรงงาน (สถานประกอบการ) <span class="text-danger">●</span></label>
+                        <select id="restrict_factory" class="form-select" multiple size="5">
+                            <option value="FAC-0001">FAC-0001 — Siam Marine Foods Co., Ltd. (สมุทรสาคร)</option>
+                            <option value="FAC-0002">FAC-0002 — Gulf Catch Processing Co., Ltd. (ชลบุรี)</option>
+                            <option value="FAC-0003">FAC-0003 — Ocean Prime Export Co., Ltd. (สงขลา)</option>
+                            <option value="FAC-0004">FAC-0004 — Andaman Cold Storage Co., Ltd. (ระนอง)</option>
+                            <option value="FAC-0005">FAC-0005 — Southern Pelagic Co., Ltd. (ภูเก็ต)</option>
+                            <option value="FAC-0006">FAC-0006 — Thai Marine Pack Co., Ltd. (กรุงเทพมหานคร)</option>
+                        </select>
+                        <small class="text-muted">กด Ctrl/⌘ เพื่อเลือกหลายโรงงาน</small>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">ขอบเขตการระงับ <span class="text-danger">●</span></label>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="restrict_scope" id="restrict_scope_all" value="all" checked />
+                                <label class="form-check-label" for="restrict_scope_all">ระงับทุกประเทศปลายทาง (global)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="restrict_scope" id="restrict_scope_selected" value="selected" />
+                                <label class="form-check-label" for="restrict_scope_selected">ระงับเฉพาะประเทศที่เลือก</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 d-none" id="restrict_countrySection">
+                        <label class="form-label">ประเทศปลายทางที่ระงับ <span class="text-danger">●</span></label>
+                        <select id="restrict_countries" class="form-select" multiple size="4"></select>
+                        <small class="text-muted">กด Ctrl/⌘ เพื่อเลือกหลายประเทศ</small>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">เหตุผลการระงับ <span class="text-danger">●</span></label>
+                        <textarea class="form-control" id="restrict_reason" rows="3" placeholder="เช่น เรือขนส่งไม่อยู่ใน UK Approved List / ป้องกัน re-export ผ่าน UK"></textarea>
+                        <div class="invalid-feedback">กรุณาระบุเหตุผล</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">มีผลถึงวันที่</label>
+                        <input type="date" class="form-control" id="restrict_untilDate" />
+                        <small class="text-muted">เว้นว่างหากไม่มีกำหนดสิ้นสุด</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmFactoryRestriction">
+                    <i class="ri ri-forbid-2-line me-1"></i>ยืนยันระงับ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Sub-Modal Add Factory Restriction -->
+
+
+<!-- ==================== Sub-Modal: ปิดกั้นประเทศ ==================== -->
+<div class="modal fade" id="modalBlockCountry" tabindex="-1" aria-labelledby="modalBlockCountryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalBlockCountryLabel">
+                    <i class="ri ri-earth-line me-2 text-danger"></i>ปิดกั้นประเทศปลายทาง (global)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger py-2 d-flex align-items-center gap-2 mb-4">
+                    <i class="ri ri-error-warning-line"></i>
+                    <span>การปิดกั้น <strong>ทุกโรงงาน</strong> จะหยุดการออกใบรับรองไปยังประเทศนี้ทั้งหมด</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="form-floating form-floating-outline">
+                            <select id="block_country" class="form-select"></select>
+                            <label for="block_country">ประเทศปลายทาง <span class="text-danger">●</span></label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">เหตุผล <span class="text-danger">●</span></label>
+                        <textarea class="form-control" id="block_reason" rows="3" placeholder="ระบุเหตุผลการปิดกั้น"></textarea>
+                        <div class="invalid-feedback">กรุณาระบุเหตุผล</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">วันที่เริ่มต้น</label>
+                        <input type="date" class="form-control" id="block_startDate" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">วันสิ้นสุด</label>
+                        <input type="date" class="form-control" id="block_endDate" />
+                        <small class="text-muted">เว้นว่างหากไม่มีกำหนด</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmBlockCountry">
+                    <i class="ri ri-earth-line me-1"></i>ยืนยันปิดกั้น
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Sub-Modal Block Country -->
+
+
+<!-- ==================== Modal: กำหนดรูปแบบการจัดทำใบรับรอง ==================== -->
+<div class="modal fade" id="modalSetProductionMode" tabindex="-1" aria-labelledby="modalSetProductionModeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSetProductionModeLabel">
+                    <i class="ri ri-settings-4-line me-2" style="color:#7367f0;"></i>กำหนดรูปแบบการจัดทำใบรับรอง
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Context header (always visible) -->
+                <div class="px-4 pt-3 pb-0">
+                    <div class="alert alert-primary d-flex align-items-center gap-2 py-2 mb-3">
+                        <i class="ri ri-information-line"></i>
+                        <span>รูปแบบ: <strong id="setModeTemplateName">—</strong></span>
+                    </div>
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs nav-tabs-lined" id="setModeTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="setModeTab-config-tab" data-bs-toggle="tab"
+                                data-bs-target="#setModeTab-config" type="button" role="tab">
+                                <i class="ri ri-settings-4-line me-1"></i>กำหนดรูปแบบ
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="setModeTab-history-tab" data-bs-toggle="tab"
+                                data-bs-target="#setModeTab-history" type="button" role="tab">
+                                <i class="ri ri-history-line me-1"></i>ประวัติรูปแบบการจัดทำ
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Tab content -->
+                <div class="tab-content px-4 pt-3 pb-3">
+                    <!-- Tab 1: กำหนดรูปแบบ -->
+                    <div class="tab-pane fade show active" id="setModeTab-config" role="tabpanel">
+                        <!-- Radio group: รูปแบบการจัดทำ -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">รูปแบบการจัดทำ <span class="text-danger">*</span></label>
+                            <div class="d-flex flex-column gap-2">
+                                <!-- เจ้าหน้าที่จัดทำ -->
+                                <div class="card border rounded p-3 setmode-card">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="setMode_radio" id="setMode_manual" value="เจ้าหน้าที่จัดทำ" />
+                                        <label class="form-check-label" for="setMode_manual">
+                                            <span class="fw-semibold"><i class="ri ri-user-3-line me-1 text-warning"></i>เจ้าหน้าที่จัดทำ (manual)</span>
+                                            <small class="d-block text-muted mt-1">เจ้าหน้าที่รับผิดชอบจัดทำและออกใบรับรองด้วยตนเอง</small>
+                                        </label>
+                                    </div>
+                                    <div class="mt-2 ps-3 d-none" id="setMode_officerSection">
+                                        <label class="form-label small mb-1">เจ้าหน้าที่รับผิดชอบ</label>
+                                        <select id="setMode_officer" class="form-select form-select-sm">
+                                            <option value="">-- เลือกเจ้าหน้าที่ --</option>
+                                            <option value="USR-001">สมชาย พัฒนา (กลุ่มพัฒนาระบบรับรอง)</option>
+                                            <option value="USR-002">วิไล สมศรี (ฝ่ายรับรองมาตรฐาน)</option>
+                                            <option value="USR-003">ประเสริฐ ดีมาก (ฝ่ายส่งออก)</option>
+                                            <option value="USR-004">รัตนา ชัยดี (กลุ่มพัฒนาระบบรับรอง)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- อัตโนมัติหลังรับคำขอ -->
+                                <div class="card border rounded p-3 setmode-card">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="setMode_radio" id="setMode_autoReceive" value="อัตโนมัติหลังรับคำขอ" />
+                                        <label class="form-check-label" for="setMode_autoReceive">
+                                            <span class="fw-semibold"><i class="ri ri-robot-line me-1 text-info"></i>อัตโนมัติหลังรับคำขอ (auto-after-receive)</span>
+                                            <small class="d-block text-muted mt-1">ระบบออกใบรับรองทันทีหลังจากรับคำขอในระบบ</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- อัตโนมัติทั้งกระบวนการ -->
+                                <div class="card border rounded p-3 setmode-card">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="setMode_radio" id="setMode_fullAuto" value="อัตโนมัติทั้งกระบวนการ" />
+                                        <label class="form-check-label" for="setMode_fullAuto">
+                                            <span class="fw-semibold"><i class="ri ri-flashlight-line me-1 text-success"></i>อัตโนมัติทั้งกระบวนการ (full-auto)</span>
+                                            <small class="d-block text-muted mt-1">ระบบออกใบรับรองโดยไม่ต้องมีเจ้าหน้าที่อนุมัติ</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- อัตโนมัติหลังการตรวจปล่อย (NEW) -->
+                                <div class="card border rounded p-3 setmode-card" style="border-color:rgba(115,103,240,0.4)!important;">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="setMode_radio" id="setMode_autoInspect" value="อัตโนมัติหลังการตรวจปล่อย" />
+                                        <label class="form-check-label" for="setMode_autoInspect">
+                                            <span class="fw-semibold">
+                                                <i class="ri ri-shield-check-line me-1" style="color:#7367f0;"></i>อัตโนมัติหลังการตรวจปล่อย (auto-after-inspection)
+                                                <span class="badge ms-1" style="background-color:rgba(115,103,240,0.16);color:#7367f0;font-size:0.65rem;">ใหม่</span>
+                                            </span>
+                                            <small class="d-block text-muted mt-1">ระบบออกใบรับรองหลังจากเจ้าหน้าที่ตรวจปล่อยสินค้าแล้ว</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Effective date range -->
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">ช่วงวันที่มีผล</label>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">วันที่เริ่มต้น <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="setMode_effectiveFrom" />
+                                <small class="text-muted">วันที่รูปแบบนี้เริ่มมีผลบังคับใช้</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">วันที่สิ้นสุด</label>
+                                <input type="date" class="form-control" id="setMode_effectiveTo" />
+                                <small class="text-muted">เว้นว่าง = ไม่มีกำหนดสิ้นสุด</small>
+                            </div>
+                            <div class="col-12">
+                                <!-- Dynamic date range preview -->
+                                <div id="setMode_datePreview" class="d-none">
+                                    <div class="alert alert-success py-2 d-flex align-items-center gap-2">
+                                        <i class="ri ri-calendar-check-line text-success"></i>
+                                        <span id="setMode_datePreviewText" class="small"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">หมายเหตุ</label>
+                                <textarea class="form-control" id="setMode_note" rows="2"
+                                    placeholder="เช่น เปลี่ยนเป็นระบบอัตโนมัติตามนโยบายปี 2569"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tab 2: ประวัติรูปแบบการจัดทำ -->
+                    <div class="tab-pane fade" id="setModeTab-history" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fw-semibold text-body">ประวัติการกำหนดรูปแบบการจัดทำ</span>
+                            <span id="setModeHistoryCurrentBadge" class="badge bg-label-success d-none">
+                                <i class="ri ri-checkbox-circle-line me-1"></i>ใช้งานอยู่ตั้งแต่ —
+                            </span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered table-hover align-middle" style="font-size:0.82rem;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-center" style="width:30px;">#</th>
+                                        <th>ช่วงวันที่มีผล</th>
+                                        <th>รูปแบบการจัดทำ</th>
+                                        <th>ผู้กำหนด</th>
+                                        <th>หมายเหตุ</th>
+                                        <th class="text-center">สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="setModeHistoryTableBody">
+                                    <tr><td colspan="6" class="text-center text-muted py-3">ยังไม่มีประวัติ</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-warning text-white" id="btnCancelProductionMode">
+                    <i class="ri ri-error-warning-line me-1"></i>ยกเลิกรูปแบบนี้
+                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="ri ri-close-line me-1"></i>ปิด
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnSaveProductionMode">
+                        <i class="ri ri-save-line me-1"></i>บันทึก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Set Production Mode -->
+
+<!-- ==================== Modal: ยืนยันยกเลิกรูปแบบการจัดทำ ==================== -->
+<div class="modal fade" id="modalConfirmCancelMode" tabindex="-1" aria-labelledby="modalConfirmCancelModeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning" id="modalConfirmCancelModeLabel">
+                    <i class="ri ri-error-warning-line me-2"></i>ยืนยันยกเลิกรูปแบบ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">ยืนยันที่จะ <strong>ยกเลิกรูปแบบการจัดทำ</strong> ของ:</p>
+                <p class="fw-bold mb-3" id="confirmCancelModeName">—</p>
+                <p class="small text-muted mb-0">รูปแบบที่ถูกยกเลิกจะไม่สามารถใช้งานได้จนกว่าจะกำหนดรูปแบบใหม่</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-warning text-white" id="btnConfirmCancelMode">
+                    <i class="ri ri-delete-bin-line me-1"></i>ยืนยันยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Confirm Cancel Mode -->
+
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:1100;">
+    <div id="templateActionToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="templateToastBody">ข้อความแจ้งเตือน</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 @section PageScripts {
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+
+        // ── Toast helper ──
+        function showTemplateToast(type, message) {
+            var toastEl = document.getElementById('templateActionToast');
+            var body    = document.getElementById('templateToastBody');
+            toastEl.className = 'toast align-items-center border-0 text-white';
+            if (type === 'success') { toastEl.classList.add('bg-success'); }
+            else if (type === 'warning') { toastEl.classList.add('bg-warning'); }
+            else if (type === 'danger')  { toastEl.classList.add('bg-danger');  }
+            else { toastEl.classList.add('bg-secondary'); }
+            body.textContent = message;
+            bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 4000 }).show();
+        }
 
         // ── Tooltips ──
         if (window.bootstrap && bootstrap.Tooltip) {
@@ -860,12 +1557,127 @@
             filterRows();
         });
 
-        // ── Populate edit modal name ──
+        // ── Edit history mockup data ──
+        var editHistoryMap = {
+            1: [
+                { version: 'v2.4', date: '10/03/2569', reason: 'ประเทศปลายทางแก้ไขกฎหมาย', note: 'EU 2026/312 – เพิ่มฟิลด์ Health Status', editor: 'สมชาย พัฒนา', approver: 'รองอธิบดี ก.', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v2.3', date: '15/09/2568', reason: 'ปรับปรุง format ใบรับรอง', note: 'จัดเรียงฟิลด์ใหม่', editor: 'สมชาย พัฒนา', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v2.2', date: '20/03/2568', reason: 'แก้ไขข้อความ/ถ้อยคำ', note: 'แก้คำแปล Species', editor: 'วิไล สมศรี', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+            2: [
+                { version: 'v1.8', date: '28/02/2569', reason: 'ปรับปรุง format ใบรับรอง', note: 'ปรับตามข้อกำหนด JAS 2025', editor: 'สมชาย พัฒนา', approver: 'รองอธิบดี ก.', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v1.7', date: '10/08/2568', reason: 'อัปเดต HS Code', note: 'เพิ่ม HS 0304.99', editor: 'วิไล สมศรี', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+            3: [
+                { version: 'v3.1', date: '01/04/2569', reason: 'ประเทศปลายทางแก้ไขกฎหมาย', note: 'US FDA FSMA 2026 amendment', editor: 'ประเสริฐ ดีมาก', approver: 'รองอธิบดี ก.', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v3.0', date: '12/10/2568', reason: 'ปรับปรุง format ใบรับรอง', note: 'Redesign layout ตาม FDA template', editor: 'ประเสริฐ ดีมาก', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v2.5', date: '05/02/2568', reason: 'แก้ไขข้อความ/ถ้อยคำ', note: 'แก้ชื่อประเทศ', editor: 'สมชาย พัฒนา', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+            4: [
+                { version: 'v1.2', date: '15/11/2568', reason: 'อัปเดต HS Code', note: 'ปรับ HS Code ตาม Korea tariff 2025', editor: 'วิไล สมศรี', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'รอดำเนินการ', statusClass: 'bg-label-warning' },
+                { version: 'v1.1', date: '01/05/2568', reason: 'แก้ไขข้อความ/ถ้อยคำ', note: 'แก้คำแปลภาษาเกาหลี', editor: 'สมชาย พัฒนา', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+            5: [
+                { version: 'v1.5', date: '20/01/2569', reason: 'ประเทศปลายทางแก้ไขกฎหมาย', note: 'DAFF 2026 – เพิ่ม Species code', editor: 'ประเสริฐ ดีมาก', approver: 'รองอธิบดี ก.', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v1.4', date: '30/06/2568', reason: 'ปรับปรุง format ใบรับรอง', note: 'อัปเดต logo กรมประมง', editor: 'สมชาย พัฒนา', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+            6: [
+                { version: 'v2.0', date: '15/03/2569', reason: 'ประเทศปลายทางแก้ไขกฎหมาย', note: 'EU ปรับข้อกำหนด HACCP certificate', editor: 'สมชาย พัฒนา', approver: 'รองอธิบดี ก.', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v1.5', date: '22/07/2568', reason: 'ปรับปรุง format ใบรับรอง', note: 'เพิ่มช่องระบุ freezing method', editor: 'วิไล สมศรี', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+            7: [
+                { version: 'v2.3', date: '05/04/2569', reason: 'ปรับปรุง format ใบรับรอง', note: 'เพิ่ม Lot traceability reference', editor: 'ประเสริฐ ดีมาก', approver: 'รองอธิบดี ก.', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v2.2', date: '10/11/2568', reason: 'อัปเดต HS Code', note: 'ปรับ HS 1604 sub-heading', editor: 'สมชาย พัฒนา', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+            8: [
+                { version: 'v1.0', date: '30/09/2568', reason: 'อื่นๆ (ระบุในหมายเหตุ)', note: 'สร้างรูปแบบใหม่สำหรับตลาด AR', editor: 'วิไล สมศรี', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'รอดำเนินการ', statusClass: 'bg-label-warning' },
+            ],
+            9: [
+                { version: 'v1.6', date: '10/02/2569', reason: 'แก้ไขข้อความ/ถ้อยคำ', note: 'แก้คำแปล Processing Method', editor: 'สมชาย พัฒนา', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+                { version: 'v1.5', date: '01/08/2568', reason: 'ปรับปรุง format ใบรับรอง', note: 'อัปเดตตาม JAS processing guidelines', editor: 'วิไล สมศรี', approver: 'ผอ.กลุ่มใบรับรอง', statusText: 'Activated', statusClass: 'bg-label-success' },
+            ],
+        };
+        var templateVersionMap = { 1:'v2.4', 2:'v1.8', 3:'v3.1', 4:'v1.2', 5:'v1.5', 6:'v2.0', 7:'v2.3', 8:'v1.0', 9:'v1.6' };
+
+        // ── Populate edit modal ──
         document.getElementById('modalEditTemplate').addEventListener('show.bs.modal', function (e) {
-            var btn  = e.relatedTarget;
-            var name = btn ? (btn.dataset.name || '') : '';
+            var btn     = e.relatedTarget;
+            var id      = btn ? parseInt(btn.dataset.id || '1') : 1;
+            var name    = btn ? (btn.dataset.name || '') : '';
+            var version = templateVersionMap[id] || 'v1.0';
+
             document.getElementById('editTemplateNameDisplay').textContent = name;
+            document.getElementById('editTemplateVersionBadge').textContent = version;
             document.getElementById('edit_templateName').value = name;
+            document.getElementById('edit_version').value = version;
+            document.getElementById('edit_reason').value = '';
+            document.getElementById('edit_effectiveDate').value = '';
+            document.getElementById('edit_docRef').value = '';
+            document.getElementById('edit_changeNote').value = '';
+            document.getElementById('edit_bumpVersion').checked = false;
+            document.getElementById('edit_reason').classList.remove('is-invalid');
+            document.getElementById('edit_effectiveDate').classList.remove('is-invalid');
+            document.getElementById('editApprovalAlert').classList.add('d-none');
+
+            // Populate history table
+            var history = editHistoryMap[id] || [];
+            var tbody = document.getElementById('editHistoryTableBody');
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">ยังไม่มีประวัติการแก้ไข</td></tr>';
+            } else {
+                tbody.innerHTML = history.map(function (h, i) {
+                    return '<tr>' +
+                        '<td class="text-center text-muted">' + (i + 1) + '</td>' +
+                        '<td class="text-center"><span class="badge bg-label-primary version-badge">' + h.version + '</span></td>' +
+                        '<td class="text-center text-nowrap">' + h.date + '</td>' +
+                        '<td><div>' + h.reason + '</div><small class="text-muted">' + h.note + '</small></td>' +
+                        '<td class="text-nowrap">' + h.editor + '</td>' +
+                        '<td class="text-nowrap">' + h.approver + '</td>' +
+                        '<td class="text-center"><span class="badge rounded-pill ' + h.statusClass + '">' + h.statusText + '</span></td>' +
+                        '</tr>';
+                }).join('');
+            }
+        });
+
+        // ── Bump version checkbox → show/hide approval alert ──
+        document.getElementById('edit_bumpVersion').addEventListener('change', function () {
+            document.getElementById('editApprovalAlert').classList.toggle('d-none', !this.checked);
+        });
+
+        // ── Send approval ──
+        document.getElementById('btnSubmitApproval').addEventListener('click', function () {
+            var name = document.getElementById('edit_templateName').value || 'รูปแบบใบรับรอง';
+            showTemplateToast('warning', 'ส่งคำขออนุมัติ "' + name + '" เพื่อ Activate เวอร์ชันใหม่แล้ว — รอการอนุมัติจากผู้บริหาร');
+            document.getElementById('editApprovalAlert').classList.add('d-none');
+            bootstrap.Modal.getInstance(document.getElementById('modalEditTemplate')).hide();
+        });
+
+        // ── Save edit ──
+        document.getElementById('btnSaveEditTemplate').addEventListener('click', function () {
+            var reason = document.getElementById('edit_reason').value;
+            var effectiveDate = document.getElementById('edit_effectiveDate').value;
+            var valid = true;
+            if (!reason) {
+                document.getElementById('edit_reason').classList.add('is-invalid');
+                valid = false;
+            } else {
+                document.getElementById('edit_reason').classList.remove('is-invalid');
+            }
+            if (!effectiveDate) {
+                document.getElementById('edit_effectiveDate').classList.add('is-invalid');
+                valid = false;
+            } else {
+                document.getElementById('edit_effectiveDate').classList.remove('is-invalid');
+            }
+            if (!valid) { return; }
+            var name = document.getElementById('edit_templateName').value || 'รูปแบบใบรับรอง';
+            var bump = document.getElementById('edit_bumpVersion').checked;
+            if (bump) {
+                showTemplateToast('warning', '"' + name + '" บันทึกเวอร์ชันใหม่แล้ว — รอการอนุมัติก่อน Activate');
+            } else {
+                showTemplateToast('success', '"' + name + '" บันทึกการแก้ไขเรียบร้อยแล้ว');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('modalEditTemplate')).hide();
         });
 
         // ── Populate field builder modal title ──
@@ -874,6 +1686,457 @@
             var name = btn ? (btn.dataset.name || '') : '';
             document.getElementById('fieldBuilderTemplateName').textContent = name;
         });
+
+        // ── Signature config sub-panel ──
+        var signerDetailMap = {
+            'SIG-001': { name: 'นายอภิชาติ วงศ์พันธ์', position: 'ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน', unit: 'กองตรวจสอบรับรองมาตรฐานสินค้าประมง' },
+            'SIG-002': { name: 'นายวีระ ทองดี',          position: 'ผู้เชี่ยวชาญด้านการรับรองสินค้าประมง',  unit: 'กองตรวจสอบรับรองมาตรฐานสินค้าประมง' },
+            'SIG-003': { name: 'น.ส.ปรียา ศรีสุข',       position: 'หัวหน้ากลุ่มออกใบรับรอง',              unit: 'ฝ่ายรับรองมาตรฐาน' },
+        };
+
+        var btnSigConfig = document.getElementById('btnSigConfig');
+        var sigConfigPanel = document.getElementById('sigConfigPanel');
+        if (btnSigConfig && sigConfigPanel) {
+            btnSigConfig.addEventListener('click', function () {
+                var isHidden = sigConfigPanel.classList.contains('d-none');
+                sigConfigPanel.classList.toggle('d-none', !isHidden);
+                this.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            });
+        }
+
+        var sigConfig_signer = document.getElementById('sigConfig_signer');
+        if (sigConfig_signer) {
+            sigConfig_signer.addEventListener('change', function () {
+                var detail = signerDetailMap[this.value];
+                var detailEl = document.getElementById('sigConfig_signerDetail');
+                if (!detailEl) { return; }
+                if (detail) {
+                    detailEl.innerHTML =
+                        '<div class="small fw-semibold">' + detail.name + '</div>' +
+                        '<div class="small text-muted">' + detail.position + '</div>' +
+                        '<div class="small text-muted">' + detail.unit + '</div>';
+                } else {
+                    detailEl.innerHTML = '<div class="small text-muted">— เลือกผู้ลงนาม —</div>';
+                }
+            });
+        }
+        // ─────────────────────────────────────────────────────────────────────────
+
+
+        var restrictionsMap = {
+            1: {
+                countries: ['ฝรั่งเศส', 'เยอรมนี', 'อิตาลี', 'สเปน', 'เนเธอร์แลนด์', 'สหราชอาณาจักร (UK)', 'นอร์เวย์'],
+                factoryRestrictions: [
+                    { factory: 'Siam Marine Foods Co., Ltd.', code: 'FAC-0001', countries: 'สหราชอาณาจักร (UK)', reason: 'เรือขนส่งไม่อยู่ใน UK Approved List — ป้องกัน re-export ผ่าน UK', suspendDate: '15/02/2569', untilDate: '—', by: 'สมชาย พัฒนา' },
+                    { factory: 'Gulf Catch Processing Co., Ltd.', code: 'FAC-0002', countries: 'ทุกประเทศ', reason: 'ใบรับรอง DOF ใกล้หมดอายุ — อยู่ระหว่างตรวจสอบ', suspendDate: '20/03/2569', untilDate: '30/04/2569', by: 'วิไล สมศรี' },
+                ],
+                blockedCountries: [
+                    { country: 'สหราชอาณาจักร (UK)', reason: 'UK Approved List ไม่รวมโรงงานไทยในรอบนี้', blockDate: '01/03/2569', endDate: '—', by: 'สมชาย พัฒนา' },
+                ]
+            },
+            6: {
+                countries: ['ฝรั่งเศส', 'เยอรมนี', 'อิตาลี', 'สเปน', 'เนเธอร์แลนด์', 'สหราชอาณาจักร (UK)'],
+                factoryRestrictions: [
+                    { factory: 'Siam Marine Foods Co., Ltd.', code: 'FAC-0001', countries: 'สเปน, อิตาลี', reason: 'โรงงานไม่อยู่ใน Spain/Italy Approved Processors List', suspendDate: '10/04/2569', untilDate: '—', by: 'ประเสริฐ ดีมาก' },
+                ],
+                blockedCountries: []
+            }
+        };
+
+        var currentRestrictionId = 1;
+
+        // ── Open restriction modal ──
+        document.querySelectorAll('.btn-manage-restriction').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                currentRestrictionId = parseInt(this.dataset.id || '1');
+                var name = this.dataset.name || '';
+                document.getElementById('restrictionTemplateName').textContent = name;
+
+                var data = restrictionsMap[currentRestrictionId] || { countries: [], factoryRestrictions: [], blockedCountries: [] };
+                var fc = data.factoryRestrictions ? data.factoryRestrictions.length : 0;
+                var cc = data.blockedCountries ? data.blockedCountries.length : 0;
+
+                var fcBadge = document.getElementById('restrictionFactoryCount');
+                fcBadge.textContent = fc > 0 ? fc : '';
+                fcBadge.style.display = fc > 0 ? '' : 'none';
+                var ccBadge = document.getElementById('restrictionCountryCount');
+                ccBadge.textContent = cc > 0 ? cc : '';
+                ccBadge.style.display = cc > 0 ? '' : 'none';
+
+                renderFactoryRestrictions(data.factoryRestrictions || []);
+                renderBlockedCountries(data.blockedCountries || []);
+
+                // Populate country selects for sub-modals
+                var countryList = data.countries || [];
+                var restrictCountries = document.getElementById('restrict_countries');
+                restrictCountries.innerHTML = countryList.map(function (c) {
+                    return '<option value="' + c + '">' + c + '</option>';
+                }).join('');
+                var blockCountrySel = document.getElementById('block_country');
+                blockCountrySel.innerHTML = '<option value="">-- เลือกประเทศ --</option>' + countryList.map(function (c) {
+                    return '<option value="' + c + '">' + c + '</option>';
+                }).join('');
+
+                // Reset to first tab
+                var factoryTabBtn = document.querySelector('[data-bs-target="#tab-restriction-factory"]');
+                if (factoryTabBtn) { new bootstrap.Tab(factoryTabBtn).show(); }
+
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRestriction')).show();
+            });
+        });
+
+        function renderFactoryRestrictions(items) {
+            var tbody = document.getElementById('factoryRestrictionTableBody');
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-3">ยังไม่มีข้อจำกัดโรงงาน</td></tr>';
+                return;
+            }
+            tbody.innerHTML = items.map(function (r, i) {
+                var countriesBadge = r.countries === 'ทุกประเทศ'
+                    ? '<span class="badge bg-danger">ทุกประเทศ</span>'
+                    : '<span class="badge bg-label-warning">' + r.countries + '</span>';
+                return '<tr>' +
+                    '<td class="text-center text-muted">' + (i + 1) + '</td>' +
+                    '<td><div class="fw-semibold">' + r.factory + '</div></td>' +
+                    '<td class="text-center"><code>' + r.code + '</code></td>' +
+                    '<td class="text-center">' + countriesBadge + '</td>' +
+                    '<td><small>' + r.reason + '</small></td>' +
+                    '<td class="text-center text-nowrap">' + r.suspendDate + '</td>' +
+                    '<td class="text-center text-nowrap">' + r.untilDate + '</td>' +
+                    '<td class="text-nowrap">' + r.by + '</td>' +
+                    '<td class="text-center"><button type="button" class="btn btn-xs btn-outline-secondary" style="font-size:0.7rem;padding:2px 6px;" title="ยกเลิกข้อจำกัด"><i class="ri ri-close-circle-line text-danger"></i></button></td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        function renderBlockedCountries(items) {
+            var tbody = document.getElementById('blockedCountryTableBody');
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">ยังไม่มีประเทศที่ถูกปิดกั้น</td></tr>';
+                return;
+            }
+            tbody.innerHTML = items.map(function (r, i) {
+                return '<tr>' +
+                    '<td class="text-center text-muted">' + (i + 1) + '</td>' +
+                    '<td class="fw-semibold">' + r.country + '</td>' +
+                    '<td><small>' + r.reason + '</small></td>' +
+                    '<td class="text-center text-nowrap">' + r.blockDate + '</td>' +
+                    '<td class="text-center text-nowrap">' + r.endDate + '</td>' +
+                    '<td class="text-nowrap">' + r.by + '</td>' +
+                    '<td class="text-center"><button type="button" class="btn btn-xs btn-outline-secondary" style="font-size:0.7rem;padding:2px 6px;" title="ยกเลิกการปิดกั้น"><i class="ri ri-close-circle-line text-danger"></i></button></td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        // ── Scope radio → show/hide country section ──
+        document.querySelectorAll('input[name="restrict_scope"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                document.getElementById('restrict_countrySection').classList.toggle('d-none', this.value !== 'selected');
+            });
+        });
+
+        // ── Add factory restriction button ──
+        document.getElementById('btnAddFactoryRestriction').addEventListener('click', function () {
+            document.getElementById('restrict_factory').selectedIndex = -1;
+            document.getElementById('restrict_scope_all').checked = true;
+            document.getElementById('restrict_countrySection').classList.add('d-none');
+            document.getElementById('restrict_reason').value = '';
+            document.getElementById('restrict_reason').classList.remove('is-invalid');
+            document.getElementById('restrict_untilDate').value = '';
+            document.getElementById('addRestrictionTemplateName').textContent = document.getElementById('restrictionTemplateName').textContent;
+
+            var restrictionModal = bootstrap.Modal.getInstance(document.getElementById('modalRestriction'));
+            document.getElementById('modalRestriction').addEventListener('hidden.bs.modal', function () {
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAddFactoryRestriction')).show();
+            }, { once: true });
+            if (restrictionModal) { restrictionModal.hide(); }
+        });
+
+        // ── Block country button ──
+        document.getElementById('btnBlockCountry').addEventListener('click', function () {
+            document.getElementById('block_country').selectedIndex = 0;
+            document.getElementById('block_reason').value = '';
+            document.getElementById('block_reason').classList.remove('is-invalid');
+            document.getElementById('block_startDate').value = '';
+            document.getElementById('block_endDate').value = '';
+
+            var restrictionModal = bootstrap.Modal.getInstance(document.getElementById('modalRestriction'));
+            document.getElementById('modalRestriction').addEventListener('hidden.bs.modal', function () {
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBlockCountry')).show();
+            }, { once: true });
+            if (restrictionModal) { restrictionModal.hide(); }
+        });
+
+        // ── Reopen restriction modal when sub-modals close ──
+        document.getElementById('modalAddFactoryRestriction').addEventListener('hidden.bs.modal', function () {
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRestriction')).show();
+        });
+        document.getElementById('modalBlockCountry').addEventListener('hidden.bs.modal', function () {
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRestriction')).show();
+        });
+
+        // ── Confirm factory restriction ──
+        document.getElementById('btnConfirmFactoryRestriction').addEventListener('click', function () {
+            var reason = document.getElementById('restrict_reason').value.trim();
+            if (!reason) {
+                document.getElementById('restrict_reason').classList.add('is-invalid');
+                return;
+            }
+            document.getElementById('restrict_reason').classList.remove('is-invalid');
+            bootstrap.Modal.getInstance(document.getElementById('modalAddFactoryRestriction')).hide();
+            showTemplateToast('danger', 'ระงับการออกใบรับรองโรงงานที่เลือกแล้ว — มีผลทันที');
+        });
+
+        // ── Confirm block country ──
+        document.getElementById('btnConfirmBlockCountry').addEventListener('click', function () {
+            var country = document.getElementById('block_country').value;
+            var reason  = document.getElementById('block_reason').value.trim();
+            var valid = true;
+            if (!country) { valid = false; }
+            if (!reason) {
+                document.getElementById('block_reason').classList.add('is-invalid');
+                valid = false;
+            } else {
+                document.getElementById('block_reason').classList.remove('is-invalid');
+            }
+            if (!valid) { return; }
+            bootstrap.Modal.getInstance(document.getElementById('modalBlockCountry')).hide();
+            showTemplateToast('danger', 'ปิดกั้นประเทศ "' + country + '" แล้ว — ทุกโรงงานไม่สามารถออกใบรับรองไปยังประเทศนี้ได้');
+        });
+
+        // ── Production Mode modal ──────────────────────────────────────────────────
+        var currentModeTemplateId   = 0;
+        var currentModeTemplateName = '';
+
+        var productionModeData = {
+            1: { mode: 'เจ้าหน้าที่จัดทำ',             officer: 'USR-001', from: '2569-03-01', to: '', note: '' },
+            2: { mode: 'อัตโนมัติหลังรับคำขอ',         officer: '',        from: '2569-03-01', to: '', note: 'ลดขั้นตอนสำหรับ template ญี่ปุ่นที่มีปริมาณสูง' },
+            3: { mode: 'อัตโนมัติทั้งกระบวนการ',       officer: '',        from: '2569-04-01', to: '2569-12-31', note: 'ทดลองระบบ full-auto สำหรับ US' },
+            4: { mode: 'เจ้าหน้าที่จัดทำ',             officer: 'USR-002', from: '2568-11-15', to: '', note: '' },
+            5: { mode: 'อัตโนมัติหลังการตรวจปล่อย',   officer: '',        from: '2569-01-20', to: '', note: 'รอผลตรวจปล่อยจากเจ้าหน้าที่ก่อนออกใบรับรอง' },
+            6: { mode: 'เจ้าหน้าที่จัดทำ',             officer: 'USR-001', from: '2569-03-15', to: '', note: '' },
+            7: { mode: 'อัตโนมัติหลังรับคำขอ',         officer: '',        from: '2569-04-05', to: '', note: '' },
+            8: { mode: 'เจ้าหน้าที่จัดทำ',             officer: 'USR-003', from: '2568-09-30', to: '', note: '' },
+            9: { mode: 'อัตโนมัติทั้งกระบวนการ',       officer: '',        from: '2569-02-10', to: '', note: '' }
+        };
+
+        // History mockup data per template: array of {from, to, mode, setBy, note, active}
+        var prodModeHistoryMap = {
+            1: [
+                { from: '01/03/2569', to: '—', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'สมชาย พัฒนา', note: '', active: true },
+                { from: '01/01/2569', to: '28/02/2569', mode: 'อัตโนมัติหลังรับคำขอ', setBy: 'สมชาย พัฒนา', note: 'ทดลองระบบอัตโนมัติ', active: false },
+                { from: '01/07/2568', to: '31/12/2568', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'วิไล สมศรี', note: '', active: false },
+            ],
+            2: [
+                { from: '01/03/2569', to: '—', mode: 'อัตโนมัติหลังรับคำขอ', setBy: 'สมชาย พัฒนา', note: 'ลดขั้นตอนสำหรับ template ญี่ปุ่นที่มีปริมาณสูง', active: true },
+                { from: '01/08/2568', to: '28/02/2569', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'วิไล สมศรี', note: '', active: false },
+            ],
+            3: [
+                { from: '01/04/2569', to: '31/12/2569', mode: 'อัตโนมัติทั้งกระบวนการ', setBy: 'ประเสริฐ ดีมาก', note: 'ทดลองระบบ full-auto สำหรับ US', active: true },
+                { from: '01/01/2569', to: '31/03/2569', mode: 'อัตโนมัติหลังรับคำขอ', setBy: 'สมชาย พัฒนา', note: '', active: false },
+            ],
+            4: [
+                { from: '15/11/2568', to: '—', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'วิไล สมศรี', note: '', active: true },
+            ],
+            5: [
+                { from: '20/01/2569', to: '—', mode: 'อัตโนมัติหลังการตรวจปล่อย', setBy: 'ประเสริฐ ดีมาก', note: 'รอผลตรวจปล่อยจากเจ้าหน้าที่ก่อนออกใบรับรอง', active: true },
+                { from: '01/07/2568', to: '19/01/2569', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'สมชาย พัฒนา', note: '', active: false },
+            ],
+            6: [
+                { from: '15/03/2569', to: '—', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'สมชาย พัฒนา', note: '', active: true },
+                { from: '01/10/2568', to: '14/03/2569', mode: 'อัตโนมัติทั้งกระบวนการ', setBy: 'รัตนา ชัยดี', note: 'ทดลองระบบ full-auto', active: false },
+            ],
+            7: [
+                { from: '05/04/2569', to: '—', mode: 'อัตโนมัติหลังรับคำขอ', setBy: 'ประเสริฐ ดีมาก', note: '', active: true },
+                { from: '01/11/2568', to: '04/04/2569', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'สมชาย พัฒนา', note: '', active: false },
+            ],
+            8: [
+                { from: '30/09/2568', to: '—', mode: 'เจ้าหน้าที่จัดทำ', setBy: 'วิไล สมศรี', note: '', active: true },
+            ],
+            9: [
+                { from: '10/02/2569', to: '—', mode: 'อัตโนมัติทั้งกระบวนการ', setBy: 'สมชาย พัฒนา', note: '', active: true },
+                { from: '01/08/2568', to: '09/02/2569', mode: 'อัตโนมัติหลังการตรวจปล่อย', setBy: 'ประเสริฐ ดีมาก', note: '', active: false },
+            ]
+        };
+
+        // Render effective-date badges in main table on page load
+        Object.keys(productionModeData).forEach(function (id) {
+            var el = document.getElementById('effectiveBadge-' + id);
+            if (!el) { return; }
+            var d  = productionModeData[id];
+            if (!d || !d.from) { return; }
+            // Convert Buddhist ISO date to display string
+            function isoToDisplayDate(iso) {
+                var parts = iso.split('-');
+                if (parts.length !== 3) { return iso; }
+                var buddhistYear = parseInt(parts[0]) + 543;
+                return parts[2] + '/' + parts[1] + '/' + buddhistYear;
+            }
+            el.innerHTML = '<span class="badge bg-label-success" style="font-size:0.6rem;">' +
+                '<i class="ri ri-checkbox-circle-line me-1"></i>ใช้งานอยู่ตั้งแต่ ' + isoToDisplayDate(d.from) + '</span>';
+        });
+
+        // Helper: ISO Gregorian → Buddhist Thai display
+        function isoToThaiDisplay(iso) {
+            if (!iso) { return ''; }
+            var parts = iso.split('-');
+            if (parts.length !== 3) { return iso; }
+            var buddhistYear = parseInt(parts[0]) + 543;
+            return parts[2] + '/' + parts[1] + '/' + buddhistYear;
+        }
+        // Helper: Buddhist ISO → Gregorian ISO
+        function buddhistToIso(d) {
+            if (!d) { return ''; }
+            var parts = d.split('-');
+            if (parts.length !== 3) { return d; }
+            return (parseInt(parts[0]) - 543) + '-' + parts[1] + '-' + parts[2];
+        }
+
+        // Update date range preview text
+        function updateDatePreview() {
+            var fromVal = document.getElementById('setMode_effectiveFrom').value;
+            var toVal   = document.getElementById('setMode_effectiveTo').value;
+            var previewDiv  = document.getElementById('setMode_datePreview');
+            var previewText = document.getElementById('setMode_datePreviewText');
+            if (!fromVal) { previewDiv.classList.add('d-none'); return; }
+            var fromDisplay = isoToThaiDisplay(fromVal);
+            var toDisplay   = toVal ? isoToThaiDisplay(toVal) : 'ไม่มีกำหนดสิ้นสุด';
+            previewText.textContent = 'รูปแบบนี้ใช้งานได้ตั้งแต่ ' + fromDisplay + ' ถึง ' + toDisplay;
+            previewDiv.classList.remove('d-none');
+        }
+
+        // Render history table
+        function renderProdModeHistory(id) {
+            var history = prodModeHistoryMap[id] || [];
+            var tbody = document.getElementById('setModeHistoryTableBody');
+            var activeEntry = history.find(function (h) { return h.active; });
+
+            // Update "ใช้งานอยู่ตั้งแต่" badge
+            var currentBadge = document.getElementById('setModeHistoryCurrentBadge');
+            if (activeEntry) {
+                currentBadge.innerHTML = '<i class="ri ri-checkbox-circle-line me-1"></i>ใช้งานอยู่ตั้งแต่ ' + activeEntry.from;
+                currentBadge.classList.remove('d-none');
+            } else {
+                currentBadge.classList.add('d-none');
+            }
+
+            if (!history.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">ยังไม่มีประวัติการกำหนดรูปแบบ</td></tr>';
+                return;
+            }
+            tbody.innerHTML = history.map(function (h, i) {
+                var modeBadge;
+                if (h.mode === 'อัตโนมัติหลังการตรวจปล่อย') {
+                    modeBadge = '<span class="badge" style="background-color:rgba(115,103,240,0.16);color:#7367f0;font-size:0.7rem;">' + h.mode + '</span>';
+                } else if (h.mode === 'อัตโนมัติทั้งกระบวนการ') {
+                    modeBadge = '<span class="badge bg-label-success" style="font-size:0.7rem;">' + h.mode + '</span>';
+                } else if (h.mode === 'อัตโนมัติหลังรับคำขอ') {
+                    modeBadge = '<span class="badge bg-label-info" style="font-size:0.7rem;">' + h.mode + '</span>';
+                } else {
+                    modeBadge = '<span class="badge bg-label-warning" style="font-size:0.7rem;">' + h.mode + '</span>';
+                }
+                var statusBadge = h.active
+                    ? '<span class="badge bg-success rounded-pill"><i class="ri ri-checkbox-circle-line me-1"></i>มีผล</span>'
+                    : '<span class="badge bg-label-secondary rounded-pill">หมดอายุ</span>';
+                var dateRange = h.from + (h.to && h.to !== '—' ? ' — ' + h.to : ' — ปัจจุบัน');
+                return '<tr' + (h.active ? ' class="table-success"' : '') + '>' +
+                    '<td class="text-center text-muted">' + (i + 1) + '</td>' +
+                    '<td class="text-nowrap"><small>' + dateRange + '</small></td>' +
+                    '<td>' + modeBadge + '</td>' +
+                    '<td class="text-nowrap"><small>' + h.setBy + '</small></td>' +
+                    '<td><small class="text-muted">' + (h.note || '—') + '</small></td>' +
+                    '<td class="text-center">' + statusBadge + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        document.getElementById('modalSetProductionMode').addEventListener('show.bs.modal', function (e) {
+            var btn  = e.relatedTarget;
+            var id   = btn ? parseInt(btn.dataset.id || '1') : 1;
+            var name = btn ? (btn.dataset.name || '') : '';
+            currentModeTemplateId   = id;
+            currentModeTemplateName = name;
+
+            document.getElementById('setModeTemplateName').textContent = name;
+
+            // Reset to first tab
+            var configTabBtn = document.getElementById('setModeTab-config-tab');
+            if (configTabBtn) { new bootstrap.Tab(configTabBtn).show(); }
+
+            // Reset form
+            document.querySelectorAll('input[name="setMode_radio"]').forEach(function (r) { r.checked = false; });
+            document.getElementById('setMode_officerSection').classList.add('d-none');
+            document.getElementById('setMode_effectiveFrom').value = '';
+            document.getElementById('setMode_effectiveTo').value   = '';
+            document.getElementById('setMode_note').value          = '';
+            document.getElementById('setMode_effectiveFrom').classList.remove('is-invalid');
+            document.getElementById('setMode_datePreview').classList.add('d-none');
+
+            // Pre-fill from mockup data
+            var data = productionModeData[id];
+            if (data) {
+                var radio = document.querySelector('input[name="setMode_radio"][value="' + data.mode + '"]');
+                if (radio) {
+                    radio.checked = true;
+                    if (data.mode === 'เจ้าหน้าที่จัดทำ') {
+                        document.getElementById('setMode_officerSection').classList.remove('d-none');
+                        if (data.officer) { document.getElementById('setMode_officer').value = data.officer; }
+                    }
+                }
+                document.getElementById('setMode_effectiveFrom').value = buddhistToIso(data.from);
+                document.getElementById('setMode_effectiveTo').value   = buddhistToIso(data.to);
+                document.getElementById('setMode_note').value          = data.note || '';
+                updateDatePreview();
+            }
+
+            // Populate history table
+            renderProdModeHistory(id);
+        });
+
+        // Date change → update preview
+        document.getElementById('setMode_effectiveFrom').addEventListener('change', updateDatePreview);
+        document.getElementById('setMode_effectiveTo').addEventListener('change', updateDatePreview);
+
+        // Show/hide officer section on radio change
+        document.querySelectorAll('input[name="setMode_radio"]').forEach(function (r) {
+            r.addEventListener('change', function () {
+                document.getElementById('setMode_officerSection').classList.toggle('d-none', this.value !== 'เจ้าหน้าที่จัดทำ');
+            });
+        });
+
+        // Save
+        document.getElementById('btnSaveProductionMode').addEventListener('click', function () {
+            var selected = document.querySelector('input[name="setMode_radio"]:checked');
+            var from     = document.getElementById('setMode_effectiveFrom').value;
+            if (!selected) {
+                showTemplateToast('warning', 'กรุณาเลือกรูปแบบการจัดทำ');
+                return;
+            }
+            if (!from) {
+                document.getElementById('setMode_effectiveFrom').classList.add('is-invalid');
+                return;
+            }
+            document.getElementById('setMode_effectiveFrom').classList.remove('is-invalid');
+            bootstrap.Modal.getInstance(document.getElementById('modalSetProductionMode')).hide();
+            showTemplateToast('success', '"' + currentModeTemplateName + '" กำหนดรูปแบบการจัดทำเป็น "' + selected.value + '" เรียบร้อยแล้ว');
+        });
+
+        // Cancel mode → open confirm modal
+        document.getElementById('btnCancelProductionMode').addEventListener('click', function () {
+            document.getElementById('confirmCancelModeName').textContent = currentModeTemplateName;
+            var setModeModal = bootstrap.Modal.getInstance(document.getElementById('modalSetProductionMode'));
+            document.getElementById('modalSetProductionMode').addEventListener('hidden.bs.modal', function () {
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmCancelMode')).show();
+            }, { once: true });
+            if (setModeModal) { setModeModal.hide(); }
+        });
+
+        // Confirm cancel mode
+        document.getElementById('btnConfirmCancelMode').addEventListener('click', function () {
+            bootstrap.Modal.getInstance(document.getElementById('modalConfirmCancelMode')).hide();
+            showTemplateToast('warning', '"' + currentModeTemplateName + '" ยกเลิกรูปแบบการจัดทำแล้ว — กรุณากำหนดรูปแบบใหม่');
+        });
+        // ─────────────────────────────────────────────────────────────────────────
     });
 </script>
 }

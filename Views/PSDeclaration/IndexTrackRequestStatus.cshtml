@@ -350,6 +350,23 @@
     var totalRequestCount = requests.Length;
     var declarationCount = requests.Count(r => r.CertificateKey == "declaration");
     var processingCount = requests.Count(r => r.CertificateKey == "processing");
+
+    // ExportDate mockup (keyed by RequestNumber)
+    var exportDates = new Dictionary<string, DateTime>
+    {
+        { "10611080320000049", new DateTime(2026, 4, 28) },  // 1 day away ⚠️
+        { "10611080319000003", new DateTime(2026, 5, 5)  },  // 8 days
+        { "10611080320000004", new DateTime(2026, 4, 29) },  // 2 days ⚠️
+        { "10611080321000005", new DateTime(2026, 5, 10) },  // 13 days
+        { "10611080321000006", new DateTime(2026, 5, 2)  },  // 5 days
+        { "10611080322000007", new DateTime(2026, 4, 30) },  // 3 days ⚠️
+        { "10611080322000008", new DateTime(2026, 5, 8)  },  // 11 days
+        { "10611080323000009", new DateTime(2026, 5, 15) },  // 18 days
+        { "10611080323000010", new DateTime(2026, 5, 3)  },  // 6 days
+        { "10611080324000011", new DateTime(2026, 4, 30) },  // 3 days ⚠️
+    };
+    var today = new DateTime(2026, 4, 27);
+    var alertThresholdDays = 3;
 }
 
 @section VendorStyles {
@@ -432,20 +449,14 @@
     document.addEventListener('DOMContentLoaded', function () {
         var fromInput = document.getElementById('filterDraftDateFrom');
         var toInput = document.getElementById('filterDraftDateTo');
+        var exportFromInput = document.getElementById('filterExportDateFrom');
+        var exportToInput = document.getElementById('filterExportDateTo');
 
-        if (fromInput) {
-            flatpickr(fromInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
-
-        if (toInput) {
-            flatpickr(toInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
+        [fromInput, toInput, exportFromInput, exportToInput].forEach(function (el) {
+            if (el) {
+                flatpickr(el, { dateFormat: 'd/m/Y', allowInput: true });
+            }
+        });
 
         if (window.bootstrap && bootstrap.Tooltip) {
             document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
@@ -454,41 +465,39 @@
         }
 
         function parseDateInput(value, endOfDay) {
-            if (!value) {
-                return null;
-            }
-
+            if (!value) { return null; }
             var parts = value.split('/');
-            if (parts.length !== 3) {
-                return null;
-            }
-
-            var day = parseInt(parts[0], 10);
+            if (parts.length !== 3) { return null; }
+            var day   = parseInt(parts[0], 10);
             var month = parseInt(parts[1], 10) - 1;
-            var year = parseInt(parts[2], 10);
-            var hours = endOfDay ? 23 : 0;
-            var minutes = endOfDay ? 59 : 0;
-            var seconds = endOfDay ? 59 : 0;
-            var parsed = new Date(year, month, day, hours, minutes, seconds);
-
+            var year  = parseInt(parts[2], 10);
+            var parsed = new Date(year, month, day, endOfDay ? 23 : 0, endOfDay ? 59 : 0, endOfDay ? 59 : 0);
             return Number.isNaN(parsed.getTime()) ? null : parsed;
         }
 
         function filterRows() {
-            var certificate = (document.getElementById('filterCertificate').value || '').trim();
-            var status = (document.getElementById('filterStatus').value || '').trim();
-            var fromDate = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
-            var toDate = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
-            var excludeRange = document.getElementById('filterDateExclude').checked;
-            var rows = document.querySelectorAll('#requestTableBody tr[data-certificate]');
-            var visibleCount = 0;
+            var certificate   = (document.getElementById('filterCertificate').value || '').trim();
+            var status        = (document.getElementById('filterStatus').value || '').trim();
+            var fromDate      = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
+            var toDate        = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
+            var excludeRange  = document.getElementById('filterDateExclude').checked;
+            var expFrom       = parseDateInput(document.getElementById('filterExportDateFrom').value, false);
+            var expTo         = parseDateInput(document.getElementById('filterExportDateTo').value, true);
+            var nearOnly      = document.getElementById('filterExportNearOnly').checked;
+            var rows          = document.querySelectorAll('#requestTableBody tr[data-certificate]');
+            var visibleCount  = 0;
 
             rows.forEach(function (row) {
                 var rowCertificate = row.dataset.certificate || '';
-                var rowStatus = row.dataset.status || '';
-                var rowDraftDate = new Date(row.dataset.draftDate || '');
-                var certificateMatch = !certificate || rowCertificate === certificate;
-                var statusMatch = !status || rowStatus === status;
+                var rowStatus      = row.dataset.status      || '';
+                var rowDraftDate   = new Date(row.dataset.draftDate || '');
+                var rowExpDateStr  = row.dataset.exportDate  || '';
+                var rowNearExport  = row.dataset.nearExport  === 'true';
+                var rowExpDate     = rowExpDateStr ? new Date(rowExpDateStr) : null;
+
+                var certMatch   = !certificate || rowCertificate === certificate;
+                var statusMatch = !status      || rowStatus       === status;
+
                 var dateMatch;
                 if (!fromDate && !toDate) {
                     dateMatch = true;
@@ -498,12 +507,19 @@
                 } else {
                     dateMatch = (!fromDate || rowDraftDate >= fromDate) && (!toDate || rowDraftDate <= toDate);
                 }
-                var isVisible = certificateMatch && statusMatch && dateMatch;
 
-                row.classList.toggle('d-none', !isVisible);
-                if (isVisible) {
-                    visibleCount += 1;
+                var expDateMatch;
+                if (nearOnly) {
+                    expDateMatch = rowNearExport;
+                } else if (!expFrom && !expTo) {
+                    expDateMatch = true;
+                } else {
+                    expDateMatch = rowExpDate && (!expFrom || rowExpDate >= expFrom) && (!expTo || rowExpDate <= expTo);
                 }
+
+                var isVisible = certMatch && statusMatch && dateMatch && expDateMatch;
+                row.classList.toggle('d-none', !isVisible);
+                if (isVisible) { visibleCount += 1; }
             });
 
             document.getElementById('requestTableEmpty').classList.toggle('d-none', visibleCount !== 0);
@@ -515,20 +531,25 @@
         document.getElementById('filterDraftDateFrom').addEventListener('change', filterRows);
         document.getElementById('filterDraftDateTo').addEventListener('change', filterRows);
         document.getElementById('filterDateExclude').addEventListener('change', filterRows);
-        document.querySelectorAll('#filterCertificate, #filterStatus, #filterDraftDateFrom, #filterDraftDateTo').forEach(function (element) {
+        document.getElementById('filterExportDateFrom').addEventListener('change', filterRows);
+        document.getElementById('filterExportDateTo').addEventListener('change', filterRows);
+        document.getElementById('filterExportNearOnly').addEventListener('change', filterRows);
+
+        document.querySelectorAll('#filterCertificate, #filterStatus, #filterDraftDateFrom, #filterDraftDateTo, #filterExportDateFrom, #filterExportDateTo').forEach(function (element) {
             element.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    filterRows();
-                }
+                if (event.key === 'Enter') { event.preventDefault(); filterRows(); }
             });
         });
+
         document.getElementById('btnResetRequests').addEventListener('click', function () {
-            document.getElementById('filterCertificate').value = '';
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterDraftDateFrom').value = '';
-            document.getElementById('filterDraftDateTo').value = '';
-            document.getElementById('filterDateExclude').checked = false;
+            document.getElementById('filterCertificate').value       = '';
+            document.getElementById('filterStatus').value            = '';
+            document.getElementById('filterDraftDateFrom').value     = '';
+            document.getElementById('filterDraftDateTo').value       = '';
+            document.getElementById('filterDateExclude').checked     = false;
+            document.getElementById('filterExportDateFrom').value    = '';
+            document.getElementById('filterExportDateTo').value      = '';
+            document.getElementById('filterExportNearOnly').checked  = false;
             filterRows();
         });
     });
@@ -601,6 +622,24 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4 col-lg-3">
+                        <label for="filterExportDateFrom" class="form-label">วันที่ส่งออก (ตั้งแต่)</label>
+                        <input type="text" id="filterExportDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <label for="filterExportDateTo" class="form-label">ถึงวันที่</label>
+                        <input type="text" id="filterExportDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
+                    </div>
+                    <div class="col-auto">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="filterExportNearOnly" />
+                            <label class="form-check-label small" for="filterExportNearOnly">เฉพาะใกล้วันส่งออก (≤ 3 วัน)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -624,13 +663,17 @@
                     <th style="min-width:200px;">ผู้ผลิตสินค้า</th>
                     <th style="min-width:120px;">ประเทศปลายทาง</th>
                     <th style="min-width:130px;">วันที่ยื่นคำขอ</th>
+                    <th style="min-width:120px;">วันส่งออก</th>
                     <th style="width:100px;"></th>
                 </tr>
             </thead>
             <tbody id="requestTableBody">
                 @foreach (var request in requests)
                 {
-                    <tr data-certificate="@request.CertificateKey" data-status="@request.StatusText" data-draft-date="@request.DraftedAt.ToString("yyyy-MM-ddTHH:mm:ss")">
+                    var expDate = exportDates.ContainsKey(request.RequestNumber) ? exportDates[request.RequestNumber] : (DateTime?)null;
+                    var daysLeft = expDate.HasValue ? (int)((expDate.Value - today).TotalDays) : 999;
+                    var isNearExport = daysLeft >= 0 && daysLeft <= alertThresholdDays;
+                    <tr data-certificate="@request.CertificateKey" data-status="@request.StatusText" data-draft-date="@request.DraftedAt.ToString("yyyy-MM-ddTHH:mm:ss")" data-export-date="@(expDate.HasValue ? expDate.Value.ToString("yyyy-MM-dd") : "")" data-days-left="@(expDate.HasValue ? daysLeft.ToString() : "")" data-near-export="@(isNearExport ? "true" : "false")">
                         <td>
                             <a href="@request.DetailUrl" class="fw-semibold text-primary text-decoration-none">@request.RequestNumber</a>
                             <div class="mt-1 d-flex flex-column gap-1">
@@ -704,6 +747,24 @@
                             @request.DraftedAt.ToString("dd/MM/yyyy")<br/>
                             <span class="small text-muted">(@request.DraftedAt.ToString("HH:mm:ss"))</span>
                         </td>
+                        <td class="text-center">
+                            @if (expDate.HasValue)
+                            {
+                                <div class="text-nowrap fw-semibold @(isNearExport ? "text-danger" : "")">@expDate.Value.ToString("dd/MM/yyyy")</div>
+                                if (isNearExport)
+                                {
+                                    <span class="badge bg-label-danger" style="font-size:0.65rem;">เหลือ @daysLeft วัน ⚠️</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-label-secondary" style="font-size:0.65rem;">@daysLeft วัน</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
                         <td>
                             <div class="d-flex flex-wrap gap-1 justify-content-center">
                                 <a href="@request.DetailUrl" class="btn btn-sm btn-icon btn-outline-info" title="รายละเอียดข้อมูล" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="รายละเอียดข้อมูล">
@@ -744,7 +805,7 @@
                     </tr>
                 }
                 <tr id="requestTableEmpty" class="d-none">
-                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="10" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>

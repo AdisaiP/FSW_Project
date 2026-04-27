@@ -1,0 +1,733 @@
+@{
+    ViewData["Title"] = "จัดการลายมือชื่ออิเล็กทรอนิกส์";
+
+    var signers = new[]
+    {
+        new { Id="SIG-001", Name="นายอภิชาติ วงศ์พันธ์",   Position="ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน",         Unit="กองตรวจสอบรับรองมาตรฐานสินค้าประมง", UsageType="อัตโนมัติทั้งกระบวนการ", UsageTypeClass="bg-label-primary",   ValidFrom="2568-10-01", ValidTo="2570-09-30", Standard="TIS 4401-2567",       StatusText="ใช้งาน",         StatusClass="bg-label-success",  SuspendReason="" },
+        new { Id="SIG-002", Name="นายวีระ ทองดี",           Position="ผู้เชี่ยวชาญด้านการรับรองสินค้าประมง",      Unit="กองตรวจสอบรับรองมาตรฐานสินค้าประมง", UsageType="อัตโนมัติหลังรับคำขอ",     UsageTypeClass="bg-label-info",      ValidFrom="2568-10-01", ValidTo="2570-09-30", Standard="ETSI EN 319 401",   StatusText="ใช้งาน",         StatusClass="bg-label-success",  SuspendReason="" },
+        new { Id="SIG-003", Name="น.ส.ปรียา ศรีสุข",        Position="หัวหน้ากลุ่มออกใบรับรอง",                  Unit="ฝ่ายรับรองมาตรฐาน",                  UsageType="อัตโนมัติหลังตรวจปล่อย",  UsageTypeClass="bg-label-warning",   ValidFrom="2568-10-01", ValidTo="2569-09-30", Standard="กรมประมงกำหนด",    StatusText="ใกล้หมดอายุ",    StatusClass="bg-label-warning",  SuspendReason="" },
+        new { Id="SIG-004", Name="นายสมชาย เกษมสุข",        Position="นักวิชาการประมงชำนาญการพิเศษ",              Unit="กองตรวจสอบรับรองมาตรฐานสินค้าประมง", UsageType="เจ้าหน้าที่ลงนามด้วยตนเอง",UsageTypeClass="bg-label-secondary", ValidFrom="2567-01-15", ValidTo="2569-01-14", Standard="TIS 4401-2567",       StatusText="ใช้งาน",         StatusClass="bg-label-success",  SuspendReason="" },
+        new { Id="SIG-005", Name="น.ส.วิภาวดี รักษ์ทะเล",  Position="นักวิชาการประมงชำนาญการ",                   Unit="ฝ่ายรับรองมาตรฐาน",                  UsageType="อัตโนมัติทั้งกระบวนการ", UsageTypeClass="bg-label-primary",   ValidFrom="2567-06-01", ValidTo="2568-05-31", Standard="ETSI EN 319 401",   StatusText="ระงับ",          StatusClass="bg-label-danger",   SuspendReason="เจ้าหน้าที่ลาออก" },
+        new { Id="SIG-006", Name="นายธนาวุฒิ บุญมาก",       Position="นักวิชาการประมง",                           Unit="กองตรวจสอบรับรองมาตรฐานสินค้าประมง", UsageType="อัตโนมัติหลังรับคำขอ",     UsageTypeClass="bg-label-info",      ValidFrom="2568-03-01", ValidTo="2570-02-28", Standard="TIS 4401-2567",       StatusText="ยกเลิก",         StatusClass="bg-label-dark",     SuspendReason="ลายมือชื่อเสียหาย" },
+    };
+
+    var auditLogs = new[]
+    {
+        new { Dt="27 เม.ย. 2569 14:32", CertNo="CERT-2569-04-00341", SignerId="SIG-001", SignerName="นายอภิชาติ วงศ์พันธ์", Operator="ระบบอัตโนมัติ", Result="สำเร็จ", ResultClass="text-success" },
+        new { Dt="27 เม.ย. 2569 11:15", CertNo="CERT-2569-04-00338", SignerId="SIG-001", SignerName="นายอภิชาติ วงศ์พันธ์", Operator="ระบบอัตโนมัติ", Result="สำเร็จ", ResultClass="text-success" },
+        new { Dt="26 เม.ย. 2569 16:48", CertNo="CERT-2569-04-00330", SignerId="SIG-002", SignerName="นายวีระ ทองดี",        Operator="ระบบอัตโนมัติ", Result="สำเร็จ", ResultClass="text-success" },
+        new { Dt="25 เม.ย. 2569 09:20", CertNo="CERT-2569-04-00318", SignerId="SIG-003", SignerName="น.ส.ปรียา ศรีสุข",    Operator="ระบบอัตโนมัติ", Result="ล้มเหลว (ลายมือชื่อหมดอายุ)", ResultClass="text-danger" },
+        new { Dt="25 เม.ย. 2569 09:18", CertNo="CERT-2569-04-00317", SignerId="SIG-002", SignerName="นายวีระ ทองดี",        Operator="ระบบอัตโนมัติ", Result="สำเร็จ", ResultClass="text-success" },
+        new { Dt="24 เม.ย. 2569 13:05", CertNo="CERT-2569-04-00305", SignerId="SIG-001", SignerName="นายอภิชาติ วงศ์พันธ์", Operator="น.ส.สมหญิง รักดี", Result="สำเร็จ", ResultClass="text-success" },
+    };
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h4 class="mb-1">
+                <i class="ri ri-pen-nib-line me-2 text-primary"></i>จัดการลายมือชื่ออิเล็กทรอนิกส์
+            </h4>
+            <p class="text-muted mb-0">กำหนด / เพิ่ม / แก้ไข / ระงับ ลายมือชื่ออิเล็กทรอนิกส์สำหรับอัตโนมัติทั้งกระบวนการ</p>
+        </div>
+        <button type="button" class="btn btn-primary"
+                data-bs-toggle="modal" data-bs-target="#modalAddESignature"
+                data-mode="add">
+            <i class="ri ri-pen-nib-line me-1"></i>เพิ่มลายมือชื่อ
+        </button>
+    </div>
+
+    <!-- Security Alert -->
+    <div class="alert alert-warning d-flex align-items-start mb-4" role="alert">
+        <i class="ri ri-alarm-warning-line me-2 fs-5 mt-1 flex-shrink-0"></i>
+        <div>
+            <strong>⚠️ การเพิ่ม / แก้ไขลายมือชื่อจะถูก log และแจ้ง Admin ระดับสูง</strong><br>
+            <small>การดำเนินการทุกครั้งจะถูกบันทึกใน audit log และส่งการแจ้งเตือนไปยังผู้ดูแลระบบอาวุโสโดยอัตโนมัติ</small>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-primary-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-pen-nib-line fs-4 text-primary"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">@signers.Length</h3>
+                    <small class="text-muted">ลายมือชื่อทั้งหมด</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-success-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-checkbox-circle-line fs-4 text-success"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold text-success">@signers.Count(s => s.StatusText == "ใช้งาน")</h3>
+                    <small class="text-muted">ใช้งานได้</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-warning-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-time-line fs-4 text-warning"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold text-warning">@signers.Count(s => s.StatusText == "ใกล้หมดอายุ")</h3>
+                    <small class="text-muted">ใกล้หมดอายุ</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-danger-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-close-circle-line fs-4 text-danger"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold text-danger">@signers.Count(s => s.StatusText == "ระงับ" || s.StatusText == "ยกเลิก")</h3>
+                    <small class="text-muted">ระงับ / ยกเลิก</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="mb-0"><i class="ri ri-list-check me-1"></i>รายการลายมือชื่ออิเล็กทรอนิกส์</h6>
+            <span class="text-muted small">ทั้งหมด @signers.Length รายการ</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">รหัส</th>
+                            <th>ผู้ลงนาม</th>
+                            <th>ประเภทการใช้งาน</th>
+                            <th>วันที่เริ่ม</th>
+                            <th>วันหมดอายุ</th>
+                            <th>มาตรฐาน</th>
+                            <th>สถานะ</th>
+                            <th class="text-center pe-3">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in signers)
+                        {
+                            <tr>
+                                <td class="ps-3">
+                                    <code class="small">@s.Id</code>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar avatar-xs" style="background:var(--bs-primary-bg-subtle);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+                                            <i class="ri ri-user-3-line text-primary" style="font-size:0.85rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold small">@s.Name</div>
+                                            <div class="text-muted" style="font-size:0.72rem;">@s.Position</div>
+                                            <div class="text-muted" style="font-size:0.72rem;">@s.Unit</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge @s.UsageTypeClass">@s.UsageType</span>
+                                </td>
+                                <td class="small">@s.ValidFrom</td>
+                                <td class="small">
+                                    @s.ValidTo
+                                    @if (s.StatusText == "ใกล้หมดอายุ")
+                                    {
+                                        <i class="ri ri-alarm-warning-line text-warning ms-1" title="ใกล้หมดอายุ"></i>
+                                    }
+                                </td>
+                                <td class="small">@s.Standard</td>
+                                <td>
+                                    <span class="badge @s.StatusClass">@s.StatusText</span>
+                                    @if (!string.IsNullOrEmpty(s.SuspendReason))
+                                    {
+                                        <div class="text-muted" style="font-size:0.7rem;">@s.SuspendReason</div>
+                                    }
+                                </td>
+                                <td class="text-center pe-3">
+                                    <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                        <button type="button" class="btn btn-xs btn-outline-primary btn-edit-esign"
+                                                title="แก้ไข"
+                                                data-id="@s.Id"
+                                                data-name="@s.Name"
+                                                data-position="@s.Position"
+                                                data-unit="@s.Unit"
+                                                data-usage="@s.UsageType"
+                                                data-valid-from="@s.ValidFrom"
+                                                data-valid-to="@s.ValidTo"
+                                                data-standard="@s.Standard"
+                                                data-bs-toggle="modal" data-bs-target="#modalAddESignature">
+                                            <i class="ri ri-edit-line"></i>
+                                        </button>
+                                        @if (s.StatusText != "ระงับ" && s.StatusText != "ยกเลิก")
+                                        {
+                                            <button type="button" class="btn btn-xs btn-outline-warning btn-suspend-esign"
+                                                    title="ระงับ"
+                                                    data-id="@s.Id"
+                                                    data-name="@s.Name"
+                                                    data-bs-toggle="modal" data-bs-target="#modalSuspendESign">
+                                                <i class="ri ri-pause-circle-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-xs btn-outline-danger btn-cancel-esign"
+                                                    title="ยกเลิก"
+                                                    data-id="@s.Id"
+                                                    data-name="@s.Name"
+                                                    data-bs-toggle="modal" data-bs-target="#modalCancelESign">
+                                                <i class="ri ri-close-circle-line"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn btn-xs btn-outline-secondary btn-history-esign"
+                                                title="ประวัติการใช้งาน"
+                                                data-id="@s.Id"
+                                                data-name="@s.Name"
+                                                data-bs-toggle="modal" data-bs-target="#modalESignHistory">
+                                            <i class="ri ri-history-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Modal: เพิ่ม / แก้ไข ลายมือชื่ออิเล็กทรอนิกส์
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalAddESignature" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-pen-nib-line me-2 text-primary"></i>
+                    <span id="addESignModalTitle">เพิ่มลายมือชื่ออิเล็กทรอนิกส์</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Security Notice -->
+                <div class="alert alert-warning d-flex align-items-center mb-4 py-2">
+                    <i class="ri ri-shield-keyhole-line me-2 text-warning"></i>
+                    <small>การบันทึกจะถูก <strong>log</strong> และส่งการแจ้งเตือนไปยัง Admin ระดับสูงโดยอัตโนมัติ</small>
+                </div>
+
+                <!-- ผู้ลงนาม -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">ผู้ลงนาม <span class="text-danger">*</span></label>
+                    <select class="form-select" id="addESign_signer">
+                        <option value="">— เลือกผู้ลงนาม —</option>
+                        <option value="SIG-001">นายอภิชาติ วงศ์พันธ์ — ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน</option>
+                        <option value="SIG-002">นายวีระ ทองดี — ผู้เชี่ยวชาญด้านการรับรองสินค้าประมง</option>
+                        <option value="SIG-003">น.ส.ปรียา ศรีสุข — หัวหน้ากลุ่มออกใบรับรอง</option>
+                        <option value="SIG-004">นายสมชาย เกษมสุข — นักวิชาการประมงชำนาญการพิเศษ</option>
+                        <option value="SIG-005">น.ส.วิภาวดี รักษ์ทะเล — นักวิชาการประมงชำนาญการ</option>
+                    </select>
+                    <!-- Signer detail card -->
+                    <div id="addESign_signerDetail" class="mt-2 d-none">
+                        <div class="card border-primary border-opacity-25">
+                            <div class="card-body py-2 px-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar avatar-xs" style="background:var(--bs-primary-bg-subtle);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                        <i class="ri ri-user-3-line text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold small" id="addESign_signerName">—</div>
+                                        <div class="text-muted" style="font-size:0.75rem;" id="addESign_signerPosition">—</div>
+                                        <div class="text-muted" style="font-size:0.75rem;" id="addESign_signerUnit">—</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ประเภทการใช้งาน -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">ประเภทการใช้งาน <span class="text-danger">*</span></label>
+                    <div class="d-flex flex-column gap-2 ps-1">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="addESign_usageType" id="usage_fullAuto" value="อัตโนมัติทั้งกระบวนการ" checked>
+                            <label class="form-check-label" for="usage_fullAuto">
+                                <span class="badge bg-label-primary me-1">●</span>
+                                สำหรับออกใบรับรองแบบ<strong>อัตโนมัติทั้งกระบวนการ</strong>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="addESign_usageType" id="usage_autoAfterRequest" value="อัตโนมัติหลังรับคำขอ">
+                            <label class="form-check-label" for="usage_autoAfterRequest">
+                                <span class="badge bg-label-info me-1">●</span>
+                                สำหรับออกใบรับรองแบบ<strong>อัตโนมัติหลังรับคำขอ</strong>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="addESign_usageType" id="usage_autoAfterInspect" value="อัตโนมัติหลังตรวจปล่อย">
+                            <label class="form-check-label" for="usage_autoAfterInspect">
+                                <span class="badge bg-label-warning me-1">●</span>
+                                สำหรับออกใบรับรองแบบ<strong>อัตโนมัติหลังการตรวจปล่อย</strong>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="addESign_usageType" id="usage_manual" value="เจ้าหน้าที่ลงนามด้วยตนเอง">
+                            <label class="form-check-label" for="usage_manual">
+                                <span class="badge bg-label-secondary me-1">●</span>
+                                สำหรับ<strong>เจ้าหน้าที่ลงนามด้วยตนเอง</strong>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ไฟล์ลายมือชื่อ -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">ไฟล์ลายมือชื่ออิเล็กทรอนิกส์ <span class="text-danger">*</span></label>
+                    <div class="border border-dashed rounded p-4 text-center" id="addESign_dropZone"
+                         style="border-color:#6366f1!important;background:#f8f7ff;cursor:pointer;">
+                        <i class="ri ri-upload-cloud-2-line fs-1 text-primary mb-2 d-block"></i>
+                        <div class="fw-semibold mb-1">คลิกเพื่อเลือกไฟล์หรือลากไฟล์มาวาง</div>
+                        <div class="text-muted small">รองรับ PNG, SVG เท่านั้น | ขนาดสูงสุด 500 KB</div>
+                        <div class="text-muted small mt-1"><i class="ri ri-information-line me-1"></i>ต้องมีพื้นหลังโปร่งแสง (Transparent Background)</div>
+                        <input type="file" id="addESign_fileInput" accept=".png,.svg" class="d-none">
+                    </div>
+                    <!-- Preview -->
+                    <div id="addESign_previewSection" class="mt-3 d-none">
+                        <label class="form-label fw-semibold small text-muted">ตัวอย่างลายมือชื่อ (preview)</label>
+                        <div class="border rounded p-3 text-center" style="background:#f9f9f9;min-height:80px;">
+                            <div class="border border-dashed rounded mx-auto d-flex align-items-center justify-content-center"
+                                 style="width:220px;height:70px;border-color:#94a3b8!important;background:#fff;">
+                                <div class="text-center text-muted small">
+                                    <i class="ri ri-image-2-line fs-4 d-block mb-1 text-primary"></i>
+                                    <span id="addESign_fileName" class="fw-semibold"></span>
+                                </div>
+                            </div>
+                            <div class="small text-muted mt-2">ไฟล์ที่เลือก: <span id="addESign_fileNameText">—</span></div>
+                        </div>
+                    </div>
+                    <!-- Placeholder preview (template) -->
+                    <div id="addESign_templatePreview" class="mt-3">
+                        <label class="form-label fw-semibold small text-muted">ตัวอย่างตำแหน่งบนใบรับรอง</label>
+                        <div class="border rounded p-3" style="background:#fffef0;">
+                            <div class="row g-0">
+                                <div class="col-5 text-center border-end pe-3">
+                                    <div class="border border-dashed rounded mx-auto mb-2 d-flex align-items-center justify-content-center"
+                                         style="width:140px;height:55px;border-color:#94a3b8!important;">
+                                        <span class="text-muted small"><i class="ri ri-pen-nib-line me-1"></i>ลายมือชื่อ</span>
+                                    </div>
+                                    <div class="small fw-semibold" id="prevSignerName">( ชื่อผู้ลงนาม )</div>
+                                    <div class="small text-muted" id="prevSignerPosition">ตำแหน่ง</div>
+                                    <div class="small text-muted" id="prevSignerUnit">หน่วยงาน</div>
+                                </div>
+                                <div class="col-2 text-center d-flex align-items-center justify-content-center">
+                                    <div class="rounded-circle border border-dashed d-flex align-items-center justify-content-center"
+                                         style="width:60px;height:60px;border-color:#94a3b8!important;">
+                                        <i class="ri ri-seal-line text-muted"></i>
+                                    </div>
+                                </div>
+                                <div class="col-5 text-center ps-3 border-start d-flex align-items-center justify-content-center">
+                                    <div>
+                                        <div class="small fw-semibold text-muted">Authorized Signature</div>
+                                        <div class="small text-muted">Official Stamp</div>
+                                        <div class="small text-muted mt-2">วันที่: ____/____/________</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ช่วงวันที่ใช้งาน -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">ช่วงวันที่ใช้งาน <span class="text-danger">*</span></label>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label small text-muted">วันที่เริ่มต้น (validFrom)</label>
+                            <input type="date" class="form-control" id="addESign_validFrom">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small text-muted">วันที่สิ้นสุด (validTo)</label>
+                            <input type="date" class="form-control" id="addESign_validTo">
+                        </div>
+                    </div>
+                    <div id="addESign_dateRangePreview" class="mt-2 d-none">
+                        <div class="alert alert-success py-2 mb-0">
+                            <i class="ri ri-calendar-check-line me-1"></i>
+                            ระยะเวลาใช้งาน: <strong id="addESign_durationText">—</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- มาตรฐาน -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">มาตรฐานลายมือชื่อ <span class="text-danger">*</span></label>
+                    <select class="form-select" id="addESign_standard">
+                        <option value="">— เลือกมาตรฐาน —</option>
+                        <option value="ETSI EN 319 401">ETSI EN 319 401 (มาตรฐานยุโรป)</option>
+                        <option value="TIS 4401-2567">TIS 4401-2567 (มาตรฐานไทย)</option>
+                        <option value="กรมประมงกำหนด">กรมประมงกำหนด (ภายใน)</option>
+                    </select>
+                    <div id="addESign_standardDesc" class="mt-1 small text-muted d-none"></div>
+                </div>
+
+                <!-- หมายเหตุ -->
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">หมายเหตุ</label>
+                    <textarea class="form-control" id="addESign_note" rows="2" placeholder="ระบุหมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="btnSaveESign">
+                    <i class="ri ri-save-line me-1"></i>บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Modal: ระงับลายมือชื่อ
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalSuspendESign" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-warning">
+                    <i class="ri ri-pause-circle-line me-2"></i>ระงับลายมือชื่ออิเล็กทรอนิกส์
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex align-items-center py-2 mb-3">
+                    <i class="ri ri-alarm-warning-line me-2"></i>
+                    <small>ลายมือชื่อที่ถูกระงับจะไม่สามารถใช้งานได้ทันที</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">ผู้ลงนาม</label>
+                    <div class="form-control-plaintext fw-semibold ps-0" id="suspendESignName">—</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เหตุผลการระงับ <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="suspendESign_reason" rows="3"
+                              placeholder="ระบุเหตุผลการระงับการใช้งาน (เช่น: เจ้าหน้าที่ลาออก, ลายมือชื่อถูกบุกรุก)"></textarea>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label fw-semibold small">วันที่มีผล</label>
+                    <input type="date" class="form-control" id="suspendESign_effectiveDate">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-warning" id="btnConfirmSuspend">
+                    <i class="ri ri-pause-circle-line me-1"></i>ยืนยันระงับ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Modal: ยกเลิกลายมือชื่อ
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalCancelESign" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-danger">
+                    <i class="ri ri-close-circle-line me-2"></i>ยกเลิกลายมือชื่ออิเล็กทรอนิกส์
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger d-flex align-items-center py-2 mb-3">
+                    <i class="ri ri-error-warning-line me-2"></i>
+                    <small>การยกเลิกเป็น<strong>การดำเนินการถาวร</strong> ลายมือชื่อจะไม่สามารถกู้คืนได้</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">ผู้ลงนาม</label>
+                    <div class="form-control-plaintext fw-semibold ps-0" id="cancelESignName">—</div>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="cancelESign_reason" rows="3"
+                              placeholder="ระบุเหตุผลการยกเลิก"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmCancel">
+                    <i class="ri ri-close-circle-line me-1"></i>ยืนยันยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Modal: ประวัติการใช้งาน (Audit Log)
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalESignHistory" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-history-line me-2 text-primary"></i>ประวัติการใช้งาน: <span id="historySignerName">—</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="alert alert-info d-flex align-items-center m-3 mb-0 py-2">
+                    <i class="ri ri-shield-check-line me-2"></i>
+                    <small>บันทึก audit log ทุกการใช้งานลายมือชื่ออิเล็กทรอนิกส์ตามมาตรฐาน ETSI / TIS 4401</small>
+                </div>
+                <div class="table-responsive m-3 mt-3">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>วันที่ - เวลา</th>
+                                <th>เลขใบรับรองที่ใช้</th>
+                                <th>รหัสผู้ลงนาม</th>
+                                <th>ผู้ดำเนินการ</th>
+                                <th>ผล</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- JS-rendered -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm">
+                    <i class="ri ri-download-2-line me-1"></i>ส่งออก CSV
+                </button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999;">
+    <div id="toastESign" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastESignBody">บันทึกสำเร็จ</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    'use strict';
+
+    // ── Signer detail data ──
+    var signerDetails = {
+        'SIG-001': { name: 'นายอภิชาติ วงศ์พันธ์',  position: 'ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน',        unit: 'กองตรวจสอบรับรองมาตรฐานสินค้าประมง' },
+        'SIG-002': { name: 'นายวีระ ทองดี',           position: 'ผู้เชี่ยวชาญด้านการรับรองสินค้าประมง',     unit: 'กองตรวจสอบรับรองมาตรฐานสินค้าประมง' },
+        'SIG-003': { name: 'น.ส.ปรียา ศรีสุข',        position: 'หัวหน้ากลุ่มออกใบรับรอง',                 unit: 'ฝ่ายรับรองมาตรฐาน' },
+        'SIG-004': { name: 'นายสมชาย เกษมสุข',        position: 'นักวิชาการประมงชำนาญการพิเศษ',             unit: 'กองตรวจสอบรับรองมาตรฐานสินค้าประมง' },
+        'SIG-005': { name: 'น.ส.วิภาวดี รักษ์ทะเล',  position: 'นักวิชาการประมงชำนาญการ',                  unit: 'ฝ่ายรับรองมาตรฐาน' },
+    };
+
+    var standardDescriptions = {
+        'ETSI EN 319 401': 'มาตรฐาน Trust Service Providers ของสหภาพยุโรป ใช้สำหรับส่งออกไปยังประเทศในกลุ่ม EU',
+        'TIS 4401-2567':   'มาตรฐานลายมือชื่ออิเล็กทรอนิกส์ของประเทศไทย (มอก. 4401-2567)',
+        'กรมประมงกำหนด':   'มาตรฐานภายในกรมประมง สำหรับใบรับรองที่ใช้ในประเทศหรือภายในหน่วยงาน',
+    };
+
+    var auditLogs = [
+        { dt: '27 เม.ย. 2569 14:32', certNo: 'CERT-2569-04-00341', signerId: 'SIG-001', operator: 'ระบบอัตโนมัติ',          result: 'สำเร็จ',                          resultClass: 'text-success fw-semibold' },
+        { dt: '27 เม.ย. 2569 11:15', certNo: 'CERT-2569-04-00338', signerId: 'SIG-001', operator: 'ระบบอัตโนมัติ',          result: 'สำเร็จ',                          resultClass: 'text-success fw-semibold' },
+        { dt: '26 เม.ย. 2569 16:48', certNo: 'CERT-2569-04-00330', signerId: 'SIG-002', operator: 'ระบบอัตโนมัติ',          result: 'สำเร็จ',                          resultClass: 'text-success fw-semibold' },
+        { dt: '25 เม.ย. 2569 09:20', certNo: 'CERT-2569-04-00318', signerId: 'SIG-003', operator: 'ระบบอัตโนมัติ',          result: 'ล้มเหลว (ลายมือชื่อหมดอายุ)',    resultClass: 'text-danger fw-semibold' },
+        { dt: '25 เม.ย. 2569 09:18', certNo: 'CERT-2569-04-00317', signerId: 'SIG-002', operator: 'ระบบอัตโนมัติ',          result: 'สำเร็จ',                          resultClass: 'text-success fw-semibold' },
+        { dt: '24 เม.ย. 2569 13:05', certNo: 'CERT-2569-04-00305', signerId: 'SIG-001', operator: 'น.ส.สมหญิง รักดี',       result: 'สำเร็จ',                          resultClass: 'text-success fw-semibold' },
+        { dt: '23 เม.ย. 2569 10:33', certNo: 'CERT-2569-04-00290', signerId: 'SIG-004', operator: 'นายสมชาย เกษมสุข',        result: 'สำเร็จ',                          resultClass: 'text-success fw-semibold' },
+        { dt: '22 เม.ย. 2569 15:17', certNo: 'CERT-2569-04-00278', signerId: 'SIG-001', operator: 'ระบบอัตโนมัติ',          result: 'สำเร็จ',                          resultClass: 'text-success fw-semibold' },
+    ];
+
+    // ── Modal: เพิ่ม/แก้ไข ──
+    document.getElementById('modalAddESignature').addEventListener('show.bs.modal', function (e) {
+        var btn  = e.relatedTarget;
+        var mode = btn ? (btn.dataset.mode || '') : '';
+        var title = (mode === 'add') ? 'เพิ่มลายมือชื่ออิเล็กทรอนิกส์' : 'แก้ไขลายมือชื่ออิเล็กทรอนิกส์';
+        document.getElementById('addESignModalTitle').textContent = title;
+
+        if (mode !== 'add' && btn) {
+            // pre-fill fields for edit
+            var sid = btn.dataset.id || '';
+            document.getElementById('addESign_signer').value = sid;
+            document.getElementById('addESign_validFrom').value = btn.dataset.validFrom || '';
+            document.getElementById('addESign_validTo').value = btn.dataset.validTo || '';
+            var stdEl = document.getElementById('addESign_standard');
+            if (stdEl) { stdEl.value = btn.dataset.standard || ''; }
+            populateSignerDetail(sid);
+            updateDateRangePreview();
+            updateStandardDesc();
+        } else {
+            document.getElementById('addESign_signer').value = '';
+            document.getElementById('addESign_signerDetail').classList.add('d-none');
+            document.getElementById('addESign_validFrom').value = '';
+            document.getElementById('addESign_validTo').value = '';
+            document.getElementById('addESign_dateRangePreview').classList.add('d-none');
+            document.getElementById('addESign_standard').value = '';
+            document.getElementById('addESign_standardDesc').classList.add('d-none');
+            document.getElementById('addESign_previewSection').classList.add('d-none');
+            document.getElementById('addESign_note').value = '';
+            document.querySelectorAll('[name="addESign_usageType"]')[0].checked = true;
+        }
+    });
+
+    function populateSignerDetail(sid) {
+        var det = signerDetails[sid];
+        var card = document.getElementById('addESign_signerDetail');
+        if (det) {
+            document.getElementById('addESign_signerName').textContent     = det.name;
+            document.getElementById('addESign_signerPosition').textContent = det.position;
+            document.getElementById('addESign_signerUnit').textContent     = det.unit;
+            document.getElementById('prevSignerName').textContent          = det.name;
+            document.getElementById('prevSignerPosition').textContent      = det.position;
+            document.getElementById('prevSignerUnit').textContent          = det.unit;
+            card.classList.remove('d-none');
+        } else {
+            card.classList.add('d-none');
+            document.getElementById('prevSignerName').textContent     = '( ชื่อผู้ลงนาม )';
+            document.getElementById('prevSignerPosition').textContent = 'ตำแหน่ง';
+            document.getElementById('prevSignerUnit').textContent     = 'หน่วยงาน';
+        }
+    }
+
+    document.getElementById('addESign_signer').addEventListener('change', function () {
+        populateSignerDetail(this.value);
+    });
+
+    // Date range preview
+    function updateDateRangePreview() {
+        var from = document.getElementById('addESign_validFrom').value;
+        var to   = document.getElementById('addESign_validTo').value;
+        var previewEl = document.getElementById('addESign_dateRangePreview');
+        var textEl    = document.getElementById('addESign_durationText');
+        if (from && to) {
+            var d1 = new Date(from), d2 = new Date(to);
+            if (d2 > d1) {
+                var days = Math.round((d2 - d1) / 86400000);
+                var years = Math.floor(days / 365), rem = days % 365, months = Math.floor(rem / 30);
+                var parts = [];
+                if (years > 0) parts.push(years + ' ปี');
+                if (months > 0) parts.push(months + ' เดือน');
+                textEl.textContent = parts.join(' ') || (days + ' วัน') + ' (' + days + ' วัน)';
+                previewEl.classList.remove('d-none');
+            } else {
+                previewEl.classList.add('d-none');
+            }
+        } else {
+            previewEl.classList.add('d-none');
+        }
+    }
+    document.getElementById('addESign_validFrom').addEventListener('change', updateDateRangePreview);
+    document.getElementById('addESign_validTo').addEventListener('change', updateDateRangePreview);
+
+    // Standard description
+    function updateStandardDesc() {
+        var val = document.getElementById('addESign_standard').value;
+        var descEl = document.getElementById('addESign_standardDesc');
+        if (val && standardDescriptions[val]) {
+            descEl.textContent = standardDescriptions[val];
+            descEl.classList.remove('d-none');
+        } else {
+            descEl.classList.add('d-none');
+        }
+    }
+    document.getElementById('addESign_standard').addEventListener('change', updateStandardDesc);
+
+    // File upload drop zone
+    var dropZone   = document.getElementById('addESign_dropZone');
+    var fileInput  = document.getElementById('addESign_fileInput');
+    var previewSec = document.getElementById('addESign_previewSection');
+    dropZone.addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            var fname = this.files[0].name;
+            document.getElementById('addESign_fileName').textContent     = fname;
+            document.getElementById('addESign_fileNameText').textContent = fname + ' (' + (this.files[0].size / 1024).toFixed(1) + ' KB)';
+            previewSec.classList.remove('d-none');
+        }
+    });
+
+    // Save button
+    document.getElementById('btnSaveESign').addEventListener('click', function () {
+        showToast('บันทึกลายมือชื่ออิเล็กทรอนิกส์สำเร็จ — ส่งการแจ้งเตือนไปยัง Admin แล้ว', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('modalAddESignature')).hide();
+    });
+
+    // ── Modal: ระงับ ──
+    document.getElementById('modalSuspendESign').addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        document.getElementById('suspendESignName').textContent = btn ? (btn.dataset.name || '—') : '—';
+        document.getElementById('suspendESign_reason').value = '';
+        var today = new Date();
+        document.getElementById('suspendESign_effectiveDate').value = today.toISOString().split('T')[0];
+    });
+
+    document.getElementById('btnConfirmSuspend').addEventListener('click', function () {
+        showToast('ระงับลายมือชื่ออิเล็กทรอนิกส์สำเร็จ', 'warning');
+        bootstrap.Modal.getInstance(document.getElementById('modalSuspendESign')).hide();
+    });
+
+    // ── Modal: ยกเลิก ──
+    document.getElementById('modalCancelESign').addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        document.getElementById('cancelESignName').textContent = btn ? (btn.dataset.name || '—') : '—';
+        document.getElementById('cancelESign_reason').value = '';
+    });
+
+    document.getElementById('btnConfirmCancel').addEventListener('click', function () {
+        showToast('ยกเลิกลายมือชื่ออิเล็กทรอนิกส์สำเร็จ', 'danger');
+        bootstrap.Modal.getInstance(document.getElementById('modalCancelESign')).hide();
+    });
+
+    // ── Modal: ประวัติ ──
+    document.getElementById('modalESignHistory').addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        var sid = btn ? (btn.dataset.id || '') : '';
+        var name = btn ? (btn.dataset.name || '—') : '—';
+        document.getElementById('historySignerName').textContent = name;
+
+        var filtered = auditLogs.filter(function (l) { return !sid || l.signerId === sid; });
+        var tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = filtered.map(function (l) {
+            return '<tr>' +
+                '<td class="small">' + l.dt + '</td>' +
+                '<td><code class="small">' + l.certNo + '</code></td>' +
+                '<td><code class="small text-muted">' + l.signerId + '</code></td>' +
+                '<td class="small">' + l.operator + '</td>' +
+                '<td class="small ' + l.resultClass + '">' + l.result + '</td>' +
+                '</tr>';
+        }).join('');
+    });
+
+    // ── Toast helper ──
+    function showToast(msg, type) {
+        var toastEl = document.getElementById('toastESign');
+        var bodyEl  = document.getElementById('toastESignBody');
+        toastEl.classList.remove('bg-success', 'bg-warning', 'bg-danger', 'bg-info');
+        var colorMap = { success: 'bg-success', warning: 'bg-warning', danger: 'bg-danger', info: 'bg-info' };
+        toastEl.classList.add(colorMap[type] || 'bg-success');
+        bodyEl.textContent = msg;
+        bootstrap.Toast.getOrCreateInstance(toastEl).show();
+    }
+}());
+</script>
+}

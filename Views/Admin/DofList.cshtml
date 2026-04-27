@@ -9,10 +9,15 @@
             DofNumber = "DOF-FAC-00128",
             FactoryCode = "FAC-0001",
             FactoryName = "บริษัท สยาม มารีน ฟู้ดส์ จำกัด",
+            FactoryNameEN = "Siam Marine Foods Co., Ltd.",
+            TaxId = "0105558012345",
+            BranchCode = "00000",
             EstablishmentNo = "EST-TH-1145",
+            ApprovalNumber = "AP-TH-2024-0128",
             Province = "สมุทรสาคร",
             ApprovalScope = "ปลาทูน่าแช่เยือกแข็ง / แปรรูป",
             ExportMarkets = 4,
+            ExportCountries = "EU,JP,US,CN",
             ExpireDate = new DateTime(2027, 2, 28),
             StatusText = "รับรองแล้ว",
             StatusClass = "bg-label-success",
@@ -24,10 +29,13 @@
             DofNumber = "DOF-FAC-00449",
             FactoryCode = "FAC-0002",
             FactoryName = "บริษัท กัลฟ์ แคทช์ โปรเซสซิ่ง จำกัด",
-            EstablishmentNo = "EST-TH-1288",
+            FactoryNameEN = "Gulf Catch Processing Co., Ltd.",            TaxId = "0205558023456",
+            BranchCode = "00000",            EstablishmentNo = "EST-TH-1288",
+            ApprovalNumber = "AP-TH-2024-0449",
             Province = "ชลบุรี",
             ApprovalScope = "ปลากระป๋อง / สัตว์น้ำพร้อมบริโภค",
             ExportMarkets = 6,
+            ExportCountries = "EU,JP,US,CN,KR,AU",
             ExpireDate = new DateTime(2026, 12, 15),
             StatusText = "รับรองแล้ว",
             StatusClass = "bg-label-success",
@@ -39,10 +47,15 @@
             DofNumber = "DOF-FAC-00613",
             FactoryCode = "FAC-0003",
             FactoryName = "บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด",
+            FactoryNameEN = "Ocean Prime Export Co., Ltd.",
+            TaxId = "0905558034567",
+            BranchCode = "00001",
             EstablishmentNo = "EST-TH-1390",
+            ApprovalNumber = "AP-TH-2023-0613",
             Province = "สงขลา",
             ApprovalScope = "คัดแยก / บรรจุส่งออก",
             ExportMarkets = 3,
+            ExportCountries = "EU,JP,ASEAN",
             ExpireDate = new DateTime(2026, 10, 10),
             StatusText = "ใกล้หมดอายุ",
             StatusClass = "bg-label-warning",
@@ -54,10 +67,15 @@
             DofNumber = "DOF-FAC-00772",
             FactoryCode = "FAC-0004",
             FactoryName = "บริษัท อันดามัน โคลด์สโตเรจ จำกัด",
+            FactoryNameEN = "Andaman Cold Storage Co., Ltd.",
+            TaxId = "0605558045678",
+            BranchCode = "00000",
             EstablishmentNo = "EST-TH-1450",
+            ApprovalNumber = "AP-TH-2024-0772",
             Province = "ระนอง",
             ApprovalScope = "ห้องเย็น / เก็บรักษาสัตว์น้ำ",
             ExportMarkets = 2,
+            ExportCountries = "EU,JP",
             ExpireDate = new DateTime(2027, 5, 20),
             StatusText = "รับรองแล้ว",
             StatusClass = "bg-label-success",
@@ -69,10 +87,15 @@
             DofNumber = "DOF-FAC-00818",
             FactoryCode = "FAC-0005",
             FactoryName = "บริษัท เซาท์เทิร์น เพลาจิก จำกัด",
+            FactoryNameEN = "Southern Pelagic Co., Ltd.",
+            TaxId = "0835558056789",
+            BranchCode = "00000",
             EstablishmentNo = "EST-TH-1502",
+            ApprovalNumber = "AP-TH-2023-0818",
             Province = "ภูเก็ต",
             ApprovalScope = "สัตว์น้ำสด / ห้องเย็น",
             ExportMarkets = 2,
+            ExportCountries = "EU,CN",
             ExpireDate = new DateTime(2026, 8, 31),
             StatusText = "ระงับชั่วคราว",
             StatusClass = "bg-label-danger",
@@ -84,10 +107,15 @@
             DofNumber = "DOF-FAC-00901",
             FactoryCode = "FAC-0006",
             FactoryName = "บริษัท ไทย มารีน แพค จำกัด",
+            FactoryNameEN = "Thai Marine Pack Co., Ltd.",
+            TaxId = "0115558067890",
+            BranchCode = "00001",
             EstablishmentNo = "EST-TH-1604",
+            ApprovalNumber = "AP-TH-2024-0901",
             Province = "สมุทรปราการ",
             ApprovalScope = "บรรจุภัณฑ์ / ฉลากส่งออก",
             ExportMarkets = 5,
+            ExportCountries = "EU,JP,US,CA,ASEAN",
             ExpireDate = new DateTime(2027, 1, 5),
             StatusText = "รับรองแล้ว",
             StatusClass = "bg-label-success",
@@ -164,6 +192,59 @@
         font-weight: 600;
         color: var(--bs-heading-color);
     }
+
+    /* --- Import wizard --- */
+    .import-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-width: 110px;
+    }
+    .import-step .step-num {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--bs-secondary-bg);
+        border: 2px solid var(--bs-border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--bs-secondary-color);
+    }
+    .import-step .step-label {
+        font-size: 0.72rem;
+        color: var(--bs-secondary-color);
+        text-align: center;
+        white-space: nowrap;
+    }
+    .import-step.active .step-num {
+        background: #7367f0;
+        border-color: #7367f0;
+        color: #fff;
+    }
+    .import-step.active .step-label {
+        color: #7367f0;
+        font-weight: 600;
+    }
+    .import-step.done .step-num {
+        background: #28a745;
+        border-color: #28a745;
+        color: #fff;
+    }
+    .import-step-divider {
+        flex: 1;
+        height: 2px;
+        background: var(--bs-border-color);
+        margin-top: -16px;
+        min-width: 24px;
+    }
+    .btn-purple { background-color: #7367f0; border-color: #7367f0; color: #fff; }
+    .btn-purple:hover { background-color: #5e50ee; border-color: #5e50ee; color: #fff; }
+    .text-purple { color: #7367f0 !important; }
+    .bg-purple { background-color: #7367f0 !important; }
 </style>
 }
 
@@ -175,7 +256,9 @@
                 certDate: '01/03/2566',
                 nextAuditDate: '15/01/2567',
                 address: '88/8 หมู่ 4 ต.นาดี อ.เมืองสมุทรสาคร จ.สมุทรสาคร 74000',
-                phone: '034-555-100',
+                addressEN: '88/8 Moo 4, Nadi, Mueang Samut Sakhon, Samut Sakhon 74000, Thailand',
+                phone: '+66 34-555-100',
+                fax: '+66 34-555-199',
                 email: 'qa@siammarine.co.th',
                 note: 'โรงงานอยู่ในกลุ่มความเสี่ยงต่ำ และส่งออกสหภาพยุโรปต่อเนื่อง',
                 products: [
@@ -185,13 +268,24 @@
                 audits: [
                     { date: '15/01/2566', result: 'ผ่าน', officer: 'กองตรวจสอบคุณภาพ', remark: 'ไม่พบข้อบกพร่อง' },
                     { date: '12/01/2565', result: 'ผ่าน', officer: 'กองตรวจสอบคุณภาพ', remark: 'ติดตามผลปกติ' }
+                ],
+                statusLogs: [
+                    { date: '01/03/2566', fromStatus: '-', toStatus: 'รับรองแล้ว', reason: 'ผ่านการตรวจประเมินรับรองครั้งแรก', officer: 'กองตรวจสอบคุณภาพ' }
+                ],
+                exportCountries: [
+                    { country: 'สหภาพยุโรป', countryEN: 'European Union', iso: 'EU', group: 'EU', startDate: '01/03/2566', endDate: '28/02/2570', status: 'ใช้งาน' },
+                    { country: 'ญี่ปุ่น', countryEN: 'Japan', iso: 'JP', group: 'เอเชียตะวันออก', startDate: '01/03/2566', endDate: '28/02/2570', status: 'ใช้งาน' },
+                    { country: 'สหรัฐอเมริกา', countryEN: 'United States', iso: 'US', group: 'อเมริกา', startDate: '15/06/2566', endDate: '14/06/2570', status: 'ใช้งาน' },
+                    { country: 'จีน', countryEN: 'China', iso: 'CN', group: 'เอเชียตะวันออก', startDate: '01/08/2566', endDate: '31/07/2569', status: 'ใช้งาน' }
                 ]
             },
             'DOF-FAC-00449': {
                 certDate: '15/12/2565',
                 nextAuditDate: '10/12/2566',
                 address: '88/21 นิคมอุตสาหกรรมแหลมฉบัง อ.ศรีราชา จ.ชลบุรี 20230',
-                phone: '038-771-220',
+                addressEN: '88/21 Laem Chabang Industrial Estate, Si Racha, Chon Buri 20230, Thailand',
+                phone: '+66 38-771-220',
+                fax: '+66 38-771-221',
                 email: 'reg@gulfcatch.co.th',
                 note: 'โรงงานผ่านเกณฑ์ GMP/HACCP และขยายตลาดอเมริกาเหนือ',
                 products: [
@@ -201,13 +295,26 @@
                 audits: [
                     { date: '10/12/2565', result: 'ผ่าน', officer: 'สำนักงานประมงเขต 2', remark: 'เอกสารครบถ้วน' },
                     { date: '08/12/2564', result: 'ผ่าน', officer: 'สำนักงานประมงเขต 2', remark: 'แนะนำปรับป้ายจุดล้างมือ' }
+                ],
+                statusLogs: [
+                    { date: '15/12/2565', fromStatus: '-', toStatus: 'รับรองแล้ว', reason: 'ผ่านการตรวจประเมินรับรองครั้งแรก', officer: 'สำนักงานประมงเขต 2' }
+                ],
+                exportCountries: [
+                    { country: 'สหภาพยุโรป', countryEN: 'European Union', iso: 'EU', group: 'EU', startDate: '01/01/2565', endDate: '15/12/2569', status: 'ใช้งาน' },
+                    { country: 'ญี่ปุ่น', countryEN: 'Japan', iso: 'JP', group: 'เอเชียตะวันออก', startDate: '01/01/2565', endDate: '15/12/2569', status: 'ใช้งาน' },
+                    { country: 'สหรัฐอเมริกา', countryEN: 'United States', iso: 'US', group: 'อเมริกา', startDate: '01/01/2565', endDate: '15/12/2569', status: 'ใช้งาน' },
+                    { country: 'จีน', countryEN: 'China', iso: 'CN', group: 'เอเชียตะวันออก', startDate: '01/06/2565', endDate: '31/05/2568', status: 'ใช้งาน' },
+                    { country: 'เกาหลีใต้', countryEN: 'South Korea', iso: 'KR', group: 'เอเชียตะวันออก', startDate: '15/03/2566', endDate: '14/03/2569', status: 'ใช้งาน' },
+                    { country: 'ออสเตรเลีย', countryEN: 'Australia', iso: 'AU', group: 'โอเชียเนีย', startDate: '01/07/2566', endDate: '30/06/2569', status: 'ใช้งาน' }
                 ]
             },
             'DOF-FAC-00613': {
                 certDate: '11/10/2565',
                 nextAuditDate: '05/10/2566',
                 address: '199/24 ถ.กาญจนวนิช ต.หาดใหญ่ อ.หาดใหญ่ จ.สงขลา 90110',
-                phone: '074-220-919',
+                addressEN: '199/24 Kanchanawanich Rd., Hat Yai, Hat Yai, Songkhla 90110, Thailand',
+                phone: '+66 74-220-919',
+                fax: '+66 74-220-920',
                 email: 'support@oceanprime.co.th',
                 note: 'ต้องติดตามการปรับปรุงพื้นที่บรรจุแยกวัตถุดิบและสินค้าสำเร็จรูป',
                 products: [
@@ -216,13 +323,24 @@
                 audits: [
                     { date: '05/10/2566', result: 'ผ่านแบบมีข้อสังเกต', officer: 'สำนักงานประมงเขต 5', remark: 'กำหนด corrective action 30 วัน' },
                     { date: '03/10/2565', result: 'ผ่าน', officer: 'สำนักงานประมงเขต 5', remark: 'สภาพโรงงานเหมาะสม' }
+                ],
+                statusLogs: [
+                    { date: '11/10/2565', fromStatus: '-', toStatus: 'รับรองแล้ว', reason: 'ผ่านการตรวจประเมินรับรองครั้งแรก', officer: 'สำนักงานประมงเขต 5' },
+                    { date: '05/10/2566', fromStatus: 'รับรองแล้ว', toStatus: 'ใกล้หมดอายุ', reason: 'วันหมดอายุน้อยกว่า 90 วัน ระบบแจ้งเตือนอัตโนมัติ', officer: 'ระบบอัตโนมัติ' }
+                ],
+                exportCountries: [
+                    { country: 'สหภาพยุโรป', countryEN: 'European Union', iso: 'EU', group: 'EU', startDate: '15/04/2564', endDate: '10/10/2569', status: 'ใช้งาน' },
+                    { country: 'ญี่ปุ่น', countryEN: 'Japan', iso: 'JP', group: 'เอเชียตะวันออก', startDate: '15/04/2564', endDate: '10/10/2569', status: 'ใช้งาน' },
+                    { country: 'อาเซียน', countryEN: 'ASEAN', iso: '-', group: 'อาเซียน', startDate: '01/01/2565', endDate: '10/10/2569', status: 'ใช้งาน' }
                 ]
             },
             'DOF-FAC-00772': {
                 certDate: '20/05/2566',
                 nextAuditDate: '10/05/2567',
                 address: '42/12 ต.บางริ้น อ.เมืองระนอง จ.ระนอง 85000',
-                phone: '077-440-778',
+                addressEN: '42/12 Bang Rin, Mueang Ranong, Ranong 85000, Thailand',
+                phone: '+66 77-440-778',
+                fax: '+66 77-440-779',
                 email: 'contact@andamancold.com',
                 note: 'ผ่านเกณฑ์ด้านห้องเย็นและการควบคุมอุณหภูมิ',
                 products: [
@@ -231,13 +349,22 @@
                 ],
                 audits: [
                     { date: '10/05/2566', result: 'ผ่าน', officer: 'ด่านตรวจสัตว์น้ำระนอง', remark: 'ห้องเย็นผ่านเกณฑ์' }
+                ],
+                statusLogs: [
+                    { date: '20/05/2566', fromStatus: '-', toStatus: 'รับรองแล้ว', reason: 'ผ่านการตรวจประเมินรับรองครั้งแรก', officer: 'ด่านตรวจสัตว์น้ำระนอง' }
+                ],
+                exportCountries: [
+                    { country: 'สหภาพยุโรป', countryEN: 'European Union', iso: 'EU', group: 'EU', startDate: '01/06/2566', endDate: '20/05/2570', status: 'ใช้งาน' },
+                    { country: 'ญี่ปุ่น', countryEN: 'Japan', iso: 'JP', group: 'เอเชียตะวันออก', startDate: '01/06/2566', endDate: '20/05/2570', status: 'ใช้งาน' }
                 ]
             },
             'DOF-FAC-00818': {
                 certDate: '01/09/2565',
                 nextAuditDate: '20/08/2566',
                 address: '15/9 ท่าเรือประมง ต.รัษฎา อ.เมืองภูเก็ต จ.ภูเก็ต 83000',
-                phone: '076-410-550',
+                addressEN: '15/9 Fishing Port, Ratsada, Mueang Phuket, Phuket 83000, Thailand',
+                phone: '+66 76-410-550',
+                fax: '+66 76-410-551',
                 email: 'ops@southernpelagic.co.th',
                 note: 'ระงับชั่วคราวจนกว่าจะส่งเอกสาร corrective action ครบ',
                 products: [
@@ -245,13 +372,23 @@
                 ],
                 audits: [
                     { date: '20/08/2566', result: 'รอตรวจซ้ำ', officer: 'สำนักงานประมงจังหวัดภูเก็ต', remark: 'พบข้อบกพร่องด้าน sanitation' }
+                ],
+                statusLogs: [
+                    { date: '01/09/2565', fromStatus: '-', toStatus: 'รับรองแล้ว', reason: 'ผ่านการตรวจประเมินรับรองครั้งแรก', officer: 'สำนักงานประมงจังหวัดภูเก็ต' },
+                    { date: '25/08/2566', fromStatus: 'รับรองแล้ว', toStatus: 'ระงับชั่วคราว', reason: 'พบข้อบกพร่องด้าน sanitation รอ corrective action', officer: 'สำนักงานประมงจังหวัดภูเก็ต' }
+                ],
+                exportCountries: [
+                    { country: 'สหภาพยุโรป', countryEN: 'European Union', iso: 'EU', group: 'EU', startDate: '01/01/2566', endDate: '31/08/2569', status: 'ระงับ' },
+                    { country: 'จีน', countryEN: 'China', iso: 'CN', group: 'เอเชียตะวันออก', startDate: '01/03/2566', endDate: '31/08/2569', status: 'ระงับ' }
                 ]
             },
             'DOF-FAC-00901': {
                 certDate: '05/01/2566',
                 nextAuditDate: '22/12/2566',
                 address: '99 หมู่ 7 ต.บางปลา อ.บางพลี จ.สมุทรปราการ 10540',
-                phone: '02-700-4567',
+                addressEN: '99 Moo 7, Bang Pla, Bang Phli, Samut Prakan 10540, Thailand',
+                phone: '+66 2-700-4567',
+                fax: '+66 2-700-4568',
                 email: 'factory@thaimarinepack.co.th',
                 note: 'รองรับการพิมพ์ฉลากส่งออกตามมาตรฐาน EU และ US',
                 products: [
@@ -260,6 +397,16 @@
                 ],
                 audits: [
                     { date: '22/12/2565', result: 'ผ่าน', officer: 'กองรับรองมาตรฐาน', remark: 'เอกสารและตัวอย่างฉลากครบ' }
+                ],
+                statusLogs: [
+                    { date: '05/01/2566', fromStatus: '-', toStatus: 'รับรองแล้ว', reason: 'ผ่านการตรวจประเมินรับรองครั้งแรก', officer: 'กองรับรองมาตรฐาน' }
+                ],
+                exportCountries: [
+                    { country: 'สหภาพยุโรป', countryEN: 'European Union', iso: 'EU', group: 'EU', startDate: '15/01/2566', endDate: '05/01/2570', status: 'ใช้งาน' },
+                    { country: 'ญี่ปุ่น', countryEN: 'Japan', iso: 'JP', group: 'เอเชียตะวันออก', startDate: '15/01/2566', endDate: '05/01/2570', status: 'ใช้งาน' },
+                    { country: 'สหรัฐอเมริกา', countryEN: 'United States', iso: 'US', group: 'อเมริกา', startDate: '01/06/2566', endDate: '31/05/2569', status: 'ใช้งาน' },
+                    { country: 'แคนาดา', countryEN: 'Canada', iso: 'CA', group: 'อเมริกา', startDate: '01/06/2566', endDate: '31/05/2569', status: 'ใช้งาน' },
+                    { country: 'อาเซียน', countryEN: 'ASEAN', iso: '-', group: 'อาเซียน', startDate: '01/09/2566', endDate: '31/08/2569', status: 'ใช้งาน' }
                 ]
             }
         };
@@ -269,6 +416,7 @@
             var province = (document.getElementById('filterProvince').value || '').trim();
             var status = (document.getElementById('filterStatus').value || '').trim();
             var audit = (document.getElementById('filterAudit').value || '').trim();
+            var market = (document.getElementById('filterMarket').value || '').trim();
             var rows = document.querySelectorAll('#dofTableBody tr[data-dof-number]');
             var visibleCount = 0;
 
@@ -277,11 +425,13 @@
                 var rowProvince = row.dataset.province || '';
                 var rowStatus = row.dataset.status || '';
                 var rowAudit = row.dataset.audit || '';
+                var rowMarkets = row.dataset.exportCountries || '';
                 var keywordMatch = !keyword || text.includes(keyword);
                 var provinceMatch = !province || rowProvince === province;
                 var statusMatch = !status || rowStatus === status;
                 var auditMatch = !audit || rowAudit === audit;
-                var isVisible = keywordMatch && provinceMatch && statusMatch && auditMatch;
+                var marketMatch = !market || rowMarkets.split(',').some(function (m) { return m.trim() === market; });
+                var isVisible = keywordMatch && provinceMatch && statusMatch && auditMatch && marketMatch;
 
                 row.classList.toggle('d-none', !isVisible);
                 if (isVisible) {
@@ -320,6 +470,51 @@
             }).join('');
         }
 
+        function renderStatusLogRows(items) {
+            if (!items || items.length === 0) {
+                return '<tr><td colspan="6" class="text-center text-muted py-3">ไม่พบประวัติการเปลี่ยนสถานะ</td></tr>';
+            }
+            return items.map(function (item, index) {
+                var fromHtml = item.fromStatus === '-' ? '<span class="text-muted">—</span>' :
+                    '<span class="badge rounded-pill bg-label-secondary">' + item.fromStatus + '</span>';
+                var toClass = item.toStatus === 'รับรองแล้ว' ? 'bg-label-success' :
+                    item.toStatus === 'ระงับชั่วคราว' ? 'bg-label-danger' :
+                    item.toStatus === 'ยกเลิกแล้ว' ? 'bg-label-secondary' :
+                    item.toStatus === 'ใกล้หมดอายุ' ? 'bg-label-warning' : 'bg-label-info';
+                return '<tr>' +
+                    '<td class="text-center text-muted small">' + (index + 1) + '</td>' +
+                    '<td>' + item.date + '</td>' +
+                    '<td>' + fromHtml + '</td>' +
+                    '<td><span class="badge rounded-pill ' + toClass + '">' + item.toStatus + '</span></td>' +
+                    '<td>' + item.reason + '</td>' +
+                    '<td>' + item.officer + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        function renderExportCountriesRows(items) {
+            if (!items || items.length === 0) {
+                return '<tr><td colspan="8" class="text-center text-muted py-3">ไม่พบข้อมูลประเทศปลายทาง</td></tr>';
+            }
+            return items.map(function (item, index) {
+                var statusClass = item.status === 'ใช้งาน' ? 'bg-label-success' : 'bg-label-danger';
+                var groupClass = item.group === 'EU' ? 'bg-label-primary' :
+                    item.group === 'เอเชียตะวันออก' ? 'bg-label-warning' :
+                    item.group === 'อเมริกา' ? 'bg-label-success' :
+                    item.group === 'อาเซียน' ? 'bg-label-info' : 'bg-label-secondary';
+                return '<tr>' +
+                    '<td class="text-center text-muted small">' + (index + 1) + '</td>' +
+                    '<td>' + item.country + '</td>' +
+                    '<td class="fst-italic">' + item.countryEN + '</td>' +
+                    '<td class="text-center font-monospace">' + item.iso + '</td>' +
+                    '<td><span class="badge rounded-pill ' + groupClass + '">' + item.group + '</span></td>' +
+                    '<td>' + item.startDate + '</td>' +
+                    '<td>' + item.endDate + '</td>' +
+                    '<td class="text-center"><span class="badge rounded-pill ' + statusClass + '">' + item.status + '</span></td>' +
+                    '</tr>';
+            }).join('');
+        }
+
         function openFactoryDetail(dofNumber) {
             var detail = detailsMap[dofNumber];
             var row = document.querySelector('#dofTableBody tr[data-dof-number="' + dofNumber + '"]');
@@ -330,7 +525,13 @@
             document.getElementById('factoryModalTitle').textContent = row.dataset.factoryName;
             document.getElementById('detailDofNumber').textContent = dofNumber;
             document.getElementById('detailFactoryCode').textContent = row.dataset.factoryCode;
+            document.getElementById('detailFactoryNameTH').textContent = row.dataset.factoryName;
+            document.getElementById('detailFactoryNameEN').textContent = row.dataset.factoryNameEn || '-';
+            document.getElementById('detailTaxId').textContent = row.dataset.taxId || '-';
+            var branchRaw = row.dataset.branchCode || '';
+            document.getElementById('detailBranchCode').textContent = branchRaw ? branchRaw + (branchRaw === '00000' ? ' (สำนักงานใหญ่)' : ' (สาขาที่ ' + parseInt(branchRaw, 10) + ')') : '-';
             document.getElementById('detailEstablishmentNo').textContent = row.dataset.establishmentNo;
+            document.getElementById('detailApprovalNumber').textContent = row.dataset.approvalNumber || '-';
             document.getElementById('detailProvince').textContent = row.dataset.province;
             document.getElementById('detailStatus').innerHTML = '<span class="badge rounded-pill ' + row.dataset.statusClass + '">' + row.dataset.status + '</span>';
             document.getElementById('detailApprovalScope').textContent = row.dataset.scope;
@@ -338,11 +539,15 @@
             document.getElementById('detailCertDate').textContent = detail.certDate;
             document.getElementById('detailNextAuditDate').textContent = detail.nextAuditDate;
             document.getElementById('detailPhone').textContent = detail.phone;
+            document.getElementById('detailFax').textContent = detail.fax || '-';
             document.getElementById('detailEmail').textContent = detail.email;
             document.getElementById('detailAddress').textContent = detail.address;
+            document.getElementById('detailAddressEN').textContent = detail.addressEN || '-';
             document.getElementById('detailNote').textContent = detail.note;
             document.getElementById('productTableBody').innerHTML = renderRows(detail.products, 5, 'ไม่พบรายการสินค้า');
             document.getElementById('auditTableBody').innerHTML = renderRows(detail.audits, 5, 'ไม่พบประวัติการตรวจประเมิน');
+            document.getElementById('statusLogTableBody').innerHTML = renderStatusLogRows(detail.statusLogs);
+            document.getElementById('exportCountriesTableBody').innerHTML = renderExportCountriesRows(detail.exportCountries);
 
             new bootstrap.Modal(document.getElementById('dofFactoryDetailModal')).show();
         }
@@ -353,10 +558,11 @@
             document.getElementById('filterProvince').value = '';
             document.getElementById('filterStatus').value = '';
             document.getElementById('filterAudit').value = '';
+            document.getElementById('filterMarket').value = '';
             filterRows();
         });
 
-        document.querySelectorAll('#filterKeyword, #filterProvince, #filterStatus, #filterAudit').forEach(function (element) {
+        document.querySelectorAll('#filterKeyword, #filterProvince, #filterStatus, #filterAudit, #filterMarket').forEach(function (element) {
             element.addEventListener('keydown', function (event) {
                 if (event.key === 'Enter') {
                     event.preventDefault();
@@ -376,6 +582,202 @@
             button.addEventListener('click', function () {
                 openFactoryDetail(this.dataset.dofNumber);
             });
+        });
+
+        document.querySelectorAll('.btn-suspend-dof').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var row = document.querySelector('#dofTableBody tr[data-dof-number="' + this.dataset.dofNumber + '"]');
+                document.getElementById('suspendFactoryName').textContent = row ? row.dataset.factoryName : this.dataset.dofNumber;
+                document.getElementById('suspendDofNumberHidden').value = this.dataset.dofNumber;
+                new bootstrap.Modal(document.getElementById('dofSuspendModal')).show();
+            });
+        });
+
+        document.querySelectorAll('.btn-cancel-dof').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var row = document.querySelector('#dofTableBody tr[data-dof-number="' + this.dataset.dofNumber + '"]');
+                document.getElementById('cancelFactoryName').textContent = row ? row.dataset.factoryName : this.dataset.dofNumber;
+                document.getElementById('cancelDofNumberHidden').value = this.dataset.dofNumber;
+                new bootstrap.Modal(document.getElementById('dofCancelModal')).show();
+            });
+        });
+
+        document.getElementById('btnConfirmSuspend').addEventListener('click', function () {
+            showDofToast('ระงับชั่วคราว: ' + document.getElementById('suspendFactoryName').textContent + ' เรียบร้อยแล้ว', 'warning');
+        });
+
+        document.getElementById('btnConfirmCancel').addEventListener('click', function () {
+            showDofToast('ยกเลิกการรับรอง: ' + document.getElementById('cancelFactoryName').textContent + ' เรียบร้อยแล้ว', 'danger');
+        });
+
+        document.querySelectorAll('.btn-export-dof').forEach(function (item) {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+                var exportType = this.dataset.exportType || 'all';
+                var allRows = document.querySelectorAll('#dofTableBody tr[data-dof-number]');
+                var filteredRows = document.querySelectorAll('#dofTableBody tr[data-dof-number]:not(.d-none)');
+                var selectedRows = document.querySelectorAll('#dofTableBody .dof-row-check:checked');
+                var count, label;
+
+                if (exportType === 'selected') {
+                    count = selectedRows.length;
+                    label = 'เฉพาะที่เลือก';
+                    if (count === 0) {
+                        showDofToast('กรุณาเลือกรายการที่ต้องการ Export ก่อน', 'warning');
+                        return;
+                    }
+                } else if (exportType === 'filtered') {
+                    count = filteredRows.length;
+                    label = 'เฉพาะที่กรอง';
+                } else if (exportType === 'summary') {
+                    count = 1;
+                    label = 'สรุปรายปี';
+                } else {
+                    count = allRows.length;
+                    label = 'ทั้งหมด';
+                }
+
+                showDofToast('กำลัง Export Excel (' + label + ')...', 'info');
+                var self = this;
+                setTimeout(function () {
+                    if (exportType === 'summary') {
+                        showDofToast('Export Excel สรุปรายปี สำเร็จ', 'success');
+                    } else {
+                        showDofToast('Export Excel สำเร็จ ' + count + ' รายการ (' + label + ')', 'success');
+                    }
+                }, 800);
+            });
+        });
+
+        /* Select-all checkbox */
+        document.getElementById('dofSelectAll').addEventListener('change', function () {
+            var checked = this.checked;
+            document.querySelectorAll('#dofTableBody tr[data-dof-number]:not(.d-none) .dof-row-check').forEach(function (cb) {
+                cb.checked = checked;
+            });
+        });
+
+        function showDofToast(message, type) {
+            var toastEl = document.getElementById('dofActionToast');
+            toastEl.className = 'toast align-items-center text-bg-' + type + ' border-0';
+            document.getElementById('dofActionToastMsg').textContent = message;
+            new bootstrap.Toast(toastEl).show();
+        }
+    });
+
+    /* --- Import wizard JS --- */
+    document.addEventListener('DOMContentLoaded', function () {
+        var currentStep = 1;
+        var totalSteps = 4;
+
+        function setStep(step) {
+            currentStep = step;
+            for (var i = 1; i <= totalSteps; i++) {
+                var el = document.getElementById('importStep' + i);
+                if (el) el.classList.toggle('d-none', i !== step);
+            }
+            document.querySelectorAll('#importStepIndicator .import-step').forEach(function (el) {
+                var s = parseInt(el.dataset.step, 10);
+                el.classList.toggle('active', s === step);
+                el.classList.toggle('done', s < step);
+            });
+            var prevBtn = document.getElementById('btnImportPrev');
+            var nextBtn = document.getElementById('btnImportNext');
+            prevBtn.classList.toggle('d-none', step === 1);
+            if (step === totalSteps) {
+                nextBtn.innerHTML = '<i class="ri ri-check-line me-1"></i>ยืนยันนำเข้า';
+            } else {
+                nextBtn.innerHTML = '<i class="ri ri-arrow-right-line me-1"></i>ถัดไป';
+            }
+        }
+
+        document.getElementById('dofImportModal').addEventListener('show.bs.modal', function () {
+            setStep(1);
+            document.getElementById('importProgressArea').classList.add('d-none');
+            document.getElementById('importSuccessMsg').classList.add('d-none');
+            document.getElementById('importProgressBar').style.width = '0%';
+            document.getElementById('importFileInfo').classList.add('d-none');
+            document.getElementById('importFileError').classList.add('d-none');
+            var fi = document.getElementById('importFileInput');
+            if (fi) fi.value = '';
+            var nb = document.getElementById('btnImportNext');
+            nb.disabled = false;
+            nb.onclick = null;
+            nb.innerHTML = '<i class="ri ri-arrow-right-line me-1"></i>ถัดไป';
+        });
+
+        document.getElementById('btnImportNext').addEventListener('click', function () {
+            if (currentStep === 2) {
+                var fi = document.getElementById('importFileInput');
+                var errEl = document.getElementById('importFileError');
+                errEl.classList.add('d-none');
+                if (!fi.files || fi.files.length === 0) {
+                    errEl.textContent = 'กรุณาเลือกไฟล์ก่อนดำเนินการต่อ';
+                    errEl.classList.remove('d-none');
+                    return;
+                }
+                var f = fi.files[0];
+                if (f.size > 5 * 1024 * 1024) {
+                    errEl.textContent = 'ไฟล์มีขนาดเกิน 5 MB กรุณาเลือกไฟล์ใหม่';
+                    errEl.classList.remove('d-none');
+                    return;
+                }
+                var ext = f.name.split('.').pop().toLowerCase();
+                if (ext !== 'xlsx' && ext !== 'csv') {
+                    errEl.textContent = 'รองรับเฉพาะไฟล์ .xlsx และ .csv เท่านั้น';
+                    errEl.classList.remove('d-none');
+                    return;
+                }
+            }
+            if (currentStep === totalSteps) {
+                var progressArea = document.getElementById('importProgressArea');
+                var progressBar = document.getElementById('importProgressBar');
+                var successMsg = document.getElementById('importSuccessMsg');
+                var nextBtn = document.getElementById('btnImportNext');
+                progressArea.classList.remove('d-none');
+                successMsg.classList.add('d-none');
+                nextBtn.disabled = true;
+                var pct = 0;
+                var iv = setInterval(function () {
+                    pct += 20;
+                    progressBar.style.width = pct + '%';
+                    if (pct >= 100) {
+                        clearInterval(iv);
+                        progressArea.classList.add('d-none');
+                        successMsg.classList.remove('d-none');
+                        nextBtn.disabled = false;
+                        nextBtn.innerHTML = '<i class="ri ri-close-line me-1"></i>ปิด';
+                        nextBtn.onclick = function () {
+                            bootstrap.Modal.getInstance(document.getElementById('dofImportModal')).hide();
+                        };
+                    }
+                }, 250);
+                return;
+            }
+            setStep(currentStep + 1);
+        });
+
+        document.getElementById('btnImportPrev').addEventListener('click', function () {
+            if (currentStep > 1) setStep(currentStep - 1);
+        });
+
+        document.getElementById('btnDownloadTemplate').addEventListener('click', function () {
+            showDofToast('ดาวน์โหลด Template DOF_Import_Template.xlsx เรียบร้อยแล้ว', 'success');
+        });
+
+        document.getElementById('importFileInput').addEventListener('change', function () {
+            var errEl = document.getElementById('importFileError');
+            var infoEl = document.getElementById('importFileInfo');
+            errEl.classList.add('d-none');
+            if (this.files && this.files.length > 0) {
+                var f = this.files[0];
+                var sizeKB = (f.size / 1024).toFixed(1);
+                document.getElementById('importFileName').textContent = f.name;
+                document.getElementById('importFileSize').textContent = sizeKB + ' KB';
+                infoEl.classList.remove('d-none');
+            } else {
+                infoEl.classList.add('d-none');
+            }
         });
     });
 </script>
@@ -452,6 +854,20 @@
                 </select>
             </div>
             <div class="col-md-3 col-lg-2">
+                <label for="filterMarket" class="form-label">ประเทศ / กลุ่มตลาด</label>
+                <select id="filterMarket" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="EU">EU (สหภาพยุโรป)</option>
+                    <option value="JP">ญี่ปุ่น (JP)</option>
+                    <option value="US">สหรัฐอเมริกา (US)</option>
+                    <option value="CN">จีน (CN)</option>
+                    <option value="KR">เกาหลีใต้ (KR)</option>
+                    <option value="AU">ออสเตรเลีย (AU)</option>
+                    <option value="ASEAN">อาเซียน</option>
+                    <option value="CA">แคนาดา (CA)</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-2">
                 <div class="d-flex gap-2 filter-action-buttons">
                     <button type="button" id="btnSearchDof" class="btn btn-outline-primary btn-square" title="ค้นหา"><i class="ri ri-search-line"></i></button>
                     <button type="button" id="btnResetDof" class="btn btn-outline-secondary btn-square" title="ล้างค่า"><i class="ri ri-refresh-line"></i></button>
@@ -468,6 +884,21 @@
             <p class="text-muted small mb-0">แสดงเลขทะเบียน DOF ขอบเขตการรับรอง ตลาดส่งออก และสถานะการรับรองสุขอนามัย</p>
         </div>
         <div class="d-flex align-items-center gap-2">
+            <div class="dropdown">
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ri ri-file-excel-2-line me-1"></i>Export Excel
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item btn-export-dof" href="#" data-export-type="all"><i class="ri ri-list-check me-1"></i>Export ทั้งหมด</a></li>
+                    <li><a class="dropdown-item btn-export-dof" href="#" data-export-type="filtered"><i class="ri ri-filter-3-line me-1"></i>Export เฉพาะที่กรอง</a></li>
+                    <li><a class="dropdown-item btn-export-dof" href="#" data-export-type="selected"><i class="ri ri-checkbox-multiple-line me-1"></i>Export เฉพาะที่เลือก</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item btn-export-dof" href="#" data-export-type="summary"><i class="ri ri-bar-chart-2-line me-1"></i>Export สรุปรายปี</a></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-outline-purple btn-sm" id="btnImportDof" data-bs-toggle="modal" data-bs-target="#dofImportModal">
+                <i class="ri ri-upload-cloud-2-line me-1"></i>นำเข้าข้อมูล
+            </button>
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#dofFactoryDetailModal">
                 <i class="ri ri-add-line me-1"></i> เพิ่มข้อมูล
             </button>
@@ -477,6 +908,7 @@
         <table class="table table-bordered align-middle mb-0 dof-table-compact">
             <thead class="text-center">
                 <tr>
+                    <th style="width:40px;" class="text-center"><input type="checkbox" id="dofSelectAll" class="form-check-input"></th>
                     <th style="width:56px;">#</th>
                     <th>เลขทะเบียน DOF</th>
                     <th>โรงงาน</th>
@@ -496,23 +928,37 @@
                     <tr data-dof-number="@factory.DofNumber"
                         data-factory-code="@factory.FactoryCode"
                         data-factory-name="@factory.FactoryName"
+                        data-factory-name-en="@factory.FactoryNameEN"
+                        data-tax-id="@factory.TaxId"
+                        data-branch-code="@factory.BranchCode"
                         data-establishment-no="@factory.EstablishmentNo"
+                        data-approval-number="@factory.ApprovalNumber"
                         data-province="@factory.Province"
                         data-scope="@factory.ApprovalScope"
                         data-audit="@factory.AuditResult"
                         data-status="@factory.StatusText"
                         data-status-class="@factory.StatusClass"
-                        data-search-text="@($"{factory.DofNumber} {factory.FactoryName} {factory.EstablishmentNo} {factory.Province}")">
+                        data-export-countries="@factory.ExportCountries"
+                        data-search-text="@($"{factory.DofNumber} {factory.FactoryName} {factory.FactoryNameEN} {factory.TaxId} {factory.EstablishmentNo} {factory.Province}")">
+                        <td class="text-center"><input type="checkbox" class="form-check-input dof-row-check" data-dof-number="@factory.DofNumber"></td>
                         <td class="text-center text-muted">@factory.RowNo</td>
                         <td class="fw-semibold text-primary">@factory.DofNumber</td>
                         <td>
                             <div class="fw-semibold">@factory.FactoryName</div>
+                            <div class="text-muted small fst-italic">@factory.FactoryNameEN</div>
                             <div class="text-muted small">@factory.FactoryCode</div>
                         </td>
                         <td class="text-center">@factory.EstablishmentNo</td>
                         <td>@factory.Province</td>
                         <td>@factory.ApprovalScope</td>
-                        <td class="text-center">@factory.ExportMarkets ตลาด</td>
+                        <td class="text-center">
+                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                @foreach (var chip in factory.ExportCountries.Split(','))
+                                {
+                                    <span class="badge bg-label-primary" style="font-size:0.65rem;">@chip.Trim()</span>
+                                }
+                            </div>
+                        </td>
                         <td class="text-center">@factory.ExpireDate.ToString("dd/MM/yyyy")</td>
                         <td class="text-center">@factory.AuditResult</td>
                         <td class="text-center"><span class="badge rounded-pill @factory.StatusClass">@factory.StatusText</span></td>
@@ -520,16 +966,154 @@
                             <div class="d-flex flex-wrap gap-1 justify-content-center">
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-info btn-view-dof" data-dof-number="@factory.DofNumber" title="รายละเอียดข้อมูล" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-eye-line text-info"></i></button>
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-warning btn-edit-dof" data-dof-number="@factory.DofNumber" title="แก้ไขข้อมูล" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-pencil-line text-warning"></i></button>
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-warning btn-suspend-dof" data-dof-number="@factory.DofNumber" title="ระงับชั่วคราว" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-forbid-2-line" style="color:#ff9f43;"></i></button>
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-cancel-dof" data-dof-number="@factory.DofNumber" title="ยกเลิกการรับรอง" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-close-circle-line text-danger"></i></button>
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="พิมพ์ทะเบียน" data-bs-toggle="tooltip" data-bs-placement="top"><i class="ri ri-printer-line text-secondary"></i></button>
                             </div>
                         </td>
                     </tr>
                 }
                 <tr id="dofTableEmpty" class="d-none">
-                    <td colspan="11" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="12" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- ผู้จัดการฐานข้อมูล DOF List (TOR 3.1(10)) -->
+<div class="card mt-4">
+    <div class="card-header d-flex align-items-center justify-content-between py-3" style="background:rgba(102,192,62,0.06);">
+        <div>
+            <h6 class="card-title mb-1 fw-semibold" style="color:#28a745;">
+                <i class="ri ri-shield-user-line me-2"></i>ผู้จัดการฐานข้อมูล DOF List
+            </h6>
+            <p class="text-muted small mb-0">เจ้าหน้าที่ที่ได้รับสิทธิ์เพิ่มเติม/แก้ไข/ระงับ/ยกเลิก ข้อมูลใน DOF List ตามพื้นที่รับผิดชอบ</p>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#dofAssignManagerModal">
+            <i class="ri ri-user-add-line me-1"></i>กำหนดสิทธิ์ผู้จัดการ
+        </button>
+    </div>
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0 dof-table-compact">
+            <thead>
+                <tr>
+                    <th style="width:50px;">#</th>
+                    <th>ชื่อ-สกุล</th>
+                    <th>สังกัดหน่วยงาน</th>
+                    <th>พื้นที่ DOF List</th>
+                    <th>สิทธิ์ที่ได้รับ</th>
+                    <th>วันที่กำหนด</th>
+                    <th>สถานะ</th>
+                    <th style="width:90px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center text-muted">1</td>
+                    <td>
+                        <div class="fw-semibold">นางสาวสมหญิง ใจดี</div>
+                        <div class="small text-muted">officer1@dof.go.th</div>
+                    </td>
+                    <td><span class="badge bg-label-primary">กตส.</span></td>
+                    <td><span class="badge bg-label-success">กตส. (ทุกโรงงาน)</span></td>
+                    <td>
+                        <span class="badge bg-label-success me-1">เพิ่ม</span>
+                        <span class="badge bg-label-warning me-1">แก้ไข</span>
+                    </td>
+                    <td class="text-muted small">01/04/2569</td>
+                    <td><span class="badge bg-label-success rounded-pill">ใช้งาน</span></td>
+                    <td class="text-center">
+                        <button class="btn btn-icon btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="แก้ไขสิทธิ์"><i class="ri ri-pencil-line text-warning"></i></button>
+                        <button class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="ถอนสิทธิ์"><i class="ri ri-user-unfollow-line text-danger"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center text-muted">2</td>
+                    <td>
+                        <div class="fw-semibold">นายประสิทธิ์ วงค์ดี</div>
+                        <div class="small text-muted">admin@dof.go.th</div>
+                    </td>
+                    <td><span class="badge bg-label-primary">กตส.</span></td>
+                    <td><span class="badge bg-label-success">ทุกพื้นที่</span></td>
+                    <td>
+                        <span class="badge bg-label-success me-1">เพิ่ม</span>
+                        <span class="badge bg-label-warning me-1">แก้ไข</span>
+                        <span class="badge bg-label-danger me-1">ระงับ</span>
+                        <span class="badge bg-label-secondary me-1">ยกเลิก</span>
+                    </td>
+                    <td class="text-muted small">01/01/2569</td>
+                    <td><span class="badge bg-label-success rounded-pill">ใช้งาน</span></td>
+                    <td class="text-center">
+                        <button class="btn btn-icon btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="แก้ไขสิทธิ์"><i class="ri ri-pencil-line text-warning"></i></button>
+                        <button class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="ถอนสิทธิ์"><i class="ri ri-user-unfollow-line text-danger"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center text-muted">3</td>
+                    <td>
+                        <div class="fw-semibold">นางสาวพิมพ์ใจ ชูศรี</div>
+                        <div class="small text-muted">pimjai@dof.go.th</div>
+                    </td>
+                    <td><span class="badge bg-label-info">ศตส.เขต 5</span></td>
+                    <td><span class="badge bg-label-info">ศตส.เขต 5 (สมุทรสาคร)</span></td>
+                    <td>
+                        <span class="badge bg-label-success me-1">เพิ่ม</span>
+                        <span class="badge bg-label-warning me-1">แก้ไข</span>
+                        <span class="badge bg-label-danger me-1">ระงับ</span>
+                    </td>
+                    <td class="text-muted small">15/04/2569</td>
+                    <td><span class="badge bg-label-success rounded-pill">ใช้งาน</span></td>
+                    <td class="text-center">
+                        <button class="btn btn-icon btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="แก้ไขสิทธิ์"><i class="ri ri-pencil-line text-warning"></i></button>
+                        <button class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="ถอนสิทธิ์"><i class="ri ri-user-unfollow-line text-danger"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: กำหนดสิทธิ์ผู้จัดการ DOF -->
+<div class="modal fade" id="dofAssignManagerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-label-success">
+                <h5 class="modal-title"><i class="ri ri-user-add-line me-2"></i>กำหนดสิทธิ์ผู้จัดการ DOF List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เลือกเจ้าหน้าที่</label>
+                    <select class="form-select">
+                        <option>— เลือกเจ้าหน้าที่ —</option>
+                        <option>นางสาวสมหญิง ใจดี (กตส.)</option>
+                        <option>นายวิทยา ทองดี (ศตส.เขต 3)</option>
+                        <option>นางสาวพิมพ์ใจ ชูศรี (ศตส.เขต 5)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">พื้นที่ DOF List ที่จัดการได้</label>
+                    <select class="form-select">
+                        <option>เฉพาะหน่วยงานสังกัด (ค่าเริ่มต้น)</option>
+                        <option>ทุกพื้นที่ (Admin เท่านั้น)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">สิทธิ์การดำเนินการ</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="mgrDofAdd" checked><label class="form-check-label" for="mgrDofAdd">เพิ่ม</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="mgrDofEdit" checked><label class="form-check-label" for="mgrDofEdit">แก้ไข</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="mgrDofSuspend"><label class="form-check-label" for="mgrDofSuspend">ระงับ</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="mgrDofCancel"><label class="form-check-label" for="mgrDofCancel">ยกเลิก</label></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal"><i class="ri ri-save-line me-1"></i>บันทึก</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -554,6 +1138,12 @@
                         <li class="nav-item">
                             <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-dof-audit" aria-selected="false"><i class="ri ri-survey-line me-1"></i> ประวัติการตรวจ</button>
                         </li>
+                        <li class="nav-item">
+                            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-dof-statuslog" aria-selected="false"><i class="ri ri-history-line me-1"></i> ประวัติสถานะ</button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-dof-country" aria-selected="false"><i class="ri ri-earth-line me-1"></i> ประเทศที่รับรองส่งออก</button>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div id="tab-dof-detail" class="tab-pane fade show active">
@@ -568,7 +1158,12 @@
                                                 <div class="col-md-4"><div class="detail-kv"><span class="label">เลขทะเบียน DOF</span><span class="value" id="detailDofNumber">-</span></div></div>
                                                 <div class="col-md-4"><div class="detail-kv"><span class="label">รหัสโรงงาน</span><span class="value" id="detailFactoryCode">-</span></div></div>
                                                 <div class="col-md-4"><div class="detail-kv"><span class="label">สถานะ</span><span class="value" id="detailStatus">-</span></div></div>
-                                                <div class="col-md-4"><div class="detail-kv"><span class="label">Establishment No.</span><span class="value" id="detailEstablishmentNo">-</span></div></div>
+                                                <div class="col-12"><div class="detail-kv"><span class="label">ชื่อสถานประกอบการ (ไทย)</span><span class="value" id="detailFactoryNameTH">-</span></div></div>
+                                                <div class="col-12"><div class="detail-kv"><span class="label">ชื่อสถานประกอบการ (EN)</span><span class="value fst-italic" id="detailFactoryNameEN">-</span></div></div>
+                                                <div class="col-md-6"><div class="detail-kv"><span class="label">เลขประจำตัวผู้เสียภาษีอากร</span><span class="value font-monospace" id="detailTaxId">-</span></div></div>
+                                                <div class="col-md-6"><div class="detail-kv"><span class="label">ลำดับสาขา (Branch Code)</span><span class="value font-monospace" id="detailBranchCode">-</span></div></div>
+                                                <div class="col-md-4"><div class="detail-kv"><span class="label">Establishment No. (EU)</span><span class="value" id="detailEstablishmentNo">-</span></div></div>
+                                                <div class="col-md-4"><div class="detail-kv"><span class="label">Approval Number</span><span class="value" id="detailApprovalNumber">-</span></div></div>
                                                 <div class="col-md-4"><div class="detail-kv"><span class="label">จังหวัด</span><span class="value" id="detailProvince">-</span></div></div>
                                                 <div class="col-md-4"><div class="detail-kv"><span class="label">ผลการตรวจล่าสุด</span><span class="value" id="detailAuditResult">-</span></div></div>
                                             </div>
@@ -585,9 +1180,11 @@
                                                 <div class="col-md-6"><div class="detail-kv"><span class="label">ขอบเขตการรับรอง</span><span class="value" id="detailApprovalScope">-</span></div></div>
                                                 <div class="col-md-3"><div class="detail-kv"><span class="label">วันที่รับรอง</span><span class="value" id="detailCertDate">-</span></div></div>
                                                 <div class="col-md-3"><div class="detail-kv"><span class="label">ตรวจครั้งถัดไป</span><span class="value" id="detailNextAuditDate">-</span></div></div>
-                                                <div class="col-md-6"><div class="detail-kv"><span class="label">ที่อยู่</span><span class="value" id="detailAddress">-</span></div></div>
+                                                <div class="col-md-6"><div class="detail-kv"><span class="label">ที่อยู่ (ไทย)</span><span class="value" id="detailAddress">-</span></div></div>
+                                                <div class="col-md-6"><div class="detail-kv"><span class="label">ที่อยู่ (EN)</span><span class="value fst-italic" id="detailAddressEN">-</span></div></div>
                                                 <div class="col-md-3"><div class="detail-kv"><span class="label">โทรศัพท์</span><span class="value" id="detailPhone">-</span></div></div>
-                                                <div class="col-md-3"><div class="detail-kv"><span class="label">อีเมล</span><span class="value" id="detailEmail">-</span></div></div>
+                                                <div class="col-md-3"><div class="detail-kv"><span class="label">โทรสาร (Fax)</span><span class="value" id="detailFax">-</span></div></div>
+                                                <div class="col-md-6"><div class="detail-kv"><span class="label">อีเมล</span><span class="value" id="detailEmail">-</span></div></div>
                                                 <div class="col-12"><div class="detail-kv"><span class="label">หมายเหตุ</span><span class="value" id="detailNote">-</span></div></div>
                                             </div>
                                         </div>
@@ -627,12 +1224,266 @@
                                 </table>
                             </div>
                         </div>
+                        <div id="tab-dof-statuslog" class="tab-pane fade">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm align-middle mb-0 dof-table-compact">
+                                    <thead class="text-center">
+                                        <tr>
+                                            <th style="width:56px;">#</th>
+                                            <th>วันที่</th>
+                                            <th>สถานะเดิม</th>
+                                            <th>สถานะใหม่</th>
+                                            <th>เหตุผล</th>
+                                            <th>ผู้ดำเนินการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="statusLogTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="tab-dof-country" class="tab-pane fade">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small text-muted">รายชื่อประเทศปลายทางที่โรงงานได้รับการรับรองให้ส่งออก</span>
+                                <button type="button" class="btn btn-sm btn-outline-primary"><i class="ri ri-earth-line me-1"></i>เพิ่มประเทศ</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm align-middle mb-0 dof-table-compact">
+                                    <thead class="text-center table-light">
+                                        <tr>
+                                            <th style="width:40px;">#</th>
+                                            <th>ประเทศ (TH)</th>
+                                            <th>ประเทศ (EN)</th>
+                                            <th>รหัส ISO</th>
+                                            <th>กลุ่มตลาด</th>
+                                            <th>วันที่เริ่มต้น</th>
+                                            <th>วันที่สิ้นสุด</th>
+                                            <th>สถานะ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="exportCountriesTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="ri ri-close-line me-1"></i> ปิด</button>
                 <button type="button" class="btn btn-primary"><i class="ri ri-save-line me-1"></i> บันทึกข้อมูล</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999;">
+    <div id="dofActionToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="dofActionToastMsg">สำเร็จ</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: ระงับโรงงานชั่วคราว -->
+<div class="modal fade" id="dofSuspendModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background:rgba(255,159,67,0.12);">
+                <h5 class="modal-title text-warning"><i class="ri ri-forbid-2-line me-2"></i>ระงับโรงงานชั่วคราว</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">คุณต้องการ <strong class="text-warning">ระงับชั่วคราว</strong> โรงงาน:</p>
+                <div class="alert alert-warning py-2 fw-semibold mb-3" id="suspendFactoryName">-</div>
+                <input type="hidden" id="suspendDofNumberHidden">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">วันที่ระงับ <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="suspendDate" value="2026-04-27">
+                </div>
+                <div class="mb-0">
+                    <label class="form-label fw-semibold">เหตุผลการระงับ <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="suspendReason" rows="3" placeholder="ระบุเหตุผลการระงับ..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-warning" id="btnConfirmSuspend" data-bs-dismiss="modal"><i class="ri ri-forbid-2-line me-1"></i>ยืนยันระงับ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: ยกเลิกการรับรอง -->
+<div class="modal fade" id="dofCancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background:rgba(234,84,85,0.12);">
+                <h5 class="modal-title text-danger"><i class="ri ri-close-circle-line me-2"></i>ยกเลิกการรับรอง</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">คุณต้องการ <strong class="text-danger">ยกเลิกการรับรอง</strong> โรงงาน:</p>
+                <div class="alert alert-danger py-2 fw-semibold mb-3" id="cancelFactoryName">-</div>
+                <input type="hidden" id="cancelDofNumberHidden">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">วันที่ยกเลิก <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="cancelDate" value="2026-04-27">
+                </div>
+                <div class="mb-0">
+                    <label class="form-label fw-semibold">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="cancelReason" rows="3" placeholder="ระบุเหตุผลการยกเลิกการรับรอง..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmCancel" data-bs-dismiss="modal"><i class="ri ri-close-circle-line me-1"></i>ยืนยันยกเลิก</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: นำเข้าข้อมูล DOF List (4-step wizard) -->
+<div class="modal fade" id="dofImportModal" tabindex="-1" aria-labelledby="dofImportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background:rgba(102,16,242,0.07);">
+                <h5 class="modal-title" id="dofImportModalLabel"><i class="ri ri-upload-cloud-2-line me-2 text-purple"></i>นำเข้าข้อมูล DOF List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Step indicator -->
+                <div class="d-flex align-items-center justify-content-center gap-0 mb-4" id="importStepIndicator">
+                    <div class="import-step active" data-step="1"><span class="step-num">1</span><span class="step-label">ดาวน์โหลด Template</span></div>
+                    <div class="import-step-divider"></div>
+                    <div class="import-step" data-step="2"><span class="step-num">2</span><span class="step-label">อัปโหลดไฟล์</span></div>
+                    <div class="import-step-divider"></div>
+                    <div class="import-step" data-step="3"><span class="step-num">3</span><span class="step-label">ตรวจสอบข้อมูล</span></div>
+                    <div class="import-step-divider"></div>
+                    <div class="import-step" data-step="4"><span class="step-num">4</span><span class="step-label">ยืนยันนำเข้า</span></div>
+                </div>
+
+                <!-- Step 1: Download template -->
+                <div id="importStep1" class="import-step-content">
+                    <h6 class="fw-semibold mb-3"><i class="ri ri-download-cloud-line me-1 text-primary"></i>Step 1 — ดาวน์โหลด Template</h6>
+                    <p class="text-muted small mb-3">ดาวน์โหลดไฟล์ Template (.xlsx) แล้วกรอกข้อมูลโรงงานตามคอลัมน์ที่กำหนด ก่อนนำเข้าระบบ</p>
+                    <button type="button" class="btn btn-outline-primary mb-4" id="btnDownloadTemplate">
+                        <i class="ri ri-download-line me-1"></i>ดาวน์โหลด Template (.xlsx)
+                    </button>
+                    <div class="card bg-light">
+                        <div class="card-header py-2"><span class="fw-semibold small">คอลัมน์ใน Template</span></div>
+                        <div class="card-body py-3">
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var col in new[] { "DofNumber", "FactoryName(TH)", "FactoryName(EN)", "TaxId", "BranchCode", "EstablishmentNo", "ApprovalNo", "Province", "Address(TH)", "Address(EN)", "Phone", "Fax", "ApprovalScope", "ExportCountries", "ExpireDate", "Status" })
+                                {
+                                    <span class="badge bg-label-primary font-monospace">@col</span>
+                                }
+                            </div>
+                            <p class="text-muted small mt-2 mb-0"><i class="ri ri-information-line me-1"></i>ExportCountries: คั่นด้วยเครื่องหมาย <code>|</code> เช่น <code>EU|JP|US</code> &nbsp;|&nbsp; ExpireDate: รูปแบบ <code>DD/MM/YYYY</code></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Upload file -->
+                <div id="importStep2" class="import-step-content d-none">
+                    <h6 class="fw-semibold mb-3"><i class="ri ri-file-upload-line me-1 text-primary"></i>Step 2 — อัปโหลดไฟล์</h6>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">เลือกไฟล์ (.xlsx หรือ .csv) <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="importFileInput" accept=".xlsx,.csv">
+                        <div class="form-text text-muted">ขนาดไฟล์สูงสุด 5 MB | รองรับ .xlsx และ .csv เท่านั้น</div>
+                    </div>
+                    <div id="importFileInfo" class="alert alert-info d-none py-2 small">
+                        <i class="ri ri-file-excel-2-line me-1"></i><span id="importFileName">-</span> &nbsp;|&nbsp; <span id="importFileSize">-</span>
+                    </div>
+                    <div id="importFileError" class="alert alert-danger d-none py-2 small"></div>
+                </div>
+
+                <!-- Step 3: Preview / validate -->
+                <div id="importStep3" class="import-step-content d-none">
+                    <h6 class="fw-semibold mb-3"><i class="ri ri-table-line me-1 text-primary"></i>Step 3 — ตรวจสอบข้อมูล</h6>
+                    <div class="d-flex gap-3 mb-3">
+                        <span class="badge bg-label-success px-3 py-2 fs-6" id="importOkCount">ผ่าน 3 รายการ</span>
+                        <span class="badge bg-label-danger px-3 py-2 fs-6" id="importErrCount">มีข้อผิดพลาด 1 รายการ</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle mb-0 dof-table-compact">
+                            <thead class="text-center table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>DofNumber</th>
+                                    <th>ชื่อโรงงาน (TH)</th>
+                                    <th>TaxId</th>
+                                    <th>EstablishmentNo</th>
+                                    <th>จังหวัด</th>
+                                    <th>สถานะตรวจสอบ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="importPreviewBody">
+                                <tr class="table-success">
+                                    <td class="text-center">1</td>
+                                    <td class="font-monospace">DOF-FAC-01001</td>
+                                    <td>บริษัท สยาม ซีฟู้ด จำกัด</td>
+                                    <td class="font-monospace">0105558099901</td>
+                                    <td>EST-TH-1701</td>
+                                    <td>สงขลา</td>
+                                    <td><span class="badge bg-success"><i class="ri ri-check-line me-1"></i>ผ่าน</span></td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td class="text-center">2</td>
+                                    <td class="font-monospace">DOF-FAC-01002</td>
+                                    <td>บริษัท ภูเก็ต ฟิช โปรเซสซิ่ง จำกัด</td>
+                                    <td class="font-monospace">0835558099902</td>
+                                    <td>EST-TH-1702</td>
+                                    <td>ภูเก็ต</td>
+                                    <td><span class="badge bg-success"><i class="ri ri-check-line me-1"></i>ผ่าน</span></td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <td class="text-center">3</td>
+                                    <td class="font-monospace">DOF-FAC-01003</td>
+                                    <td>บริษัท ชลบุรี มารีน จำกัด</td>
+                                    <td class="font-monospace text-danger fw-bold">020555</td>
+                                    <td>EST-TH-1703</td>
+                                    <td>ชลบุรี</td>
+                                    <td><span class="badge bg-danger"><i class="ri ri-error-warning-line me-1"></i>TaxId ไม่ครบ 13 หลัก</span></td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td class="text-center">4</td>
+                                    <td class="font-monospace">DOF-FAC-01004</td>
+                                    <td>บริษัท ระนอง โคลด์เชน จำกัด</td>
+                                    <td class="font-monospace">0605558099904</td>
+                                    <td>EST-TH-1704</td>
+                                    <td>ระนอง</td>
+                                    <td><span class="badge bg-success"><i class="ri ri-check-line me-1"></i>ผ่าน</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-muted small mt-2 mb-0"><i class="ri ri-information-line me-1"></i>แถวสีแดงจะถูกข้ามในการนำเข้า โปรดแก้ไขไฟล์แล้วอัปโหลดใหม่ หรือดำเนินการต่อเฉพาะแถวที่ผ่าน</p>
+                </div>
+
+                <!-- Step 4: Confirm / progress -->
+                <div id="importStep4" class="import-step-content d-none">
+                    <h6 class="fw-semibold mb-3"><i class="ri ri-check-double-line me-1 text-primary"></i>Step 4 — ยืนยันนำเข้า</h6>
+                    <div class="alert alert-warning py-2 small mb-3">
+                        <i class="ri ri-error-warning-line me-1"></i>ระบบจะนำเข้า <strong>3 รายการที่ผ่านการตรวจสอบ</strong> และข้าม 1 รายการที่มีข้อผิดพลาด
+                    </div>
+                    <div id="importProgressArea" class="d-none mb-3">
+                        <label class="form-label small fw-semibold">กำลังนำเข้าข้อมูล...</label>
+                        <div class="progress" style="height:18px;">
+                            <div id="importProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-purple" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div id="importSuccessMsg" class="alert alert-success d-none py-2">
+                        <i class="ri ri-checkbox-circle-line me-1"></i><strong>นำเข้าสำเร็จ 3 รายการ</strong> — ข้อมูลได้รับการบันทึกลงในระบบแล้ว
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" id="btnImportPrev"><i class="ri ri-arrow-left-line me-1"></i>ย้อนกลับ</button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-purple" id="btnImportNext"><i class="ri ri-arrow-right-line me-1"></i>ถัดไป</button>
+                </div>
             </div>
         </div>
     </div>

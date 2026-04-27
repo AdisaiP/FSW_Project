@@ -1,0 +1,894 @@
+@{
+    ViewData["Title"] = "ประชาสัมพันธ์และแจ้งข่าว";
+
+    var announcements = new[]
+    {
+        new
+        {
+            RowNo = 1,
+            AnnouncementId = "ANN-2569-001",
+            Title = "ประกาศ: ปรับปรุงระบบ FSW เวอร์ชัน 2.5 — กำหนดการและผลกระทบ",
+            TypeText = "อัปเดตระบบ",
+            TypeClass = "bg-label-primary",
+            TypeIcon = "ri-settings-3-line",
+            Target = "ทุกคน",
+            PublishDate = new DateTime(2026, 4, 25),
+            ExpireDate = new DateTime(2026, 5, 31),
+            StatusText = "เผยแพร่แล้ว",
+            StatusClass = "bg-label-success",
+            AttachmentCount = 2,
+            LinkCount = 1,
+            CreatedBy = "admin.sys01",
+            PinTop = true
+        },
+        new
+        {
+            RowNo = 2,
+            AnnouncementId = "ANN-2569-002",
+            Title = "ข่าวสาร: กรมประมงจัดอบรมการออกใบรับรอง PS สำหรับเจ้าหน้าที่ใหม่",
+            TypeText = "ข่าวสาร",
+            TypeClass = "bg-label-info",
+            TypeIcon = "ri-newspaper-line",
+            Target = "เจ้าหน้าที่",
+            PublishDate = new DateTime(2026, 4, 20),
+            ExpireDate = new DateTime(2026, 5, 15),
+            StatusText = "เผยแพร่แล้ว",
+            StatusClass = "bg-label-success",
+            AttachmentCount = 1,
+            LinkCount = 2,
+            CreatedBy = "admin.hr02",
+            PinTop = false
+        },
+        new
+        {
+            RowNo = 3,
+            AnnouncementId = "ANN-2569-003",
+            Title = "คำเตือน: ระวังเอกสารปลอมที่อ้างชื่อกรมประมง — วิธีตรวจสอบ QR Code",
+            TypeText = "คำเตือน",
+            TypeClass = "bg-label-danger",
+            TypeIcon = "ri-error-warning-line",
+            Target = "ผู้ประกอบการ",
+            PublishDate = new DateTime(2026, 4, 18),
+            ExpireDate = new DateTime(2026, 6, 30),
+            StatusText = "เผยแพร่แล้ว",
+            StatusClass = "bg-label-success",
+            AttachmentCount = 0,
+            LinkCount = 1,
+            CreatedBy = "admin.sec03",
+            PinTop = false
+        },
+        new
+        {
+            RowNo = 4,
+            AnnouncementId = "ANN-2569-004",
+            Title = "ประกาศ: แนวทางปฏิบัติการออกใบรับรองในช่วงวันหยุดสงกรานต์ 2569",
+            TypeText = "ประกาศ",
+            TypeClass = "bg-label-warning",
+            TypeIcon = "ri-megaphone-line",
+            Target = "ทุกคน",
+            PublishDate = new DateTime(2026, 4, 1),
+            ExpireDate = new DateTime(2026, 4, 30),
+            StatusText = "หมดอายุ",
+            StatusClass = "bg-label-secondary",
+            AttachmentCount = 1,
+            LinkCount = 0,
+            CreatedBy = "admin.ops04",
+            PinTop = false
+        },
+        new
+        {
+            RowNo = 5,
+            AnnouncementId = "ANN-2569-005",
+            Title = "ร่าง: การปรับปรุงแบบฟอร์มใบรับรอง NMD สำหรับตลาดญี่ปุ่น (ยังไม่เผยแพร่)",
+            TypeText = "ประกาศ",
+            TypeClass = "bg-label-warning",
+            TypeIcon = "ri-megaphone-line",
+            Target = "เจ้าหน้าที่",
+            PublishDate = new DateTime(2026, 5, 1),
+            ExpireDate = new DateTime(2026, 12, 31),
+            StatusText = "ฉบับร่าง",
+            StatusClass = "bg-label-secondary",
+            AttachmentCount = 0,
+            LinkCount = 0,
+            CreatedBy = "admin.doc05",
+            PinTop = false
+        },
+        new
+        {
+            RowNo = 6,
+            AnnouncementId = "ANN-2569-006",
+            Title = "ข่าวสาร: ผลการตรวจประเมิน ISO 9001:2015 ประจำปี 2569 — ผ่านการรับรอง",
+            TypeText = "ข่าวสาร",
+            TypeClass = "bg-label-info",
+            TypeIcon = "ri-newspaper-line",
+            Target = "ทุกคน",
+            PublishDate = new DateTime(2026, 3, 15),
+            ExpireDate = new DateTime(2026, 9, 30),
+            StatusText = "เผยแพร่แล้ว",
+            StatusClass = "bg-label-success",
+            AttachmentCount = 3,
+            LinkCount = 0,
+            CreatedBy = "admin.qa06",
+            PinTop = false
+        }
+    };
+
+    var totalCount = announcements.Length;
+    var publishedCount = announcements.Count(a => a.StatusText == "เผยแพร่แล้ว");
+    var expiredCount = announcements.Count(a => a.StatusText == "หมดอายุ");
+    var draftCount = announcements.Count(a => a.StatusText == "ฉบับร่าง");
+}
+
+@section PageStyles {
+<style>
+    .announce-table-compact {
+        font-size: 0.78rem;
+    }
+
+    .announce-table-compact th,
+    .announce-table-compact td {
+        padding: 0.45rem 0.5rem;
+        vertical-align: middle;
+        line-height: 1.3;
+    }
+
+    .announce-table-compact .badge {
+        font-size: 0.68rem;
+    }
+
+    .announce-table-compact .btn.btn-sm {
+        --bs-btn-padding-y: 0.14rem;
+        --bs-btn-padding-x: 0.3rem;
+    }
+
+    .announce-table-compact .btn-icon {
+        width: 1.65rem;
+        height: 1.65rem;
+    }
+
+    .filter-action-buttons .btn-square {
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .announce-title-col {
+        min-width: 280px;
+        max-width: 380px;
+    }
+
+    .link-list-item,
+    .file-list-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.6rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.5rem;
+        margin-bottom: 0.4rem;
+        background: var(--bs-paper-bg);
+        font-size: 0.82rem;
+    }
+
+    .link-list-item .btn-remove,
+    .file-list-item .btn-remove {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .content-preview-box {
+        border: 1px dashed var(--bs-border-color);
+        border-radius: 0.6rem;
+        background: var(--bs-paper-bg);
+        padding: 1rem;
+        min-height: 80px;
+        font-size: 0.86rem;
+        line-height: 1.55;
+    }
+
+    .announce-preview-card {
+        border: 2px solid var(--bs-primary);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        background: var(--bs-paper-bg);
+    }
+
+    .pin-badge {
+        font-size: 0.65rem;
+        vertical-align: middle;
+    }
+</style>
+}
+
+@section PageScripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ---- Filter ----
+        function filterRows() {
+            var keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
+            var typeFilter = (document.getElementById('filterType').value || '').trim();
+            var targetFilter = (document.getElementById('filterTarget').value || '').trim();
+            var statusFilter = (document.getElementById('filterStatus').value || '').trim();
+
+            var rows = document.querySelectorAll('#announceTableBody tr[data-ann-id]');
+            var visible = 0;
+            rows.forEach(function (row) {
+                var title = (row.dataset.title || '').toLowerCase();
+                var type = (row.dataset.type || '');
+                var target = (row.dataset.target || '');
+                var status = (row.dataset.status || '');
+
+                var match =
+                    (!keyword || title.includes(keyword)) &&
+                    (!typeFilter || type === typeFilter) &&
+                    (!targetFilter || target === targetFilter) &&
+                    (!statusFilter || status === statusFilter);
+
+                row.classList.toggle('d-none', !match);
+                if (match) visible++;
+            });
+            document.getElementById('announceTableEmpty').classList.toggle('d-none', visible !== 0);
+            document.getElementById('visibleCount').textContent = visible;
+        }
+
+        document.getElementById('btnSearch').addEventListener('click', filterRows);
+        document.getElementById('btnReset').addEventListener('click', function () {
+            document.getElementById('filterKeyword').value = '';
+            document.getElementById('filterType').value = '';
+            document.getElementById('filterTarget').value = '';
+            document.getElementById('filterStatus').value = '';
+            filterRows();
+        });
+        document.getElementById('filterKeyword').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
+        });
+        ['filterType', 'filterTarget', 'filterStatus'].forEach(function (id) {
+            document.getElementById(id).addEventListener('change', filterRows);
+        });
+
+        // ---- Open detail ----
+        document.querySelectorAll('.btn-view-ann, .btn-edit-ann').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = this.dataset.annId;
+                var row = document.querySelector('#announceTableBody tr[data-ann-id="' + id + '"]');
+                if (!row) return;
+                document.getElementById('annModalTitle').textContent = row.dataset.title;
+                document.getElementById('detailAnnId').textContent = id;
+                document.getElementById('detailAnnType').innerHTML = '<span class="badge ' + row.dataset.typeClass + '"><i class="ri ' + row.dataset.typeIcon + ' me-1"></i>' + row.dataset.type + '</span>';
+                document.getElementById('detailAnnTarget').textContent = row.dataset.target;
+                document.getElementById('detailAnnPublish').textContent = row.dataset.publishDate;
+                document.getElementById('detailAnnExpire').textContent = row.dataset.expireDate;
+                document.getElementById('detailAnnStatus').innerHTML = '<span class="badge ' + row.dataset.statusClass + '">' + row.dataset.status + '</span>';
+                document.getElementById('detailAnnCreatedBy').textContent = row.dataset.createdBy;
+                new bootstrap.Modal(document.getElementById('annDetailModal')).show();
+            });
+        });
+
+        // ---- Add Link (in create/edit modal) ----
+        var linkCount = 0;
+        document.getElementById('btnAddLink').addEventListener('click', function () {
+            linkCount++;
+            var item = document.createElement('div');
+            item.className = 'link-list-item';
+            item.innerHTML =
+                '<i class="ri ri-links-line text-primary"></i>' +
+                '<input type="url" class="form-control form-control-sm" placeholder="https://..." style="flex:1;">' +
+                '<input type="text" class="form-control form-control-sm ms-1" placeholder="ชื่อลิงก์" style="width:140px;">' +
+                '<button type="button" class="btn btn-icon btn-xs btn-outline-danger btn-remove ms-1"><i class="ri ri-close-line"></i></button>';
+            item.querySelector('.btn-remove').addEventListener('click', function () { item.remove(); });
+            document.getElementById('linkListContainer').appendChild(item);
+        });
+
+        // ---- Add File (in create/edit modal) ----
+        document.getElementById('btnAddFile').addEventListener('click', function () {
+            var item = document.createElement('div');
+            item.className = 'file-list-item';
+            var fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.pdf,.doc,.docx,.xls,.xlsx,.zip';
+            fileInput.style.display = 'none';
+            fileInput.addEventListener('change', function () {
+                if (fileInput.files.length > 0) {
+                    var file = fileInput.files[0];
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('ขนาดไฟล์เกิน 10 MB กรุณาเลือกไฟล์ใหม่');
+                        return;
+                    }
+                    label.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                }
+            });
+            var label = document.createElement('span');
+            label.className = 'flex-grow-1 text-muted small';
+            label.textContent = 'ยังไม่ได้เลือกไฟล์';
+            var selectBtn = document.createElement('button');
+            selectBtn.type = 'button';
+            selectBtn.className = 'btn btn-xs btn-outline-primary';
+            selectBtn.innerHTML = '<i class="ri ri-upload-2-line me-1"></i> เลือกไฟล์';
+            selectBtn.addEventListener('click', function () { fileInput.click(); });
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-icon btn-xs btn-outline-danger btn-remove ms-1';
+            removeBtn.innerHTML = '<i class="ri ri-close-line"></i>';
+            removeBtn.addEventListener('click', function () { item.remove(); });
+            item.appendChild(document.createElement('i')).className = 'ri ri-file-line text-success';
+            item.appendChild(fileInput);
+            item.appendChild(label);
+            item.appendChild(selectBtn);
+            item.appendChild(removeBtn);
+            document.getElementById('fileListContainer').appendChild(item);
+        });
+
+        // ---- Schedule date toggle ----
+        document.querySelectorAll('input[name="publishMode"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var show = this.value === 'schedule';
+                document.getElementById('schedulePublishDateRow').classList.toggle('d-none', !show);
+            });
+        });
+
+        // ---- Preview modal ----
+        document.getElementById('btnPreview').addEventListener('click', function () {
+            var title = (document.getElementById('annTitle').value || '').trim() || '(ยังไม่ได้ระบุหัวข้อ)';
+            var content = (document.getElementById('annContent').value || '').trim() || '(ยังไม่มีเนื้อหา)';
+            var type = document.getElementById('annType').options[document.getElementById('annType').selectedIndex].text;
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewType').textContent = type;
+            document.getElementById('previewContent').textContent = content;
+            var lnkCount = document.getElementById('linkListContainer').children.length;
+            var fileCount = document.getElementById('fileListContainer').children.length;
+            document.getElementById('previewAttachInfo').textContent =
+                'ลิงก์: ' + lnkCount + ' รายการ  |  ไฟล์: ' + fileCount + ' รายการ';
+            new bootstrap.Modal(document.getElementById('previewModal')).show();
+        });
+    });
+</script>
+}
+
+<h4 class="mb-1">ประชาสัมพันธ์และแจ้งข่าว</h4>
+<p class="mb-1 text-muted">จัดการข่าวประชาสัมพันธ์ ประกาศ และแจ้งข่าวสารพร้อมแนบลิงก์และไฟล์ประกอบ</p>
+
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Announcement", "Admin")" class="text-primary fw-semibold">ผู้ดูแลระบบ</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary">ประชาสัมพันธ์และแจ้งข่าว</li>
+    </ol>
+</nav>
+
+<!-- Summary Cards -->
+<div class="row mb-6 g-6">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@totalCount</h5>
+                        <small>ข่าวทั้งหมด</small>
+                    </div>
+                    <span class="badge bg-label-primary rounded-circle p-2"><i class="icon-base ri ri-megaphone-line icon-24px"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@publishedCount</h5>
+                        <small>เผยแพร่อยู่</small>
+                    </div>
+                    <span class="badge bg-label-success rounded-circle p-2"><i class="icon-base ri ri-broadcast-line icon-24px"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@expiredCount</h5>
+                        <small>หมดอายุ</small>
+                    </div>
+                    <span class="badge bg-label-warning rounded-circle p-2"><i class="icon-base ri ri-time-line icon-24px"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@draftCount</h5>
+                        <small>ฉบับร่าง</small>
+                    </div>
+                    <span class="badge bg-label-secondary rounded-circle p-2"><i class="icon-base ri ri-draft-line icon-24px"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Card -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <h5 class="card-title mb-1">ค้นหาข่าวประชาสัมพันธ์</h5>
+            <p class="text-muted small mb-0">ค้นหาตามหัวข้อ ประเภท กลุ่มเป้าหมาย และสถานะ</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4 col-lg-4">
+                <label for="filterKeyword" class="form-label">คำค้นหา</label>
+                <input type="text" id="filterKeyword" class="form-control" placeholder="หัวข้อข่าว, รหัส..." />
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label for="filterType" class="form-label">ประเภท</label>
+                <select id="filterType" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="ข่าวสาร">ข่าวสาร</option>
+                    <option value="ประกาศ">ประกาศ</option>
+                    <option value="คำเตือน">คำเตือน</option>
+                    <option value="อัปเดตระบบ">อัปเดตระบบ</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label for="filterTarget" class="form-label">กลุ่มเป้าหมาย</label>
+                <select id="filterTarget" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="ทุกคน">ทุกคน</option>
+                    <option value="ผู้ประกอบการ">ผู้ประกอบการ</option>
+                    <option value="เจ้าหน้าที่">เจ้าหน้าที่</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label for="filterStatus" class="form-label">สถานะ</label>
+                <select id="filterStatus" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="เผยแพร่แล้ว">เผยแพร่แล้ว</option>
+                    <option value="หมดอายุ">หมดอายุ</option>
+                    <option value="ฉบับร่าง">ฉบับร่าง</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <div class="d-flex gap-2 filter-action-buttons">
+                    <button type="button" id="btnSearch" class="btn btn-outline-primary btn-square" title="ค้นหา"><i class="ri ri-search-line"></i></button>
+                    <button type="button" id="btnReset" class="btn btn-outline-secondary btn-square" title="ล้างค่า"><i class="ri ri-refresh-line"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h5 class="card-title mb-1">รายการข่าวประชาสัมพันธ์</h5>
+            <p class="text-muted small mb-0">แสดง <span id="visibleCount">@totalCount</span> รายการ</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
+                <i class="ri ri-megaphone-line me-1"></i> เพิ่มข่าว
+            </button>
+        </div>
+    </div>
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0 announce-table-compact">
+            <thead class="text-center">
+                <tr>
+                    <th style="width:44px;">#</th>
+                    <th class="announce-title-col">หัวข้อข่าว</th>
+                    <th style="min-width:100px;">ประเภท</th>
+                    <th style="min-width:100px;">กลุ่มเป้าหมาย</th>
+                    <th style="min-width:110px;">วันเผยแพร่</th>
+                    <th style="min-width:110px;">วันหมดอายุ</th>
+                    <th style="min-width:70px;">ไฟล์/ลิงก์</th>
+                    <th style="min-width:100px;">สถานะ</th>
+                    <th style="width:7rem;">การดำเนินการ</th>
+                </tr>
+            </thead>
+            <tbody id="announceTableBody">
+                @foreach (var ann in announcements)
+                {
+                    <tr data-ann-id="@ann.AnnouncementId"
+                        data-title="@ann.Title"
+                        data-type="@ann.TypeText"
+                        data-type-class="@ann.TypeClass"
+                        data-type-icon="@ann.TypeIcon"
+                        data-target="@ann.Target"
+                        data-publish-date="@ann.PublishDate.ToString("dd/MM/yyyy")"
+                        data-expire-date="@ann.ExpireDate.ToString("dd/MM/yyyy")"
+                        data-status="@ann.StatusText"
+                        data-status-class="@ann.StatusClass"
+                        data-created-by="@ann.CreatedBy">
+                        <td class="text-center text-muted">@ann.RowNo</td>
+                        <td class="announce-title-col">
+                            @if (ann.PinTop)
+                            {
+                                <span class="badge bg-label-danger pin-badge me-1"><i class="ri ri-pushpin-line"></i> ปักหมุด</span>
+                            }
+                            <span class="fw-semibold small d-block">@ann.Title</span>
+                            <small class="text-muted">@ann.AnnouncementId</small>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @ann.TypeClass">
+                                <i class="ri @ann.TypeIcon me-1"></i>@ann.TypeText
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            @if (ann.Target == "ทุกคน")
+                            {
+                                <span class="badge bg-label-primary">ทุกคน</span>
+                            }
+                            else if (ann.Target == "ผู้ประกอบการ")
+                            {
+                                <span class="badge bg-label-info">ผู้ประกอบการ</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-warning">เจ้าหน้าที่</span>
+                            }
+                        </td>
+                        <td class="text-center">@ann.PublishDate.ToString("dd/MM/yyyy")</td>
+                        <td class="text-center @(ann.StatusText == "หมดอายุ" ? "text-danger" : "")">
+                            @ann.ExpireDate.ToString("dd/MM/yyyy")
+                            @if (ann.StatusText == "หมดอายุ")
+                            {
+                                <i class="ri ri-error-warning-line" title="หมดอายุแล้ว"></i>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (ann.AttachmentCount > 0)
+                            {
+                                <span class="badge bg-label-success me-1"><i class="ri ri-file-line me-1"></i>@ann.AttachmentCount</span>
+                            }
+                            @if (ann.LinkCount > 0)
+                            {
+                                <span class="badge bg-label-info"><i class="ri ri-links-line me-1"></i>@ann.LinkCount</span>
+                            }
+                            @if (ann.AttachmentCount == 0 && ann.LinkCount == 0)
+                            {
+                                <span class="text-muted small">-</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill @ann.StatusClass">@ann.StatusText</span>
+                        </td>
+                        <td class="text-center text-nowrap">
+                            <button class="btn btn-icon btn-sm btn-outline-primary me-1 btn-view-ann" data-ann-id="@ann.AnnouncementId" title="ดูรายละเอียด">
+                                <i class="ri ri-eye-line"></i>
+                            </button>
+                            <button class="btn btn-icon btn-sm btn-outline-warning me-1 btn-edit-ann" data-ann-id="@ann.AnnouncementId" title="แก้ไข">
+                                <i class="ri ri-pencil-line"></i>
+                            </button>
+                            <button class="btn btn-icon btn-sm btn-outline-danger" title="ลบ">
+                                <i class="ri ri-delete-bin-line"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                <tr id="announceTableEmpty" class="d-none">
+                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ===== Modal: เพิ่ม/แก้ไขข่าวประชาสัมพันธ์ ===== -->
+<div class="modal fade" id="addAnnouncementModal" tabindex="-1" aria-labelledby="addAnnouncementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAnnouncementModalLabel">
+                    <i class="ri ri-megaphone-line me-2 text-primary"></i>เพิ่ม/แก้ไขข่าวประชาสัมพันธ์
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <!-- Left column -->
+                    <div class="col-lg-8">
+                        <!-- Basic info -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">หัวข้อข่าว <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="annTitle" placeholder="กรอกหัวข้อข่าว เช่น ประกาศ: แนวทางปฏิบัติ...">
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">ประเภทข่าว <span class="text-danger">*</span></label>
+                                <select class="form-select" id="annType">
+                                    <option value="">-- เลือกประเภท --</option>
+                                    <option value="news">ข่าวสาร</option>
+                                    <option value="announce">ประกาศ</option>
+                                    <option value="warning">คำเตือน</option>
+                                    <option value="update">อัปเดตระบบ</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">กลุ่มเป้าหมาย <span class="text-danger">*</span></label>
+                                <div class="d-flex flex-wrap gap-3 mt-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="targetOperator" value="ผู้ประกอบการ">
+                                        <label class="form-check-label" for="targetOperator">ผู้ประกอบการ</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="targetOfficer" value="เจ้าหน้าที่">
+                                        <label class="form-check-label" for="targetOfficer">เจ้าหน้าที่</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="targetAll" value="ทุกคน">
+                                        <label class="form-check-label" for="targetAll">ทุกคน</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Content -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">เนื้อหาข่าว <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="annContent" rows="6"
+                                placeholder="กรอกเนื้อหาข่าวประชาสัมพันธ์ รองรับรูปแบบข้อความธรรมดา (plain text)&#10;&#10;เช่น กรมประมงขอประกาศว่า..."></textarea>
+                            <div class="form-text">รองรับข้อความธรรมดา (plain text) ขนาดสูงสุด 5,000 ตัวอักษร</div>
+                        </div>
+                        <!-- Attachments -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-semibold mb-0">
+                                    <i class="ri ri-links-line me-1 text-primary"></i>แนบลิงก์
+                                </label>
+                                <button type="button" class="btn btn-xs btn-outline-primary" id="btnAddLink">
+                                    <i class="ri ri-add-line me-1"></i> + เพิ่มลิงก์
+                                </button>
+                            </div>
+                            <div id="linkListContainer">
+                                <!-- Dynamic link items -->
+                                <div class="link-list-item">
+                                    <i class="ri ri-links-line text-primary"></i>
+                                    <input type="url" class="form-control form-control-sm" placeholder="https://..." style="flex:1;" value="https://www.fisheries.go.th/news/2569">
+                                    <input type="text" class="form-control form-control-sm ms-1" placeholder="ชื่อลิงก์" style="width:160px;" value="ข่าวบนเว็บไซต์กรมประมง">
+                                    <button type="button" class="btn btn-icon btn-xs btn-outline-danger btn-remove ms-1"><i class="ri ri-close-line"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-semibold mb-0">
+                                    <i class="ri ri-attachment-2 me-1 text-success"></i>แนบไฟล์
+                                    <span class="text-muted fw-normal small">(PDF / DOC / XLSX / ZIP, สูงสุด 10 MB ต่อไฟล์)</span>
+                                </label>
+                                <button type="button" class="btn btn-xs btn-outline-success" id="btnAddFile">
+                                    <i class="ri ri-upload-2-line me-1"></i> + แนบไฟล์
+                                </button>
+                            </div>
+                            <div id="fileListContainer">
+                                <!-- Dynamic file items -->
+                                <div class="file-list-item">
+                                    <i class="ri ri-file-pdf-line text-danger"></i>
+                                    <span class="flex-grow-1 small">ประกาศกรมประมง_2569.pdf (245 KB)</span>
+                                    <span class="badge bg-label-secondary ms-1">PDF</span>
+                                    <button type="button" class="btn btn-icon btn-xs btn-outline-danger btn-remove ms-1"><i class="ri ri-close-line"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right column: settings -->
+                    <div class="col-lg-4">
+                        <div class="card bg-light border-0 p-3 h-100">
+                            <h6 class="fw-semibold mb-3"><i class="ri ri-settings-3-line me-1"></i>ตั้งค่าการเผยแพร่</h6>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">วันที่เผยแพร่ <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm flatpickr-date" id="annPublishDate" placeholder="วว/ดด/ปปปป">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">วันหมดอายุ</label>
+                                <input type="text" class="form-control form-control-sm flatpickr-date" id="annExpireDate" placeholder="วว/ดด/ปปปป">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">สถานะการเผยแพร่ <span class="text-danger">*</span></label>
+                                <div class="d-flex flex-column gap-2 mt-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="publishMode" id="modeDraft" value="draft" checked>
+                                        <label class="form-check-label small" for="modeDraft">
+                                            <i class="ri ri-draft-line me-1 text-secondary"></i>ฉบับร่าง (บันทึกเท่านั้น)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="publishMode" id="modeNow" value="now">
+                                        <label class="form-check-label small" for="modeNow">
+                                            <i class="ri ri-broadcast-line me-1 text-success"></i>เผยแพร่ทันที
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="publishMode" id="modeSchedule" value="schedule">
+                                        <label class="form-check-label small" for="modeSchedule">
+                                            <i class="ri ri-calendar-schedule-line me-1 text-primary"></i>กำหนดเวลาเผยแพร่
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 d-none" id="schedulePublishDateRow">
+                                <label class="form-label fw-semibold small">วันและเวลาที่กำหนดเผยแพร่ <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="annScheduleDate" placeholder="วว/ดด/ปปปป ชช:นน">
+                            </div>
+                            <hr class="my-3">
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="annPinTop">
+                                    <label class="form-check-label small fw-semibold" for="annPinTop">
+                                        <i class="ri ri-pushpin-line me-1 text-danger"></i>ปักหมุดข้างบน
+                                    </label>
+                                </div>
+                                <div class="form-text small mt-1">ข่าวจะแสดงที่ด้านบนสุดของรายการเสมอ</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small">หมายเหตุภายใน</label>
+                                <textarea class="form-control form-control-sm" rows="3" placeholder="บันทึกภายในสำหรับ Admin เท่านั้น (ไม่แสดงต่อผู้ใช้)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i> ยกเลิก
+                </button>
+                <button type="button" class="btn btn-outline-info" id="btnPreview">
+                    <i class="ri ri-eye-line me-1"></i> ตัวอย่างการแสดงผล
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-save-line me-1"></i> บันทึกฉบับร่าง
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="ri ri-broadcast-line me-1"></i> เผยแพร่
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal: รายละเอียดข่าว ===== -->
+<div class="modal fade" id="annDetailModal" tabindex="-1" aria-labelledby="annDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="annDetailModalLabel">
+                    <i class="ri ri-newspaper-line me-2 text-primary"></i><span id="annModalTitle">รายละเอียดข่าว</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <div class="detail-kv-mini">
+                            <small class="text-muted d-block">รหัสข่าว</small>
+                            <span class="fw-semibold" id="detailAnnId">-</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-kv-mini">
+                            <small class="text-muted d-block">ประเภท</small>
+                            <span id="detailAnnType">-</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-kv-mini">
+                            <small class="text-muted d-block">กลุ่มเป้าหมาย</small>
+                            <span class="fw-semibold" id="detailAnnTarget">-</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-kv-mini">
+                            <small class="text-muted d-block">วันที่เผยแพร่</small>
+                            <span class="fw-semibold" id="detailAnnPublish">-</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-kv-mini">
+                            <small class="text-muted d-block">วันหมดอายุ</small>
+                            <span class="fw-semibold" id="detailAnnExpire">-</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="detail-kv-mini">
+                            <small class="text-muted d-block">สถานะ</small>
+                            <span id="detailAnnStatus">-</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-kv-mini">
+                            <small class="text-muted d-block">ผู้สร้าง</small>
+                            <span class="fw-semibold" id="detailAnnCreatedBy">-</span>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-3">
+                <h6 class="fw-semibold mb-2">เนื้อหาข่าว (mockup)</h6>
+                <div class="content-preview-box mb-3">
+                    กรมประมงขอแจ้งให้ทราบโดยทั่วกัน เกี่ยวกับการดำเนินการตามข่าวสารฉบับนี้
+                    โดยเนื้อหาและรายละเอียดทั้งหมดถูกจัดทำขึ้นเพื่อเป็นตัวอย่างในระบบ mockup
+                    สำหรับการตรวจสอบการแสดงผลและเลย์เอาต์ของระบบประชาสัมพันธ์และแจ้งข่าวกรมประมง
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="fw-semibold small mb-2"><i class="ri ri-links-line me-1 text-primary"></i>ลิงก์ที่แนบ</h6>
+                        <div class="link-list-item">
+                            <i class="ri ri-links-line text-primary"></i>
+                            <a href="#" class="small text-primary flex-grow-1">ข่าวบนเว็บไซต์กรมประมง</a>
+                            <span class="text-muted small">fisheries.go.th</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-semibold small mb-2"><i class="ri ri-attachment-2 me-1 text-success"></i>ไฟล์แนบ</h6>
+                        <div class="file-list-item">
+                            <i class="ri ri-file-pdf-line text-danger"></i>
+                            <span class="flex-grow-1 small">ประกาศกรมประมง_2569.pdf</span>
+                            <button class="btn btn-xs btn-outline-primary">
+                                <i class="ri ri-download-line me-1"></i> ดาวน์โหลด
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i> ปิด
+                </button>
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
+                    <i class="ri ri-pencil-line me-1"></i> แก้ไข
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    <i class="ri ri-delete-bin-line me-1"></i> ลบข่าว
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal: ตัวอย่างการแสดงผล (Preview) ===== -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="ri ri-eye-line me-2 text-info"></i>ตัวอย่างการแสดงผล (Preview)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info d-flex align-items-center gap-2 mb-4 py-2">
+                    <i class="ri ri-information-line flex-shrink-0"></i>
+                    <span class="small">ตัวอย่างที่ผู้ใช้งานจะเห็นในระบบ — ข้อมูลที่แสดงมาจากฟอร์มด้านซ้าย</span>
+                </div>
+                <div class="announce-preview-card">
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <span class="badge bg-label-primary fs-6 px-3 py-2" id="previewType">ประกาศ</span>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1" id="previewTitle">หัวข้อข่าว</h5>
+                            <small class="text-muted">กรมประมง — <span id="previewDate">27/04/2569</span></small>
+                        </div>
+                    </div>
+                    <div class="content-preview-box mb-3" id="previewContent">
+                        เนื้อหาข่าวจะแสดงที่นี่...
+                    </div>
+                    <div class="d-flex gap-3 text-muted small">
+                        <span><i class="ri ri-attachment-2 me-1"></i>ไฟล์/ลิงก์: <span id="previewAttachInfo">-</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i> ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

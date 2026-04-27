@@ -512,11 +512,14 @@ Views/Access/
  Permission.cshtml
  Roles.cshtml
 Views/Admin/
+ Announcement.cshtml
  CertificateTemplate.cshtml
  DofList.cshtml
+ ESignature.cshtml
  IssueReason.cshtml
  NotificationReason.cshtml
  Organization.cshtml
+ ReceptionTemplate.cshtml
  Reports.cshtml
  TraceabilityList.cshtml
 Views/Apps/
@@ -818,11 +821,14 @@ Views/Access/
  Permission.cshtml
  Roles.cshtml
 Views/Admin/
+ Announcement.cshtml
  CertificateTemplate.cshtml
  DofList.cshtml
+ ESignature.cshtml
  IssueReason.cshtml
  NotificationReason.cshtml
  Organization.cshtml
+ ReceptionTemplate.cshtml
  Reports.cshtml
  TraceabilityList.cshtml
 Views/Apps/

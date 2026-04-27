@@ -1,0 +1,758 @@
+@{
+    ViewData["Title"] = "ต้นแบบการลงทะเบียนรับเรื่อง";
+
+    var templates = new[]
+    {
+        new {
+            Id = "RTP-001",
+            Name = "ต้นแบบมาตรฐาน (PS/NMD)",
+            CertTypes = "PS, NMD",
+            Steps = 4,
+            ResponsibleName = "น.ส.ปรียา ศรีสุข",
+            ResponsibleUnit = "กลุ่มออกใบรับรอง",
+            StartDate = "2568-10-01",
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            ProxyName = "นายวีระ ทองดี",
+            ProxyActive = true
+        },
+        new {
+            Id = "RTP-002",
+            Name = "ต้นแบบใบรับรอง Declaration",
+            CertTypes = "Declaration",
+            Steps = 3,
+            ResponsibleName = "นายสมชาย เกษมสุข",
+            ResponsibleUnit = "ฝ่ายรับรองมาตรฐาน",
+            StartDate = "2568-10-01",
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            ProxyName = "น.ส.ปรียา ศรีสุข",
+            ProxyActive = false
+        },
+        new {
+            Id = "RTP-003",
+            Name = "ต้นแบบด่วนพิเศษ (Fast-Track)",
+            CertTypes = "PS, NMD, Declaration",
+            Steps = 2,
+            ResponsibleName = "นายอภิชาติ วงศ์พันธ์",
+            ResponsibleUnit = "กองตรวจสอบรับรองมาตรฐาน",
+            StartDate = "2569-01-01",
+            StatusText = "ใช้งาน",
+            StatusClass = "bg-label-success",
+            ProxyName = "นายสมชาย เกษมสุข",
+            ProxyActive = true
+        },
+        new {
+            Id = "RTP-004",
+            Name = "ต้นแบบ ศตส. เขตพื้นที่",
+            CertTypes = "PS",
+            Steps = 4,
+            ResponsibleName = "น.ส.วิภาวดี รักษ์ทะเล",
+            ResponsibleUnit = "ฝ่ายรับรองมาตรฐาน",
+            StartDate = "2568-06-01",
+            StatusText = "รอทบทวน",
+            StatusClass = "bg-label-warning",
+            ProxyName = "—",
+            ProxyActive = false
+        },
+        new {
+            Id = "RTP-005",
+            Name = "ต้นแบบเดิม (ยกเลิก)",
+            CertTypes = "PS, NMD",
+            Steps = 5,
+            ResponsibleName = "นายธนาวุฒิ บุญมาก",
+            ResponsibleUnit = "กองตรวจสอบรับรองมาตรฐาน",
+            StartDate = "2567-01-01",
+            StatusText = "ยกเลิก",
+            StatusClass = "bg-label-dark",
+            ProxyName = "—",
+            ProxyActive = false
+        },
+    };
+}
+
+@section PageStyles {
+<style>
+    .step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 50%;
+        font-size: 0.72rem;
+        font-weight: 700;
+        background: var(--bs-primary-bg-subtle);
+        color: var(--bs-primary);
+        flex-shrink: 0;
+    }
+    .step-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.5rem 0.6rem;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.5rem;
+        background: var(--bs-paper-bg);
+        cursor: grab;
+        font-size: 0.82rem;
+    }
+    .step-row:active { cursor: grabbing; }
+    .step-row .drag-handle { color: var(--bs-secondary-color); cursor: grab; }
+    .proxy-delegate-card {
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.75rem;
+        background: var(--bs-paper-bg);
+    }
+    .proxy-rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.4rem;
+        height: 1.4rem;
+        border-radius: 50%;
+        font-size: 0.65rem;
+        font-weight: 700;
+        background: var(--bs-success-bg-subtle);
+        color: var(--bs-success);
+        flex-shrink: 0;
+    }
+</style>
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h4 class="mb-1">
+                <i class="ri ri-file-list-3-line me-2 text-primary"></i>ต้นแบบการลงทะเบียนรับเรื่อง
+            </h4>
+            <p class="text-muted mb-0">กำหนดกระบวนการรับเรื่อง + กำหนดผู้ทำหน้าที่แทน (Proxy/Delegate) สำหรับแต่ละประเภทใบรับรอง</p>
+        </div>
+        <button type="button" class="btn btn-primary"
+                data-bs-toggle="modal" data-bs-target="#modalAddTemplate"
+                data-mode="add">
+            <i class="ri ri-file-list-3-line me-1"></i>เพิ่มต้นแบบ
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-primary-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-file-list-3-line fs-4 text-primary"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">@templates.Length</h3>
+                    <small class="text-muted">ต้นแบบทั้งหมด</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-success-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-checkbox-circle-line fs-4 text-success"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold text-success">@templates.Count(t => t.StatusText == "ใช้งาน")</h3>
+                    <small class="text-muted">ใช้งาน</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-warning-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-time-line fs-4 text-warning"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold text-warning">@templates.Count(t => t.StatusText == "รอทบทวน")</h3>
+                    <small class="text-muted">รอทบทวน</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body py-3">
+                    <div class="avatar avatar-md mx-auto mb-2" style="background:var(--bs-secondary-bg-subtle);border-radius:50%;">
+                        <i class="ri ri-user-shared-line fs-4 text-secondary"></i>
+                    </div>
+                    <h3 class="mb-0 fw-bold">@templates.Count(t => t.ProxyActive)</h3>
+                    <small class="text-muted">มีผู้แทนแอคทีฟ</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="mb-0"><i class="ri ri-list-check me-1"></i>รายการต้นแบบการรับเรื่อง</h6>
+            <span class="text-muted small">ทั้งหมด @templates.Length รายการ</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size:0.82rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">รหัส</th>
+                            <th>ชื่อต้นแบบ</th>
+                            <th>ประเภทใบรับรอง</th>
+                            <th class="text-center">ขั้นตอน</th>
+                            <th>ผู้รับผิดชอบ</th>
+                            <th>ผู้ทำหน้าที่แทน</th>
+                            <th>วันที่เริ่ม</th>
+                            <th>สถานะ</th>
+                            <th class="text-center pe-3">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in templates)
+                        {
+                            <tr>
+                                <td class="ps-3"><code class="small">@t.Id</code></td>
+                                <td>
+                                    <div class="fw-semibold">@t.Name</div>
+                                </td>
+                                <td>
+                                    @foreach (var ct in t.CertTypes.Split(','))
+                                    {
+                                        var certClass = ct.Trim() == "PS" ? "bg-label-primary" : ct.Trim() == "NMD" ? "bg-label-info" : "bg-label-warning";
+                                        <span class="badge @certClass me-1">@ct.Trim()</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-label-secondary">@t.Steps ขั้นตอน</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold small">@t.ResponsibleName</div>
+                                    <div class="text-muted" style="font-size:0.7rem;">@t.ResponsibleUnit</div>
+                                </td>
+                                <td>
+                                    @if (t.ProxyActive)
+                                    {
+                                        <span class="badge bg-label-success">
+                                            <i class="ri ri-user-shared-line me-1"></i>@t.ProxyName ✅
+                                        </span>
+                                    }
+                                    else if (t.ProxyName != "—")
+                                    {
+                                        <span class="badge bg-label-secondary">@t.ProxyName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">—</span>
+                                    }
+                                </td>
+                                <td class="small">@t.StartDate</td>
+                                <td><span class="badge @t.StatusClass">@t.StatusText</span></td>
+                                <td class="text-center pe-3">
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <button type="button" class="btn btn-xs btn-outline-primary btn-edit-template"
+                                                title="แก้ไข"
+                                                data-id="@t.Id"
+                                                data-name="@t.Name"
+                                                data-bs-toggle="modal" data-bs-target="#modalAddTemplate">
+                                            <i class="ri ri-edit-line"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-outline-info btn-view-proxy"
+                                                title="กำหนดผู้แทน"
+                                                data-id="@t.Id"
+                                                data-name="@t.Name"
+                                                data-bs-toggle="modal" data-bs-target="#modalProxy">
+                                            <i class="ri ri-user-shared-line"></i>
+                                        </button>
+                                        @if (t.StatusText != "ยกเลิก")
+                                        {
+                                            <button type="button" class="btn btn-xs btn-outline-danger btn-cancel-template"
+                                                    title="ยกเลิก"
+                                                    data-id="@t.Id"
+                                                    data-name="@t.Name"
+                                                    data-bs-toggle="modal" data-bs-target="#modalCancelTemplate">
+                                                <i class="ri ri-close-circle-line"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Modal: เพิ่ม / แก้ไข ต้นแบบการรับเรื่อง
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalAddTemplate" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-file-list-3-line me-2 text-primary"></i>
+                    <span id="addTemplateModalTitle">เพิ่มต้นแบบการลงทะเบียนรับเรื่อง</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <!-- Left col: basic info + steps -->
+                    <div class="col-md-7">
+                        <!-- ชื่อต้นแบบ -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">ชื่อต้นแบบ <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="tmpl_name" placeholder="เช่น ต้นแบบมาตรฐาน PS/NMD">
+                        </div>
+
+                        <!-- ประเภทใบรับรอง -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">ประเภทใบรับรอง <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="cert_ps" value="PS" checked>
+                                    <label class="form-check-label" for="cert_ps">
+                                        <span class="badge bg-label-primary me-1">PS</span>ใบรับรองสุขภาพ
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="cert_nmd" value="NMD" checked>
+                                    <label class="form-check-label" for="cert_nmd">
+                                        <span class="badge bg-label-info me-1">NMD</span>ไม่ตรวจพบ NMD
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="cert_decl" value="Declaration">
+                                    <label class="form-check-label" for="cert_decl">
+                                        <span class="badge bg-label-warning me-1">Declaration</span>คำรับรอง
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- กระบวนการรับเรื่อง (step list) -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label class="form-label fw-semibold mb-0">กระบวนการรับเรื่อง (ขั้นตอน)</label>
+                                <button type="button" class="btn btn-xs btn-outline-primary" id="btnAddStep">
+                                    <i class="ri ri-add-line me-1"></i>เพิ่มขั้นตอน
+                                </button>
+                            </div>
+                            <div id="stepList" class="d-flex flex-column gap-2">
+                                <!-- JS rendered -->
+                            </div>
+                            <div class="text-muted small mt-2">
+                                <i class="ri ri-drag-move-2-line me-1"></i>ลากเพื่อเรียงลำดับขั้นตอน
+                            </div>
+                        </div>
+
+                        <!-- ผู้รับผิดชอบหลัก -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">ผู้รับผิดชอบหลัก <span class="text-danger">*</span></label>
+                            <select class="form-select" id="tmpl_responsible">
+                                <option value="">— เลือกผู้รับผิดชอบ —</option>
+                                <option value="นายอภิชาติ วงศ์พันธ์">นายอภิชาติ วงศ์พันธ์ — ผู้อำนวยการกองตรวจสอบรับรองมาตรฐาน</option>
+                                <option value="นายวีระ ทองดี">นายวีระ ทองดี — ผู้เชี่ยวชาญด้านการรับรองสินค้าประมง</option>
+                                <option value="น.ส.ปรียา ศรีสุข">น.ส.ปรียา ศรีสุข — หัวหน้ากลุ่มออกใบรับรอง</option>
+                                <option value="นายสมชาย เกษมสุข">นายสมชาย เกษมสุข — นักวิชาการประมงชำนาญการพิเศษ</option>
+                                <option value="น.ส.วิภาวดี รักษ์ทะเล">น.ส.วิภาวดี รักษ์ทะเล — นักวิชาการประมงชำนาญการ</option>
+                            </select>
+                        </div>
+
+                        <!-- วันที่เริ่มต้น -->
+                        <div class="mb-1">
+                            <label class="form-label fw-semibold">วันที่เริ่มต้น</label>
+                            <input type="date" class="form-control" id="tmpl_startDate">
+                        </div>
+                    </div>
+
+                    <!-- Right col: Proxy/Delegate -->
+                    <div class="col-md-5">
+                        <div class="proxy-delegate-card p-3 h-100">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="ri ri-user-shared-line text-info fs-5"></i>
+                                <h6 class="mb-0 fw-semibold">ผู้ทำหน้าที่แทน (Proxy/Delegate)</h6>
+                            </div>
+                            <div class="alert alert-info d-flex align-items-center py-2 mb-3">
+                                <i class="ri ri-mail-send-line me-2 flex-shrink-0"></i>
+                                <small>⚠️ ผู้ทำหน้าที่แทนจะได้รับ <strong>email แจ้ง</strong>เมื่อได้รับสิทธิ์</small>
+                            </div>
+
+                            <!-- ผู้แทน ลำดับ 1–3 -->
+                            @for (int i = 1; i <= 3; i++)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">
+                                        <span class="proxy-rank-badge me-1">@i</span>ผู้ทำหน้าที่แทน ลำดับ @i
+                                    </label>
+                                    <select class="form-select form-select-sm" id="proxy_@i">
+                                        <option value="">— ไม่ระบุ —</option>
+                                        <option value="นายอภิชาติ วงศ์พันธ์">นายอภิชาติ วงศ์พันธ์</option>
+                                        <option value="นายวีระ ทองดี">นายวีระ ทองดี</option>
+                                        <option value="น.ส.ปรียา ศรีสุข">น.ส.ปรียา ศรีสุข</option>
+                                        <option value="นายสมชาย เกษมสุข">นายสมชาย เกษมสุข</option>
+                                        <option value="น.ส.วิภาวดี รักษ์ทะเล">น.ส.วิภาวดี รักษ์ทะเล</option>
+                                        <option value="นายกิตติ วงศ์สวัสดิ์">นายกิตติ วงศ์สวัสดิ์</option>
+                                    </select>
+                                </div>
+                            }
+
+                            <!-- เงื่อนไขการเปิดสิทธิ์แทน -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">เงื่อนไขการเปิดสิทธิ์แทน <span class="text-danger">*</span></label>
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="proxyCondition" id="proxyCond_noLogin" value="no_login" checked>
+                                        <label class="form-check-label small" for="proxyCond_noLogin">
+                                            ผู้รับผิดชอบหลักไม่ได้ login &gt;
+                                            <input type="number" class="form-control form-control-sm d-inline-block ms-1"
+                                                   id="proxyCond_days" value="3" min="1" max="30"
+                                                   style="width:55px;display:inline-block!important;"> วัน
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="proxyCondition" id="proxyCond_leave" value="leave">
+                                        <label class="form-check-label small" for="proxyCond_leave">
+                                            ผู้รับผิดชอบหลักตั้งค่า <strong>"ลาหยุด"</strong> ในระบบ
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="proxyCondition" id="proxyCond_manual" value="manual">
+                                        <label class="form-check-label small" for="proxyCond_manual">
+                                            <strong>Admin</strong> กำหนดด้วยตนเอง
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ช่วงวันที่ใช้สิทธิ์แทน -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">ช่วงวันที่ใช้สิทธิ์แทน</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label small text-muted mb-1">เริ่มต้น</label>
+                                        <input type="date" class="form-control form-control-sm" id="proxy_dateFrom">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-muted mb-1">สิ้นสุด</label>
+                                        <input type="date" class="form-control form-control-sm" id="proxy_dateTo">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preview badge -->
+                            <div id="proxyPreviewBadge" class="d-none">
+                                <div class="badge bg-label-success w-100 text-start p-2" style="white-space:normal;">
+                                    <i class="ri ri-user-shared-line me-1"></i>
+                                    ผู้แทน: <strong id="proxyBadgeName">—</strong> ✅
+                                    (<span id="proxyBadgeDateRange">—</span>)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="btnSaveTemplate">
+                    <i class="ri ri-save-line me-1"></i>บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Modal: กำหนดผู้ทำหน้าที่แทน (standalone, from table action)
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalProxy" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-user-shared-line me-2 text-info"></i>กำหนดผู้ทำหน้าที่แทน
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info d-flex align-items-center py-2 mb-3">
+                    <i class="ri ri-mail-send-line me-2 flex-shrink-0"></i>
+                    <small>⚠️ ผู้ทำหน้าที่แทนจะได้รับ <strong>email แจ้ง</strong>เมื่อได้รับสิทธิ์</small>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label fw-semibold small">ต้นแบบ</label>
+                    <div class="form-control-plaintext fw-semibold ps-0" id="proxyModalTemplateName">—</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">ผู้ทำหน้าที่แทน <span class="text-danger">*</span></label>
+                    <select class="form-select" id="proxyModal_delegate">
+                        <option value="">— เลือกผู้แทน —</option>
+                        <option value="นายอภิชาติ วงศ์พันธ์">นายอภิชาติ วงศ์พันธ์</option>
+                        <option value="นายวีระ ทองดี">นายวีระ ทองดี</option>
+                        <option value="น.ส.ปรียา ศรีสุข">น.ส.ปรียา ศรีสุข</option>
+                        <option value="นายสมชาย เกษมสุข">นายสมชาย เกษมสุข</option>
+                        <option value="น.ส.วิภาวดี รักษ์ทะเล">น.ส.วิภาวดี รักษ์ทะเล</option>
+                        <option value="นายกิตติ วงศ์สวัสดิ์">นายกิตติ วงศ์สวัสดิ์</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เงื่อนไข <span class="text-danger">*</span></label>
+                    <div class="d-flex flex-column gap-2 ps-1">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="proxyModalCond" id="pmCond_noLogin" value="no_login" checked>
+                            <label class="form-check-label small" for="pmCond_noLogin">ไม่ได้ login &gt; <input type="number" class="form-control form-control-sm d-inline-block" id="pmCond_days" value="3" min="1" max="30" style="width:50px;"> วัน</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="proxyModalCond" id="pmCond_leave" value="leave">
+                            <label class="form-check-label small" for="pmCond_leave">ตั้งค่า "ลาหยุด" ในระบบ</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="proxyModalCond" id="pmCond_manual" value="manual">
+                            <label class="form-check-label small" for="pmCond_manual">Admin กำหนดด้วยตนเอง</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">ช่วงวันที่ใช้สิทธิ์แทน</label>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input type="date" class="form-control form-control-sm" id="proxyModal_dateFrom">
+                        </div>
+                        <div class="col-6">
+                            <input type="date" class="form-control form-control-sm" id="proxyModal_dateTo">
+                        </div>
+                    </div>
+                </div>
+                <!-- Preview badge -->
+                <div id="proxyModalBadge" class="d-none">
+                    <div class="badge bg-label-success p-2 w-100 text-start" style="white-space:normal;">
+                        <i class="ri ri-user-shared-line me-1"></i>
+                        ผู้แทน: <strong id="proxyModalBadgeName">—</strong> ✅
+                        (ถึง <span id="proxyModalBadgeTo">—</span>)
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-info text-white" id="btnSaveProxy">
+                    <i class="ri ri-user-shared-line me-1"></i>บันทึกผู้แทน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     Modal: ยกเลิกต้นแบบ
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalCancelTemplate" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-danger">
+                    <i class="ri ri-close-circle-line me-2"></i>ยกเลิกต้นแบบ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger d-flex align-items-center py-2 mb-3">
+                    <i class="ri ri-error-warning-line me-2"></i>
+                    <small>ต้นแบบที่ยกเลิกแล้วจะไม่สามารถใช้งานได้อีก</small>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label fw-semibold small">ต้นแบบ</label>
+                    <div class="form-control-plaintext fw-semibold ps-0" id="cancelTemplateName">—</div>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label fw-semibold">เหตุผล <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="cancelTemplate_reason" rows="3" placeholder="ระบุเหตุผลการยกเลิก"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmCancelTemplate">
+                    <i class="ri ri-close-circle-line me-1"></i>ยืนยันยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999;">
+    <div id="toastRT" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastRTBody">บันทึกสำเร็จ</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    'use strict';
+
+    // ── Default steps ──
+    var defaultSteps = [
+        'ตรวจสอบเอกสารเบื้องต้น',
+        'ลงทะเบียนเข้าระบบ',
+        'มอบหมายเจ้าหน้าที่พิจารณา',
+        'ส่งให้ผู้อนุมัติ',
+    ];
+
+    function renderStepList(steps) {
+        var list = document.getElementById('stepList');
+        list.innerHTML = steps.map(function (s, i) {
+            return '<div class="step-row" data-index="' + i + '">' +
+                '<i class="ri ri-drag-move-2-line drag-handle text-muted"></i>' +
+                '<span class="step-badge">' + (i + 1) + '</span>' +
+                '<input type="text" class="form-control form-control-sm border-0 p-0 flex-grow-1 bg-transparent" value="' + s + '" style="outline:none;">' +
+                '<button type="button" class="btn btn-xs btn-outline-danger ms-auto btn-remove-step"><i class="ri ri-delete-bin-line"></i></button>' +
+            '</div>';
+        }).join('');
+
+        // re-number on delete
+        list.querySelectorAll('.btn-remove-step').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                this.closest('.step-row').remove();
+                renumberSteps();
+            });
+        });
+    }
+
+    function renumberSteps() {
+        document.querySelectorAll('#stepList .step-row').forEach(function (row, i) {
+            var badge = row.querySelector('.step-badge');
+            if (badge) badge.textContent = i + 1;
+        });
+    }
+
+    // ── Modal: เพิ่ม/แก้ไข ──
+    document.getElementById('modalAddTemplate').addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        var mode = btn ? (btn.dataset.mode || '') : '';
+        var isEdit = (mode !== 'add' && btn && btn.dataset.id);
+        document.getElementById('addTemplateModalTitle').textContent =
+            isEdit ? 'แก้ไขต้นแบบการลงทะเบียนรับเรื่อง' : 'เพิ่มต้นแบบการลงทะเบียนรับเรื่อง';
+
+        if (!isEdit) {
+            document.getElementById('tmpl_name').value = '';
+            document.getElementById('cert_ps').checked = true;
+            document.getElementById('cert_nmd').checked = true;
+            document.getElementById('cert_decl').checked = false;
+            document.getElementById('tmpl_responsible').value = '';
+            document.getElementById('tmpl_startDate').value = '';
+            document.getElementById('proxy_1').value = '';
+            document.getElementById('proxy_2').value = '';
+            document.getElementById('proxy_3').value = '';
+            document.getElementById('proxy_dateFrom').value = '';
+            document.getElementById('proxy_dateTo').value = '';
+            document.getElementById('proxyCond_noLogin').checked = true;
+            document.getElementById('proxyPreviewBadge').classList.add('d-none');
+            renderStepList([...defaultSteps]);
+        } else {
+            document.getElementById('tmpl_name').value = btn.dataset.name || '';
+            renderStepList([...defaultSteps]);
+        }
+    });
+
+    // Add step button
+    document.getElementById('btnAddStep').addEventListener('click', function () {
+        var list = document.getElementById('stepList');
+        var count = list.querySelectorAll('.step-row').length;
+        var newRow = document.createElement('div');
+        newRow.className = 'step-row';
+        newRow.dataset.index = count;
+        newRow.innerHTML =
+            '<i class="ri ri-drag-move-2-line drag-handle text-muted"></i>' +
+            '<span class="step-badge">' + (count + 1) + '</span>' +
+            '<input type="text" class="form-control form-control-sm border-0 p-0 flex-grow-1 bg-transparent" placeholder="ระบุชื่อขั้นตอน" style="outline:none;">' +
+            '<button type="button" class="btn btn-xs btn-outline-danger ms-auto btn-remove-step"><i class="ri ri-delete-bin-line"></i></button>';
+        list.appendChild(newRow);
+        newRow.querySelector('.btn-remove-step').addEventListener('click', function () {
+            this.closest('.step-row').remove();
+            renumberSteps();
+        });
+        newRow.querySelector('input').focus();
+    });
+
+    // Proxy preview badge (in add/edit modal)
+    function updateProxyPreview() {
+        var name = document.getElementById('proxy_1').value;
+        var dateTo = document.getElementById('proxy_dateTo').value;
+        var badge = document.getElementById('proxyPreviewBadge');
+        if (name) {
+            document.getElementById('proxyBadgeName').textContent = name;
+            document.getElementById('proxyBadgeDateRange').textContent = dateTo ? 'ถึง ' + dateTo : 'ไม่จำกัด';
+            badge.classList.remove('d-none');
+        } else {
+            badge.classList.add('d-none');
+        }
+    }
+    document.getElementById('proxy_1').addEventListener('change', updateProxyPreview);
+    document.getElementById('proxy_dateTo').addEventListener('change', updateProxyPreview);
+
+    // Save template
+    document.getElementById('btnSaveTemplate').addEventListener('click', function () {
+        showToast('บันทึกต้นแบบการรับเรื่องสำเร็จ', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('modalAddTemplate')).hide();
+    });
+
+    // ── Modal: Proxy standalone ──
+    document.getElementById('modalProxy').addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        document.getElementById('proxyModalTemplateName').textContent = btn ? (btn.dataset.name || '—') : '—';
+        document.getElementById('proxyModal_delegate').value = '';
+        document.getElementById('proxyModal_dateFrom').value = '';
+        document.getElementById('proxyModal_dateTo').value = '';
+        document.getElementById('pmCond_noLogin').checked = true;
+        document.getElementById('proxyModalBadge').classList.add('d-none');
+    });
+
+    function updateProxyModalBadge() {
+        var name = document.getElementById('proxyModal_delegate').value;
+        var dateTo = document.getElementById('proxyModal_dateTo').value;
+        var badge = document.getElementById('proxyModalBadge');
+        if (name) {
+            document.getElementById('proxyModalBadgeName').textContent = name;
+            document.getElementById('proxyModalBadgeTo').textContent = dateTo || 'ไม่จำกัด';
+            badge.classList.remove('d-none');
+        } else {
+            badge.classList.add('d-none');
+        }
+    }
+    document.getElementById('proxyModal_delegate').addEventListener('change', updateProxyModalBadge);
+    document.getElementById('proxyModal_dateTo').addEventListener('change', updateProxyModalBadge);
+
+    document.getElementById('btnSaveProxy').addEventListener('click', function () {
+        showToast('บันทึกผู้ทำหน้าที่แทนสำเร็จ — ส่ง email แจ้งแล้ว', 'info');
+        bootstrap.Modal.getInstance(document.getElementById('modalProxy')).hide();
+    });
+
+    // ── Modal: ยกเลิก ──
+    document.getElementById('modalCancelTemplate').addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        document.getElementById('cancelTemplateName').textContent = btn ? (btn.dataset.name || '—') : '—';
+        document.getElementById('cancelTemplate_reason').value = '';
+    });
+
+    document.getElementById('btnConfirmCancelTemplate').addEventListener('click', function () {
+        showToast('ยกเลิกต้นแบบสำเร็จ', 'danger');
+        bootstrap.Modal.getInstance(document.getElementById('modalCancelTemplate')).hide();
+    });
+
+    // ── Toast helper ──
+    function showToast(msg, type) {
+        var toastEl = document.getElementById('toastRT');
+        var bodyEl  = document.getElementById('toastRTBody');
+        toastEl.classList.remove('bg-success', 'bg-warning', 'bg-danger', 'bg-info');
+        var map = { success: 'bg-success', warning: 'bg-warning', danger: 'bg-danger', info: 'bg-info' };
+        toastEl.classList.add(map[type] || 'bg-success');
+        bodyEl.textContent = msg;
+        bootstrap.Toast.getOrCreateInstance(toastEl).show();
+    }
+}());
+</script>
+}

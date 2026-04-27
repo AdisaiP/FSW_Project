@@ -3,12 +3,14 @@
 
     var users = new[]
     {
-        new { RowNo=1, UserId="USR-0001", FullName="นางสาวปรียา ศรีสุข", Email="priya@siammarine.co.th", Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", Role="สมาชิก", LastLoginAt=new DateTime(2026,4,23,9,15,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
-        new { RowNo=2, UserId="USR-0002", FullName="นายภาณุพงศ์ รัตน์ชัย", Email="phanu@oceanprime.co.th", Organization="บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", Role="สมาชิก", LastLoginAt=new DateTime(2026,4,22,14,30,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
-        new { RowNo=3, UserId="USR-0003", FullName="นางสาวสมหญิง ใจดี", Email="officer1@dof.go.th", Organization="กรมประมง", Role="เจ้าหน้าที่", LastLoginAt=new DateTime(2026,4,23,8,0,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
-        new { RowNo=4, UserId="USR-0004", FullName="นายประสิทธิ์ วงค์ดี", Email="admin@dof.go.th", Organization="กรมประมง", Role="ผู้ดูแลระบบ", LastLoginAt=new DateTime(2026,4,23,7,45,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
-        new { RowNo=5, UserId="USR-0005", FullName="นายธนกฤต วงศ์ดี", Email="thanakrit@siammarine.co.th", Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", Role="สมาชิก", LastLoginAt=new DateTime(2026,4,20,11,0,0), StatusText="ระงับ", StatusClass="bg-label-warning" },
-        new { RowNo=6, UserId="USR-0006", FullName="นางสาวกนกพร สายชล", Email="kanokporn@oceanprime.co.th", Organization="บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", Role="สมาชิก", LastLoginAt=new DateTime(2026,4,15,16,30,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=1, UserId="USR-0001", FullName="นางสาวปรียา ศรีสุข", Email="priya@siammarine.co.th", Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", Role="สมาชิก", Agency="", SpecificRoles="", ResponsibleArea="", IsSigner=false, IsApprover=false, HasDataScope=false, DataScopeLabel="", HasCrossAgencyCertAccess=false, CrossAgencyCertLabel="", CanManageDofList=false, DofScopeLabel="", CanManageTraceList=false, TraceScopeLabel="", LastLoginAt=new DateTime(2026,4,23,9,15,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=2, UserId="USR-0002", FullName="นายภาณุพงศ์ รัตน์ชัย", Email="phanu@oceanprime.co.th", Organization="บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", Role="สมาชิก", Agency="", SpecificRoles="", ResponsibleArea="", IsSigner=false, IsApprover=false, HasDataScope=false, DataScopeLabel="", HasCrossAgencyCertAccess=false, CrossAgencyCertLabel="", CanManageDofList=false, DofScopeLabel="", CanManageTraceList=false, TraceScopeLabel="", LastLoginAt=new DateTime(2026,4,22,14,30,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=3, UserId="USR-0003", FullName="นางสาวสมหญิง ใจดี", Email="officer1@dof.go.th", Organization="กรมประมง — กตส.", Role="เจ้าหน้าที่", Agency="กตส.", SpecificRoles="เจ้าหน้าที่รับเรื่อง,เจ้าหน้าที่พิจารณา", ResponsibleArea="กรุงเทพมหานคร,สมุทรปราการ", IsSigner=false, IsApprover=false, HasDataScope=true, DataScopeLabel="พื้นที่ กตส. ✅", HasCrossAgencyCertAccess=false, CrossAgencyCertLabel="", CanManageDofList=true, DofScopeLabel="DOF: จัดการได้ ✅ (กตส.)", CanManageTraceList=false, TraceScopeLabel="", LastLoginAt=new DateTime(2026,4,23,8,0,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=4, UserId="USR-0004", FullName="นายประสิทธิ์ วงค์ดี", Email="admin@dof.go.th", Organization="กรมประมง — กตส.", Role="ผู้ดูแลระบบ", Agency="กตส.", SpecificRoles="ผู้อนุมัติ RMBS1,ผู้ลงนามใบรับรอง", ResponsibleArea="กรุงเทพมหานคร,นนทบุรี,ปทุมธานี", IsSigner=true, IsApprover=true, HasDataScope=true, DataScopeLabel="ทุกพื้นที่ ✅", HasCrossAgencyCertAccess=false, CrossAgencyCertLabel="", CanManageDofList=true, DofScopeLabel="DOF: ทุกพื้นที่ ✅", CanManageTraceList=true, TraceScopeLabel="Trace: ทุกพื้นที่ ✅", LastLoginAt=new DateTime(2026,4,23,7,45,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=5, UserId="USR-0005", FullName="นายธนกฤต วงศ์ดี", Email="thanakrit@siammarine.co.th", Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", Role="สมาชิก", Agency="", SpecificRoles="", ResponsibleArea="", IsSigner=false, IsApprover=false, HasDataScope=false, DataScopeLabel="", HasCrossAgencyCertAccess=false, CrossAgencyCertLabel="", CanManageDofList=false, DofScopeLabel="", CanManageTraceList=false, TraceScopeLabel="", LastLoginAt=new DateTime(2026,4,20,11,0,0), StatusText="ระงับ", StatusClass="bg-label-warning" },
+        new { RowNo=6, UserId="USR-0006", FullName="นางสาวกนกพร สายชล", Email="kanokporn@oceanprime.co.th", Organization="บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", Role="สมาชิก", Agency="", SpecificRoles="", ResponsibleArea="", IsSigner=false, IsApprover=false, HasDataScope=false, DataScopeLabel="", HasCrossAgencyCertAccess=false, CrossAgencyCertLabel="", CanManageDofList=false, DofScopeLabel="", CanManageTraceList=false, TraceScopeLabel="", LastLoginAt=new DateTime(2026,4,15,16,30,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=7, UserId="USR-0007", FullName="นายวิทยา ทองดี", Email="wittaya@dof.go.th", Organization="ศตส. เขต 3 (สงขลา)", Role="เจ้าหน้าที่", Agency="ศตส.เขต 3", SpecificRoles="เจ้าหน้าที่รับเรื่อง,ผู้ตรวจสอบ Traceability,ผู้ลงนามใบรับรอง", ResponsibleArea="สงขลา,สตูล,พัทลุง", IsSigner=true, IsApprover=false, HasDataScope=true, DataScopeLabel="พื้นที่ ศตส.เขต 3 ✅", HasCrossAgencyCertAccess=true, CrossAgencyCertLabel="ตรวจ กตส. ✅", CanManageDofList=false, DofScopeLabel="", CanManageTraceList=true, TraceScopeLabel="Trace: ศตส.เขต 3 ✅", LastLoginAt=new DateTime(2026,4,22,10,30,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=8, UserId="USR-0008", FullName="นางสาวพิมพ์ใจ ชูศรี", Email="pimjai@dof.go.th", Organization="ศตส. เขต 5 (สมุทรสาคร)", Role="เจ้าหน้าที่", Agency="ศตส.เขต 5", SpecificRoles="ผู้อนุมัติ RMBS1,เจ้าหน้าที่พิจารณา", ResponsibleArea="สมุทรสาคร,สมุทรสงคราม,เพชรบุรี", IsSigner=false, IsApprover=true, HasDataScope=true, DataScopeLabel="พื้นที่ ศตส.เขต 5 ✅", HasCrossAgencyCertAccess=true, CrossAgencyCertLabel="ตรวจ กตส. ✅", CanManageDofList=true, DofScopeLabel="DOF: จัดการได้ ✅ (ศตส.เขต 5)", CanManageTraceList=true, TraceScopeLabel="Trace: ศตส.เขต 5 ✅", LastLoginAt=new DateTime(2026,4,21,15,0,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
     };
 
     var totalCount = users.Length;
@@ -32,18 +34,31 @@
 
 @section PageScripts {
 <script>
+var userData = {
+    "USR-0001": { userId:"USR-0001", fullName:"นางสาวปรียา ศรีสุข", email:"priya@siammarine.co.th", organization:"บริษัท สยาม มารีน ฟู้ดส์ จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, status:"ใช้งาน" },
+    "USR-0002": { userId:"USR-0002", fullName:"นายภาณุพงศ์ รัตน์ชัย", email:"phanu@oceanprime.co.th", organization:"บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, status:"ใช้งาน" },
+    "USR-0003": { userId:"USR-0003", fullName:"นางสาวสมหญิง ใจดี", email:"officer1@dof.go.th", organization:"กรมประมง — กตส.", role:"เจ้าหน้าที่", agency:"กตส.", specificRoles:["เจ้าหน้าที่รับเรื่อง","เจ้าหน้าที่พิจารณา"], responsibleArea:["กรุงเทพมหานคร","สมุทรปราการ"], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:true, dofManageScope:"กตส.", canManageTraceList:false, traceManageScope:"", status:"ใช้งาน" },
+    "USR-0004": { userId:"USR-0004", fullName:"นายประสิทธิ์ วงค์ดี", email:"admin@dof.go.th", organization:"กรมประมง — กตส.", role:"ผู้ดูแลระบบ", agency:"กตส.", specificRoles:["ผู้อนุมัติ RMBS1","ผู้ลงนามใบรับรอง"], responsibleArea:["กรุงเทพมหานคร","นนทบุรี","ปทุมธานี"], isSigner:true, isApprover:true, crossAgencyCertAccess:false, canManageDofList:true, dofManageScope:"ทุกพื้นที่", canManageTraceList:true, traceManageScope:"ทุกพื้นที่", status:"ใช้งาน" },
+    "USR-0005": { userId:"USR-0005", fullName:"นายธนกฤต วงศ์ดี", email:"thanakrit@siammarine.co.th", organization:"บริษัท สยาม มารีน ฟู้ดส์ จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:false, dofManageScope:"", canManageTraceList:false, traceManageScope:"", status:"ระงับ" },
+    "USR-0006": { userId:"USR-0006", fullName:"นางสาวกนกพร สายชล", email:"kanokporn@oceanprime.co.th", organization:"บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:false, dofManageScope:"", canManageTraceList:false, traceManageScope:"", status:"ใช้งาน" },
+    "USR-0007": { userId:"USR-0007", fullName:"นายวิทยา ทองดี", email:"wittaya@dof.go.th", organization:"ศตส. เขต 3 (สงขลา)", role:"เจ้าหน้าที่", agency:"ศตส.เขต 3", specificRoles:["เจ้าหน้าที่รับเรื่อง","ผู้ตรวจสอบ Traceability","ผู้ลงนามใบรับรอง"], responsibleArea:["สงขลา","สตูล","พัทลุง"], isSigner:true, isApprover:false, crossAgencyCertAccess:true, certTypes:["PS","NMD","RMBS1"], canManageDofList:false, dofManageScope:"", canManageTraceList:true, traceManageScope:"ศตส.เขต 3", status:"ใช้งาน" },
+    "USR-0008": { userId:"USR-0008", fullName:"นางสาวพิมพ์ใจ ชูศรี", email:"pimjai@dof.go.th", organization:"ศตส. เขต 5 (สมุทรสาคร)", role:"เจ้าหน้าที่", agency:"ศตส.เขต 5", specificRoles:["ผู้อนุมัติ RMBS1","เจ้าหน้าที่พิจารณา"], responsibleArea:["สมุทรสาคร","สมุทรสงคราม","เพชรบุรี"], isSigner:false, isApprover:true, crossAgencyCertAccess:true, certTypes:["PS","NMD","RMBS2"], canManageDofList:true, dofManageScope:"ศตส.เขต 5", canManageTraceList:true, traceManageScope:"ศตส.เขต 5", status:"ใช้งาน" }
+};
 document.addEventListener('DOMContentLoaded', function () {
     function filterRows() {
         var keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
         var role = (document.getElementById('filterRole').value || '').trim();
+        var agency = (document.getElementById('filterAgency').value || '').trim();
         var status = (document.getElementById('filterStatus').value || '').trim();
         var rows = document.querySelectorAll('#userTableBody tr[data-id]');
         var count = 0;
         rows.forEach(function (row) {
             var text = (row.dataset.searchText || '').toLowerCase();
             var rowRole = row.dataset.role || '';
+            var rowAgency = row.dataset.agency || '';
             var rowStatus = row.dataset.status || '';
-            var show = (!keyword || text.includes(keyword)) && (!role || rowRole === role) && (!status || rowStatus === status);
+            var agencyMatch = !agency || (agency === 'ศตส.' ? rowAgency.startsWith('ศตส.') : rowAgency === agency);
+            var show = (!keyword || text.includes(keyword)) && (!role || rowRole === role) && agencyMatch && (!status || rowStatus === status);
             row.classList.toggle('d-none', !show);
             if (show) count++;
         });
@@ -53,13 +68,146 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnReset').addEventListener('click', function () {
         document.getElementById('filterKeyword').value = '';
         document.getElementById('filterRole').value = '';
+        document.getElementById('filterAgency').value = '';
         document.getElementById('filterStatus').value = '';
         filterRows();
     });
-    ['filterKeyword', 'filterRole', 'filterStatus'].forEach(function (id) {
+    ['filterKeyword', 'filterRole', 'filterAgency', 'filterStatus'].forEach(function (id) {
         var el = document.getElementById(id);
         el.addEventListener('change', filterRows);
         if (el.tagName === 'INPUT') el.addEventListener('keydown', function (e) { if (e.key === 'Enter') filterRows(); });
+    });
+    // ---- กำหนดสิทธิ์ข้อมูล ----
+    document.querySelectorAll('.btn-assign-scope').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var userId = this.dataset.userId;
+            var u = userData[userId];
+            if (!u) return;
+            document.getElementById('scopeModalUserName').textContent = u.fullName;
+            document.getElementById('scopeModalUserId').textContent = u.userId;
+            document.getElementById('scopeModalAgency').textContent = u.agency || '(ไม่ระบุหน่วยงาน)';
+            // pre-select scope mode to "agency"
+            document.getElementById('scopeModeAgency').checked = true;
+            document.getElementById('scopeCustomProvinceRow').classList.add('d-none');
+            // pre-check all data-access checkboxes for officers with agency
+            document.querySelectorAll('.scope-data-checkbox').forEach(function (cb) {
+                cb.checked = !!u.agency;
+            });
+            // cross-agency: set based on user cert access data
+            var hasCrossAgencyCert = !!(u.crossAgencyCertAccess);
+            document.getElementById('crossAgencyToggle').checked = hasCrossAgencyCert;
+            document.getElementById('crossAgencySection').classList.toggle('d-none', !hasCrossAgencyCert);
+            // cert-specific toggle
+            document.getElementById('certCrossAgencyToggle').checked = hasCrossAgencyCert;
+            document.getElementById('certCrossAgencySection').classList.toggle('d-none', !hasCrossAgencyCert);
+            // cert type checkboxes
+            var certTypes = u.certTypes || [];
+            document.getElementById('crossCertPS').checked = certTypes.includes('PS');
+            document.getElementById('crossCertNMD').checked = certTypes.includes('NMD');
+            document.getElementById('crossCertRMBS1').checked = certTypes.includes('RMBS1');
+            document.getElementById('crossCertRMBS2').checked = certTypes.includes('RMBS2');
+            // TOR 3.1(10): DOF / Trace manage toggles
+            var hasDof = !!(u.canManageDofList);
+            var hasTrace = !!(u.canManageTraceList);
+            document.getElementById('dofManageToggle').checked = hasDof;
+            document.getElementById('dofManageSection').classList.toggle('d-none', !hasDof);
+            if (hasDof && u.dofManageScope === 'ทุกพื้นที่') document.getElementById('dofScopeAll').checked = true;
+            else document.getElementById('dofScopeAgency').checked = true;
+            document.getElementById('traceManageToggle').checked = hasTrace;
+            document.getElementById('traceManageSection').classList.toggle('d-none', !hasTrace);
+            if (hasTrace && u.traceManageScope === 'ทุกพื้นที่') document.getElementById('traceScopeAll').checked = true;
+            else document.getElementById('traceScopeAgency').checked = true;
+            new bootstrap.Modal(document.getElementById('dataAccessModal')).show();
+        });
+    });
+
+    // scope mode toggle
+    document.querySelectorAll('input[name="scopeMode"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            var show = this.value === 'custom';
+            document.getElementById('scopeCustomProvinceRow').classList.toggle('d-none', !show);
+        });
+    });
+
+    // cross-agency toggle
+    document.getElementById('crossAgencyToggle').addEventListener('change', function () {
+        document.getElementById('crossAgencySection').classList.toggle('d-none', !this.checked);
+        // sync cert toggle
+        document.getElementById('certCrossAgencyToggle').checked = this.checked;
+        document.getElementById('certCrossAgencySection').classList.toggle('d-none', !this.checked);
+    });
+
+    // cert cross-agency toggle
+    document.getElementById('certCrossAgencyToggle').addEventListener('change', function () {
+        document.getElementById('certCrossAgencySection').classList.toggle('d-none', !this.checked);
+        // ensure parent toggle also on
+        if (this.checked) {
+            document.getElementById('crossAgencyToggle').checked = true;
+            document.getElementById('crossAgencySection').classList.remove('d-none');
+        }
+    });
+
+    // TOR 3.1(10): DOF/Trace manage toggles
+    document.getElementById('dofManageToggle').addEventListener('change', function () {
+        document.getElementById('dofManageSection').classList.toggle('d-none', !this.checked);
+    });
+    document.getElementById('traceManageToggle').addEventListener('change', function () {
+        document.getElementById('traceManageSection').classList.toggle('d-none', !this.checked);
+    });
+
+    document.querySelectorAll('.btn-view-user').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var userId = this.dataset.userId;
+            var u = userData[userId];
+            if (!u) return;
+            document.getElementById('modalUserId').textContent = u.userId;
+            document.getElementById('modalUserFullName').textContent = u.fullName;
+            document.getElementById('modalUserEmail').textContent = u.email;
+            document.getElementById('modalUserOrg').textContent = u.organization;
+            document.getElementById('modalUserRole').textContent = u.role;
+            document.getElementById('modalUserStatus').textContent = u.status;
+            var agencySelect = document.getElementById('modalUserAgency');
+            agencySelect.value = u.agency || '';
+            document.querySelectorAll('.modal-role-checkbox').forEach(function (cb) {
+                cb.checked = u.specificRoles.indexOf(cb.value) !== -1;
+            });
+            var areaEl = document.getElementById('modalResponsibleArea');
+            areaEl.innerHTML = '';
+            if (u.responsibleArea && u.responsibleArea.length > 0) {
+                u.responsibleArea.forEach(function (area) {
+                    var span = document.createElement('span');
+                    span.className = 'badge bg-label-secondary me-1 mb-1';
+                    span.textContent = area;
+                    areaEl.appendChild(span);
+                });
+            } else {
+                areaEl.textContent = '-';
+            }
+            document.getElementById('modalSignerBadge').classList.toggle('d-none', !u.isSigner);
+            document.getElementById('modalApproverBadge').classList.toggle('d-none', !u.isApprover);
+            // TOR 3.1(9): permissions section
+            var hasAgency = !!u.agency;
+            document.getElementById('permissionManageCard').classList.toggle('d-none', !hasAgency);
+            if (hasAgency) {
+                // status radio
+                var statusVal = u.status || 'ใช้งาน';
+                document.querySelectorAll('input[name="modalUserStatusRadio"]').forEach(function(r){ r.checked = (r.value === statusVal); });
+                document.getElementById('modalPermStatusBadge').textContent = statusVal;
+                document.getElementById('modalPermStatusBadge').className = 'badge small ' +
+                    (statusVal === 'ใช้งาน' ? 'bg-label-success' : statusVal === 'ระงับ' ? 'bg-label-warning' : 'bg-label-danger');
+                // role & scope agency
+                document.getElementById('modalRoleAssign').value = u.role || 'สมาชิก';
+                document.getElementById('modalScopeAgency').value = u.agency || '';
+                // signer / approver toggles
+                document.getElementById('modalIsSignerToggle').checked = !!u.isSigner;
+                document.getElementById('modalIsApproverToggle').checked = !!u.isApprover;
+                // toggle button label
+                document.getElementById('btnTogglePermission').innerHTML = statusVal === 'ใช้งาน'
+                    ? '<i class="ri ri-lock-line me-1"></i>ปิดสิทธิ์ชั่วคราว'
+                    : '<i class="ri ri-lock-unlock-line me-1"></i>เปิดสิทธิ์';
+            }
+            new bootstrap.Modal(document.getElementById('userDetailModal')).show();
+        });
     });
     if (window.bootstrap && bootstrap.Tooltip) {
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) { new bootstrap.Tooltip(el); });
@@ -149,22 +297,30 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h5 class="card-title mb-1">ค้นหาผู้ใช้งาน</h5>
-            <p class="text-muted small mb-0">ค้นหาตามชื่อ อีเมล องค์กร บทบาท หรือสถานะ</p>
+            <p class="text-muted small mb-0">ค้นหาตามชื่อ อีเมล องค์กร บทบาท สังกัด หรือสถานะ</p>
         </div>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end">
-            <div class="col-md-4 col-lg-4">
+            <div class="col-md-3 col-lg-3">
                 <label for="filterKeyword" class="form-label">ค้นหา</label>
                 <input id="filterKeyword" type="text" class="form-control" placeholder="ชื่อผู้ใช้ / อีเมล / องค์กร" />
             </div>
-            <div class="col-md-3 col-lg-3">
+            <div class="col-md-2 col-lg-2">
                 <label for="filterRole" class="form-label">บทบาท</label>
                 <select id="filterRole" class="form-select">
                     <option value="">ทั้งหมด</option>
                     <option value="สมาชิก">สมาชิก</option>
                     <option value="เจ้าหน้าที่">เจ้าหน้าที่</option>
                     <option value="ผู้ดูแลระบบ">ผู้ดูแลระบบ</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-3">
+                <label for="filterAgency" class="form-label">สังกัดหน่วยงาน</label>
+                <select id="filterAgency" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="กตส.">กตส. (กองตรวจสอบคุณภาพสินค้าประมง)</option>
+                    <option value="ศตส.">ศตส. (ทุกเขต)</option>
                 </select>
             </div>
             <div class="col-md-2 col-lg-2">
@@ -175,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <option value="ระงับ">ระงับ</option>
                 </select>
             </div>
-            <div class="col-md-3 col-lg-3">
+            <div class="col-md-2 col-lg-2">
                 <div class="d-flex gap-2 filter-action-buttons">
                     <button type="button" id="btnSearch" class="btn btn-outline-primary btn-square" title="ค้นหา">
                         <i class="ri ri-search-line"></i>
@@ -205,38 +361,725 @@ document.addEventListener('DOMContentLoaded', function () {
                     <th>รหัสผู้ใช้</th>
                     <th>ชื่อ-สกุล</th>
                     <th>อีเมล</th>
-                    <th>องค์กร</th>
+                    <th>องค์กร / สังกัด</th>
                     <th>บทบาท</th>
+                    <th>บทบาทพิเศษ</th>
+                    <th style="min-width:110px;">สิทธิ์ข้อมูล</th>
                     <th>เข้าใช้ล่าสุด</th>
                     <th>สถานะ</th>
-                    <th style="width:60px"></th>
+                    <th style="width:80px"></th>
                 </tr>
             </thead>
             <tbody id="userTableBody">
                 @foreach (var u in users)
                 {
-                    <tr data-id="@u.UserId" data-role="@u.Role" data-status="@u.StatusText" data-search-text="@u.FullName.ToLower() @u.Email.ToLower() @u.Organization.ToLower()">
+                    <tr data-id="@u.UserId" data-role="@u.Role" data-status="@u.StatusText" data-agency="@u.Agency" data-search-text="@u.FullName.ToLower() @u.Email.ToLower() @u.Organization.ToLower()">
                         <td class="text-center text-muted">@u.RowNo</td>
                         <td><span class="fw-semibold text-primary">@u.UserId</span></td>
                         <td>@u.FullName</td>
                         <td>@u.Email</td>
-                        <td>@u.Organization</td>
+                        <td>
+                            @u.Organization
+                            @if (!string.IsNullOrEmpty(u.Agency)) {
+                                <br/><small class="text-muted">@u.Agency</small>
+                            }
+                        </td>
                         <td class="text-center">
                             <span class="badge rounded-pill bg-label-@(u.Role == "ผู้ดูแลระบบ" ? "danger" : u.Role == "เจ้าหน้าที่" ? "info" : "secondary")">@u.Role</span>
                         </td>
+                        <td class="text-center">
+                            @if (u.IsSigner) {<span class="badge bg-success me-1"><i class="ri ri-pen-nib-line"></i> ผู้ลงนาม</span>}
+                            @if (u.IsApprover) {<span class="badge bg-primary"><i class="ri ri-checkbox-circle-line"></i> ผู้อนุมัติ</span>}
+                            @if (!u.IsSigner && !u.IsApprover) {<span class="text-muted small">-</span>}
+                        </td>
+                        <td class="text-center">
+                            @if (u.HasDataScope)
+                            {
+                                <span class="badge bg-label-success" style="font-size:0.67rem;">
+                                    <i class="ri ri-eye-line me-1"></i>@u.DataScopeLabel
+                                </span>
+                            }
+                            else if (!string.IsNullOrEmpty(u.Agency))
+                            {
+                                <span class="badge bg-label-warning" style="font-size:0.67rem;">
+                                    <i class="ri ri-eye-off-line me-1"></i>ยังไม่กำหนด
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">-</span>
+                            }
+                            @if (u.HasCrossAgencyCertAccess)
+                            {
+                                <br/><span class="badge bg-label-primary mt-1" style="font-size:0.67rem;">
+                                    <i class="ri ri-file-certificate-line me-1"></i>@u.CrossAgencyCertLabel
+                                </span>
+                            }
+                            @if (u.CanManageDofList)
+                            {
+                                <br/><span class="badge bg-label-warning mt-1" style="font-size:0.67rem;">
+                                    <i class="ri ri-list-check me-1"></i>@u.DofScopeLabel
+                                </span>
+                            }
+                            @if (u.CanManageTraceList)
+                            {
+                                <br/><span class="badge bg-label-danger mt-1" style="font-size:0.67rem;">
+                                    <i class="ri ri-route-line me-1"></i>@u.TraceScopeLabel
+                                </span>
+                            }
+                        </td>
                         <td>@u.LastLoginAt.ToString("dd/MM/yyyy HH:mm")</td>
                         <td class="text-center"><span class="badge rounded-pill @u.StatusClass">@u.StatusText</span></td>
-                        <td class="text-center">
-                            <button class="btn btn-icon btn-sm btn-outline-info" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                        <td class="text-center text-nowrap">
+                            @if (!string.IsNullOrEmpty(u.Agency))
+                            {
+                                <button class="btn btn-icon btn-sm btn-outline-primary me-1 btn-assign-scope" data-user-id="@u.UserId" data-bs-toggle="tooltip" title="กำหนดสิทธิ์ข้อมูล">
+                                    <i class="ri ri-shield-keyhole-line text-primary"></i>
+                                </button>
+                            }
+                            <button class="btn btn-icon btn-sm btn-outline-info btn-view-user" data-user-id="@u.UserId" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                 <i class="ri ri-eye-line text-info"></i>
                             </button>
                         </td>
                     </tr>
                 }
                 <tr id="userTableEmpty" class="d-none">
-                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="11" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- User Detail Modal -->
+<div class="modal fade" id="userDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ri ri-user-settings-line me-2 text-primary"></i>รายละเอียดผู้ใช้งาน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- ข้อมูลผู้ใช้งาน -->
+                <div class="card border mb-4">
+                    <div class="card-header bg-light py-2">
+                        <h6 class="mb-0 fw-semibold text-secondary"><i class="ri ri-information-line me-1"></i>ข้อมูลผู้ใช้งาน</h6>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small mb-0">รหัสผู้ใช้</label>
+                                <div class="fw-semibold text-primary" id="modalUserId">-</div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label text-muted small mb-0">ชื่อ-สกุล</label>
+                                <div class="fw-semibold" id="modalUserFullName">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small mb-0">อีเมล</label>
+                                <div id="modalUserEmail">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small mb-0">องค์กร / สังกัด</label>
+                                <div id="modalUserOrg">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small mb-0">บทบาทในระบบ</label>
+                                <div id="modalUserRole">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small mb-0">สถานะ</label>
+                                <div id="modalUserStatus">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small mb-0">สถานะพิเศษ</label>
+                                <div>
+                                    <span id="modalSignerBadge" class="badge bg-success me-1 d-none"><i class="ri ri-pen-nib-line me-1"></i>ผู้ลงนาม ✅</span>
+                                    <span id="modalApproverBadge" class="badge bg-primary d-none"><i class="ri ri-checkbox-circle-line me-1"></i>ผู้อนุมัติ ✅</span>
+                                    <span id="modalNoBadge" class="text-muted small">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- บทบาทและสังกัด -->
+                <div class="card border">
+                    <div class="card-header py-2" style="background:rgba(105,108,255,0.08)">
+                        <h6 class="mb-0 fw-semibold text-primary"><i class="ri ri-shield-user-line me-1"></i>บทบาทและสังกัด</h6>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-4">
+
+                            <!-- สังกัดหน่วยงาน -->
+                            <div class="col-md-8">
+                                <label for="modalUserAgency" class="form-label fw-semibold">สังกัดหน่วยงาน</label>
+                                <select id="modalUserAgency" class="form-select">
+                                    <option value="">-- ไม่ระบุ (ผู้ประกอบการ / สมาชิก) --</option>
+                                    <option value="กตส.">กองตรวจสอบคุณภาพสินค้าประมง (กตส.)</option>
+                                    <option value="ศตส.เขต 1">ศตส. เขต 1 (เชียงใหม่)</option>
+                                    <option value="ศตส.เขต 2">ศตส. เขต 2 (พิษณุโลก)</option>
+                                    <option value="ศตส.เขต 3">ศตส. เขต 3 (สงขลา)</option>
+                                    <option value="ศตส.เขต 4">ศตส. เขต 4 (ขอนแก่น)</option>
+                                    <option value="ศตส.เขต 5">ศตส. เขต 5 (สมุทรสาคร)</option>
+                                    <option value="ศตส.เขต 6">ศตส. เขต 6 (ระยอง)</option>
+                                    <option value="ศตส.เขต 7">ศตส. เขต 7 (สุราษฎร์ธานี)</option>
+                                    <option value="ศตส.เขต 8">ศตส. เขต 8 (ปัตตานี)</option>
+                                    <option value="ศตส.เขต 9">ศตส. เขต 9 (ตราด)</option>
+                                </select>
+                            </div>
+
+                            <!-- ตำแหน่ง / บทบาทในระบบ -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">ตำแหน่ง / บทบาทในระบบ</label>
+                                <div class="row g-2 border rounded p-2 bg-light">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input modal-role-checkbox" type="checkbox" value="เจ้าหน้าที่รับเรื่อง" id="roleRecv">
+                                            <label class="form-check-label" for="roleRecv">เจ้าหน้าที่รับเรื่อง</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input modal-role-checkbox" type="checkbox" value="เจ้าหน้าที่พิจารณา" id="roleConsider">
+                                            <label class="form-check-label" for="roleConsider">เจ้าหน้าที่พิจารณา</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input modal-role-checkbox" type="checkbox" value="ผู้อนุมัติ RMBS1" id="roleApprRMBS1">
+                                            <label class="form-check-label" for="roleApprRMBS1">ผู้อนุมัติ RMBS1</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input modal-role-checkbox" type="checkbox" value="ผู้ลงนามใบรับรอง" id="roleSigner">
+                                            <label class="form-check-label" for="roleSigner">ผู้ลงนามใบรับรอง</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input modal-role-checkbox" type="checkbox" value="ผู้ตรวจสอบ Traceability" id="roleTraceCheck">
+                                            <label class="form-check-label" for="roleTraceCheck">ผู้ตรวจสอบ Traceability</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input modal-role-checkbox" type="checkbox" value="ผู้จัดการ DOF List" id="roleDOFMgr">
+                                            <label class="form-check-label" for="roleDOFMgr">ผู้จัดการ DOF List</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- พื้นที่รับผิดชอบ -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">พื้นที่รับผิดชอบ</label>
+                                <div id="modalResponsibleArea" class="mt-1">-</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOR 3.1(9): การจัดการสิทธิ์ -->
+                <div class="card border mt-3" id="permissionManageCard">
+                    <div class="card-header py-2" style="background:rgba(40,199,111,0.08)">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0 fw-semibold text-success">
+                                <i class="ri ri-lock-password-line me-1"></i>การจัดการสิทธิ์การใช้งาน
+                            </h6>
+                            <span class="badge bg-label-success small" id="modalPermStatusBadge">ใช้งาน</span>
+                        </div>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-3">
+
+                            <!-- เปิด/ปิดสิทธิ์ -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold mb-1">สถานะการใช้งาน</label>
+                                <div class="d-flex align-items-center gap-4 border rounded p-2 bg-light">
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="radio" name="modalUserStatusRadio" id="radioStatusActive" value="ใช้งาน" checked>
+                                        <label class="form-check-label text-success fw-semibold" for="radioStatusActive">
+                                            <i class="ri ri-toggle-line me-1"></i>เปิดสิทธิ์ (ใช้งาน)
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="radio" name="modalUserStatusRadio" id="radioStatusSuspend" value="ระงับ">
+                                        <label class="form-check-label text-warning fw-semibold" for="radioStatusSuspend">
+                                            <i class="ri ri-forbid-line me-1"></i>ปิดสิทธิ์ (ระงับชั่วคราว)
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline mb-0">
+                                        <input class="form-check-input" type="radio" name="modalUserStatusRadio" id="radioStatusInactive" value="ยกเลิก">
+                                        <label class="form-check-label text-danger fw-semibold" for="radioStatusInactive">
+                                            <i class="ri ri-close-circle-line me-1"></i>ยกเลิกบัญชี
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- กำหนดบทบาทหลัก -->
+                            <div class="col-md-6">
+                                <label for="modalRoleAssign" class="form-label fw-semibold">บทบาทหลักในระบบ</label>
+                                <select id="modalRoleAssign" class="form-select">
+                                    <option value="สมาชิก">สมาชิก (ผู้ประกอบการ)</option>
+                                    <option value="เจ้าหน้าที่">เจ้าหน้าที่ กตส./ศตส.</option>
+                                    <option value="ผู้ดูแลระบบ">ผู้ดูแลระบบ (Admin)</option>
+                                </select>
+                            </div>
+
+                            <!-- ขอบเขตภายใต้หน่วยงานสังกัด -->
+                            <div class="col-md-6">
+                                <label for="modalScopeAgency" class="form-label fw-semibold">หน่วยงานที่กำหนดสิทธิ์ให้</label>
+                                <select id="modalScopeAgency" class="form-select">
+                                    <option value="">-- ไม่จำกัดหน่วยงาน --</option>
+                                    <option value="กตส.">กองตรวจสอบคุณภาพสินค้าประมง (กตส.)</option>
+                                    <option value="ศตส.เขต 1">ศตส. เขต 1 (เชียงใหม่)</option>
+                                    <option value="ศตส.เขต 2">ศตส. เขต 2 (พิษณุโลก)</option>
+                                    <option value="ศตส.เขต 3">ศตส. เขต 3 (สงขลา)</option>
+                                    <option value="ศตส.เขต 4">ศตส. เขต 4 (ขอนแก่น)</option>
+                                    <option value="ศตส.เขต 5">ศตส. เขต 5 (สมุทรสาคร)</option>
+                                    <option value="ศตส.เขต 6">ศตส. เขต 6 (ระยอง)</option>
+                                    <option value="ศตส.เขต 7">ศตส. เขต 7 (สุราษฎร์ธานี)</option>
+                                    <option value="ศตส.เขต 8">ศตส. เขต 8 (ปัตตานี)</option>
+                                    <option value="ศตส.เขต 9">ศตส. เขต 9 (ตราด)</option>
+                                </select>
+                                <div class="form-text">สิทธิ์จะถูก scope ภายใต้หน่วยงานที่เลือกเท่านั้น</div>
+                            </div>
+
+                            <!-- ผู้ลงนาม / ผู้อนุมัติ -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">สถานะพิเศษ (อำนาจในระบบ)</label>
+                                <div class="row g-2 border rounded p-2 bg-light">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="modalIsSignerToggle">
+                                            <label class="form-check-label fw-semibold" for="modalIsSignerToggle">
+                                                <i class="ri ri-pen-nib-line me-1 text-success"></i>ผู้ลงนามใบรับรอง
+                                                <span class="badge bg-success ms-1 small">ลงนาม</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-text ms-4">มีอำนาจลงนามในใบรับรอง PS / NMD</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="modalIsApproverToggle">
+                                            <label class="form-check-label fw-semibold" for="modalIsApproverToggle">
+                                                <i class="ri ri-checkbox-circle-line me-1 text-primary"></i>ผู้อนุมัติ RMBS1/RMBS2
+                                                <span class="badge bg-primary ms-1 small">อนุมัติ</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-text ms-4">มีอำนาจอนุมัติเอกสาร RMBS1/RMBS2</div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning border-0 py-1 mt-2 small mb-0" role="alert">
+                                    <i class="ri ri-error-warning-line me-1"></i>
+                                    การกำหนดผู้ลงนาม/ผู้อนุมัติต้องได้รับการยืนยันจาก Admin ระดับ กตส. ก่อนมีผล
+                                </div>
+                            </div>
+
+                            <!-- ประวัติการเปลี่ยนสิทธิ์ -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold mb-1">
+                                    <i class="ri ri-history-line me-1 text-secondary"></i>ประวัติการเปลี่ยนแปลงสิทธิ์ล่าสุด
+                                </label>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0" style="font-size:0.72rem;">
+                                        <thead class="table-light text-center">
+                                            <tr>
+                                                <th>วันที่</th>
+                                                <th>รายการเปลี่ยนแปลง</th>
+                                                <th>ผู้ดำเนินการ</th>
+                                                <th>สถานะ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="modalPermHistoryBody">
+                                            <tr>
+                                                <td>23/04/2569</td>
+                                                <td>กำหนดบทบาท: เจ้าหน้าที่รับเรื่อง</td>
+                                                <td>นายประสิทธิ์ วงค์ดี</td>
+                                                <td class="text-center"><span class="badge bg-label-success">มีผล</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>20/04/2569</td>
+                                                <td>เปิดสิทธิ์การใช้งาน</td>
+                                                <td>ระบบ (Auto)</td>
+                                                <td class="text-center"><span class="badge bg-label-success">มีผล</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-warning me-auto" id="btnTogglePermission">
+                    <i class="ri ri-lock-unlock-line me-1"></i>ปิดสิทธิ์ชั่วคราว
+                </button>
+                <button type="button" class="btn btn-primary">
+                    <i class="ri ri-save-line me-1"></i>บันทึกการแก้ไข
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: กำหนดสิทธิ์การมองเห็นข้อมูล (TOR 3.1(7)) -->
+<div class="modal fade" id="dataAccessModal" tabindex="-1" aria-labelledby="dataAccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white py-2">
+                <h6 class="modal-title fw-semibold" id="dataAccessModalLabel">
+                    <i class="ri ri-shield-keyhole-line me-1"></i>กำหนดสิทธิ์การมองเห็นข้อมูล
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+
+                <!-- ข้อมูลผู้ใช้ (header info strip) -->
+                <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-light rounded">
+                    <div class="avatar avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;font-size:1rem;">
+                        <i class="ri ri-user-3-line"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold" id="scopeModalUserName">-</div>
+                        <div class="small text-muted">
+                            <span id="scopeModalUserId" class="me-2"></span>
+                            <span>สังกัด: </span><span id="scopeModalAgency" class="text-primary fw-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 1: ส่วนข้อมูลที่มองเห็นได้ -->
+                <div class="card border mb-3">
+                    <div class="card-header py-2" style="background:rgba(105,108,255,0.08)">
+                        <h6 class="mb-0 fw-semibold text-primary">
+                            <i class="ri ri-eye-line me-1"></i>ส่วนข้อมูลที่มองเห็นได้ในพื้นที่รับผิดชอบ
+                        </h6>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input scope-data-checkbox" type="checkbox" value="cert" id="scopeCert" checked>
+                                    <label class="form-check-label" for="scopeCert">
+                                        <i class="ri ri-file-text-line me-1 text-success"></i>ข้อมูลใบรับรองในพื้นที่รับผิดชอบ
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input scope-data-checkbox" type="checkbox" value="rmbs" id="scopeRMBS" checked>
+                                    <label class="form-check-label" for="scopeRMBS">
+                                        <i class="ri ri-clipboard-line me-1 text-primary"></i>ข้อมูล RMBS1/RMBS2 ในพื้นที่รับผิดชอบ
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input scope-data-checkbox" type="checkbox" value="operator" id="scopeOperator" checked>
+                                    <label class="form-check-label" for="scopeOperator">
+                                        <i class="ri ri-store-2-line me-1 text-info"></i>ข้อมูลผู้ประกอบการในพื้นที่รับผิดชอบ
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input scope-data-checkbox" type="checkbox" value="dof" id="scopeDOF">
+                                    <label class="form-check-label" for="scopeDOF">
+                                        <i class="ri ri-list-check me-1 text-warning"></i>DOF List ในพื้นที่รับผิดชอบ
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input scope-data-checkbox" type="checkbox" value="trace" id="scopeTrace">
+                                    <label class="form-check-label" for="scopeTrace">
+                                        <i class="ri ri-route-line me-1 text-danger"></i>Traceability List ในพื้นที่รับผิดชอบ
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 2: ขอบเขตพื้นที่ -->
+                <div class="card border mb-3">
+                    <div class="card-header py-2" style="background:rgba(105,108,255,0.08)">
+                        <h6 class="mb-0 fw-semibold text-primary">
+                            <i class="ri ri-map-pin-2-line me-1"></i>ขอบเขตพื้นที่ที่มองเห็นได้
+                        </h6>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="scopeMode" id="scopeModeAgency" value="agency" checked>
+                                    <label class="form-check-label" for="scopeModeAgency">
+                                        <i class="ri ri-government-line me-1"></i>ตามที่มอบหมายจากหน่วยงาน (ค่าเริ่มต้น)
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="scopeMode" id="scopeModeCustom" value="custom">
+                                    <label class="form-check-label" for="scopeModeCustom">
+                                        <i class="ri ri-settings-3-line me-1"></i>กำหนดเอง
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12 d-none" id="scopeCustomProvinceRow">
+                                <label class="form-label fw-semibold">เลือกจังหวัดในขอบเขตที่มองเห็นได้</label>
+                                <select id="scopeCustomProvinces" class="form-select" multiple size="6">
+                                    <option>กรุงเทพมหานคร</option>
+                                    <option>นนทบุรี</option>
+                                    <option>ปทุมธานี</option>
+                                    <option>สมุทรปราการ</option>
+                                    <option>สมุทรสาคร</option>
+                                    <option>สมุทรสงคราม</option>
+                                    <option>สงขลา</option>
+                                    <option>สตูล</option>
+                                    <option>พัทลุง</option>
+                                    <option>ระยอง</option>
+                                    <option>ชลบุรี</option>
+                                    <option>เพชรบุรี</option>
+                                    <option>เชียงใหม่</option>
+                                    <option>ขอนแก่น</option>
+                                    <option>สุราษฎร์ธานี</option>
+                                    <option>ปัตตานี</option>
+                                    <option>ตราด</option>
+                                    <option>พิษณุโลก</option>
+                                </select>
+                                <div class="form-text">กด Ctrl/Cmd ค้างเพื่อเลือกหลายจังหวัด</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 3: สิทธิ์ข้ามพื้นที่ (TOR 3.1(8)) -->
+                <div class="card border mb-3">
+                    <div class="card-header py-2" style="background:rgba(255,159,67,0.08)">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0 fw-semibold text-warning">
+                                <i class="ri ri-exchange-2-line me-1"></i>สิทธิ์ข้ามพื้นที่ (Cross-Area Access)
+                            </h6>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="crossAgencyToggle">
+                                <label class="form-check-label small" for="crossAgencyToggle">เปิดใช้งาน</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body py-3 d-none" id="crossAgencySection">
+                        <div class="alert alert-warning border-0 py-2 mb-3" role="alert">
+                            <i class="ri ri-error-warning-line me-1"></i>
+                            สิทธิ์ข้ามพื้นที่ต้องได้รับอนุมัติจาก Admin ระดับ กตส. ก่อนมีผล
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">หน่วยงานที่อนุญาตให้มองเห็นข้ามพื้นที่</label>
+                                <div class="row g-2">
+                                    @foreach (var agencyOpt in new[]{"กตส.","ศตส.เขต 1","ศตส.เขต 2","ศตส.เขต 3","ศตส.เขต 4","ศตส.เขต 5","ศตส.เขต 6"})
+                                    {
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input cross-agency-checkbox" type="checkbox" value="@agencyOpt" id="cross_@agencyOpt.Replace(" ","_")">
+                                                <label class="form-check-label" for="cross_@agencyOpt.Replace(" ","_")">@agencyOpt</label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">เหตุผล / บันทึกการร้องขอ</label>
+                                <textarea class="form-control" id="crossAgencyReason" rows="2" placeholder="ระบุเหตุผลความจำเป็น..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- TOR 3.1(8): สิทธิ์ตรวจสอบใบรับรองข้ามหน่วยงาน (ศตส. ดู กตส.) -->
+                        <hr class="my-3">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label class="fw-semibold mb-0 small">
+                                    <i class="ri ri-file-certificate-line me-1 text-primary"></i>
+                                    สิทธิ์ตรวจสอบใบรับรองที่ออกโดย กตส. (สำหรับ ศตส. เท่านั้น)
+                                </label>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="certCrossAgencyToggle">
+                                    <label class="form-check-label small" for="certCrossAgencyToggle">อนุญาต</label>
+                                </div>
+                            </div>
+                            <div class="d-none" id="certCrossAgencySection">
+                                <div class="row g-2 border rounded p-2 bg-light mb-2">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="crossCertPS" checked>
+                                            <label class="form-check-label small" for="crossCertPS">
+                                                <i class="ri ri-file-text-line me-1 text-success"></i>ใบรับรอง PS (Health Certificate) กตส.
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="crossCertNMD" checked>
+                                            <label class="form-check-label small" for="crossCertNMD">
+                                                <i class="ri ri-file-list-3-line me-1 text-primary"></i>ใบรับรอง NMD กตส.
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="crossCertRMBS1">
+                                            <label class="form-check-label small" for="crossCertRMBS1">
+                                                <i class="ri ri-clipboard-line me-1 text-info"></i>ข้อมูล RMBS1 กตส.
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="crossCertRMBS2">
+                                            <label class="form-check-label small" for="crossCertRMBS2">
+                                                <i class="ri ri-clipboard-check-line me-1 text-warning"></i>ข้อมูล RMBS2 กตส.
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info border-0 py-2 mb-0 small" role="alert">
+                                    <i class="ri ri-information-line me-1"></i>
+                                    สิทธิ์ตรวจสอบใบรับรองเป็นสิทธิ์อ่านอย่างเดียว (ไม่สามารถแก้ไข/ยกเลิกได้)
+                                    ผู้อนุมัติคือ Admin ระดับ กตส. เท่านั้น
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ส่วนที่ 4: สิทธิ์จัดการฐานข้อมูล DOF List + Traceability List (TOR 3.1(10)) -->
+                <div class="card border mb-0">
+                    <div class="card-header py-2" style="background:rgba(102,192,62,0.08)">
+                        <h6 class="mb-0 fw-semibold" style="color:#28a745;">
+                            <i class="ri ri-database-2-line me-1"></i>สิทธิ์จัดการฐานข้อมูล (DOF List / Traceability List)
+                        </h6>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="alert alert-info border-0 py-2 mb-3 small">
+                            <i class="ri ri-information-line me-1"></i>
+                            สิทธิ์นี้อนุญาตให้เจ้าหน้าที่ เพิ่มเติม/แก้ไข/ระงับ/ยกเลิก ข้อมูลในพื้นที่รับผิดชอบ
+                        </div>
+                        <div class="row g-3">
+                            <!-- DOF List -->
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light p-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="fw-semibold small">
+                                            <i class="ri ri-list-check me-1 text-warning"></i>DOF List
+                                        </div>
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="dofManageToggle">
+                                            <label class="form-check-label small" for="dofManageToggle">จัดการได้</label>
+                                        </div>
+                                    </div>
+                                    <div id="dofManageSection" class="d-none">
+                                        <label class="form-label small fw-semibold">ขอบเขตพื้นที่ DOF List</label>
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input" type="radio" name="dofScope" id="dofScopeAgency" value="agency" checked>
+                                            <label class="form-check-label small" for="dofScopeAgency">เฉพาะหน่วยงานสังกัด</label>
+                                        </div>
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input" type="radio" name="dofScope" id="dofScopeAll" value="all">
+                                            <label class="form-check-label small" for="dofScopeAll">ทุกพื้นที่ (เฉพาะ Admin)</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="form-label small fw-semibold">สิทธิ์การดำเนินการ</label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input dof-perm" type="checkbox" id="dofPermAdd" value="add" checked>
+                                                    <label class="form-check-label small" for="dofPermAdd">เพิ่ม</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input dof-perm" type="checkbox" id="dofPermEdit" value="edit" checked>
+                                                    <label class="form-check-label small" for="dofPermEdit">แก้ไข</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input dof-perm" type="checkbox" id="dofPermSuspend" value="suspend">
+                                                    <label class="form-check-label small" for="dofPermSuspend">ระงับ</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input dof-perm" type="checkbox" id="dofPermCancel" value="cancel">
+                                                    <label class="form-check-label small" for="dofPermCancel">ยกเลิก</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Traceability List -->
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light p-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="fw-semibold small">
+                                            <i class="ri ri-route-line me-1 text-danger"></i>Traceability List
+                                        </div>
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="traceManageToggle">
+                                            <label class="form-check-label small" for="traceManageToggle">จัดการได้</label>
+                                        </div>
+                                    </div>
+                                    <div id="traceManageSection" class="d-none">
+                                        <label class="form-label small fw-semibold">ขอบเขตพื้นที่ Traceability</label>
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input" type="radio" name="traceScope" id="traceScopeAgency" value="agency" checked>
+                                            <label class="form-check-label small" for="traceScopeAgency">เฉพาะหน่วยงานสังกัด</label>
+                                        </div>
+                                        <div class="form-check mb-1">
+                                            <input class="form-check-input" type="radio" name="traceScope" id="traceScopeAll" value="all">
+                                            <label class="form-check-label small" for="traceScopeAll">ทุกพื้นที่ (เฉพาะ Admin)</label>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="form-label small fw-semibold">สิทธิ์การดำเนินการ</label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input trace-perm" type="checkbox" id="tracePermAdd" value="add" checked>
+                                                    <label class="form-check-label small" for="tracePermAdd">เพิ่ม</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input trace-perm" type="checkbox" id="tracePermEdit" value="edit" checked>
+                                                    <label class="form-check-label small" for="tracePermEdit">แก้ไข</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input trace-perm" type="checkbox" id="tracePermSuspend" value="suspend">
+                                                    <label class="form-check-label small" for="tracePermSuspend">ระงับ</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input trace-perm" type="checkbox" id="tracePermCancel" value="cancel">
+                                                    <label class="form-check-label small" for="tracePermCancel">ยกเลิก</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="ri ri-save-line me-1"></i>บันทึกสิทธิ์
+                </button>
+            </div>
+        </div>
     </div>
 </div>

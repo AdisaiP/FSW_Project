@@ -46,4 +46,19 @@ public class AdminController : Controller
   {
     return View();
   }
+
+  public IActionResult ESignature()
+  {
+    return View();
+  }
+
+  public IActionResult ReceptionTemplate()
+  {
+    return View();
+  }
+
+  public IActionResult Announcement()
+  {
+    return View();
+  }
 }

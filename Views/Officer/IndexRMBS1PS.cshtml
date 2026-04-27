@@ -25,6 +25,8 @@
             QtyEnteringFactory = 60000m,
             DocumentType = "cc",
             SourceText = "ภายนอกระบบ [FSW]",
+            ResponsibleAgencyCode = "GOV-STS-01",
+            ResponsibleAgencyName = "ศตส.เขต 1",
             CertificationStatusText = "CCSCC มาภายหลัง",
             CertificationStatusClass = "bg-label-danger",
             CertificationStatusIcon = "ri-file-warning-line",
@@ -51,6 +53,8 @@
             QtyEnteringFactory = 240000m,
             DocumentType = "cc",
             SourceText = "ภายนอกระบบ [FSW]",
+            ResponsibleAgencyCode = "GOV-STS-03",
+            ResponsibleAgencyName = "ศตส.เขต 3",
             CertificationStatusText = "CCSCC มาแล้ว",
             CertificationStatusClass = "bg-label-success",
             CertificationStatusIcon = "ri-file-check-line",
@@ -77,6 +81,8 @@
             QtyEnteringFactory = 45000m,
             DocumentType = "cc",
             SourceText = "ภายนอกระบบ [FSW]",
+            ResponsibleAgencyCode = "GOV-STS-05",
+            ResponsibleAgencyName = "ศตส.เขต 5",
             CertificationStatusText = "CCSCC มาแล้ว",
             CertificationStatusClass = "bg-label-success",
             CertificationStatusIcon = "ri-file-check-line",
@@ -103,6 +109,8 @@
             QtyEnteringFactory = 80000m,
             DocumentType = "scc",
             SourceText = "ภายนอกระบบ [FSW]",
+            ResponsibleAgencyCode = "GOV-KTS-00",
+            ResponsibleAgencyName = "กตส. (ส่วนกลาง)",
             CertificationStatusText = "CCSCC มาแล้ว",
             CertificationStatusClass = "bg-label-success",
             CertificationStatusIcon = "ri-file-check-line",
@@ -247,6 +255,7 @@
             var registrationNo = (document.getElementById('filterRegistrationNo').value || '').trim().toLowerCase();
             var certTypeFilter = (document.getElementById('filterCertType').value || '').trim();
             var statusFilter = (document.getElementById('filterStatus').value || '').trim();
+            var agencyFilter = (document.getElementById('filterAgency').value || '').trim();
             var logFromDate = parseDateInput(document.getElementById('filterLogDateFrom').value, false);
             var logToDate = parseDateInput(document.getElementById('filterLogDateTo').value, true);
             var logExcludeRange = document.getElementById('filterLogDateExclude').checked;
@@ -270,6 +279,7 @@
                     (!registrationNo || (row.dataset.registrationNo || '').toLowerCase().includes(registrationNo)) &&
                     (!certTypeFilter || (row.dataset.certType || '') === certTypeFilter) &&
                     (!statusFilter || (row.dataset.status || '') === statusFilter) &&
+                    (!agencyFilter || (row.dataset.agencyCode || '') === agencyFilter) &&
                     ((!logFromDate && !logToDate) || (logExcludeRange ? !inLogRange : inLogRange)) &&
                     ((!fishingFromDate && !fishingToDate) || inFishingRange);
 
@@ -287,12 +297,26 @@
             });
             document.getElementById('filterCertType').value = '';
             document.getElementById('filterStatus').value = '';
+            document.getElementById('filterAgency').value = '';
             document.getElementById('filterLogDateExclude').checked = false;
             filterRows();
         });
 
         document.getElementById('filterCertType').addEventListener('change', filterRows);
         document.getElementById('filterStatus').addEventListener('change', filterRows);
+        document.getElementById('filterAgency').addEventListener('change', filterRows);
+
+        // Assign agency modal
+        document.querySelectorAll('.btn-assign-agency').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var rmbs1 = this.dataset.rmbs1;
+                var row = this.closest('tr');
+                document.getElementById('assignModalRmbs1Number').textContent = rmbs1;
+                document.getElementById('assignModalCurrentAgency').textContent = row.dataset.agencyName || '-';
+                document.getElementById('assignModalNewAgency').value = '';
+                new bootstrap.Modal(document.getElementById('assignAgencyModal')).show();
+            });
+        });
 
         document.getElementById('filterLogDateExclude').addEventListener('change', filterRows);
 
@@ -412,6 +436,19 @@
                     <option value="ส่งคืนแก้ไข">ส่งคืนแก้ไข</option>
                 </select>
             </div>
+            <div class="col-md-6 col-xl-4">
+                <label for="filterAgency" class="form-label filter-form-label">หน่วยงานรับผิดชอบ</label>
+                <select id="filterAgency" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด (กตส./ศตส.)</option>
+                    <option value="GOV-KTS-00">กตส. (ส่วนกลาง)</option>
+                    <option value="GOV-STS-01">ศตส.เขต 1 (ชลบุรี)</option>
+                    <option value="GOV-STS-02">ศตส.เขต 2 (สุราษฎร์ธานี)</option>
+                    <option value="GOV-STS-03">ศตส.เขต 3 (สงขลา)</option>
+                    <option value="GOV-STS-04">ศตส.เขต 4 (นครศรีธรรมราช)</option>
+                    <option value="GOV-STS-05">ศตส.เขต 5 (ระนอง)</option>
+                    <option value="GOV-STS-06">ศตส.เขต 6 (ภูเก็ต)</option>
+                </select>
+            </div>
             <div class="col-12">
                 <div class="row g-2 align-items-end">
                     <div class="col-12 col-md-4">
@@ -478,6 +515,7 @@
                     <th>เครื่องมือทำการประมง</th>
                     <th style="min-width:280px;">ชนิดสัตว์น้ำ</th>
                     <th>ปริมาณสัตว์น้ำเข้าโรงงาน</th>
+                    <th style="min-width:120px;">หน่วยงานรับผิดชอบ</th>
                     <th style="min-width:110px;">สถานะ</th>
                     <th style="width:7rem;">การดำเนินการ</th>
                 </tr>
@@ -492,6 +530,8 @@
                         data-cert-type="@rec.CertificateType"
                         data-status="@rec.StatusText"
                         data-vessel="@rec.VesselName"
+                        data-agency-code="@rec.ResponsibleAgencyCode"
+                        data-agency-name="@rec.ResponsibleAgencyName"
                         data-registration-no="@rec.RegistrationNo"
                         data-fishing-start-date="@rec.FishingStartDate.ToString("yyyy-MM-ddTHH:mm:ss")"
                         data-fishing-end-date="@rec.FishingEndDate.ToString("yyyy-MM-ddTHH:mm:ss")"
@@ -528,6 +568,12 @@
                         <td style="max-width:280px;">@rec.FisheryProducts</td>
                         <td class="text-end">@rec.QtyEnteringFactory.ToString("N2")</td>
                         <td class="text-center">
+                            <span class="badge @(rec.ResponsibleAgencyCode == "GOV-KTS-00" ? "bg-label-primary" : "bg-label-info") d-block mb-1">@rec.ResponsibleAgencyName</span>
+                            <button type="button" class="btn btn-xs btn-outline-secondary btn-assign-agency" style="font-size:0.65rem;padding:0.1rem 0.4rem;" data-rmbs1="@rec.Rmbs1Number" data-bs-toggle="tooltip" title="เปลี่ยนหน่วยงาน">
+                                <i class="ri ri-exchange-line"></i>
+                            </button>
+                        </td>
+                        <td class="text-center">
                             <span class="badge @rec.StatusClass">@rec.StatusText</span>
                         </td>
                         <td class="text-center">
@@ -549,9 +595,65 @@
                     </tr>
                 }
                 <tr id="imdTableEmpty" class="d-none">
-                    <td colspan="12" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="13" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Modal: เปลี่ยนหน่วยงานรับผิดชอบ RMBS1 -->
+<div class="modal fade" id="assignAgencyModal" tabindex="-1" aria-labelledby="assignAgencyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignAgencyModalLabel">
+                    <i class="ri ri-exchange-line me-2 text-primary"></i>เปลี่ยนหน่วยงานรับผิดชอบ RMBS1
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex align-items-start gap-2 mb-3">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <div class="small">
+                        การเปลี่ยนหน่วยงานรับผิดชอบจะส่งผลต่อเจ้าหน้าที่ที่มีสิทธิ์พิจารณา RMBS1 นี้
+                        และจะถูก log เป็นประวัติการเปลี่ยนแปลง
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เลขที่ RMBS1</label>
+                    <p class="form-control-plaintext fw-semibold text-primary" id="assignModalRmbs1Number">-</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">หน่วยงานรับผิดชอบปัจจุบัน</label>
+                    <p class="form-control-plaintext" id="assignModalCurrentAgency">-</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">หน่วยงานรับผิดชอบใหม่ <span class="text-danger">*</span></label>
+                    <select class="form-select" id="assignModalNewAgency">
+                        <option value="">-- เลือกหน่วยงาน --</option>
+                        <option value="GOV-KTS-00">กตส. (ส่วนกลาง)</option>
+                        <option value="GOV-STS-01">ศตส.เขต 1 (ชลบุรี)</option>
+                        <option value="GOV-STS-02">ศตส.เขต 2 (สุราษฎร์ธานี)</option>
+                        <option value="GOV-STS-03">ศตส.เขต 3 (สงขลา)</option>
+                        <option value="GOV-STS-04">ศตส.เขต 4 (นครศรีธรรมราช)</option>
+                        <option value="GOV-STS-05">ศตส.เขต 5 (ระนอง)</option>
+                        <option value="GOV-STS-06">ศตส.เขต 6 (ภูเก็ต)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เหตุผลในการเปลี่ยน</label>
+                    <textarea class="form-control" rows="2" placeholder="ระบุเหตุผล เช่น โอนย้ายความรับผิดชอบตามพื้นที่จังหวัดใหม่"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i> ยกเลิก
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="ri ri-save-line me-1"></i> ยืนยันเปลี่ยนหน่วยงาน
+                </button>
+            </div>
+        </div>
     </div>
 </div>

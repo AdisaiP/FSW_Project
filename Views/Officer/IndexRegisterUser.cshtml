@@ -3,16 +3,18 @@
 
     var pendingRegistrations = new[]
     {
-        new { RowNo=1, ReqNo="REG-2026-00101", FullName="นายสุรชาติ เกษมสุข", Email="surachat@newcompany.co.th", Organization="บริษัท นิว ซีฟู้ด เทรด จำกัด", RequestedRole="สมาชิก", SubmittedAt=new DateTime(2026,4,22,10,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
-        new { RowNo=2, ReqNo="REG-2026-00102", FullName="นางสาววรรณพร ดีงาม", Email="wannaporn@bluefish.co.th", Organization="บริษัท บลู ฟิช เอ็กซ์พอร์ต จำกัด", RequestedRole="สมาชิก", SubmittedAt=new DateTime(2026,4,22,14,15,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
-        new { RowNo=3, ReqNo="REG-2026-00103", FullName="นายกิตติภัทร พงษ์ไพร", Email="kittipat@andaman2.co.th", Organization="บริษัท อันดามัน 2 โปรเซสซิ่ง จำกัด", RequestedRole="สมาชิก", SubmittedAt=new DateTime(2026,4,23,9,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
-        new { RowNo=4, ReqNo="REG-2026-00099", FullName="นางสาวมณีรัตน์ สุขใจ", Email="maneerat@siammarine.co.th", Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", RequestedRole="สมาชิก", SubmittedAt=new DateTime(2026,4,21,11,0,0), StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
-        new { RowNo=5, ReqNo="REG-2026-00098", FullName="นายอิทธิพล รักดี", Email="itthiphon@fake.co.th", Organization="ไม่ระบุ", RequestedRole="สมาชิก", SubmittedAt=new DateTime(2026,4,20,8,30,0), StatusText="ปฏิเสธ", StatusClass="bg-label-danger" },
+        new { RowNo=1, ReqNo="REG-2026-00101", FullName="นายสุรชาติ เกษมสุข", Email="surachat@newcompany.co.th", Organization="บริษัท นิว ซีฟู้ด เทรด จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,22,10,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
+        new { RowNo=2, ReqNo="REG-2026-00102", FullName="นางสาววรรณพร ดีงาม", Email="wannaporn@bluefish.co.th", Organization="บริษัท บลู ฟิช เอ็กซ์พอร์ต จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,22,14,15,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
+        new { RowNo=3, ReqNo="REG-2026-00103", FullName="นายกิตติภัทร พงษ์ไพร", Email="kittipat@andaman2.co.th", Organization="บริษัท อันดามัน 2 โปรเซสซิ่ง จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,23,9,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
+        new { RowNo=4, ReqNo="REG-2026-00104", FullName="นายศุภชัย มือเย็น", Email="supachai@dof.go.th", Organization="กรมประมง — ศตส. เขต 4", RequestedRole="เจ้าหน้าที่", RequestedAgency="ศตส.เขต 4", SubmittedAt=new DateTime(2026,4,23,11,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
+        new { RowNo=5, ReqNo="REG-2026-00099", FullName="นางสาวมณีรัตน์ สุขใจ", Email="maneerat@siammarine.co.th", Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,21,11,0,0), StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
+        new { RowNo=6, ReqNo="REG-2026-00098", FullName="นายอิทธิพล รักดี", Email="itthiphon@fake.co.th", Organization="ไม่ระบุ", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,20,8,30,0), StatusText="ปฏิเสธ", StatusClass="bg-label-danger" },
     };
 
     var pendingCount = pendingRegistrations.Count(x => x.StatusText == "รอตรวจสอบ");
     var approvedCount = pendingRegistrations.Count(x => x.StatusText == "อนุมัติแล้ว");
     var rejectedCount = pendingRegistrations.Count(x => x.StatusText == "ปฏิเสธ");
+    var officerCount = pendingRegistrations.Count(x => x.RequestedRole == "เจ้าหน้าที่" && x.StatusText == "รอตรวจสอบ");
 }
 
 @section PageStyles {
@@ -34,12 +36,14 @@ document.addEventListener('DOMContentLoaded', function () {
     function filterRows() {
         var keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
         var status = (document.getElementById('filterStatus').value || '').trim();
+        var role = (document.getElementById('filterRole').value || '').trim();
         var rows = document.querySelectorAll('#regTableBody tr[data-id]');
         var count = 0;
         rows.forEach(function (row) {
             var text = (row.dataset.searchText || '').toLowerCase();
             var rowStatus = row.dataset.status || '';
-            var show = (!keyword || text.includes(keyword)) && (!status || rowStatus === status);
+            var rowRole = row.dataset.role || '';
+            var show = (!keyword || text.includes(keyword)) && (!status || rowStatus === status) && (!role || rowRole === role);
             row.classList.toggle('d-none', !show);
             if (show) count++;
         });
@@ -49,10 +53,51 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnReset').addEventListener('click', function () {
         document.getElementById('filterKeyword').value = '';
         document.getElementById('filterStatus').value = '';
+        document.getElementById('filterRole').value = '';
         filterRows();
     });
     document.getElementById('filterKeyword').addEventListener('keydown', function (e) { if (e.key === 'Enter') filterRows(); });
     document.getElementById('filterStatus').addEventListener('change', filterRows);
+    document.getElementById('filterRole').addEventListener('change', filterRows);
+
+    // Approve button — open approval modal
+    document.querySelectorAll('.btn-approve-reg').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var reqNo = this.dataset.reqNo;
+            var fullName = this.dataset.fullName;
+            var org = this.dataset.org;
+            var reqRole = this.dataset.role;
+            var reqAgency = this.dataset.agency || '';
+            document.getElementById('approveModalReqNo').textContent = reqNo;
+            document.getElementById('approveModalName').textContent = fullName;
+            document.getElementById('approveModalOrg').textContent = org;
+            // set role default from request
+            document.getElementById('approveRoleAssign').value = (reqRole === 'เจ้าหน้าที่') ? 'เจ้าหน้าที่' : 'สมาชิก';
+            document.getElementById('approveAgencyAssign').value = reqAgency;
+            document.getElementById('approveOfficerSection').classList.toggle('d-none', reqRole !== 'เจ้าหน้าที่');
+            document.getElementById('approveIsSignerToggle').checked = false;
+            document.getElementById('approveIsApproverToggle').checked = false;
+            document.querySelectorAll('.approve-specific-role').forEach(function(cb){ cb.checked = false; });
+            document.getElementById('approveResponsibleArea').value = '';
+            new bootstrap.Modal(document.getElementById('approveRegModal')).show();
+        });
+    });
+
+    // Role select in approve modal toggles officer section
+    document.getElementById('approveRoleAssign').addEventListener('change', function() {
+        document.getElementById('approveOfficerSection').classList.toggle('d-none', this.value !== 'เจ้าหน้าที่');
+    });
+
+    // Reject button
+    document.querySelectorAll('.btn-reject-reg').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.getElementById('rejectModalReqNo').textContent = this.dataset.reqNo;
+            document.getElementById('rejectModalName').textContent = this.dataset.fullName;
+            document.getElementById('rejectReason').value = '';
+            new bootstrap.Modal(document.getElementById('rejectRegModal')).show();
+        });
+    });
+
     if (window.bootstrap && bootstrap.Tooltip) {
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) { new bootstrap.Tooltip(el); });
     }
@@ -124,11 +169,11 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="card-body">
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="content-left">
-                        <h5 class="mb-1">@rejectedCount</h5>
-                        <small>ปฏิเสธ</small>
+                        <h5 class="mb-1">@officerCount</h5>
+                        <small>เจ้าหน้าที่รออนุมัติ</small>
                     </div>
-                    <span class="badge bg-label-danger rounded-circle p-2">
-                        <i class="icon-base ri ri-user-unfollow-line icon-24px"></i>
+                    <span class="badge bg-label-info rounded-circle p-2">
+                        <i class="icon-base ri ri-shield-user-line icon-24px"></i>
                     </span>
                 </div>
             </div>
@@ -150,7 +195,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 <label for="filterKeyword" class="form-label">ค้นหา</label>
                 <input id="filterKeyword" type="text" class="form-control" placeholder="ชื่อ / อีเมล / องค์กร" />
             </div>
-            <div class="col-md-3 col-lg-3">
+            <div class="col-md-2 col-lg-2">
+                <label for="filterRole" class="form-label">บทบาทที่ขอ</label>
+                <select id="filterRole" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="สมาชิก">สมาชิก</option>
+                    <option value="เจ้าหน้าที่">เจ้าหน้าที่ กตส./ศตส.</option>
+                </select>
+            </div>
+            <div class="col-md-2 col-lg-2">
                 <label for="filterStatus" class="form-label">สถานะ</label>
                 <select id="filterStatus" class="form-select">
                     <option value="">ทั้งหมด</option>
@@ -194,23 +247,42 @@ document.addEventListener('DOMContentLoaded', function () {
                     <th>เลขที่คำขอ</th>
                     <th>ชื่อ-สกุล</th>
                     <th>อีเมล</th>
-                    <th>องค์กร</th>
+                    <th>องค์กร / หน่วยงาน</th>
                     <th>บทบาทที่ขอ</th>
+                    <th>สังกัดที่ขอ</th>
                     <th>วันที่ยื่น</th>
                     <th>สถานะ</th>
-                    <th style="width:110px"></th>
+                    <th style="width:120px"></th>
                 </tr>
             </thead>
             <tbody id="regTableBody">
                 @foreach (var r in pendingRegistrations)
                 {
-                    <tr data-id="@r.ReqNo" data-status="@r.StatusText" data-search-text="@r.FullName.ToLower() @r.Email.ToLower() @r.Organization.ToLower()">
+                    <tr data-id="@r.ReqNo" data-status="@r.StatusText" data-role="@r.RequestedRole" data-search-text="@r.FullName.ToLower() @r.Email.ToLower() @r.Organization.ToLower()">
                         <td class="text-center text-muted">@r.RowNo</td>
                         <td><span class="fw-semibold text-primary">@r.ReqNo</span></td>
                         <td>@r.FullName</td>
                         <td>@r.Email</td>
-                        <td>@r.Organization</td>
-                        <td class="text-center"><span class="badge bg-label-secondary rounded-pill">@r.RequestedRole</span></td>
+                        <td>
+                            @r.Organization
+                            @if (!string.IsNullOrEmpty(r.RequestedAgency))
+                            {
+                                <br/><small class="text-muted"><i class="ri ri-government-line me-1"></i>@r.RequestedAgency</small>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill @(r.RequestedRole == "เจ้าหน้าที่" ? "bg-label-info" : "bg-label-secondary")">@r.RequestedRole</span>
+                        </td>
+                        <td class="text-center">
+                            @if (!string.IsNullOrEmpty(r.RequestedAgency))
+                            {
+                                <span class="badge bg-label-primary">@r.RequestedAgency</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">-</span>
+                            }
+                        </td>
                         <td>@r.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
                         <td class="text-center"><span class="badge rounded-pill @r.StatusClass">@r.StatusText</span></td>
                         <td class="text-center">
@@ -218,20 +290,204 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <button class="btn btn-icon btn-sm btn-outline-info" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                     <i class="ri ri-eye-line text-info"></i>
                                 </button>
-                                <button class="btn btn-icon btn-sm btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ">
-                                    <i class="ri ri-check-line text-success"></i>
-                                </button>
-                                <button class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="ปฏิเสธ">
-                                    <i class="ri ri-close-line text-danger"></i>
-                                </button>
+                                @if (r.StatusText == "รอตรวจสอบ")
+                                {
+                                    <button class="btn btn-icon btn-sm btn-outline-success btn-approve-reg"
+                                            data-req-no="@r.ReqNo" data-full-name="@r.FullName"
+                                            data-org="@r.Organization" data-role="@r.RequestedRole"
+                                            data-agency="@r.RequestedAgency"
+                                            data-bs-toggle="tooltip" title="อนุมัติ">
+                                        <i class="ri ri-check-line text-success"></i>
+                                    </button>
+                                    <button class="btn btn-icon btn-sm btn-outline-danger btn-reject-reg"
+                                            data-req-no="@r.ReqNo" data-full-name="@r.FullName"
+                                            data-bs-toggle="tooltip" title="ปฏิเสธ">
+                                        <i class="ri ri-close-line text-danger"></i>
+                                    </button>
+                                }
                             </div>
                         </td>
                     </tr>
                 }
                 <tr id="regTableEmpty" class="d-none">
-                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="10" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- ======================================================
+     Modal: อนุมัติคำขอลงทะเบียน (TOR 3.1(9))
+     ====================================================== -->
+<div class="modal fade" id="approveRegModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-label-success">
+                <h5 class="modal-title"><i class="ri ri-user-follow-line me-2"></i>อนุมัติคำขอลงทะเบียน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- ข้อมูลผู้ยื่นคำขอ -->
+                <div class="alert alert-info d-flex gap-3 mb-4 py-2">
+                    <i class="ri ri-information-line fs-5 mt-1"></i>
+                    <div>
+                        <div class="fw-semibold mb-1">คำขอ: <span id="approveModalReqNo">-</span> &mdash; <span id="approveModalName">-</span></div>
+                        <div class="small text-muted">หน่วยงาน: <span id="approveModalOrg">-</span></div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Section 1: บทบาทหลัก -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">บทบาทหลักที่กำหนด <span class="text-danger">*</span></label>
+                        <select id="approveRoleAssign" class="form-select">
+                            <option value="สมาชิก">สมาชิก (ผู้ประกอบการ)</option>
+                            <option value="เจ้าหน้าที่">เจ้าหน้าที่ กตส./ศตส.</option>
+                            <option value="ผู้ดูแลระบบ">ผู้ดูแลระบบ</option>
+                        </select>
+                    </div>
+                    <!-- Section 2: หน่วยงานสังกัด -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">หน่วยงานสังกัด กตส./ศตส.</label>
+                        <select id="approveAgencyAssign" class="form-select">
+                            <option value="">— ไม่ระบุ (สมาชิกทั่วไป) —</option>
+                            <option value="กตส.">กตส. (กองตรวจสอบสินค้าประมง)</option>
+                            <option value="ศตส.เขต 1">ศตส. เขต 1 (สมุทรปราการ)</option>
+                            <option value="ศตส.เขต 2">ศตส. เขต 2 (สงขลา)</option>
+                            <option value="ศตส.เขต 3">ศตส. เขต 3 (ระยอง)</option>
+                            <option value="ศตส.เขต 4">ศตส. เขต 4 (สมุทรสาคร)</option>
+                            <option value="ศตส.เขต 5">ศตส. เขต 5 (สุราษฎร์ธานี)</option>
+                            <option value="ศตส.เขต 6">ศตส. เขต 6 (ชลบุรี)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Officer-only section -->
+                <div id="approveOfficerSection" class="mt-4 d-none">
+                    <hr class="my-2" />
+                    <h6 class="fw-semibold mb-3 text-primary"><i class="ri ri-shield-user-line me-1"></i>การกำหนดสิทธิ์เจ้าหน้าที่</h6>
+
+                    <!-- บทบาทพิเศษ -->
+                    <label class="form-label fw-semibold">บทบาทพิเศษ</label>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input approve-specific-role" type="checkbox" id="approveRoleReceive" value="เจ้าหน้าที่รับเรื่อง">
+                                <label class="form-check-label" for="approveRoleReceive">เจ้าหน้าที่รับเรื่อง</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input approve-specific-role" type="checkbox" id="approveRoleReview" value="เจ้าหน้าที่พิจารณา">
+                                <label class="form-check-label" for="approveRoleReview">เจ้าหน้าที่พิจารณา</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input approve-specific-role" type="checkbox" id="approveRoleApproveRMBS" value="ผู้อนุมัติ RMBS1">
+                                <label class="form-check-label" for="approveRoleApproveRMBS">ผู้อนุมัติ RMBS1</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input approve-specific-role" type="checkbox" id="approveRoleSigner" value="ผู้ลงนามใบรับรอง">
+                                <label class="form-check-label" for="approveRoleSigner">ผู้ลงนามใบรับรอง</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input approve-specific-role" type="checkbox" id="approveRoleTrace" value="ผู้ตรวจสอบ Trace">
+                                <label class="form-check-label" for="approveRoleTrace">ผู้ตรวจสอบ Trace</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input approve-specific-role" type="checkbox" id="approveRoleDOF" value="ผู้จัดการ DOF List">
+                                <label class="form-check-label" for="approveRoleDOF">ผู้จัดการ DOF List</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- พื้นที่รับผิดชอบ -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">พื้นที่รับผิดชอบ <small class="text-muted">(คั่นด้วยคอมมา)</small></label>
+                        <input id="approveResponsibleArea" type="text" class="form-control"
+                               placeholder="เช่น สมุทรปราการ, ชลบุรี, ระยอง" />
+                        <div class="form-text">ระบุจังหวัด/พื้นที่ที่เจ้าหน้าที่รับผิดชอบ</div>
+                    </div>
+
+                    <!-- ผู้ลงนาม / ผู้อนุมัติ -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card bg-label-info border-0 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-semibold"><i class="ri ri-quill-pen-line me-1"></i>ผู้ลงนามใบรับรอง</div>
+                                        <small class="text-muted">สามารถลงนามใบรับรองได้</small>
+                                    </div>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="approveIsSignerToggle" role="switch">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-label-warning border-0 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-semibold"><i class="ri ri-shield-check-line me-1"></i>ผู้อนุมัติ</div>
+                                        <small class="text-muted">สามารถอนุมัติคำขอได้</small>
+                                    </div>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="approveIsApproverToggle" role="switch">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- หมายเหตุ -->
+                <div class="mt-4">
+                    <label class="form-label fw-semibold">หมายเหตุ / เหตุผลการอนุมัติ</label>
+                    <textarea class="form-control" id="approveNote" rows="2"
+                              placeholder="ระบุหมายเหตุ (ถ้ามี)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success">
+                    <i class="ri ri-check-line me-1"></i>อนุมัติและบันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: ปฏิเสธคำขอลงทะเบียน -->
+<div class="modal fade" id="rejectRegModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-label-danger">
+                <h5 class="modal-title"><i class="ri ri-user-unfollow-line me-2"></i>ปฏิเสธคำขอลงทะเบียน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-error-warning-line fs-5"></i>
+                    <div>คำขอ <strong id="rejectModalReqNo">-</strong> ของ <strong id="rejectModalName">-</strong> จะถูกปฏิเสธ</div>
+                </div>
+                <label class="form-label fw-semibold">เหตุผลการปฏิเสธ <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="rejectReason" rows="3"
+                          placeholder="ระบุเหตุผลในการปฏิเสธคำขอ..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-danger">
+                    <i class="ri ri-close-circle-line me-1"></i>ยืนยันปฏิเสธ
+                </button>
+            </div>
+        </div>
     </div>
 </div>
