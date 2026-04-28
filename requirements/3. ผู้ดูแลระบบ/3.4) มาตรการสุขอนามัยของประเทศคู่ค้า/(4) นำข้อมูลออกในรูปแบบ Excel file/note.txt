@@ -1,0 +1,10 @@
+# (4) นำข้อมูลออกในรูปแบบ Excel file
+
+URL: http://localhost:5055/Admin/NotificationReason
+
+จำนวนรูปที่ต้องแคป: 2 รูป
+
+รายการหน้าที่ต้องแคป
+1. Export Excel dropdown (4 ตัวเลือก) ใน card header
+   ตัวเลือก: Export ทั้งหมด / Export เฉพาะที่กรอง / Export สรุปตามภูมิภาค / Export ความเสี่ยงสูง
+2. Toast 2 ขั้น: info 'กำลัง Export...' > success 'Export สำเร็จ N รายการ' (delay 900ms)

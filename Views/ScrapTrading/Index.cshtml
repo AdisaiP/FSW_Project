@@ -84,13 +84,19 @@ document.addEventListener('DOMContentLoaded', function () {
     flatpickr('#filterDateTo',   { dateFormat: 'd/m/Y', allowInput: true });
 
     function filterRows() {
-        var status = (document.getElementById('filterStatus').value || '').trim();
-        var buyer  = (document.getElementById('filterBuyerType').value || '').trim();
-        var rows   = document.querySelectorAll('#scrapTableBody tr[data-status]');
+        var status   = (document.getElementById('filterStatus').value || '').trim();
+        var buyer    = (document.getElementById('filterBuyerType').value || '').trim();
+        var p1Ref    = (document.getElementById('filterP1Ref').value || '').trim().toLowerCase();
+        var scrapType = (document.getElementById('filterScrapType').value || '').trim();
+        var rows     = document.querySelectorAll('#scrapTableBody tr[data-status]');
         var vis = 0;
         rows.forEach(function(row) {
-            var ok = (!status || row.dataset.status === status)
-                  && (!buyer  || row.dataset.buyerType === buyer);
+            var rowP1   = (row.dataset.p1Ref   || '').toLowerCase();
+            var rowScrT = (row.dataset.scrapType || '').toLowerCase();
+            var ok = (!status    || row.dataset.status === status)
+                  && (!buyer     || row.dataset.buyerType === buyer)
+                  && (!p1Ref     || rowP1.indexOf(p1Ref) !== -1)
+                  && (!scrapType || rowScrT === scrapType);
             row.classList.toggle('d-none', !ok);
             if (ok) vis++;
         });
@@ -103,9 +109,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('filterBuyerType').value = '';
         document.getElementById('filterDateFrom').value = '';
         document.getElementById('filterDateTo').value = '';
+        document.getElementById('filterP1Ref').value = '';
+        document.getElementById('filterScrapType').value = '';
         filterRows();
     });
-    ['filterStatus','filterBuyerType'].forEach(function(id) {
+    ['filterStatus','filterBuyerType','filterScrapType'].forEach(function(id) {
         document.getElementById(id).addEventListener('change', filterRows);
     });
 
@@ -119,9 +127,19 @@ document.addEventListener('DOMContentLoaded', function () {
     $(document).ready(function () {
         // PDF Preview
         $(document).on('click', '.btn-preview-pdf', function () {
-            var docNo = $(this).data('doc-no');
+            var docNo   = $(this).data('doc-no');
+            var docDate = $(this).data('doc-date');
+            var seller  = $(this).data('seller');
+            var buyer   = $(this).data('buyer');
+            var species = $(this).data('species');
+            var weight  = $(this).data('weight');
             $('#pdfPreviewDocNo').text(docNo);
             $('#pdfDocNo').text(docNo);
+            $('#pdfDocDate').text(docDate);
+            $('#pdfSeller').text(seller);
+            $('#pdfBuyer').text(buyer);
+            $('#pdfSpecies').text(species);
+            $('#pdfWeight').text(weight);
             new bootstrap.Modal(document.getElementById('modalPdfPreview')).show();
         });
 
@@ -222,11 +240,11 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 </div>
 
-<!-- ── Filter Card ── -->
+<!-- ── Filter Card (TOR 1.6(19.3)) ── -->
 <div class="card mb-4">
     <div class="card-header">
         <h5 class="card-title mb-1">ค้นหารายการ</h5>
-        <p class="text-muted small mb-0">ค้นหาตามสถานะ ประเภทผู้ซื้อ และช่วงวันที่</p>
+        <p class="text-muted small mb-0">ค้นหาตามสถานะ ประเภทผู้ซื้อ วันที่ และ P1 อ้างอิง</p>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end">
@@ -266,6 +284,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     </button>
                 </div>
             </div>
+            <!-- P1 Reference filter (TOR 1.6(19.3)) -->
+            <div class="col-md-4">
+                <label class="form-label">เลขที่ P1 อ้างอิง (กรองรายการเศษเหลือตาม P1 ที่เป็นต้นทาง)</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="ri ri-file-list-3-line"></i></span>
+                    <input type="text" id="filterP1Ref" class="form-control" placeholder="เช่น P1-2569-00046" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">ประเภทเศษเหลือ</label>
+                <select id="filterScrapType" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="bone">กระดูก / ก้างปลา</option>
+                    <option value="organ">เครื่องในสัตว์น้ำ</option>
+                    <option value="liquid">น้ำที่ได้จากการต้ม/คั้น</option>
+                    <option value="skin">หนัง / เกล็ด</option>
+                    <option value="other">อื่นๆ</option>
+                </select>
+            </div>
+            @* <div class="col-md-4">
+                <label class="form-label">Export ตาม P1</label>
+                <button type="button" class="btn btn-outline-success w-100"
+                    data-bs-toggle="modal" data-bs-target="#modalExportScrap">
+                    <i class="ri ri-file-excel-2-line me-1"></i> Export Excel เศษเหลือ (พร้อม P1)
+                </button>
+            </div> *@
         </div>
     </div>
 </div>
@@ -278,6 +322,15 @@ document.addEventListener('DOMContentLoaded', function () {
             <p class="text-muted small mb-0">หนังสือกำกับการซื้อขายเศษเหลือจากการแปรรูปสัตว์น้ำนำเข้า</p>
         </div>
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-success btn-sm"
+                title="ดาวน์โหลดรายการเศษเหลือเป็นไฟล์ Excel"
+                data-bs-toggle="modal" data-bs-target="#modalExportScrap">
+                <i class="ri ri-file-excel-2-line me-1"></i> Export Excel เศษเหลือ
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                title="พิมพ์/ดาวน์โหลดฟอร์ม RMBS1 ส่วนเศษเหลือ (PDF)" data-bs-toggle="modal" data-bs-target="#modalPrintScrapRMBS1">
+                <i class="ri ri-file-pdf-line me-1"></i> ฟอร์ม PDF RMBS1 เศษเหลือ
+            </button>
             <a href="@Url.Action("CreateSeller", "ScrapTrading")" class="btn btn-primary btn-sm">
                 <i class="ri ri-add-line me-1"></i> บันทึกการขายเศษเหลือ
             </a>
@@ -350,6 +403,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <!-- PDF Preview -->
                                 <button type="button" class="btn btn-sm btn-icon btn-outline-info btn-preview-pdf"
                                     data-doc-no="@rec.DocNo"
+                                    data-doc-date="@rec.DocDate.ToString("dd/MM/yyyy")"
+                                    data-seller="@rec.SellerName"
+                                    data-buyer="@rec.BuyerName"
+                                    data-species="@rec.Species"
+                                    data-weight="@rec.WeightKg.ToString("N3")"
                                     data-bs-toggle="tooltip" title="พรีวิว PDF">
                                     <i class="ri ri-file-pdf-line"></i>
                                 </button>
@@ -431,23 +489,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div class="row mb-2">
                             <div class="col-4 fw-semibold">วันที่ออกเอกสาร :</div>
-                            <div class="col-8">—</div>
+                            <div class="col-8" id="pdfDocDate">—</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-4 fw-semibold">ผู้ขาย :</div>
-                            <div class="col-8">—</div>
+                            <div class="col-8" id="pdfSeller">—</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-4 fw-semibold">ผู้ซื้อ :</div>
-                            <div class="col-8">—</div>
+                            <div class="col-8" id="pdfBuyer">—</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-4 fw-semibold">ประเภทสัตว์น้ำ :</div>
-                            <div class="col-8">—</div>
+                            <div class="col-8" id="pdfSpecies">—</div>
                         </div>
                         <div class="row mb-2">
                             <div class="col-4 fw-semibold">น้ำหนักรวม (กก.) :</div>
-                            <div class="col-8">—</div>
+                            <div class="col-8" id="pdfWeight">—</div>
                         </div>
                     </div>
                 </div>
@@ -463,6 +521,172 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </div>
 </div>
+
+<!-- ==================== Modal: Export Excel เศษเหลือ TOR 1.6(19.3) ==================== -->
+<div class="modal fade" id="modalExportScrap" tabindex="-1" aria-labelledby="modalExportScrapLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalExportScrapLabel">
+                    <i class="ri ri-file-excel-2-line me-2"></i>
+                    Export Excel เศษเหลือจากการแปรรูป P1
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- ตัวเลือก Export -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card border">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="ri ri-filter-3-line me-1 text-primary"></i> ตัวเลือก Export</h6>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">P1 อ้างอิง (กรองได้)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="ri ri-file-list-3-line"></i></span>
+                                        <input type="text" id="exportP1Filter" class="form-control" value="P1-2569-00046 (ทูน่า 5,800 กก.)" />
+                                    </div>
+                                    <div class="form-text">ว่างเปล่า = export ทั้งหมด</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">ช่วงวันที่</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" value="01/04/2569" placeholder="จาก" />
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" value="28/04/2569" placeholder="ถึง" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label fw-semibold">ประเภทเศษเหลือ</label>
+                                    <select class="form-select">
+                                        <option value="">ทั้งหมด</option>
+                                        <option>กระดูก / ก้างปลา</option>
+                                        <option>เครื่องในสัตว์น้ำ</option>
+                                        <option>น้ำที่ได้จากการต้ม/คั้น</option>
+                                        <option>หนัง / เกล็ด</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="ri ri-table-2 me-1 text-success"></i> Columns ใน Excel</h6>
+                                <ul class="list-unstyled small mb-0">
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> เลขที่ P1 อ้างอิง</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> เลขที่ RMBS1:PS</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> เลขที่รายการซื้อขาย (SCR)</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> วันที่ขาย</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> ผู้ขาย (ชื่อสถานประกอบการ)</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> ผู้ซื้อ (ชื่อ / ทะเบียน)</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> ประเภทเศษเหลือ</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> น้ำหนักเศษเหลือ (กก.)</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> ราคา (บาท)</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> สถานะ</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> ปลายทาง (ระบบปลาป่น / ขายทั่วไป)</li>
+                                    <li><i class="ri ri-checkbox-circle-fill text-success me-1"></i> หมายเหตุ</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview ตาราง -->
+                <h6 class="fw-semibold mb-2"><i class="ri ri-eye-line me-1 text-muted"></i> Preview ข้อมูลที่จะ Export (3 รายการ — กรองตาม P1-2569-00046)</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered table-striped align-middle small">
+                        <thead class="table-success text-center">
+                            <tr>
+                                <th>#</th>
+                                <th>P1 อ้างอิง</th>
+                                <th>เลขที่ SCR</th>
+                                <th>วันที่ขาย</th>
+                                <th>ผู้ขาย</th>
+                                <th>ผู้ซื้อ</th>
+                                <th>ประเภทเศษ</th>
+                                <th class="text-end">น้ำหนัก (กก.)</th>
+                                <th class="text-end">ราคา (บาท)</th>
+                                <th>สถานะ</th>
+                                <th>ปลายทาง</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center text-muted">1</td>
+                                <td><span class="badge bg-label-primary">P1-2569-00046</span></td>
+                                <td>SCR-2569-0001</td>
+                                <td>10/04/2569</td>
+                                <td>บ. ทะเลไทย จำกัด</td>
+                                <td>บ. โปรตีน ABC จำกัด</td>
+                                <td>กระดูก / ก้างปลา</td>
+                                <td class="text-end">400</td>
+                                <td class="text-end">8,000</td>
+                                <td><span class="badge bg-label-success">ยืนยันแล้ว</span></td>
+                                <td><span class="badge bg-label-info">ระบบปลาป่น</span></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-muted">2</td>
+                                <td><span class="badge bg-label-primary">P1-2569-00046</span></td>
+                                <td>SCR-2569-0002</td>
+                                <td>12/04/2569</td>
+                                <td>บ. ทะเลไทย จำกัด</td>
+                                <td>บ. ปศุสัตว์ไทย จำกัด</td>
+                                <td>เครื่องใน</td>
+                                <td class="text-end">100</td>
+                                <td class="text-end">1,500</td>
+                                <td><span class="badge bg-label-success">ยืนยันแล้ว</span></td>
+                                <td><span class="badge bg-label-secondary">ขายทั่วไป</span></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center text-muted">3</td>
+                                <td><span class="badge bg-label-primary">P1-2569-00046</span></td>
+                                <td>SCR-2569-0003</td>
+                                <td>18/04/2569</td>
+                                <td>บ. ทะเลไทย จำกัด</td>
+                                <td>บ. โปรตีน ABC จำกัด</td>
+                                <td>เครื่องใน</td>
+                                <td class="text-end">350</td>
+                                <td class="text-end">5,250</td>
+                                <td><span class="badge bg-label-info">สร้างหนังสือปลาป่น</span></td>
+                                <td><span class="badge bg-label-info">ระบบปลาป่น</span></td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="fw-semibold table-light">
+                            <tr>
+                                <td colspan="7" class="text-end">รวม 3 รายการ</td>
+                                <td class="text-end">850</td>
+                                <td class="text-end">14,750</td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="alert alert-info small mt-3 mb-0 py-2">
+                    <i class="ri ri-information-line me-1"></i>
+                    <strong>หมายเหตุ:</strong> ข้อมูลที่ Export จะรวม P1 Reference, RMBS1:PS และ Scrap Chain ครบถ้วนสำหรับการตรวจสอบของกรมประมง
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i> ยกเลิก
+                </button>
+                <button type="button" class="btn btn-outline-success"
+                    onclick="alert('Export Excel เศษเหลือ พร้อม P1 Reference (mockup)\n\nรูปแบบไฟล์: ScrapExport_P1-2569-00046_2569-04.xlsx\nจำนวน: 3 รายการ, น้ำหนักรวม: 850 กก.')">
+                    <i class="ri ri-file-excel-2-line me-1"></i> ดาวน์โหลด Excel (ตัวอย่าง)
+                </button>
+                <button type="button" class="btn btn-success"
+                    onclick="alert('Export Excel เศษเหลือ (ทั้งหมดตาม filter) — mockup')">
+                    <i class="ri ri-file-excel-2-line me-1"></i> Export ทั้งหมด
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Export Excel เศษเหลือ TOR 1.6(19.3) -->
 
 <!-- ── Modal: ยืนยันยกเลิก ── -->
 <div class="modal fade" id="modalConfirmCancel" tabindex="-1" aria-labelledby="modalConfirmCancelLabel" aria-hidden="true">

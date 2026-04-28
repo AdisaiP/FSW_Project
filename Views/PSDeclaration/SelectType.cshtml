@@ -19,32 +19,71 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
+        <div class="col-12 col-xl-11">
+
+            <!-- TOR 1.7(5): ป้ายอธิบายการแยกประเภท -->
+            <div class="alert alert-info d-flex gap-2 align-items-start mb-4 py-2">
+                <i class="ri ri-information-line fs-5 flex-shrink-0 mt-1"></i>
+                <div class="small">
+                    <strong>ประเภท "Thailand"</strong> ใช้สำหรับสัตว์น้ำที่จับหรือเพาะเลี้ยง<strong>ในน่านน้ำไทย</strong>
+                    และนำเข้าสู่กระบวนการผลิตภายในประเทศ —
+                    หาก Health Certificate ออกโดยกรมประมงไทย ให้เลือกประเภท "Thailand"
+                </div>
+            </div>
 
             <!-- Selection Cards -->
-            <div class="row g-4 justify-content-center">
+            <div class="row g-4">
 
                 <!-- Processing Statement -->
-                <div class="col-12 col-sm-6">
+                <div class="col-12 col-sm-6 col-lg-3">
                     <a href="@Url.Action("CreateProcessing", "PSDeclaration")" class="text-decoration-none">
                         <div class="card card-hover-shadow h-100 border border-2 border-transparent"
                              style="cursor: pointer; transition: border-color .2s, box-shadow .2s;"
                              onmouseover="this.style.borderColor='var(--bs-primary)'"
                              onmouseout="this.style.borderColor='transparent'">
-                            <div class="card-body d-flex flex-column align-items-center text-center p-6">
-                                <div class="mb-4">
+                            <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                                <div class="mb-3">
                                     <span class="badge bg-label-primary rounded-circle p-3">
-                                        <i class="ri ri-settings-3-line" style="font-size: 2rem;"></i>
+                                        <i class="ri ri-settings-3-line" style="font-size: 1.8rem;"></i>
                                     </span>
                                 </div>
-                                <h5 class="card-title mb-2">ใบรับรองการแปรรูปสัตว์น้ำ</h5>
-                                <p class="text-muted small mb-3">Processing Statement</p>
-                                <p class="text-body-secondary small mb-4">
-                                    สำหรับสินค้าสัตว์น้ำที่ผ่านกระบวนการแปรรูป<br>
-                                    เช่น ต้ม นึ่ง แช่แข็ง บรรจุกระป๋อง
+                                <h5 class="card-title mb-1 fs-6">ใบรับรองการแปรรูปสัตว์น้ำ</h5>
+                                <p class="text-primary fw-semibold small mb-2">Processing Statement (PS)</p>
+                                <p class="text-body-secondary small mb-3">
+                                    สัตว์น้ำนำเข้าจากต่างประเทศ<br>
+                                    ผ่านกระบวนการแปรรูป เช่น<br>
+                                    ต้ม นึ่ง แช่แข็ง บรรจุกระป๋อง
                                 </p>
                                 <span class="btn btn-primary btn-sm mt-auto">
-                                    <i class="ri ri-arrow-right-line me-1"></i> เลือกประเภทนี้
+                                    <i class="ri ri-arrow-right-line me-1"></i> เลือก PS
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- PS Thailand -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <a href="@Url.Action("CreateProcessing", "PSDeclaration")" class="text-decoration-none">
+                        <div class="card card-hover-shadow h-100 border border-2 border-transparent"
+                             style="cursor: pointer; transition: border-color .2s, box-shadow .2s;"
+                             onmouseover="this.style.borderColor='var(--bs-success)'"
+                             onmouseout="this.style.borderColor='transparent'">
+                            <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                                <div class="mb-3">
+                                    <span class="badge bg-label-success rounded-circle p-3">
+                                        <i class="ri ri-settings-3-line" style="font-size: 1.8rem;"></i>
+                                    </span>
+                                </div>
+                                <h5 class="card-title mb-1 fs-6">ใบรับรองการแปรรูปสัตว์น้ำ</h5>
+                                <p class="text-success fw-semibold small mb-2">Processing Statement Thailand (PS-TH)</p>
+                                <p class="text-body-secondary small mb-3">
+                                    สัตว์น้ำจากน่านน้ำ<strong>ไทย</strong><br>
+                                    HC ออกโดยกรมประมงไทย<br>
+                                    ผ่านกระบวนการแปรรูปในประเทศ
+                                </p>
+                                <span class="btn btn-success btn-sm mt-auto">
+                                    <i class="ri ri-arrow-right-line me-1"></i> เลือก PS Thailand
                                 </span>
                             </div>
                         </div>
@@ -52,26 +91,55 @@
                 </div>
 
                 <!-- Declaration -->
-                <div class="col-12 col-sm-6">
+                <div class="col-12 col-sm-6 col-lg-3">
                     <a href="@Url.Action("CreateDeclaration", "PSDeclaration")" class="text-decoration-none">
                         <div class="card card-hover-shadow h-100 border border-2 border-transparent"
                              style="cursor: pointer; transition: border-color .2s, box-shadow .2s;"
                              onmouseover="this.style.borderColor='var(--bs-primary)'"
                              onmouseout="this.style.borderColor='transparent'">
-                            <div class="card-body d-flex flex-column align-items-center text-center p-6">
-                                <div class="mb-4">
+                            <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                                <div class="mb-3">
                                     <span class="badge bg-label-primary rounded-circle p-3">
-                                        <i class="ri ri-leaf-line" style="font-size: 2rem;"></i>
+                                        <i class="ri ri-leaf-line" style="font-size: 1.8rem;"></i>
                                     </span>
                                 </div>
-                                <h5 class="card-title mb-2">ใบรับรองสัตว์น้ำไม่แปรรูป</h5>
-                                <p class="text-muted small mb-3">Declaration</p>
-                                <p class="text-body-secondary small mb-4">
-                                    สำหรับสินค้าสัตว์น้ำสดที่ยังไม่ผ่านกระบวนการแปรรูป<br>
+                                <h5 class="card-title mb-1 fs-6">ใบรับรองสัตว์น้ำไม่แปรรูป</h5>
+                                <p class="text-primary fw-semibold small mb-2">Non-Manipulation Document (NMD)</p>
+                                <p class="text-body-secondary small mb-3">
+                                    สัตว์น้ำนำเข้าจากต่างประเทศ<br>
+                                    ยังไม่ผ่านกระบวนการแปรรูป<br>
                                     เช่น ปลาสด กุ้งสด หอยสด
                                 </p>
                                 <span class="btn btn-primary btn-sm mt-auto">
-                                    <i class="ri ri-arrow-right-line me-1"></i> เลือกประเภทนี้
+                                    <i class="ri ri-arrow-right-line me-1"></i> เลือก NMD
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- NMD Thailand -->
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <a href="@Url.Action("CreateDeclaration", "PSDeclaration")" class="text-decoration-none">
+                        <div class="card card-hover-shadow h-100 border border-2 border-transparent"
+                             style="cursor: pointer; transition: border-color .2s, box-shadow .2s;"
+                             onmouseover="this.style.borderColor='var(--bs-success)'"
+                             onmouseout="this.style.borderColor='transparent'">
+                            <div class="card-body d-flex flex-column align-items-center text-center p-4">
+                                <div class="mb-3">
+                                    <span class="badge bg-label-success rounded-circle p-3">
+                                        <i class="ri ri-leaf-line" style="font-size: 1.8rem;"></i>
+                                    </span>
+                                </div>
+                                <h5 class="card-title mb-1 fs-6">ใบรับรองสัตว์น้ำไม่แปรรูป</h5>
+                                <p class="text-success fw-semibold small mb-2">Non-Manipulation Document Thailand (NMD-TH)</p>
+                                <p class="text-body-secondary small mb-3">
+                                    สัตว์น้ำจากน่านน้ำ<strong>ไทย</strong><br>
+                                    HC ออกโดยกรมประมงไทย<br>
+                                    ยังไม่ผ่านกระบวนการแปรรูป
+                                </p>
+                                <span class="btn btn-success btn-sm mt-auto">
+                                    <i class="ri ri-arrow-right-line me-1"></i> เลือก NMD Thailand
                                 </span>
                             </div>
                         </div>

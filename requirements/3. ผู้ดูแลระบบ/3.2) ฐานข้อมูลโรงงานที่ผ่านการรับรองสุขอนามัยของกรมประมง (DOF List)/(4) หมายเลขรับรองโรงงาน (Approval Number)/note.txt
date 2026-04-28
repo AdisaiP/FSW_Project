@@ -1,0 +1,9 @@
+# (4) หมายเลขรับรองโรงงาน (Approval Number)
+
+URL: http://localhost:5055/Admin/DofList
+
+จำนวนรูปที่ต้องแคป: 2 รูป
+
+รายการหน้าที่ต้องแคป
+1. Detail modal > accordion 'ข้อมูลทั่วไป' > EstablishmentNo (EU) + ApprovalNo
+2. คอลัมน์ 'ApprovalNo' ในตารางหลัก (badge + filter ค้นหาเลขรับรอง)

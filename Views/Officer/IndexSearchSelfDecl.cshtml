@@ -200,6 +200,78 @@
     var expiredCount = declarations.Count(d => d.StatusText == "หมดอายุ");
     var psCount = declarations.Count(d => d.CertType == "PS");
     var nopsCount = declarations.Count(d => d.CertType == "NoPS");
+
+    // 2.10(1): Role-based access + measure tracking mock
+    var currentRole = "กตส"; // "กตส" | "officer" | "other"
+    var isKtosRole = currentRole == "กตส";
+    // batches ที่ติดมาตรการประเทศคู่ค้า (mock)
+    var measureBatches = new System.Collections.Generic.HashSet<string> {
+        "LOT-2026-0423-002", "LOT-2026-0421-002"
+    };
+    var measureCountries = new System.Collections.Generic.Dictionary<string, string> {
+        ["LOT-2026-0423-002"] = "ญี่ปุ่น",
+        ["LOT-2026-0421-002"] = "สหรัฐอเมริกา"
+    };
+    // 2.10(2): IUU + เงื่อนไขอื่น per doc (mock)
+    var iuuFailDocs = new System.Collections.Generic.HashSet<string> {
+        "SD-2026-00906"  // ซีเฟรช — ติดมาตรการ IUU
+    };
+    var otherCondDocs = new System.Collections.Generic.Dictionary<string, string> {
+        ["SD-2026-00906"] = "อยู่ระหว่างตรวจสอบเอกสาร COC"
+    };
+
+    // 2.10(3): Quota deduction mock — RMBS2/RMBS1 per declaration
+    // key = DocNo, value = array of (Type, DocNo, OrigKg, DeductKg, RemainKg)
+    var quotaRows = new System.Collections.Generic.Dictionary<string, (string Type, string DocNo, decimal OrigKg, decimal DeductKg, decimal RemainKg)[]> {
+        ["SD-2026-00901"] = new[] {
+            ("RMBS2", "RMBS2-TH-2026-01145", 10000m, 3200m, 6800m),
+            ("RMBS1", "RMBS1-2026-04512",  8000m, 3200m, 4800m),
+            ("P2",    "P2-2026-0418-A1",   5000m, 3200m, 1800m),
+            ("P1",    "P1-2026-0418-B1",   5000m, 3200m, 1800m),
+        },
+        ["SD-2026-00902"] = new[] {
+            ("RMBS2", "RMBS2-TH-2026-01198", 2000m, 2000m, 0m),
+            ("RMBS1", "RMBS1-2026-04601",    2000m, 2000m, 0m),
+            ("P2",    "P2-2026-0419-A1",     2000m, 2000m, 0m),
+            ("P1",    "P1-2026-0419-B1",     2000m, 2000m, 0m),
+        },
+        ["SD-2026-00903"] = new[] {
+            ("RMBS2", "RMBS2-TH-2026-01230", 12000m, 1500m, 10500m),
+            ("RMBS1", "RMBS1-2026-04710",    10000m, 1500m,  8500m),
+            ("P2",    "P2-2026-0420-A1",      8000m, 1500m,  6500m),
+            ("P1",    "P1-2026-0420-B1",      8000m, 1500m,  6500m),
+        },
+        ["SD-2025-00411"] = new[] {
+            ("RMBS2", "RMBS2-TH-2025-09001", 1000m, 800m, 200m),
+            ("RMBS1", "RMBS1-2025-09211",    1000m, 800m, 200m),
+            ("P2",    "P2-2025-1010-A1",     1000m, 800m, 200m),
+            ("P1",    "P1-2025-1010-B1",     1000m, 800m, 200m),
+        },
+        ["SD-2026-00904"] = new[] {
+            ("RMBS2", "RMBS2-TH-2026-01302", 3000m, 0m, 3000m),
+            ("RMBS1", "RMBS1-2026-04822",    3000m, 0m, 3000m),
+            ("P2",    "P2-2026-0422-A1",     3000m, 0m, 3000m),
+            ("P1",    "P1-2026-0422-B1",     3000m, 0m, 3000m),
+        },
+        ["SD-2026-00905"] = new[] {
+            ("RMBS2", "RMBS2-TH-2026-01401", 15000m, 4800m, 10200m),
+            ("RMBS1", "RMBS1-2026-04901",    12000m, 4800m,  7200m),
+            ("P2",    "P2-2026-0423-A1",      8000m, 4800m,  3200m),
+            ("P1",    "P1-2026-0423-B1",      8000m, 4800m,  3200m),
+        },
+        ["SD-2026-00906"] = new[] {
+            ("RMBS2", "RMBS2-TH-2026-01350", 6000m, 2100m, 3900m),
+            ("RMBS1", "RMBS1-2026-04850",    6000m, 2100m, 3900m),
+            ("P2",    "P2-2026-0421-A1",     4000m, 2100m, 1900m),
+            ("P1",    "P1-2026-0421-B1",     4000m, 2100m, 1900m),
+        },
+        ["SD-2026-00907"] = new[] {
+            ("RMBS2", "RMBS2-TH-2026-01100", 4500m, 4500m, 0m),
+            ("RMBS1", "RMBS1-2026-04200",    4500m, 4500m, 0m),
+            ("P2",    "P2-2026-0415-A1",     4500m, 4500m, 0m),
+            ("P1",    "P1-2026-0415-B1",     4500m, 4500m, 0m),
+        },
+    };
 }
 
 @section VendorStyles {
@@ -366,6 +438,11 @@ document.addEventListener('DOMContentLoaded', function () {
         var certType = (document.getElementById('filterCertType').value || '').trim();
         var fromDate = parseDateInput(document.getElementById('filterDateFrom').value, false);
         var toDate = parseDateInput(document.getElementById('filterDateTo').value, true);
+        // 2.10(1): advanced filters
+        var filterFactory = (document.getElementById('filterFactory') ? document.getElementById('filterFactory').value : '').trim().toLowerCase();
+        var filterEstCode = (document.getElementById('filterEstCode') ? document.getElementById('filterEstCode').value : '').trim().toLowerCase();
+        var filterSpecies = (document.getElementById('filterSpecies') ? document.getElementById('filterSpecies').value : '').trim().toLowerCase();
+        var filterOrigin = (document.getElementById('filterOriginCountry') ? document.getElementById('filterOriginCountry').value : '').trim().toLowerCase();
 
         var rows = document.querySelectorAll('#sdTableBody tr[data-id]');
         var count = 0;
@@ -379,7 +456,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 && (!status || rowStatus === status)
                 && (!certType || rowCertType === certType)
                 && (!fromDate || rowDate >= fromDate)
-                && (!toDate || rowDate <= toDate);
+                && (!toDate || rowDate <= toDate)
+                // 2.10(1): advanced filters
+                && (!filterFactory || (row.dataset.company || '').includes(filterFactory))
+                && (!filterEstCode || (row.dataset.estCode || '').includes(filterEstCode))
+                && (!filterSpecies || (row.dataset.species || '').includes(filterSpecies))
+                && (!filterOrigin || (row.dataset.origin || '').includes(filterOrigin));
 
             row.classList.toggle('d-none', !ok);
             if (ok) count++;
@@ -389,16 +471,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('btnSearch').addEventListener('click', filterRows);
     document.getElementById('btnReset').addEventListener('click', function () {
-        ['filterKeyword', 'filterStatus', 'filterCertType', 'filterDateFrom', 'filterDateTo'].forEach(function (id) {
-            document.getElementById(id).value = '';
+        ['filterKeyword', 'filterStatus', 'filterCertType', 'filterDateFrom', 'filterDateTo',
+         'filterFactory', 'filterEstCode', 'filterSpecies', 'filterOriginCountry'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.value = '';
         });
         filterRows();
     });
     document.getElementById('filterKeyword').addEventListener('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
     });
-    ['filterStatus', 'filterCertType', 'filterDateFrom', 'filterDateTo'].forEach(function (id) {
-        document.getElementById(id).addEventListener('change', filterRows);
+    ['filterStatus', 'filterCertType', 'filterDateFrom', 'filterDateTo', 'filterOriginCountry'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', filterRows);
     });
 
     /* --- Detail Modal --- */
@@ -431,9 +516,146 @@ document.addEventListener('DOMContentLoaded', function () {
             var batchTemplate = document.getElementById('batch-template-' + id);
             batchContainer.innerHTML = batchTemplate ? batchTemplate.innerHTML : '<p class="text-muted small">ไม่มีข้อมูลรุ่นวัตถุดิบ</p>';
 
+            // 2.10(2): Fill measure summary
+            var hasMeasure = card.dataset.hasmeasure === 'true';
+            var measureCountry = card.dataset.measurecountry || '';
+            var iuuFail = card.dataset.iuufail === 'true';
+            var otherCond = card.dataset.othercond || '';
+            var measureSummary = document.getElementById('modalMeasureSummary');
+            if (measureSummary) {
+                var measureHtml = '<hr class="mt-3 mb-3" />' +
+                    '<h6 class="fw-bold mb-3"><i class="ri ri-shield-check-line me-1 text-danger"></i>สรุปข้อจำกัดมาตรการ</h6>' +
+                    '<div class="row g-3 mb-3" style="font-size:0.82rem;">' +
+                    '<div class="col-md-4">' +
+                    '<span class="text-muted d-block mb-1">มาตรการประเทศคู่ค้า</span>' +
+                    (hasMeasure
+                        ? '<span class="badge bg-danger px-3 py-2">ติดมาตรการ ' + measureCountry + ' ❌</span>'
+                        : '<span class="badge bg-label-success px-3 py-2">ไม่ติดมาตรการ ✅</span>') +
+                    '</div>' +
+                    '<div class="col-md-4">' +
+                    '<span class="text-muted d-block mb-1">มาตรการสุขอนามัย (IUU)</span>' +
+                    (iuuFail
+                        ? '<span class="badge bg-danger px-3 py-2">ติดมาตรการ IUU ❌</span>'
+                        : '<span class="badge bg-label-success px-3 py-2">ผ่าน ✅</span>') +
+                    '</div>' +
+                    '<div class="col-md-4">' +
+                    '<span class="text-muted d-block mb-1">เงื่อนไขอื่น</span>' +
+                    (otherCond
+                        ? '<span class="badge bg-warning text-dark px-3 py-2">มีเงื่อนไข — ' + otherCond + ' ⚠️</span>'
+                        : '<span class="badge bg-label-secondary px-3 py-2">ไม่มีเงื่อนไข ✅</span>') +
+                    '</div>' +
+                    '</div>';
+                if (hasMeasure || iuuFail) {
+                    var alertCountry = hasMeasure ? measureCountry : 'ประเทศที่ออกมาตรการ IUU';
+                    measureHtml += '<div class="alert alert-danger d-flex gap-2 align-items-start py-2 px-3" style="font-size:0.82rem;">' +
+                        '<i class="ri ri-forbid-2-line mt-1 flex-shrink-0" style="font-size:1.1rem;"></i>' +
+                        '<div><strong>🚫 RMBS1 ในชุดนี้ติดมาตรการ — ไม่สามารถขอหนังสือรับรองตนเองไปยัง ' + alertCountry + ' ได้</strong>' +
+                        '<div class="mt-1 text-danger">กรุณาตรวจสอบแหล่งที่มาและดำเนินการแก้ไขก่อนยื่นคำขอ</div>' +
+                        '</div></div>';
+                }
+                measureSummary.innerHTML = measureHtml;
+                // Re-init tooltips inside modal after content change
+                if (window.bootstrap && bootstrap.Tooltip) {
+                    measureSummary.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+                        new bootstrap.Tooltip(el);
+                    });
+                }
+            }
+
+            // 2.10(3): Fill quota section
+            var quotaSection = document.getElementById('modalQuotaSection');
+            var quotaTemplate = document.getElementById('quota-template-' + id);
+            if (quotaSection) {
+                quotaSection.innerHTML = '';
+                if (quotaTemplate && quotaTemplate.dataset.quota) {
+                    try {
+                        var rows = JSON.parse(quotaTemplate.dataset.quota);
+                        var hasExhausted = rows.some(function (r) { return r.remain <= 0; });
+                        var typeColors = { RMBS2: 'bg-label-purple', RMBS1: 'bg-label-primary', P2: 'bg-label-success', P1: 'bg-label-warning' };
+                        var typeStyles = {
+                            RMBS2: 'background:#f3eeff;color:#6f42c1;border:1px solid #b89fee;',
+                            RMBS1: 'background:#e8f0ff;color:#0d6efd;border:1px solid #9ec5fe;',
+                            P2:    'background:#e8f5ed;color:#198754;border:1px solid #a3cfbb;',
+                            P1:    'background:#fff3e8;color:#fd7e14;border:1px solid #fecba1;'
+                        };
+                        var rowsHtml = rows.map(function (r) {
+                            var pct = r.orig > 0 ? Math.round((r.deduct / r.orig) * 100) : 0;
+                            var exhausted = r.remain <= 0;
+                            var badgeHtml = exhausted
+                                ? '<span class="badge bg-danger" style="font-size:0.63rem;">หมดโควตา ❌</span>'
+                                : '<span class="badge bg-label-success" style="font-size:0.63rem;">ปกติ ✅</span>';
+                            var style = typeStyles[r.type] || '';
+                            return '<tr' + (exhausted ? ' class="table-warning"' : '') + '>' +
+                                '<td class="text-center"><span class="badge px-2 py-1" style="font-size:0.68rem;' + style + '">' + r.type + '</span></td>' +
+                                '<td class="text-nowrap" style="font-size:0.73rem;">' + r.docno + '</td>' +
+                                '<td class="text-end text-nowrap">' + r.orig.toLocaleString('th-TH') + '</td>' +
+                                '<td class="text-end text-nowrap fw-semibold text-primary">' + r.deduct.toLocaleString('th-TH') + '</td>' +
+                                '<td class="text-end text-nowrap fw-semibold ' + (exhausted ? 'text-danger' : 'text-success') + '">' + r.remain.toLocaleString('th-TH') + '</td>' +
+                                '<td class="text-center">' + badgeHtml + '</td>' +
+                                '</tr>';
+                        }).join('');
+                        var quotaHtml = '<hr class="mt-3 mb-3" />' +
+                            '<h6 class="fw-bold mb-2"><i class="ri ri-scales-3-line me-1 text-primary"></i>โควตา/ปริมาณที่ตัดจาก RMBS2/RMBS1/P2/P1' +
+                            '&nbsp;<span class="badge bg-label-success ms-1" style="font-size:0.7rem;vertical-align:middle;">ตัดโควตาอัตโนมัติแล้ว ✅</span></h6>' +
+                            '<div class="table-responsive mb-3">' +
+                            '<table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">' +
+                            '<thead class="table-light text-center"><tr>' +
+                            '<th style="width:70px;">เอกสาร</th><th>เลขที่</th>' +
+                            '<th>น้ำหนักเดิม (กก.)</th><th>ตัดไป (กก.)</th><th>คงเหลือ (กก.)</th><th>สถานะโควตา</th>' +
+                            '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
+                            '<div class="alert alert-success d-flex gap-2 align-items-center py-2 px-3" style="font-size:0.82rem;">' +
+                            '<i class="ri ri-checkbox-circle-line flex-shrink-0" style="font-size:1.1rem;"></i>' +
+                            '<div>✅ ระบบตัดโควตาจาก RMBS2/RMBS1/P2/P1 อัตโนมัติเรียบร้อยแล้ว — ยอดคงเหลือถูกปรับปรุงแล้วในระบบ</div>' +
+                            '</div>';
+                        if (hasExhausted) {
+                            quotaHtml += '<div class="alert alert-warning d-flex gap-2 align-items-center py-2 px-3 mt-2" style="font-size:0.82rem;">' +
+                                '<i class="ri ri-error-warning-line flex-shrink-0" style="font-size:1.1rem;"></i>' +
+                                '<div>⚠️ มีเอกสารที่หมดโควตาแล้ว — กรุณาตรวจสอบและขอเพิ่มโควตาจากเจ้าหน้าที่กรมประมง</div>' +
+                                '</div>';
+                        }
+                        quotaSection.innerHTML = quotaHtml;
+                    } catch (e) { /* ignore parse error */ }
+                }
+            }
+
             detailModal.show();
         });
     });
+
+    // 2.10(4): Export Excel — ส่งออกรายการหนังสือรับรองตนเอง
+    var btnExportSelfDecl = document.getElementById('btnExportSelfDecl');
+    if (btnExportSelfDecl) {
+        btnExportSelfDecl.addEventListener('click', function (e) {
+            e.preventDefault();
+            // TODO: เรียก API /Officer/ExportSelfDeclExcel
+            alert('TODO: ส่งออกรายการหนังสือรับรองตนเองเป็น Excel\n(จะ export ตามเงื่อนไข filter ที่เลือกไว้)');
+        });
+    }
+
+    // 2.10(4): Export Excel — ส่งออก RMBS2/RMBS1/P2/P1
+    var btnDoExportRmbs = document.getElementById('btnDoExportRmbs');
+    if (btnDoExportRmbs) {
+        btnDoExportRmbs.addEventListener('click', function () {
+            var selected = [];
+            ['exportChkRmbs2', 'exportChkRmbs1', 'exportChkP2', 'exportChkP1'].forEach(function (id) {
+                var chk = document.getElementById(id);
+                if (chk && chk.checked) selected.push(chk.value);
+            });
+            if (selected.length === 0) {
+                alert('กรุณาเลือกประเภทเอกสารอย่างน้อย 1 ประเภท');
+                return;
+            }
+            var dateFrom  = (document.getElementById('exportDateFrom') || {}).value || '';
+            var dateTo    = (document.getElementById('exportDateTo') || {}).value || '';
+            var quotaSt   = (document.getElementById('exportQuotaStatus') || {}).value || '';
+            var sdFilter  = ((document.getElementById('exportSdFilter') || {}).value || '').trim();
+            // TODO: เรียก API /Officer/ExportRmbsExcel?types=RMBS2,RMBS1&dateFrom=...&dateTo=...&quotaStatus=...&sdFilter=...
+            alert('TODO: ส่งออก Excel ประเภท: ' + selected.join(', ') +
+                '\nวันที่ออก: ' + (dateFrom || 'ทั้งหมด') + ' — ' + (dateTo || 'ทั้งหมด') +
+                '\nสถานะโควตา: ' + (quotaSt || 'ทั้งหมด') +
+                '\nSD Filter: ' + (sdFilter || 'ทั้งหมด'));
+        });
+    }
 });
 </script>
 }
@@ -443,6 +665,21 @@ document.addEventListener('DOMContentLoaded', function () {
 @* ============================================================ *@
 <h4 class="mb-1">ค้นหาหนังสือรับรองตนเอง</h4>
 <p class="mb-1">ตรวจสอบข้อมูลหนังสือรับรองตนเอง (Self-Declaration) แหล่งที่มาสัตว์น้ำ รุ่นวัตถุดิบ และเชื่อมโยง RMBS2 / RMBS1 / P2 / P1</p>
+
+@* 2.10(1): Role banner กตส. *@
+@if (isKtosRole)
+{
+    <div class="alert d-flex align-items-center gap-3 mb-3" style="background:linear-gradient(135deg,#f3eeff 0%,#ede6ff 100%);border:1px solid #b89fee;">
+        <span class="badge px-3 py-2 flex-shrink-0" style="background-color:#6f42c1;font-size:0.82rem;">
+            <i class="ri ri-shield-user-line me-1"></i>กตส.
+        </span>
+        <div class="flex-grow-1">
+            <div class="fw-semibold mb-0" style="color:#4a2d8a;">🔎 ท่านเข้าใช้ในฐานะเจ้าหน้าที่ กตส. — แสดงข้อมูลตามเงื่อนไขที่กรมประมงกำหนด</div>
+            <div class="small text-muted">สามารถตรวจสอบหนังสือรับรองตนเอง แหล่งที่มาสัตว์น้ำ รุ่นวัตถุดิบ และเชื่อมโยง RMBS2/RMBS1/P2/P1 เพื่อตรวจสอบแหล่งที่มาสัตว์น้ำนำเข้า</div>
+        </div>
+        <span class="badge flex-shrink-0 d-none d-md-inline-flex" style="background-color:#6f42c1;font-size:0.72rem;">กตส. — ตรวจสอบแหล่งที่มาสัตว์น้ำนำเข้า</span>
+    </div>
+}
 
 <nav aria-label="breadcrumb" class="mb-6">
     <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
@@ -567,6 +804,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>
         </div>
+
+        @* 2.10(1): Advanced filter collapsible (กตส.) *@
+        <div class="mt-2">
+            <button class="btn btn-link btn-sm p-0 text-muted text-decoration-none" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseAdvancedFilter" aria-expanded="false">
+                <i class="ri ri-settings-3-line me-1"></i>ค้นหาขั้นสูง
+                <i class="ri ri-arrow-down-s-line ms-1"></i>
+            </button>
+        </div>
+        <div class="collapse" id="collapseAdvancedFilter">
+            <hr class="mt-2 mb-3" />
+            <div class="row g-3">
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterFactory" class="form-label">ชื่อสถานประกอบการ</label>
+                    <input type="text" id="filterFactory" class="form-control" placeholder="ชื่อบริษัท / สถานประกอบการ" />
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <label for="filterEstCode" class="form-label">เลขทะเบียนโรงงาน</label>
+                    <input type="text" id="filterEstCode" class="form-control" placeholder="เช่น TH-1234" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterSpecies" class="form-label">ชนิดสัตว์น้ำ</label>
+                    <input type="text" id="filterSpecies" class="form-control" placeholder="เช่น ทูน่า / กุ้ง / ปลาหมึก" />
+                </div>
+                <div class="col-md-4 col-lg-4">
+                    <label for="filterOriginCountry" class="form-label">ประเทศ/พื้นที่แหล่งที่มา</label>
+                    <select id="filterOriginCountry" class="form-select">
+                        <option value="">ทั้งหมด</option>
+                        <option value="มหาสมุทรอินเดีย">มหาสมุทรอินเดีย</option>
+                        <option value="มหาสมุทรแปซิฟิก">มหาสมุทรแปซิฟิก</option>
+                        <option value="อ่าวไทย">อ่าวไทย</option>
+                        <option value="ทะเลอันดามัน">ทะเลอันดามัน</option>
+                        <option value="ไทย">ไทย (เพาะเลี้ยง)</option>
+                        <option value="เวียดนาม">เวียดนาม</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -579,9 +854,25 @@ document.addEventListener('DOMContentLoaded', function () {
             <h5 class="card-title mb-1">รายการหนังสือรับรองตนเอง</h5>
             <p class="text-muted small mb-0">แสดงข้อมูลหนังสือรับรองตนเอง รายละเอียดแหล่งที่มา และรุ่นวัตถุดิบที่ใช้ในการผลิต</p>
         </div>
-        <button type="button" class="btn btn-outline-secondary btn-sm">
-            <i class="ri ri-download-2-line me-1"></i>Export Excel
-        </button>
+        @* 2.10(4): Export dropdown *@
+        <div class="dropdown">
+            <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="btnExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ri ri-download-2-line me-1"></i>Export Excel
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="btnExportDropdown">
+                <li>
+                    <a class="dropdown-item" href="#" id="btnExportSelfDecl">
+                        <i class="ri ri-file-excel-line me-2 text-success"></i>ส่งออกรายการหนังสือรับรองตนเอง
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="#" id="btnExportRmbs" data-bs-toggle="modal" data-bs-target="#modalExportRmbs">
+                        <i class="ri ri-git-branch-line me-2 text-primary"></i>ส่งออกรายการ RMBS2/RMBS1/P2/P1 ที่อ้างถึง
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
     <div class="table-responsive p-1">
         <table class="table table-bordered align-middle mb-0 sd-table">
@@ -610,7 +901,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         data-status="@d.StatusText"
                         data-cert-type="@d.CertType"
                         data-issued-date="@d.IssuedAt.ToString("yyyy-MM-dd")"
-                        data-search-text="@d.DocNo.ToLower() @d.CompanyName.ToLower() @d.HsCode.ToLower() @d.ProductDesc.ToLower() @d.Species.ToLower() @d.EstablishmentCode.ToLower()">
+                        data-est-code="@d.EstablishmentCode.ToLower()"
+                        data-species="@d.Species.ToLower()"
+                        data-origin="@d.SourceCountry.ToLower()"
+                        data-company="@d.CompanyName.ToLower()"
+                        data-search-text="@d.DocNo.ToLower() @d.CompanyName.ToLower() @d.HsCode.ToLower() @d.ProductDesc.ToLower() @d.Species.ToLower() @d.EstablishmentCode.ToLower() @d.SourceCountry.ToLower()">
                         <td class="text-center text-muted">@d.RowNo</td>
                         <td>
                             <button type="button" class="btn btn-link p-0 fw-semibold text-primary text-decoration-none" data-action="show-detail" data-doc-id="@d.DocNo">
@@ -683,6 +978,12 @@ document.addEventListener('DOMContentLoaded', function () {
 @foreach (var d in declarations)
 {
     var pct2 = d.WeightKg > 0 ? (int)Math.Round(d.UsedWeightKg / d.WeightKg * 100) : 0;
+    var docHasMeasure = d.Batches.Any(b => measureBatches.Contains(b.BatchNo));
+    var docMeasureCountryList = string.Join(", ", d.Batches
+        .Where(b => measureBatches.Contains(b.BatchNo))
+        .Select(b => measureCountries[b.BatchNo]).Distinct());
+    var docIuuFail = iuuFailDocs.Contains(d.DocNo);
+    var docOtherCond = otherCondDocs.ContainsKey(d.DocNo) ? otherCondDocs[d.DocNo] : "";
     <div id="detail-@d.DocNo" class="d-none"
          data-docno="@d.DocNo"
          data-company="@d.CompanyName"
@@ -696,7 +997,20 @@ document.addEventListener('DOMContentLoaded', function () {
          data-expiresat="@d.ExpiresAt.ToString("dd/MM/yyyy")"
          data-weighttotal="@((int)d.WeightKg)"
          data-weightused="@((int)d.UsedWeightKg)"
-         data-weightremain="@((int)d.RemainingKg)"></div>
+         data-weightremain="@((int)d.RemainingKg)"
+         data-hasmeasure="@docHasMeasure.ToString().ToLower()"
+         data-measurecountry="@docMeasureCountryList"
+         data-iuufail="@docIuuFail.ToString().ToLower()"
+         data-othercond="@docOtherCond"></div>
+
+    @* 2.10(3): Quota data for JS *@
+    @if (quotaRows.ContainsKey(d.DocNo))
+    {
+        <div id="quota-template-@d.DocNo" class="d-none" data-quota='@Html.Raw(
+            "[" + string.Join(",", quotaRows[d.DocNo].Select(q =>
+                $"{{\"type\":\"{q.Type}\",\"docno\":\"{q.DocNo}\",\"orig\":{q.OrigKg},\"deduct\":{q.DeductKg},\"remain\":{q.RemainKg}}}")) + "]"
+        )'></div>
+    }
 
     <div id="batch-template-@d.DocNo" class="d-none">
         @foreach (var b in d.Batches)
@@ -704,7 +1018,14 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="batch-card mb-3">
                 <div class="batch-card-header d-flex align-items-center justify-content-between">
                     <span><i class="ri ri-box-3-line me-1 text-primary"></i>@b.BatchNo</span>
-                    <small class="text-muted">วันที่ผลิต: @b.LotDate.ToString("dd/MM/yyyy")</small>
+                    <div class="d-flex align-items-center gap-2">
+                        @if (measureBatches.Contains(b.BatchNo)) {
+                            <span class="badge bg-danger" style="font-size:0.65rem;">ติดมาตรการ @measureCountries[b.BatchNo] ❌</span>
+                        } else {
+                            <span class="badge bg-label-success" style="font-size:0.65rem;">ไม่ติดมาตรการ ✅</span>
+                        }
+                        <small class="text-muted">วันที่ผลิต: @b.LotDate.ToString("dd/MM/yyyy")</small>
+                    </div>
                 </div>
                 <div class="batch-card-body">
                     <div class="row g-2">
@@ -747,6 +1068,58 @@ document.addEventListener('DOMContentLoaded', function () {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    @* 2.10(1): Traceability section *@
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="small fw-semibold text-muted mb-2">
+                            <i class="ri ri-map-pin-2-line me-1 text-primary"></i>Traceability — แหล่งที่มาสัตว์น้ำนำเข้า
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered mb-2" style="font-size:0.71rem;">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th>เลขที่ RMBS2</th>
+                                        <th>เลขที่ RMBS1</th>
+                                        <th>เลขที่ P2</th>
+                                        <th>เลขที่ P1</th>
+                                        <th>รุ่นการผลิต</th>
+                                        <th>น้ำหนัก (กก.)</th>
+                                        <th>สถานะมาตรการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr @Html.Raw(measureBatches.Contains(b.BatchNo) ? "class=\"table-danger\"" : "")>
+                                        <td class="text-nowrap"><span class="link-chip link-chip-rmbs2" style="cursor:default;">@b.Rmbs2No</span></td>
+                                        <td class="text-nowrap"><span class="link-chip link-chip-rmbs1" style="cursor:default;">@b.Rmbs1No</span></td>
+                                        <td class="text-nowrap"><span class="link-chip link-chip-p2" style="cursor:default;">@b.P2No</span></td>
+                                        <td class="text-nowrap"><span class="link-chip link-chip-p1" style="cursor:default;">@b.P1No</span></td>
+                                        <td class="text-nowrap">@b.BatchNo<br /><span class="text-muted" style="font-size:0.65rem;">@b.LotDate.ToString("dd/MM/yyyy")</span></td>
+                                        <td class="text-end text-nowrap">@b.WeightKg.ToString("N0")</td>
+                                        <td class="text-center text-nowrap">
+                                            @if (measureBatches.Contains(b.BatchNo)) {
+                                                <span class="badge bg-danger"
+                                                      data-bs-toggle="tooltip"
+                                                      title="RMBS1 นี้ติดมาตรการประเทศ @measureCountries[b.BatchNo] — ไม่สามารถขอหนังสือรับรองตนเองเพื่อส่งออกไปยัง @measureCountries[b.BatchNo] ได้"
+                                                      style="font-size:0.63rem;">ติดมาตรการ @measureCountries[b.BatchNo] ❌</span>
+                                            } else {
+                                                <span class="badge bg-label-success" style="font-size:0.63rem;">ปกติ ✅</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="#" class="btn btn-sm" style="font-size:0.72rem;border:1px solid #6f42c1;color:#6f42c1;background:#f3eeff;"
+                               onclick="alert('mockup — นำทางไปยังรายละเอียด RMBS2: @b.Rmbs2No');return false;">
+                                <i class="ri ri-external-link-line me-1"></i>ดูรายละเอียด RMBS2 →
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-primary" style="font-size:0.72rem;"
+                               onclick="alert('mockup — นำทางไปยังรายละเอียด RMBS1: @b.Rmbs1No');return false;">
+                                <i class="ri ri-external-link-line me-1"></i>ดูรายละเอียด RMBS1 →
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -845,6 +1218,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div id="modalBatches"></div>
 
+                @* 2.10(2): สรุปข้อจำกัดมาตรการ *@
+                <div id="modalMeasureSummary" class="mt-4"></div>
+
+                @* 2.10(3): โควตา/ปริมาณที่ตัดจาก RMBS2/RMBS1/P2/P1 *@
+                <div id="modalQuotaSection" class="mt-4"></div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
@@ -852,6 +1231,133 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
                 <button type="button" class="btn btn-outline-primary btn-sm">
                     <i class="ri ri-file-pdf-line me-1"></i>Export PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 2.10(4): Modal Export RMBS2/RMBS1/P2/P1 *@
+<div class="modal fade" id="modalExportRmbs" tabindex="-1" aria-labelledby="modalExportRmbsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExportRmbsLabel">
+                    <i class="ri ri-git-branch-line me-2 text-primary"></i>ส่งออก Excel — รายการ RMBS2/RMBS1/P2/P1 ที่อ้างถึง
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @* เลือกประเภทเอกสาร *@
+                <div class="mb-3">
+                    <label class="form-label fw-semibold mb-2">เลือกประเภทเอกสารที่ต้องการส่งออก</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportChkRmbs2" value="RMBS2" checked>
+                            <label class="form-check-label" for="exportChkRmbs2">
+                                <span class="badge px-2 py-1 me-1" style="background:#f3eeff;color:#6f42c1;border:1px solid #b89fee;">RMBS2</span>ใบรับรองวัตถุดิบมาตรฐาน (ชั้น 2)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportChkRmbs1" value="RMBS1" checked>
+                            <label class="form-check-label" for="exportChkRmbs1">
+                                <span class="badge px-2 py-1 me-1" style="background:#e8f0ff;color:#0d6efd;border:1px solid #9ec5fe;">RMBS1</span>ใบรับรองวัตถุดิบมาตรฐาน (ชั้น 1)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportChkP2" value="P2" checked>
+                            <label class="form-check-label" for="exportChkP2">
+                                <span class="badge px-2 py-1 me-1" style="background:#e8f5ed;color:#198754;border:1px solid #a3cfbb;">P2</span>ใบอนุญาต P2
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exportChkP1" value="P1" checked>
+                            <label class="form-check-label" for="exportChkP1">
+                                <span class="badge px-2 py-1 me-1" style="background:#fff3e8;color:#fd7e14;border:1px solid #fecba1;">P1</span>ใบอนุญาต P1
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3" />
+
+                @* filter *@
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <label class="form-label small fw-semibold">วันที่ออก (จาก)</label>
+                        <input type="date" class="form-control form-control-sm" id="exportDateFrom">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <label class="form-label small fw-semibold">วันที่ออก (ถึง)</label>
+                        <input type="date" class="form-control form-control-sm" id="exportDateTo">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <label class="form-label small fw-semibold">สถานะโควตา</label>
+                        <select class="form-select form-select-sm" id="exportQuotaStatus">
+                            <option value="">ทั้งหมด</option>
+                            <option value="normal">ปกติ ✅</option>
+                            <option value="exhausted">หมดโควตา ❌</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <label class="form-label small fw-semibold">เลขที่ SD (คัดกรอง)</label>
+                        <input type="text" class="form-control form-control-sm" id="exportSdFilter" placeholder="เช่น SD-2026-009...">
+                    </div>
+                </div>
+
+                <hr class="my-3" />
+
+                @* ตัวอย่าง header *@
+                <p class="fw-semibold small mb-2"><i class="ri ri-table-line me-1 text-muted"></i>ตัวอย่าง header ของไฟล์ Excel ที่จะส่งออก</p>
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm table-bordered mb-0" style="font-size:0.73rem;">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th style="min-width:120px;">เลขที่ SD</th>
+                                <th style="min-width:140px;">เลขที่ RMBS2/P2</th>
+                                <th style="min-width:140px;">เลขที่ RMBS1/P1</th>
+                                <th style="min-width:100px;">รุ่นการผลิต (LOT)</th>
+                                <th style="min-width:90px;">น้ำหนักรวม (กก.)</th>
+                                <th style="min-width:90px;">ตัดโควตา (กก.)</th>
+                                <th style="min-width:90px;">คงเหลือ (กก.)</th>
+                                <th style="min-width:80px;">สถานะโควตา</th>
+                                <th style="min-width:90px;">วันที่ออก SD</th>
+                                <th style="min-width:80px;">ประเทศส่งออก</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            <tr class="text-muted">
+                                <td>SD-2026-00901</td>
+                                <td>RMBS2-TH-2026-01145</td>
+                                <td>RMBS1-TH-2026-02201</td>
+                                <td>LOT-2026-0420-001</td>
+                                <td>10,000</td>
+                                <td>3,200</td>
+                                <td>6,800</td>
+                                <td><span class="badge bg-label-success" style="font-size:0.65rem;">ปกติ ✅</span></td>
+                                <td>15/01/2569</td>
+                                <td>ญี่ปุ่น</td>
+                            </tr>
+                            <tr class="text-muted">
+                                <td colspan="10" class="text-center py-1" style="font-size:0.68rem;background:#f8f9fa;font-style:italic;">
+                                    … (แสดงข้อมูลทั้งหมดตามเงื่อนไขที่เลือก)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info d-flex gap-2 align-items-start py-2 px-3 mb-0" style="font-size:0.82rem;">
+                    <i class="ri ri-information-line flex-shrink-0" style="font-size:1rem;margin-top:2px;"></i>
+                    <div>ไฟล์ Excel จะแยก Sheet ตามประเภทเอกสาร (RMBS2 / RMBS1 / P2 / P1) และมี Sheet สรุปรวมอัตโนมัติ</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-success btn-sm" id="btnDoExportRmbs">
+                    <i class="ri ri-file-excel-line me-1"></i>ส่งออก Excel
                 </button>
             </div>
         </div>

@@ -1,166 +1,33 @@
 @{
     ViewData["Title"] = "พิจารณาใบรับรองทดแทนฉบับเก่า";
 
+    // 2.6(3): เพิ่มฟิลด์ EstablishmentName / FactoryRegNo / ProductName / DestinationCountry / ReceivedNo
     var requests = new[]
     {
-        new
-        {
-            RequestNumber = "REP821B211301",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            OriginalCertNumber = "HC821B211301",
-            ReplacementReason = "ใบรับรองชำรุด/เสียหาย",
-            TransactionAt = new DateTime(2026, 4, 18, 10, 20, 11),
-            StatusText = "ฉบับร่าง",
-            StatusClass = "bg-label-secondary",
-            StatusIcon = "ri-file-3-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211302",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            OriginalCertNumber = "AC821B2171001",
-            ReplacementReason = "ใบรับรองสูญหาย",
-            TransactionAt = new DateTime(2026, 4, 19, 14, 33, 52),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "เจ้าหน้าที่",
-            RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211303",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            OriginalCertNumber = "HC821B211302",
-            ReplacementReason = "ต้องการฉบับแทนฉบับเก่า",
-            TransactionAt = new DateTime(2026, 4, 20, 9, 5, 44),
-            StatusText = "อนุมัติ",
-            StatusClass = "bg-label-success",
-            StatusIcon = "ri-checkbox-circle-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211304",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            OriginalCertNumber = "AC821B2171002",
-            ReplacementReason = "ใบรับรองชำรุด/เสียหาย",
-            TransactionAt = new DateTime(2026, 4, 20, 16, 47, 30),
-            StatusText = "ไม่อนุมัติ",
-            StatusClass = "bg-label-danger",
-            StatusIcon = "ri-close-circle-line",
-            RequestedByText = "เจ้าหน้าที่",
-            RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211305",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            OriginalCertNumber = "HC821B211303",
-            ReplacementReason = "ใบรับรองสูญหาย",
-            TransactionAt = new DateTime(2026, 4, 21, 8, 12, 5),
-            StatusText = "ฉบับร่าง",
-            StatusClass = "bg-label-secondary",
-            StatusIcon = "ri-file-3-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211306",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            OriginalCertNumber = "AC821B2171003",
-            ReplacementReason = "ต้องการฉบับแทนฉบับเก่า",
-            TransactionAt = new DateTime(2026, 4, 21, 13, 55, 18),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "เจ้าหน้าที่",
-            RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211307",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            OriginalCertNumber = "HC821B211304",
-            ReplacementReason = "ใบรับรองชำรุด/เสียหาย",
-            TransactionAt = new DateTime(2026, 4, 22, 10, 0, 0),
-            StatusText = "อนุมัติ",
-            StatusClass = "bg-label-success",
-            StatusIcon = "ri-checkbox-circle-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211308",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            OriginalCertNumber = "AC821B2171004",
-            ReplacementReason = "ใบรับรองสูญหาย",
-            TransactionAt = new DateTime(2026, 4, 22, 15, 22, 41),
-            StatusText = "ยกเลิก",
-            StatusClass = "bg-label-secondary",
-            StatusIcon = "ri-forbid-line",
-            RequestedByText = "เจ้าหน้าที่",
-            RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211309",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            OriginalCertNumber = "HC821B211305",
-            ReplacementReason = "ต้องการฉบับแทนฉบับเก่า",
-            TransactionAt = new DateTime(2026, 4, 23, 9, 30, 0),
-            StatusText = "ฉบับร่าง",
-            StatusClass = "bg-label-secondary",
-            StatusIcon = "ri-file-3-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "REP821B211310",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            OriginalCertNumber = "AC821B2171005",
-            ReplacementReason = "ใบรับรองชำรุด/เสียหาย",
-            TransactionAt = new DateTime(2026, 4, 23, 14, 10, 7),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "เจ้าหน้าที่",
-            RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
-        }
+        new { RequestNumber = "REP821B211301", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",      CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",       OriginalCertNumber = "HC821B211301",   ReplacementReason = "ใบรับรองชำรุด/เสียหาย",                              TransactionAt = new DateTime(2026, 4, 18, 10, 20, 11), StatusText = "ฉบับร่าง",   StatusClass = "bg-label-secondary", StatusIcon = "ri-file-3-line",          RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",  EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งแช่แข็ง",    DestinationCountry = "สหรัฐอเมริกา",   ReceivedNo = "" },
+        new { RequestNumber = "REP821B211302", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",   CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",         OriginalCertNumber = "AC821B2171001",  ReplacementReason = "ใบรับรองสูญหาย",                                     TransactionAt = new DateTime(2026, 4, 19, 14, 33, 52), StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาทูน่ากระป๋อง", DestinationCountry = "สหภาพยุโรป",    ReceivedNo = "รบ.2569-00301" },
+        new { RequestNumber = "REP821B211303", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",      CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",       OriginalCertNumber = "HC821B211302",   ReplacementReason = "ต้องการฉบับแทนฉบับเก่า",                            TransactionAt = new DateTime(2026, 4, 20, 9, 5, 44),   StatusText = "อนุมัติ",    StatusClass = "bg-label-success",   StatusIcon = "ri-checkbox-circle-line", RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",  EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งแช่แข็ง",    DestinationCountry = "ญี่ปุ่น",        ReceivedNo = "รบ.2569-00302" },
+        new { RequestNumber = "REP821B211304", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",   CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",         OriginalCertNumber = "AC821B2171002",  ReplacementReason = "ใบรับรองชำรุด/เสียหาย",                              TransactionAt = new DateTime(2026, 4, 20, 16, 47, 30), StatusText = "ไม่อนุมัติ", StatusClass = "bg-label-danger",    StatusIcon = "ri-close-circle-line",    RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาแซลมอน",      DestinationCountry = "ญี่ปุ่น",        ReceivedNo = "รบ.2569-00303" },
+        new { RequestNumber = "REP821B211305", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",      CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",       OriginalCertNumber = "HC821B211303",   ReplacementReason = "ใบรับรองสูญหาย",                                     TransactionAt = new DateTime(2026, 4, 21, 8, 12, 5),   StatusText = "ฉบับร่าง",   StatusClass = "bg-label-secondary", StatusIcon = "ri-file-3-line",          RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",  EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งแช่แข็ง",    DestinationCountry = "สหรัฐอเมริกา",   ReceivedNo = "" },
+        new { RequestNumber = "REP821B211306", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",   CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",         OriginalCertNumber = "AC821B2171003",  ReplacementReason = "ต้องการฉบับแทนฉบับเก่า",                            TransactionAt = new DateTime(2026, 4, 21, 13, 55, 18), StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาทูน่ากระป๋อง", DestinationCountry = "สหภาพยุโรป",    ReceivedNo = "รบ.2569-00304" },
+        new { RequestNumber = "REP821B211307", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",      CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",       OriginalCertNumber = "HC821B211304",   ReplacementReason = "ใบรับรองชำรุด/เสียหาย",                              TransactionAt = new DateTime(2026, 4, 22, 10, 0, 0),   StatusText = "อนุมัติ",    StatusClass = "bg-label-success",   StatusIcon = "ri-checkbox-circle-line", RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",  EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "ปลาหมึก",        DestinationCountry = "จีน",            ReceivedNo = "รบ.2569-00305" },
+        new { RequestNumber = "REP821B211308", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",   CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",         OriginalCertNumber = "AC821B2171004",  ReplacementReason = "ใบรับรองสูญหาย",                                     TransactionAt = new DateTime(2026, 4, 22, 15, 22, 41), StatusText = "ยกเลิก",     StatusClass = "bg-label-secondary", StatusIcon = "ri-forbid-line",          RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาทูน่ากระป๋อง", DestinationCountry = "สหรัฐอเมริกา",  ReceivedNo = "รบ.2569-00306" },
+        new { RequestNumber = "REP821B211309", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",      CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",       OriginalCertNumber = "HC821B211305",   ReplacementReason = "ต้องการฉบับแทนฉบับเก่า",                            TransactionAt = new DateTime(2026, 4, 23, 9, 30, 0),   StatusText = "ฉบับร่าง",   StatusClass = "bg-label-secondary", StatusIcon = "ri-file-3-line",          RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",  EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งแช่แข็ง",    DestinationCountry = "ออสเตรเลีย",    ReceivedNo = "" },
+        new { RequestNumber = "REP821B211310", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",   CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",         OriginalCertNumber = "AC821B2171005",  ReplacementReason = "ใบรับรองชำรุด/เสียหาย",                              TransactionAt = new DateTime(2026, 4, 23, 14, 10, 7),  StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาทูน่ากระป๋อง", DestinationCountry = "สหภาพยุโรป",    ReceivedNo = "รบ.2569-00307" },
+        new { RequestNumber = "REP821B211311", CertificateKey = "PST",  CertTypeBadge = "bg-label-info",      CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PST — ไทย)", OriginalCertNumber = "PST821B2171001", ReplacementReason = "ข้อผิดพลาดต้องแก้ไขหลังสินค้าออกจากประเทศ",       TransactionAt = new DateTime(2026, 4, 24, 11, 0, 0),   StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",  EstablishmentName = "บริษัท ไทย ฟิชเชอรี่ จำกัด",           FactoryRegNo = "0105548067890", ProductName = "ปลาหมึกแช่แข็ง", DestinationCountry = "จีน",            ReceivedNo = "รบ.2569-00308" },
+        new { RequestNumber = "REP821B211312", CertificateKey = "PST",  CertTypeBadge = "bg-label-info",      CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PST — ไทย)", OriginalCertNumber = "PST821B2171002", ReplacementReason = "เชื่อมโยง/แลกเปลี่ยน/ส่งต่อข้อมูลไปยังระบบภายนอกแล้ว", TransactionAt = new DateTime(2026, 4, 25, 9, 45, 0),   StatusText = "อนุมัติ",    StatusClass = "bg-label-success",   StatusIcon = "ri-checkbox-circle-line", RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท ไทย ฟิชเชอรี่ จำกัด",           FactoryRegNo = "0105548067890", ProductName = "ปลาหมึกแช่แข็ง", DestinationCountry = "ญี่ปุ่น",        ReceivedNo = "รบ.2569-00309" },
+        new { RequestNumber = "REP821B211313", CertificateKey = "NMDT", CertTypeBadge = "bg-label-secondary", CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMDT — ไทย)", OriginalCertNumber = "NMDT21B211301",  ReplacementReason = "สำแดงใบรับรองกับลูกค้าแล้ว",                        TransactionAt = new DateTime(2026, 4, 25, 14, 30, 0),  StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",  EstablishmentName = "บริษัท ทะเลไทย เอ็กซ์พอร์ต จำกัด",    FactoryRegNo = "0105548078901", ProductName = "ปูม้าสด",        DestinationCountry = "ออสเตรเลีย",    ReceivedNo = "รบ.2569-00310" },
+        new { RequestNumber = "REP821B211314", CertificateKey = "NMDT", CertTypeBadge = "bg-label-secondary", CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMDT — ไทย)", OriginalCertNumber = "NMDT21B211302",  ReplacementReason = "ใบรับรองสูญหาย",                                     TransactionAt = new DateTime(2026, 4, 26, 10, 0, 0),   StatusText = "ฉบับร่าง",   StatusClass = "bg-label-secondary", StatusIcon = "ri-file-3-line",          RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท ทะเลไทย เอ็กซ์พอร์ต จำกัด",    FactoryRegNo = "0105548078901", ProductName = "ปูม้าสด",        DestinationCountry = "ออสเตรเลีย",    ReceivedNo = "" },
     };
 
     var totalRequestCount = requests.Length;
-    var declarationCount = requests.Count(r => r.CertificateKey == "declaration");
-    var processingCount = requests.Count(r => r.CertificateKey == "processing");
-    var pendingCount = requests.Count(r => r.StatusText == "รออนุมัติ");
-    var approvedCount = requests.Count(r => r.StatusText == "อนุมัติ");
-    var rejectedCount = requests.Count(r => r.StatusText == "ไม่อนุมัติ");
+    var psCount   = requests.Count(r => r.CertificateKey == "PS");
+    var pstCount  = requests.Count(r => r.CertificateKey == "PST");
+    var nmdCount  = requests.Count(r => r.CertificateKey == "NMD");
+    var nmdtCount = requests.Count(r => r.CertificateKey == "NMDT");
+    var pendingCount   = requests.Count(r => r.StatusText == "รออนุมัติ");
+    var approvedCount  = requests.Count(r => r.StatusText == "อนุมัติ");
+    var rejectedCount  = requests.Count(r => r.StatusText == "ไม่อนุมัติ");
     var cancelledCount = requests.Count(r => r.StatusText == "ยกเลิก");
 }
 
@@ -195,6 +62,12 @@
 
     .request-table-compact .badge {
         font-size: 0.68rem;
+    }
+
+    /* 2.6(2): NMD badge color (purple) */
+    .cert-type-nmd {
+        background-color: rgba(123, 31, 162, 0.15);
+        color: #7b1fa2;
     }
 
     .request-table-compact .btn.btn-sm {
@@ -248,26 +121,50 @@
             var day = parseInt(parts[0], 10);
             var month = parseInt(parts[1], 10) - 1;
             var year = parseInt(parts[2], 10);
+            // แปลง BE → CE ถ้า year > 2500
+            if (year > 2500) year -= 543;
             var h = endOfDay ? 23 : 0, m = endOfDay ? 59 : 0, s = endOfDay ? 59 : 0;
             var parsed = new Date(year, month, day, h, m, s);
             return Number.isNaN(parsed.getTime()) ? null : parsed;
         }
 
+        // 2.6(3): ค้นหาจาก 9 ฟิลด์
         function filterRows() {
-            var status = (document.getElementById('filterStatus').value || '').trim();
-            var certType = (document.getElementById('filterCertType').value || '').trim();
-            var fromDate = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
-            var toDate = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
-            var excludeRange = document.getElementById('filterDateExclude').checked;
+            var certType      = (document.getElementById('filterCertType').value || '').trim();
+            var reqNo         = (document.getElementById('filterReqNo').value || '').trim().toLowerCase();
+            var status        = (document.getElementById('filterStatus').value || '').trim();
+            var establishment = (document.getElementById('filterEstablishment') ? document.getElementById('filterEstablishment').value : '').trim().toLowerCase();
+            var factoryReg    = (document.getElementById('filterFactoryReg') ? document.getElementById('filterFactoryReg').value : '').trim().toLowerCase();
+            var product       = (document.getElementById('filterProduct') ? document.getElementById('filterProduct').value : '').trim().toLowerCase();
+            var country       = (document.getElementById('filterCountry') ? document.getElementById('filterCountry').value : '').trim().toLowerCase();
+            var receivedNo    = (document.getElementById('filterReceivedNo') ? document.getElementById('filterReceivedNo').value : '').trim().toLowerCase();
+            var fromDate      = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
+            var toDate        = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
+            var excludeRange  = document.getElementById('filterDateExclude').checked;
+
             var rows = document.querySelectorAll('#requestTableBody tr[data-certificate]');
             var visibleCount = 0;
 
             rows.forEach(function (row) {
-                var rowStatus = row.dataset.status || '';
-                var rowCert = row.dataset.certificate || '';
-                var rowDate = new Date(row.dataset.draftDate || '');
-                var statusMatch = !status || rowStatus === status;
-                var certMatch = !certType || rowCert === certType;
+                var rowCert    = row.dataset.certificate || '';
+                var rowStatus  = row.dataset.status || '';
+                var rowDate    = new Date(row.dataset.draftDate || '');
+                var rowReqNo   = row.dataset.reqno || '';
+                var rowEstab   = row.dataset.establishment || '';
+                var rowFactory = row.dataset.factory || '';
+                var rowProduct = row.dataset.product || '';
+                var rowCountry = row.dataset.country || '';
+                var rowRecvNo  = row.dataset.receivedno || '';
+
+                var certMatch    = !certType    || rowCert === certType;
+                var statusMatch  = !status      || rowStatus === status;
+                var reqNoMatch   = !reqNo       || rowReqNo.includes(reqNo);
+                var estabMatch   = !establishment || rowEstab.includes(establishment);
+                var factoryMatch = !factoryReg  || rowFactory.includes(factoryReg);
+                var productMatch = !product     || rowProduct.includes(product);
+                var countryMatch = !country     || rowCountry.includes(country);
+                var recvNoMatch  = !receivedNo  || rowRecvNo.includes(receivedNo);
+
                 var dateMatch;
                 if (!fromDate && !toDate) {
                     dateMatch = true;
@@ -277,7 +174,8 @@
                 } else {
                     dateMatch = (!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate);
                 }
-                var isVisible = statusMatch && certMatch && dateMatch;
+
+                var isVisible = certMatch && statusMatch && reqNoMatch && estabMatch && factoryMatch && productMatch && countryMatch && recvNoMatch && dateMatch;
                 row.classList.toggle('d-none', !isVisible);
                 if (isVisible) visibleCount++;
             });
@@ -285,34 +183,76 @@
             document.getElementById('requestTableEmpty').classList.toggle('d-none', visibleCount !== 0);
         }
 
-        document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
-        document.getElementById('filterStatus').addEventListener('change', filterRows);
-        document.getElementById('filterCertType').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateFrom').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateTo').addEventListener('change', filterRows);
-        document.getElementById('filterDateExclude').addEventListener('change', filterRows);
-
-        ['filterStatus', 'filterCertType', 'filterDraftDateFrom', 'filterDraftDateTo'].forEach(function (id) {
-            document.getElementById(id).addEventListener('keydown', function (e) {
+        // Event listeners — all filter fields
+        var filterIds = ['filterCertType', 'filterReqNo', 'filterStatus',
+                         'filterEstablishment', 'filterFactoryReg', 'filterProduct',
+                         'filterCountry', 'filterReceivedNo',
+                         'filterDraftDateFrom', 'filterDraftDateTo'];
+        filterIds.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('change', filterRows);
+            el.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
+        document.getElementById('filterDateExclude').addEventListener('change', filterRows);
+        document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
 
         document.getElementById('btnResetRequests').addEventListener('click', function () {
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterCertType').value = '';
-            document.getElementById('filterDraftDateFrom').value = '';
-            document.getElementById('filterDraftDateTo').value = '';
+            filterIds.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.value = '';
+            });
             document.getElementById('filterDateExclude').checked = false;
             filterRows();
         });
+
+        // 2.6(3): CRUD — Cancel modal: ใส่ data-reqno ในชื่อ modal
+        var modalCancelEl = document.getElementById('modalCancelRequest');
+        if (modalCancelEl) {
+            modalCancelEl.addEventListener('show.bs.modal', function (e) {
+                var btn = e.relatedTarget;
+                var reqNo = btn ? btn.getAttribute('data-reqno') : '';
+                document.getElementById('cancelRequestReqNo').textContent = reqNo;
+                document.getElementById('cancelRequestReason').value = '';
+                document.getElementById('cancelRequestReason').classList.remove('is-invalid');
+            });
+            document.getElementById('btnConfirmCancel').addEventListener('click', function () {
+                var reason = document.getElementById('cancelRequestReason').value.trim();
+                if (!reason) {
+                    document.getElementById('cancelRequestReason').classList.add('is-invalid');
+                    return;
+                }
+                document.getElementById('cancelRequestReason').classList.remove('is-invalid');
+                bootstrap.Modal.getInstance(modalCancelEl).hide();
+                // TODO: ส่ง API ยกเลิกคำขอ
+                alert('TODO: ยกเลิกคำขอ ' + document.getElementById('cancelRequestReqNo').textContent + '\nเหตุผล: ' + reason);
+            });
+        }
+
+        // 2.6(3): CRUD — Delete modal
+        var modalDeleteEl = document.getElementById('modalDeleteRequest');
+        if (modalDeleteEl) {
+            modalDeleteEl.addEventListener('show.bs.modal', function (e) {
+                var btn = e.relatedTarget;
+                var reqNo = btn ? btn.getAttribute('data-reqno') : '';
+                document.getElementById('deleteRequestReqNo').textContent = reqNo;
+            });
+            document.getElementById('btnConfirmDelete').addEventListener('click', function () {
+                var reqNo = document.getElementById('deleteRequestReqNo').textContent;
+                bootstrap.Modal.getInstance(modalDeleteEl).hide();
+                // TODO: ส่ง API ลบคำขอ
+                alert('TODO: ลบคำขอ ' + reqNo);
+            });
+        }
     });
 </script>
 }
 
 @* ************** Content ************** *@
 <h4 class="mb-1">พิจารณาใบรับรองทดแทนฉบับเก่า</h4>
-<p class="mb-1">พิจารณาคำขอใบรับรองทดแทนฉบับเก่า สำหรับใบรับรองการแปรรูปสัตว์น้ำ (PS) และใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</p>
+<p class="mb-1">พิจารณาคำขอใบรับรองทดแทนฉบับเก่า สำหรับใบรับรอง 4 ประเภท: PS / PST / NMD / NMDT</p>
 
 <!-- Breadcrumb -->
 <nav aria-label="breadcrumb" class="mb-6">
@@ -339,8 +279,24 @@
     <div class="col-sm-6 col-xl-2">
         <div class="card h-100">
             <div class="card-body d-flex align-items-center gap-3">
+                <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-primary"><i class="ri ri-file-paper-2-line ri-22px"></i></span></div>
+                <div><p class="mb-0 small text-muted">PS</p><h5 class="mb-0">@psCount</h5></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
                 <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-info"><i class="ri ri-file-paper-2-line ri-22px"></i></span></div>
-                <div><p class="mb-0 small text-muted">PS (การแปรรูป)</p><h5 class="mb-0">@processingCount</h5></div>
+                <div><p class="mb-0 small text-muted">PST</p><h5 class="mb-0">@pstCount</h5></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-2">
+        <div class="card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="avatar flex-shrink-0" style="background:rgba(123,31,162,0.15);border-radius:0.375rem;"><span class="avatar-initial rounded" style="background:rgba(123,31,162,0.15);"><i class="ri ri-file-paper-line ri-22px" style="color:#7b1fa2;"></i></span></div>
+                <div><p class="mb-0 small text-muted">NMD</p><h5 class="mb-0">@nmdCount</h5></div>
             </div>
         </div>
     </div>
@@ -348,7 +304,7 @@
         <div class="card h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-secondary"><i class="ri ri-file-paper-line ri-22px"></i></span></div>
-                <div><p class="mb-0 small text-muted">NoPS (ไม่แปรรูป)</p><h5 class="mb-0">@declarationCount</h5></div>
+                <div><p class="mb-0 small text-muted">NMDT</p><h5 class="mb-0">@nmdtCount</h5></div>
             </div>
         </div>
     </div>
@@ -383,55 +339,96 @@
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h5 class="card-title mb-1">ตัวกรองการค้นหา</h5>
-            <p class="text-muted small mb-0">ค้นหารายการคำขอตามประเภทใบรับรอง สถานะ และช่วงวันที่ทำรายการ</p>
+            <p class="text-muted small mb-0">
+                ค้นหาจาก: ประเภทใบรับรอง / เลขที่คำขอ / สถานะ /
+                <span class="text-primary" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#collapseAdvancedFilter">
+                    ชื่อสถานประกอบการ / เลขทะเบียนโรงงาน / ชื่อสินค้า / ประเทศปลายทาง / วันที่ยื่น / เลขที่รับคำขอ
+                </span>
+            </p>
         </div>
+        <button class="btn btn-sm btn-outline-secondary" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapseAdvancedFilter" aria-expanded="false" aria-controls="collapseAdvancedFilter">
+            <i class="ri ri-filter-3-line me-1"></i>ค้นหาขั้นสูง
+        </button>
     </div>
     <div class="card-body">
+        <!-- แถวหลัก: ประเภท / เลขที่คำขอ / สถานะ + ปุ่ม -->
         <div class="row g-3 align-items-end">
-            <div class="col-md-3 col-lg-2">
+            <div class="col-md-3">
+                <label for="filterCertType" class="form-label">ประเภทใบรับรอง</label>
+                <select id="filterCertType" class="form-select">
+                    <option value="">ทั้งหมด (4 ประเภท)</option>
+                    <option value="PS">PS — ใบรับรองการแปรรูปสัตว์น้ำ</option>
+                    <option value="PST">PST — ใบรับรองการแปรรูปสัตว์น้ำ (ไทย)</option>
+                    <option value="NMD">NMD — ใบรับรองสัตว์น้ำไม่แปรรูป</option>
+                    <option value="NMDT">NMDT — ใบรับรองสัตว์น้ำไม่แปรรูป (ไทย)</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterReqNo" class="form-label">เลขที่คำขอ</label>
+                <input type="text" id="filterReqNo" class="form-control" placeholder="REP821B...">
+            </div>
+            <div class="col-md-2">
                 <label for="filterStatus" class="form-label">สถานะ</label>
                 <select id="filterStatus" class="form-select">
                     <option value="">ทั้งหมด</option>
+                    <option value="ฉบับร่าง">ฉบับร่าง</option>
                     <option value="รออนุมัติ">รออนุมัติ</option>
                     <option value="อนุมัติ">อนุมัติ</option>
                     <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
                     <option value="ยกเลิก">ยกเลิก</option>
                 </select>
             </div>
-            <div class="col-md-3 col-lg-3">
-                <label for="filterCertType" class="form-label">ประเภทใบรับรอง</label>
-                <select id="filterCertType" class="form-select">
-                    <option value="">ทั้งหมด</option>
-                    <option value="declaration">Declaration</option>
-                    <option value="processing">Processing Statement</option>
-                </select>
+            <div class="col-auto">
+                <div class="d-flex gap-2 filter-action-buttons">
+                    <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
+                        <i class="ri ri-search-line"></i>
+                    </button>
+                    <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square" title="รีเซ็ต">
+                        <i class="ri ri-refresh-line"></i>
+                    </button>
+                </div>
             </div>
-            <div class="col-md-12 col-lg-7">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-4">
-                        <label for="filterDraftDateFrom" class="form-label">วันที่ทำรายการ</label>
-                        <input type="text" id="filterDraftDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
+        </div>
+        <!-- ค้นหาขั้นสูง (collapsible) -->
+        <div class="collapse mt-3" id="collapseAdvancedFilter">
+            <hr class="mb-3 mt-0" />
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="filterEstablishment" class="form-label">ชื่อสถานประกอบการ</label>
+                    <input type="text" id="filterEstablishment" class="form-control" placeholder="บริษัท...">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterFactoryReg" class="form-label">เลขทะเบียนโรงงาน</label>
+                    <input type="text" id="filterFactoryReg" class="form-control" placeholder="0105548...">
+                </div>
+                <div class="col-md-2">
+                    <label for="filterProduct" class="form-label">ชื่อสินค้า</label>
+                    <input type="text" id="filterProduct" class="form-control" placeholder="ปลา / กุ้ง...">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterCountry" class="form-label">ประเทศปลายทาง</label>
+                    <input type="text" id="filterCountry" class="form-control" placeholder="ญี่ปุ่น / EU...">
+                </div>
+            </div>
+            <div class="row g-3 align-items-end mt-0">
+                <div class="col-md-3">
+                    <label for="filterDraftDateFrom" class="form-label">วันที่ยื่น (ตั้งแต่)</label>
+                    <input type="text" id="filterDraftDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
+                </div>
+                <div class="col-md-3">
+                    <label for="filterDraftDateTo" class="form-label">วันที่ยื่น (ถึง)</label>
+                    <input type="text" id="filterDraftDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
+                </div>
+                <div class="col-auto">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="filterDateExclude" />
+                        <label class="form-check-label small" for="filterDateExclude">ไม่อยู่ในช่วง</label>
                     </div>
-                    <div class="col-md-4">
-                        <label for="filterDraftDateTo" class="form-label">ถึงวันที่</label>
-                        <input type="text" id="filterDraftDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
-                    </div>
-                    <div class="col-auto">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="filterDateExclude" />
-                            <label class="form-check-label small" for="filterDateExclude">ไม่อยู่ในช่วง</label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <div class="d-flex gap-2 filter-action-buttons">
-                            <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
-                                <i class="ri ri-search-line"></i>
-                            </button>
-                            <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square" title="รีเซ็ต">
-                                <i class="ri ri-refresh-line"></i>
-                            </button>
-                        </div>
-                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterReceivedNo" class="form-label">เลขที่รับคำขอ</label>
+                    <input type="text" id="filterReceivedNo" class="form-control" placeholder="รบ.2569-...">
                 </div>
             </div>
         </div>
@@ -445,24 +442,38 @@
             <h5 class="card-title mb-1">รายการคำขอใบรับรองทดแทนฉบับเก่า</h5>
             <p class="text-muted small mb-0">รายการคำขอใบรับรองทดแทนสำหรับใบรับรองสูญหายหรือชำรุดเสียหาย</p>
         </div>
-
+        <button type="button" class="btn btn-primary"
+                onclick="alert('TODO: สร้างคำขอใหม่')">
+            <i class="ri ri-add-line me-1"></i>สร้างคำขอใหม่
+        </button>
     </div>
     <div class="table-responsive p-1">
         <table class="table table-bordered align-middle mb-0 request-table-compact">
             <thead class="text-center">
                 <tr>
                     <th style="min-width:180px;">เลขที่คำขอ</th>
-                    <th style="min-width:200px;">ใบรับรอง</th>
-                    <th style="min-width:160px;">เลขที่ใบรับรองเดิม</th>
+                    <th style="width:5rem;">ประเภท</th>
+                    <th style="min-width:175px;">ใบรับรอง</th>
+                    <th style="min-width:155px;">เลขที่ใบรับรองเดิม</th>
+                    <th style="min-width:175px;">สถานประกอบการ</th>
+                    <th style="min-width:130px;">สินค้า / ปลายทาง</th>
                     <th>เหตุผลการขอ</th>
-                    <th style="min-width:150px;">วันที่ทำรายการ</th>
-                    <th style="width:8rem;"></th>
+                    <th style="min-width:130px;">วันที่ยื่น</th>
+                    <th style="width:9rem;"></th>
                 </tr>
             </thead>
             <tbody id="requestTableBody">
                 @foreach (var request in requests)
                 {
-                    <tr data-certificate="@request.CertificateKey" data-status="@request.StatusText" data-draft-date="@request.TransactionAt.ToString("yyyy-MM-ddTHH:mm:ss")">
+                    <tr data-certificate="@request.CertificateKey"
+                        data-status="@request.StatusText"
+                        data-draft-date="@request.TransactionAt.ToString("yyyy-MM-ddTHH:mm:ss")"
+                        data-reqno="@request.RequestNumber.ToLower()"
+                        data-establishment="@request.EstablishmentName.ToLower()"
+                        data-factory="@request.FactoryRegNo.ToLower()"
+                        data-product="@request.ProductName.ToLower()"
+                        data-country="@request.DestinationCountry.ToLower()"
+                        data-receivedno="@request.ReceivedNo.ToLower()">
                         <td>
                             <span class="fw-semibold text-primary d-block mb-1">@request.RequestNumber</span>
                             <div class="d-flex flex-column gap-1">
@@ -478,51 +489,158 @@
                                     </span>
                                     <span>ขอโดย: @request.RequestedByText</span>
                                 </div>
+                                @if (!string.IsNullOrEmpty(request.ReceivedNo))
+                                {
+                                    <div class="d-flex align-items-center gap-1 small text-muted">
+                                        <i class="ri ri-inbox-archive-line" style="font-size:0.75rem;"></i>
+                                        <span>เลขรับ: @request.ReceivedNo</span>
+                                    </div>
+                                }
                             </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @request.CertTypeBadge">@request.CertificateKey</span>
                         </td>
                         <td class="small">@request.CertificateName</td>
                         <td class="text-center">
                             <span class="fw-semibold text-secondary">@request.OriginalCertNumber</span>
                         </td>
+                        <td class="small">
+                            <span class="fw-semibold d-block">@request.EstablishmentName</span>
+                            <span class="text-muted" style="font-size:0.72rem;">@request.FactoryRegNo</span>
+                        </td>
+                        <td class="small">
+                            <span class="d-block">@request.ProductName</span>
+                            <span class="text-muted" style="font-size:0.72rem;">@request.DestinationCountry</span>
+                        </td>
                         <td class="small">@request.ReplacementReason</td>
                         <td class="text-center small text-nowrap">
-                            @request.TransactionAt.ToString("dd/MM/yyyy")<br />
-                            <span class="text-muted">(@request.TransactionAt.ToString("HH:mm:ss"))</span>
+                            @{
+                                var beYear = request.TransactionAt.Year + 543;
+                            }
+                            @request.TransactionAt.ToString("dd/MM/")@beYear<br />
+                            <span class="text-muted">(@request.TransactionAt.ToString("HH:mm"))</span>
                         </td>
                         <td class="text-center">
-                            <div class="d-flex gap-1 justify-content-center">
+                            <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                @if (request.StatusText == "ฉบับร่าง")
+                                {
+                                    <a href="@(request.CertificateKey == "PS" || request.CertificateKey == "PST" ? Url.Action("ReviewReplacementProcessing", "Officer") : Url.Action("ReviewReplacementDeclaration", "Officer"))"
+                                       class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                        <i class="ri ri-eye-line"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="แก้ไข"
+                                            onclick="alert('TODO: แก้ไขคำขอ @request.RequestNumber')">
+                                        <i class="ri ri-edit-line"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                            data-bs-toggle="modal" data-bs-target="#modalCancelRequest"
+                                            data-reqno="@request.RequestNumber" title="ยกเลิก">
+                                        <i class="ri ri-close-circle-line"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#modalDeleteRequest"
+                                            data-reqno="@request.RequestNumber" title="ลบ">
+                                        <i class="ri ri-delete-bin-line"></i>
+                                    </button>
+                                }
                                 @if (request.StatusText == "รออนุมัติ")
                                 {
-                                    <a href="@(request.CertificateKey == "processing" ? Url.Action("ReviewReplacementProcessing", "Officer") : Url.Action("ReviewReplacementDeclaration", "Officer"))"
+                                    <a href="@(request.CertificateKey == "PS" || request.CertificateKey == "PST" ? Url.Action("ReviewReplacementProcessing", "Officer") : Url.Action("ReviewReplacementDeclaration", "Officer"))"
                                        class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                         <i class="ri ri-eye-line"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ">
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ"
+                                            onclick="if(confirm('ยืนยันอนุมัติคำขอ @request.RequestNumber ?')) alert('TODO: อนุมัติ')">
                                         <i class="ri ri-checkbox-circle-line text-success"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="ไม่อนุมัติ">
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="ไม่อนุมัติ"
+                                            onclick="if(confirm('ยืนยันไม่อนุมัติคำขอ @request.RequestNumber ?')) alert('TODO: ไม่อนุมัติ')">
                                         <i class="ri ri-close-circle-line text-danger"></i>
                                     </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                            data-bs-toggle="modal" data-bs-target="#modalCancelRequest"
+                                            data-reqno="@request.RequestNumber" title="ยกเลิก">
+                                        <i class="ri ri-forbid-line"></i>
+                                    </button>
                                 }
-                                @if (request.StatusText == "อนุมัติ" || request.StatusText == "ไม่อนุมัติ")
+                                @if (request.StatusText == "อนุมัติ" || request.StatusText == "ไม่อนุมัติ" || request.StatusText == "ยกเลิก")
                                 {
-                                    <a href="@(request.CertificateKey == "processing" ? Url.Action("ReviewReplacementProcessing", "Officer") : Url.Action("ReviewReplacementDeclaration", "Officer"))"
+                                    <a href="@(request.CertificateKey == "PS" || request.CertificateKey == "PST" ? Url.Action("ReviewReplacementProcessing", "Officer") : Url.Action("ReviewReplacementDeclaration", "Officer"))"
                                        class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                         <i class="ri ri-eye-line"></i>
                                     </a>
-                                }
-                                @if (request.StatusText == "ยกเลิก" || request.StatusText == "ฉบับร่าง")
-                                {
-                                    <span class="text-muted small">-</span>
+                                    @* 2.6(8): badge พิมพ์ใบรับรองทดแทนแล้ว เฉพาะอนุมัติ *@
+                                    @if (request.StatusText == "อนุมัติ")
+                                    {
+                                        <span class="badge bg-label-success px-2 py-1" data-bs-toggle="tooltip"
+                                              title="พิมพ์ใบรับรองทดแทนแล้ว (PDF/A-3)">
+                                            <i class="ri ri-printer-line me-1"></i>พิมพ์แล้ว ✅
+                                        </span>
+                                    }
                                 }
                             </div>
                         </td>
                     </tr>
                 }
                 <tr id="requestTableEmpty" class="d-none">
-                    <td colspan="6" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+@* 2.6(3): Modal ยืนยันยกเลิกคำขอ *@
+<div class="modal fade" id="modalCancelRequest" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ri ri-close-circle-line me-2 text-warning"></i>ยืนยันยกเลิกคำขอ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">คุณต้องการยกเลิกคำขอ <strong id="cancelRequestReqNo"></strong> ใช่หรือไม่?</p>
+                <div class="mb-3">
+                    <label for="cancelRequestReason" class="form-label">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                    <textarea id="cancelRequestReason" class="form-control" rows="3"
+                              placeholder="ระบุเหตุผลการยกเลิก..."></textarea>
+                    <div class="invalid-feedback">กรุณาระบุเหตุผลการยกเลิก</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" id="btnConfirmCancel" class="btn btn-warning">
+                    <i class="ri ri-close-circle-line me-1"></i>ยืนยันยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 2.6(3): Modal ยืนยันลบคำขอ *@
+<div class="modal fade" id="modalDeleteRequest" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ri ri-delete-bin-line me-2 text-danger"></i>ยืนยันลบคำขอ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger d-flex align-items-start gap-2 mb-3">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <div>
+                        <strong>คำเตือน:</strong> การลบข้อมูลไม่สามารถกู้คืนได้
+                    </div>
+                </div>
+                <p>คุณต้องการลบคำขอ <strong id="deleteRequestReqNo"></strong> ออกจากระบบถาวรหรือไม่?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmDelete" class="btn btn-danger">
+                    <i class="ri ri-delete-bin-line me-1"></i>ลบถาวร
+                </button>
+            </div>
+        </div>
     </div>
 </div>

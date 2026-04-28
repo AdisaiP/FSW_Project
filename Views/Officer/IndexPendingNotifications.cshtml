@@ -1,0 +1,410 @@
+@{
+    ViewData["Title"] = "ศูนย์แจ้งเตือน — คำขอค้างดำเนินการ";
+
+    // TODO: ดึงจากฐานข้อมูลจริง
+    // ─── Summary per process type ───────────────────────────────
+    var processSummary = new[]
+    {
+        new { RowNo=1, ProcessName="ออกใบรับรอง PS/NMD",             Pending=12, MaxDays=5,  Urgent=true,  IndexUrl="/Officer/IndexPSDeclaration" },
+        new { RowNo=2, ProcessName="พิจารณาขอเปลี่ยนแปลงใบรับรอง",  Pending=3,  MaxDays=2,  Urgent=false, IndexUrl="/Officer/IndexChangeRequest"  },
+        new { RowNo=3, ProcessName="พิจารณาออกใบรับรองทดแทน",        Pending=2,  MaxDays=7,  Urgent=true,  IndexUrl="/Officer/IndexReplacement"    },
+        new { RowNo=4, ProcessName="พิจารณายกเลิกใบรับรอง",          Pending=1,  MaxDays=1,  Urgent=false, IndexUrl="/Officer/IndexCancelCertificate" },
+        new { RowNo=5, ProcessName="พิจารณาคืนน้ำหนักสินค้าส่งคืน", Pending=4,  MaxDays=3,  Urgent=false, IndexUrl="/Officer/IndexReturnWeight"   },
+        new { RowNo=6, ProcessName="อนุมัติ %Yield",                  Pending=2,  MaxDays=4,  Urgent=false, IndexUrl="/Officer/IndexYieldApproval"  },
+        new { RowNo=7, ProcessName="RMBS1/P1 — ตรวจสอบวัตถุดิบ",    Pending=6,  MaxDays=2,  Urgent=false, IndexUrl="/Officer/IndexRMBS1"          },
+    };
+
+    int totalPending = processSummary.Sum(x => x.Pending);
+
+    // ─── Unified Inbox ───────────────────────────────────────────
+    var pendingItems = new[]
+    {
+        new { No=1,  ReqNo="PS-TH-2026-00927",   ReqType="ออกใบรับรอง PS",              Establishment="บริษัท ทูน่าโปรดักส์ จำกัด",         SubmitDate="21/04/2569", DueDate="28/04/2569", WaitDays=7, Officer="นายประสิทธิ์ วงค์ดี",       Province="กรุงเทพมหานคร", IndexUrl="/Officer/IndexPSDeclaration"    },
+        new { No=2,  ReqNo="NMD-2026-00211",      ReqType="ออกใบรับรอง NMD",             Establishment="บริษัท ไทยซีฟู้ด จำกัด",              SubmitDate="22/04/2569", DueDate="29/04/2569", WaitDays=6, Officer="นางสาวสมหญิง ใจดี",          Province="สมุทรปราการ",    IndexUrl="/Officer/IndexPSDeclaration"    },
+        new { No=3,  ReqNo="RMBS1-2026-02289",    ReqType="RMBS1/P1 วัตถุดิบ",          Establishment="บริษัท โอเชียน ไพร์ม จำกัด",          SubmitDate="23/04/2569", DueDate="30/04/2569", WaitDays=5, Officer="นายประสิทธิ์ วงค์ดี",       Province="สมุทรสาคร",      IndexUrl="/Officer/IndexRMBS1"            },
+        new { No=4,  ReqNo="PS-TH-2026-00930",    ReqType="ออกใบรับรอง PS",              Establishment="บริษัท สยาม มารีน ฟู้ดส์ จำกัด",     SubmitDate="24/04/2569", DueDate="01/05/2569", WaitDays=4, Officer="นางสาวสมหญิง ใจดี",          Province="กรุงเทพมหานคร", IndexUrl="/Officer/IndexPSDeclaration"    },
+        new { No=5,  ReqNo="CHNG-2026-00182",     ReqType="เปลี่ยนแปลงใบรับรอง",        Establishment="บริษัท แหลมทองมาริน จำกัด",           SubmitDate="25/04/2569", DueDate="02/05/2569", WaitDays=3, Officer="นายเชาวลิต พรหมรัตน์",       Province="ระยอง",           IndexUrl="/Officer/IndexChangeRequest"    },
+        new { No=6,  ReqNo="RMBS1-2026-02293",    ReqType="RMBS1/P1 วัตถุดิบ",          Establishment="บริษัท เอเชียน ซีฟู้ด จำกัด",         SubmitDate="25/04/2569", DueDate="02/05/2569", WaitDays=3, Officer="นายประสิทธิ์ วงค์ดี",       Province="นนทบุรี",         IndexUrl="/Officer/IndexRMBS1"            },
+        new { No=7,  ReqNo="RPLC-2026-00043",     ReqType="ใบรับรองทดแทน",               Establishment="บริษัท ทะเลไทย โปรดักส์ จำกัด",      SubmitDate="21/04/2569", DueDate="28/04/2569", WaitDays=7, Officer="นางสาวสมหญิง ใจดี",          Province="ชลบุรี",          IndexUrl="/Officer/IndexReplacement"      },
+        new { No=8,  ReqNo="YIELD-2026-00081",    ReqType="อนุมัติ %Yield",              Establishment="บริษัท ทูน่าโปรดักส์ จำกัด",         SubmitDate="26/04/2569", DueDate="03/05/2569", WaitDays=2, Officer="นายเชาวลิต พรหมรัตน์",       Province="กรุงเทพมหานคร", IndexUrl="/Officer/IndexYieldApproval"    },
+        new { No=9,  ReqNo="RMBS1-2026-02295",    ReqType="RMBS1/P1 วัตถุดิบ",          Establishment="บริษัท ไทยยูเนี่ยน โฟรเซ่น จำกัด", SubmitDate="26/04/2569", DueDate="03/05/2569", WaitDays=2, Officer="นายประสิทธิ์ วงค์ดี",       Province="สมุทรสาคร",      IndexUrl="/Officer/IndexRMBS1"            },
+        new { No=10, ReqNo="CNCL-2026-00019",     ReqType="ยกเลิกใบรับรอง",              Establishment="บริษัท แปซิฟิค ฟิชเชอรี่ จำกัด",    SubmitDate="27/04/2569", DueDate="04/05/2569", WaitDays=1, Officer="นางสาวสมหญิง ใจดี",          Province="ปทุมธานี",        IndexUrl="/Officer/IndexCancelCertificate"},
+        new { No=11, ReqNo="RETWT-2026-00103",    ReqType="คืนน้ำหนักสินค้าส่งคืน",    Establishment="บริษัท สยาม มารีน ฟู้ดส์ จำกัด",     SubmitDate="25/04/2569", DueDate="02/05/2569", WaitDays=3, Officer="นายเชาวลิต พรหมรัตน์",       Province="กรุงเทพมหานคร", IndexUrl="/Officer/IndexReturnWeight"     },
+        new { No=12, ReqNo="NMD-2026-00213",      ReqType="ออกใบรับรอง NMD",             Establishment="บริษัท โอเชียน ไพร์ม จำกัด",         SubmitDate="23/04/2569", DueDate="30/04/2569", WaitDays=5, Officer="นายประสิทธิ์ วงค์ดี",       Province="ระยอง",           IndexUrl="/Officer/IndexPSDeclaration"    },
+        new { No=13, ReqNo="RMBS1-2026-02297",    ReqType="RMBS1/P1 วัตถุดิบ",          Establishment="บริษัท เอเชียน ซีฟู้ด จำกัด",         SubmitDate="27/04/2569", DueDate="04/05/2569", WaitDays=1, Officer="นางสาวสมหญิง ใจดี",          Province="สมุทรสงคราม",    IndexUrl="/Officer/IndexRMBS1"            },
+        new { No=14, ReqNo="PS-TH-2026-00933",    ReqType="ออกใบรับรอง PS",              Establishment="บริษัท ทะเลไทย โปรดักส์ จำกัด",      SubmitDate="27/04/2569", DueDate="04/05/2569", WaitDays=1, Officer="นายเชาวลิต พรหมรัตน์",       Province="นนทบุรี",         IndexUrl="/Officer/IndexPSDeclaration"    },
+        new { No=15, ReqNo="RETWT-2026-00105",    ReqType="คืนน้ำหนักสินค้าส่งคืน",    Establishment="บริษัท ไทยยูเนี่ยน โฟรเซ่น จำกัด", SubmitDate="26/04/2569", DueDate="03/05/2569", WaitDays=2, Officer="นายประสิทธิ์ วงค์ดี",       Province="สมุทรสาคร",      IndexUrl="/Officer/IndexReturnWeight"     },
+    };
+
+    // overdue threshold (วัน)
+    const int overdueThreshold = 5;
+}
+
+@section PageStyles {
+<style>
+    .notif-table th, .notif-table td { padding: 0.4rem 0.55rem; vertical-align: middle; font-size: 0.79rem; }
+    .process-row:hover { background: rgba(105,108,255,0.04); }
+    .badge-overdue { animation: pulse-badge 1.8s infinite; }
+    @@keyframes pulse-badge { 0%,100%{ opacity:1; } 50%{ opacity:.65; } }
+</style>
+}
+
+@* ─── Content ─── *@
+<h4 class="mb-1">
+    <i class="ri ri-notification-3-line me-2 text-danger"></i>
+    ศูนย์แจ้งเตือน — คำขอค้างดำเนินการ
+</h4>
+<p class="mb-1 text-muted">รายการคำขอที่รออนุมัติ/ดำเนินการครบทุกกระบวนงาน (Unified Inbox)</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="#" class="text-primary fw-semibold">เจ้าหน้าที่</a></li>
+        <li class="breadcrumb-item active text-secondary">ศูนย์แจ้งเตือนคำขอค้าง</li>
+    </ol>
+</nav>
+
+<!-- Top summary cards -->
+<div class="row mb-6 g-3">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-danger border-2">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-danger fw-bold">@totalPending</h4>
+                        <small class="text-muted">คำขอค้างทั้งหมด</small>
+                    </div>
+                    <span class="badge bg-label-danger rounded-circle p-2">
+                        <i class="icon-base ri ri-inbox-archive-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-warning fw-bold">@pendingItems.Count(x => x.WaitDays >= overdueThreshold)</h4>
+                        <small class="text-muted">เกินกำหนด (&ge;@overdueThreshold วัน)</small>
+                    </div>
+                    <span class="badge bg-label-warning rounded-circle p-2">
+                        <i class="icon-base ri ri-alarm-warning-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-0 fw-bold">@processSummary.Length</h4>
+                        <small class="text-muted">กระบวนงาน</small>
+                    </div>
+                    <span class="badge bg-label-primary rounded-circle p-2">
+                        <i class="icon-base ri ri-git-branch-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="mb-0 text-danger fw-bold">@processSummary.Max(x => x.MaxDays)</h4>
+                        <small class="text-muted">ค้างนานสุด (วัน)</small>
+                    </div>
+                    <span class="badge bg-label-info rounded-circle p-2">
+                        <i class="icon-base ri ri-time-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Process Summary Table -->
+<div class="card mb-6">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <div>
+            <h5 class="card-title mb-1">
+                <i class="ri ri-list-check-3 me-2 text-primary"></i>สรุปคำขอค้างแยกตามกระบวนงาน
+            </h5>
+            <p class="text-muted small mb-0">คลิก "ดูรายการ →" เพื่อเปิดรายการค้างของกระบวนงานนั้น (กรอง สถานะ=รออนุมัติ)</p>
+        </div>
+        <span class="badge bg-label-danger rounded-pill px-3">
+            รวม @totalPending รายการ
+        </span>
+    </div>
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0 notif-table" id="processSummaryTable">
+            <thead class="table-light text-center">
+                <tr>
+                    <th style="width:40px">#</th>
+                    <th class="text-start">กระบวนงาน</th>
+                    <th style="width:130px;">ค้างดำเนินการ</th>
+                    <th style="width:130px;">นานสุด (วัน)</th>
+                    <th style="width:110px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in processSummary)
+                {
+                    <tr class="process-row">
+                        <td class="text-center text-muted">@p.RowNo</td>
+                        <td>
+                            <span class="fw-semibold">@p.ProcessName</span>
+                            @if (p.Urgent)
+                            {
+                                <span class="badge bg-label-danger ms-2" style="font-size:0.6rem;">ด่วน</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill fs-6 @(p.Pending >= 10 ? "bg-danger" : p.Pending >= 5 ? "bg-warning" : "bg-label-secondary") px-3">
+                                @p.Pending
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @(p.MaxDays >= overdueThreshold ? "bg-danger badge-overdue" : p.MaxDays >= 3 ? "bg-warning" : "bg-label-secondary")">
+                                @p.MaxDays วัน
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)"
+                               onclick="alert('// TODO: นำไปยัง @p.IndexUrl?status=pending')"
+                               class="btn btn-sm btn-outline-primary">
+                                ดูรายการ <i class="ri ri-arrow-right-line ms-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-light fw-semibold">
+                <tr>
+                    <td colspan="2" class="text-end">รวมทั้งหมด</td>
+                    <td class="text-center">
+                        <span class="badge bg-danger rounded-pill px-3 fs-6">@totalPending</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge bg-danger">@processSummary.Max(x => x.MaxDays) วัน</span>
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Unified Inbox Table -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h5 class="card-title mb-1">
+                <i class="ri ri-inbox-line me-2 text-warning"></i>
+                รายการค้างดำเนินการทั้งหมด (Unified Inbox)
+            </h5>
+            <p class="text-muted small mb-0">
+                แสดง @pendingItems.Length รายการ — badge
+                <span class="badge bg-danger" style="font-size:0.6rem;">สีแดง</span>
+                = ค้างเกิน @overdueThreshold วัน
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- Filter quick buttons -->
+            <button class="btn btn-sm btn-outline-danger" id="btnShowOverdue">
+                <i class="ri ri-alarm-warning-line me-1"></i>เกินกำหนดเท่านั้น
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" id="btnShowAll">
+                <i class="ri ri-list-unordered me-1"></i>ทั้งหมด
+            </button>
+            <button class="btn btn-sm btn-success" onclick="alert('// TODO: Export Excel รายการค้างทั้งหมด')">
+                <i class="ri ri-file-excel-line me-1"></i>Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter row -->
+    <div class="card-body pb-0 pt-3">
+        <div class="row g-3 align-items-end mb-3">
+            <div class="col-md-3">
+                <label for="inboxFilterKw" class="form-label">ค้นหา</label>
+                <input id="inboxFilterKw" type="text" class="form-control form-control-sm" placeholder="เลขที่คำขอ / สถานประกอบการ" />
+            </div>
+            <div class="col-md-3">
+                <label for="inboxFilterType" class="form-label">ประเภทกระบวนงาน</label>
+                <select id="inboxFilterType" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    @foreach (var p in processSummary)
+                    {
+                        <option value="@p.ProcessName">@p.ProcessName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="inboxFilterOfficer" class="form-label">ผู้รับผิดชอบ</label>
+                <select id="inboxFilterOfficer" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    @foreach (var name in pendingItems.Select(x => x.Officer).Distinct())
+                    {
+                        <option value="@name">@name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button id="inboxBtnSearch" class="btn btn-sm btn-outline-primary">
+                    <i class="ri ri-search-line me-1"></i>ค้นหา
+                </button>
+                <button id="inboxBtnReset" class="btn btn-sm btn-outline-secondary">
+                    <i class="ri ri-refresh-line me-1"></i>รีเซ็ต
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive px-1">
+        <table class="table table-bordered align-middle mb-0 notif-table" id="inboxTable">
+            <thead class="table-light text-center">
+                <tr>
+                    <th style="width:40px">#</th>
+                    <th>เลขที่คำขอ</th>
+                    <th>ประเภทกระบวนงาน</th>
+                    <th>ชื่อสถานประกอบการ</th>
+                    <th>วันที่ยื่น</th>
+                    <th>วันที่ครบกำหนด</th>
+                    <th style="width:100px;">ค้างมา (วัน)</th>
+                    <th>ผู้รับผิดชอบ</th>
+                    <th style="width:110px;"></th>
+                </tr>
+            </thead>
+            <tbody id="inboxTBody">
+                @foreach (var item in pendingItems)
+                {
+                    bool isOverdue = item.WaitDays >= overdueThreshold;
+                    <tr data-process="@item.ReqType"
+                        data-officer="@item.Officer"
+                        data-overdue="@isOverdue.ToString().ToLower()"
+                        data-search="@item.ReqNo.ToLower() @item.Establishment.ToLower() @item.ReqType.ToLower()">
+                        <td class="text-center text-muted">@item.No</td>
+                        <td>
+                            <a href="javascript:void(0)"
+                               onclick="alert('// TODO: ดูรายละเอียด @item.ReqNo — ประเภท @item.ReqType')"
+                               class="fw-semibold text-primary text-decoration-none">
+                                @item.ReqNo
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-label-info" style="font-size:0.65rem;">@item.ReqType</span>
+                        </td>
+                        <td>
+                            @item.Establishment
+                            <br/><small class="text-muted" style="font-size:0.65rem;">
+                                <i class="ri ri-map-pin-2-line me-1"></i>@item.Province
+                            </small>
+                        </td>
+                        <td class="text-center">@item.SubmitDate</td>
+                        <td class="text-center @(isOverdue ? "text-danger fw-semibold" : "")">@item.DueDate</td>
+                        <td class="text-center">
+                            @if (isOverdue)
+                            {
+                                <span class="badge bg-danger badge-overdue px-2">
+                                    <i class="ri ri-alarm-warning-line me-1"></i>@item.WaitDays วัน
+                                </span>
+                            }
+                            else if (item.WaitDays >= 3)
+                            {
+                                <span class="badge bg-warning px-2">@item.WaitDays วัน</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-secondary px-2">@item.WaitDays วัน</span>
+                            }
+                        </td>
+                        <td>
+                            <small>@item.Officer</small>
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)"
+                               onclick="alert('// TODO: ดูรายละเอียด @item.ReqNo\nนำไปยัง @item.IndexUrl/Review?reqNo=@item.ReqNo')"
+                               class="btn btn-sm @(isOverdue ? "btn-danger" : "btn-outline-primary")">
+                                ดูรายละเอียด <i class="ri ri-arrow-right-line ms-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                <tr id="inboxEmpty" class="d-none">
+                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer py-2">
+        <div class="alert alert-warning border-0 py-2 mb-0 small" role="alert">
+            <i class="ri ri-information-line me-1"></i>
+            <strong>หมายเหตุ:</strong>
+            badge <span class="badge bg-danger" style="font-size:0.6rem;">สีแดง</span> = ค้างเกิน @overdueThreshold วัน &nbsp;|&nbsp;
+            badge <span class="badge bg-warning" style="font-size:0.6rem;">สีเหลือง</span> = ค้าง 3–@(overdueThreshold-1) วัน &nbsp;|&nbsp;
+            กดปุ่ม "ดูรายละเอียด →" เพื่อไปยังหน้าพิจารณาคำขอนั้นโดยตรง &nbsp;|&nbsp;
+            กดปุ่มกระบวนงานใน widget 🔔 navbar เพื่อกรองตามประเภท
+        </div>
+    </div>
+</div>
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    function filterInbox() {
+        var kw       = (document.getElementById('inboxFilterKw').value || '').trim().toLowerCase();
+        var procType = (document.getElementById('inboxFilterType').value || '').trim();
+        var officer  = (document.getElementById('inboxFilterOfficer').value || '').trim();
+        var onlyOver = document.getElementById('inboxTable').dataset.overdueOnly === 'true';
+
+        var rows  = document.querySelectorAll('#inboxTBody tr[data-process]');
+        var count = 0;
+        rows.forEach(function (row) {
+            var srch = row.dataset.search || '';
+            var proc = row.dataset.process || '';
+            var off  = row.dataset.officer || '';
+            var over = row.dataset.overdue === 'true';
+            var show = (!kw || srch.includes(kw))
+                    && (!procType || proc === procType)
+                    && (!officer  || off === officer)
+                    && (!onlyOver || over);
+            row.classList.toggle('d-none', !show);
+            if (show) count++;
+        });
+        document.getElementById('inboxEmpty').classList.toggle('d-none', count !== 0);
+    }
+
+    document.getElementById('inboxBtnSearch').addEventListener('click', filterInbox);
+    document.getElementById('inboxFilterType').addEventListener('change', filterInbox);
+    document.getElementById('inboxFilterOfficer').addEventListener('change', filterInbox);
+    document.getElementById('inboxFilterKw').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') filterInbox();
+    });
+    document.getElementById('inboxBtnReset').addEventListener('click', function () {
+        ['inboxFilterKw','inboxFilterType','inboxFilterOfficer'].forEach(function (id) {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('inboxTable').dataset.overdueOnly = 'false';
+        filterInbox();
+    });
+
+    document.getElementById('btnShowOverdue').addEventListener('click', function () {
+        document.getElementById('inboxTable').dataset.overdueOnly = 'true';
+        filterInbox();
+    });
+    document.getElementById('btnShowAll').addEventListener('click', function () {
+        document.getElementById('inboxTable').dataset.overdueOnly = 'false';
+        filterInbox();
+    });
+
+});
+</script>
+}

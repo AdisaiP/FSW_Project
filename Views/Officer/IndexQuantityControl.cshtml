@@ -53,6 +53,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.bootstrap && bootstrap.Tooltip) {
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) { new bootstrap.Tooltip(el); });
     }
+
+    // ─── Export buttons ───
+    document.getElementById('btnExportExcel').addEventListener('click', function () {
+        // TODO: export Excel via server API
+        alert('TODO: Export Excel — เชื่อมต่อ API สร้างไฟล์ Excel จริง');
+    });
+    document.getElementById('btnExportPdf').addEventListener('click', function () {
+        // TODO: export PDF via server API
+        alert('TODO: Export PDF — เชื่อมต่อ API สร้างไฟล์ PDF จริง');
+    });
 });
 </script>
 }
@@ -131,7 +141,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Table -->
 <div class="card">
-    <div class="card-header"><h6 class="mb-0">รายการเอกสารควบคุมปริมาณสินค้า</h6></div>
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h6 class="mb-0">รายการเอกสารควบคุมปริมาณสินค้า</h6>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-success" id="btnExportExcel">
+                <i class="ri ri-file-excel-line me-1"></i> Export Excel
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" id="btnExportPdf">
+                <i class="ri ri-file-pdf-line me-1"></i> Export PDF
+            </button>
+        </div>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover qc-table mb-0">
             <thead class="table-light">
@@ -162,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <td>@r.DocDate.ToString("dd/MM/yyyy")</td>
                         <td class="text-center"><span class="badge rounded-pill @r.StatusClass">@r.StatusText</span></td>
                         <td class="text-center">
-                            <button class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="ดูรายละเอียด"><i class="ri ri-eye-line ri-16px"></i></button>
+                            <a href="@Url.Action("ReviewQuantityControl","Officer")" class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="ดูรายละเอียด"><i class="ri ri-eye-line ri-16px"></i></a>
                         </td>
                     </tr>
                 }

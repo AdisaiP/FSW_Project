@@ -17,6 +17,8 @@
             QtyInCC = 0m,
             QtyEnteringFactory = 240000m,
             DocumentType = "cc",
+            P1BuyerNumber = "—",
+            BuyerConfirmStatus = "รอยืนยันรับซื้อ",
             StatusText = "รออนุมัติ",
             StatusClass = "bg-label-warning"
         },
@@ -34,6 +36,8 @@
             QtyInCC = 60000m,
             QtyEnteringFactory = 60000m,
             DocumentType = "cc",
+            P1BuyerNumber = "P1-2569-00131",
+            BuyerConfirmStatus = "รับซื้อแล้ว",
             StatusText = "อนุมัติแล้ว",
             StatusClass = "bg-label-success"
         },
@@ -51,6 +55,8 @@
             QtyInCC = 120000m,
             QtyEnteringFactory = 120000m,
             DocumentType = "scc",
+            P1BuyerNumber = "—",
+            BuyerConfirmStatus = "รอยืนยันรับซื้อ",
             StatusText = "รออนุมัติ",
             StatusClass = "bg-label-warning"
         },
@@ -68,6 +74,8 @@
             QtyInCC = 45000m,
             QtyEnteringFactory = 45000m,
             DocumentType = "cc",
+            P1BuyerNumber = "P1-2569-00132",
+            BuyerConfirmStatus = "รับซื้อแล้ว",
             StatusText = "อนุมัติแล้ว",
             StatusClass = "bg-label-success"
         },
@@ -85,6 +93,8 @@
             QtyInCC = 0m,
             QtyEnteringFactory = 180000m,
             DocumentType = "cc",
+            P1BuyerNumber = "—",
+            BuyerConfirmStatus = "—",
             StatusText = "ไม่อนุมัติ",
             StatusClass = "bg-label-danger"
         }
@@ -250,7 +260,52 @@
                 if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
+
+        // ── ยกเลิกการซื้อขาย ──
+        document.querySelectorAll('.btn-cancel-purchase').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                new bootstrap.Modal(document.getElementById('modalCancelPurchase')).show();
+            });
+        });
+        document.getElementById('btnConfirmCancelPurchase').addEventListener('click', function() {
+            var reason = document.getElementById('cancelPurchaseReason').value.trim();
+            if (!reason) { alert('กรุณาระบุเหตุผลการยกเลิก'); return; }
+            bootstrap.Modal.getInstance(document.getElementById('modalCancelPurchase')).hide();
+            setTimeout(function() {
+                new bootstrap.Modal(document.getElementById('modalCancelPurchaseDone')).show();
+            }, 350);
+        });
     });
+
+    // TOR 1.6(5): ยืนยันรับซื้อผลิตภัณฑ์ → ออกเลขที่ P1 อัตโนมัติ
+    function showBuyerConfirmModal(imdNo, product, qty) {
+        document.getElementById('buyerConfirmImdNumber').textContent = imdNo;
+        document.getElementById('buyerConfirmProduct').textContent = product || '—';
+        document.getElementById('buyerConfirmQty').textContent = qty || '—';
+        document.getElementById('buyerConfirmNote').value = '';
+        new bootstrap.Modal(document.getElementById('modalBuyerConfirmReceive')).show();
+    }
+
+    function confirmBuyerReceive() {
+        var imdNo = document.getElementById('buyerConfirmImdNumber').textContent;
+        var qty   = document.getElementById('buyerConfirmQty').textContent;
+
+        // ปิด modal ยืนยัน
+        bootstrap.Modal.getInstance(document.getElementById('modalBuyerConfirmReceive')).hide();
+
+        // สร้างเลขที่ P1 อัตโนมัติ (mockup)
+        var p1No = 'P1-2569-001' + (Math.floor(Math.random() * 9) + 33);
+
+        // อัพเดท modal P1 issued
+        document.getElementById('p1BuyerIssuedNumber').textContent = p1No;
+        document.getElementById('p1BuyerImdRef').textContent = imdNo;
+        document.getElementById('p1BuyerQtyRef').textContent = qty + ' KGM';
+
+        // แสดง modal P1 issued
+        setTimeout(function() {
+            new bootstrap.Modal(document.getElementById('modalP1BuyerAutoIssued')).show();
+        }, 350);
+    }
 </script>
 }
 
@@ -355,6 +410,28 @@
     </div>
 </div>
 
+<!-- TOR 1.6(5): Info Banner — ผู้ซื้อรับซื้อและรับเลขที่ P1 อัตโนมัติ -->
+<div class="alert alert-primary d-flex gap-3 align-items-start mb-3 py-3" role="alert">
+    <i class="ri ri-robot-line fs-4 flex-shrink-0 mt-1 text-primary"></i>
+    <div>
+        <div class="fw-semibold mb-1">ระบบออกเลขที่ P1 ให้ผู้ซื้ออัตโนมัติ</div>
+        <div class="small text-muted">
+            รายการที่สถานะ <strong>"รอยืนยันรับซื้อ"</strong> — กดปุ่ม
+            <span class="badge bg-success" style="font-size:10px;">ยืนยันรับซื้อ</span>
+            เพื่อยืนยันการรับผลิตภัณฑ์แปรรูป
+            ระบบจะ<strong>ออกเลขที่ P1 ให้ผู้ซื้ออัตโนมัติทันที</strong>หลังบันทึกรับซื้อ
+        </div>
+        <div class="d-flex gap-2 mt-2 flex-wrap">
+            <span class="badge bg-label-primary"><i class="ri ri-robot-line me-1"></i>ออก P1 อัตโนมัติ</span>
+            <span class="badge bg-label-success"><i class="ri ri-check-double-line me-1"></i>ยืนยันรับซื้อ = รับเลขที่ P1</span>
+            <span class="badge bg-label-info"><i class="ri ri-eye-line me-1"></i>ดูรายการ P1 ทั้งหมดได้ที่หน้า "เอกสาร P1"</span>
+        </div>
+    </div>
+    <a href="@Url.Action("IndexP1", "ImportAdjustment")" class="btn btn-outline-primary btn-sm flex-shrink-0 ms-auto align-self-center">
+        <i class="ri ri-file-list-3-line me-1"></i>ดูเอกสาร P1
+    </a>
+</div>
+
 <!-- Table card -->
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -380,6 +457,7 @@
                     <th>สินค้าประมง</th>
                     <th>ปริมาณสัตว์น้ำใน CC</th>
                     <th>ปริมาณสัตว์น้ำเข้าโรงงาน</th>
+                    <th>เลขที่ P1 (ผู้ซื้อ)</th>
                     <th></th>
                 </tr>
             </thead>
@@ -440,28 +518,284 @@
                         <td style="max-width:220px;">@rec.FisheryProducts</td>
                         <td class="text-end">@rec.QtyInCC.ToString("N2")</td>
                         <td class="text-end">@rec.QtyEnteringFactory.ToString("N2")</td>
+                        <!-- เลขที่ P1 (ผู้ซื้อ) (TOR 1.6(5)) -->
+                        <td class="text-nowrap">
+                            @if (rec.P1BuyerNumber != "—")
+                            {
+                                <a href="@Url.Action("IndexP1", "ImportAdjustment")" class="text-success fw-semibold">
+                                    @rec.P1BuyerNumber
+                                </a>
+                                <br />
+                                <span class="badge bg-label-success" style="font-size:10px;">
+                                    <i class="ri ri-robot-line me-1"></i>ออกอัตโนมัติ
+                                </span>
+                            }
+                            else if (rec.BuyerConfirmStatus == "รอยืนยันรับซื้อ")
+                            {
+                                <span class="badge bg-label-warning" style="font-size:10px;">
+                                    <i class="ri ri-time-line me-1"></i>รอยืนยัน
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
                         <td>
-                            <div class="d-flex gap-1 justify-content-center">
+                            <div class="d-flex gap-1 justify-content-center flex-wrap">
                                 <a href="@Url.Action("CreateIMD", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-info" title="รายละเอียด" data-bs-toggle="tooltip" data-bs-placement="top">
                                     <i class="ri ri-eye-line text-info"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top">
-                                    <i class="ri ri-pencil-line text-warning"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="คัดลอก" data-bs-toggle="tooltip" data-bs-placement="top">
-                                    <i class="ri ri-file-copy-line text-secondary"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="ลบ" data-bs-toggle="tooltip" data-bs-placement="top">
-                                    <i class="ri ri-delete-bin-line text-danger"></i>
-                                </button>
+                                @if (rec.BuyerConfirmStatus == "รอยืนยันรับซื้อ")
+                                {
+                                    <!-- ปุ่ม ยืนยันรับซื้อ (TOR 1.6(5)) -->
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                        style="font-size:0.72rem;padding:2px 8px;"
+                                        title="ยืนยันรับซื้อผลิตภัณฑ์และรับเลขที่ P1"
+                                        onclick="showBuyerConfirmModal('@rec.ImdNumber', '@rec.FisheryProducts', '@rec.QtyEnteringFactory.ToString("N2")')">
+                                        <i class="ri ri-check-double-line me-1"></i>ยืนยันรับซื้อ
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-pencil-line text-warning"></i>
+                                    </button>
+                                }
+                                else if (rec.BuyerConfirmStatus == "รับซื้อแล้ว")
+                                {
+                                    <!-- รับซื้อแล้ว: ดู P1 -->
+                                    <a href="@Url.Action("IndexP1", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-success" title="ดูเอกสาร P1" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-file-list-3-line text-success"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="คัดลอก" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="alert('คัดลอกรายการ (mockup)')">
+                                        <i class="ri ri-file-copy-line text-secondary"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-pencil-line text-warning"></i>
+                                    </button>
+                                    <a href="@Url.Action("CreateChangeRMBS1", "ImportAdjustment")"
+                                        class="btn btn-sm btn-icon btn-outline-primary" title="ขอเปลี่ยนแปลงผลการพิจารณา" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-loop-right-line text-primary"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="คัดลอก" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-file-copy-line text-secondary"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning btn-cancel-purchase"
+                                        title="ยกเลิกการซื้อขาย" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-forbid-2-line text-warning"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="ลบ" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-delete-bin-line text-danger"></i>
+                                    </button>
+                                }
                             </div>
                         </td>
                     </tr>
                 }
                 <tr id="imdTableEmpty" class="d-none">
-                    <td colspan="12" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="13" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- ==================== Modal: ยืนยันยกเลิกการซื้อขาย ==================== -->
+<div class="modal fade" id="modalCancelPurchase" tabindex="-1" aria-labelledby="modalCancelPurchaseLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCancelPurchaseLabel">
+                    <i class="ri ri-forbid-2-line me-2 text-warning"></i>ยกเลิกการซื้อขาย
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex align-items-start gap-2 py-2 mb-3">
+                    <i class="ri ri-alert-line fs-5 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <div class="fw-semibold mb-1">คุณต้องการยกเลิกการซื้อขายนี้ใช่หรือไม่?</div>
+                        <ul class="mb-0 small ps-3">
+                            <li>ระบบจะคืนโควตา/ปริมาณที่จองไว้ให้ผู้ขาย RMBS1:PS ต้นทาง <strong>อัตโนมัติ</strong></li>
+                            <li>เอกสาร RMBS1:PS ที่ออกให้ผู้ซื้อแล้วจะถูกยกเลิกอัตโนมัติ</li>
+                            <li>การดำเนินการนี้ไม่สามารถเอาคืนได้</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card border-0 bg-label-secondary mb-2">
+                    <div class="card-body py-2 px-3 small">
+                        <div class="row g-1">
+                            <div class="col-5 text-muted">เลขที่ RMBS1:PS (ต้นทาง)</div>
+                            <div class="col-7 fw-semibold">10611280211800000562</div>
+                            <div class="col-5 text-muted">ผู้ขาย</div>
+                            <div class="col-7 fw-semibold">Alpha Office Automation Co., Ltd.</div>
+                            <div class="col-5 text-muted">ผู้ซื้อ</div>
+                            <div class="col-7 fw-semibold">Beta Seafood Processing Co., Ltd.</div>
+                            <div class="col-5 text-muted">ปริมาณที่จับคู่</div>
+                            <div class="col-7 fw-semibold">1,500.000 กก.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                    <textarea class="form-control form-control-sm" id="cancelPurchaseReason" rows="3"
+                        placeholder="ระบุเหตุผลการยกเลิกการซื้อขาย"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-label-secondary btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-warning btn-sm" id="btnConfirmCancelPurchase">
+                    <i class="ri ri-forbid-2-line me-1"></i>ยืนยันยกเลิกการซื้อขาย
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal: ยืนยันยกเลิกการซื้อขาย -->
+
+<!-- ==================== Modal: ยกเลิกสำเร็จ ==================== -->
+<div class="modal fade" id="modalCancelPurchaseDone" tabindex="-1" aria-labelledby="modalCancelPurchaseDoneLabel" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-warning">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="modalCancelPurchaseDoneLabel">
+                    <i class="ri ri-checkbox-circle-line me-2"></i>ยกเลิกการซื้อขายเรียบร้อย
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="ri ri-check-double-line text-warning" style="font-size:3rem;"></i>
+                </div>
+                <p class="fw-semibold mb-1">ยกเลิกการซื้อขายเรียบร้อยแล้ว</p>
+                <div class="small text-muted mb-3">ระบบได้คืนโควตา/ปริมาณให้ผู้ขาย RMBS1:PS ต้นทางอัตโนมัติแล้ว</div>
+                <div class="card border-0 bg-label-warning d-inline-block px-4 py-2 mb-2">
+                    <div class="text-muted small">โควตาที่คืน</div>
+                    <div class="fs-5 fw-bold text-warning">1,500.000 กก.</div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal"
+                    onclick="window.location.reload()">
+                    <i class="ri ri-refresh-line me-1"></i>รีเฟรชหน้า
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal: ยกเลิกสำเร็จ -->
+
+<!-- ==================== Modal: ยืนยันรับซื้อผลิตภัณฑ์ (TOR 1.6(5)) ==================== -->
+<div class="modal fade" id="modalBuyerConfirmReceive" tabindex="-1" aria-labelledby="modalBuyerConfirmReceiveLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalBuyerConfirmReceiveLabel">
+                    <i class="ri ri-check-double-line me-2"></i>ยืนยันรับซื้อผลิตภัณฑ์แปรรูป
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-information-line fs-5 flex-shrink-0 mt-1"></i>
+                    <div class="small">
+                        เมื่อยืนยันรับซื้อแล้ว <strong>ระบบจะออกเลขที่ P1 ให้ผู้ซื้ออัตโนมัติทันที</strong>
+                        เพื่อยืนยันการรับผลิตภัณฑ์แปรรูปจากผู้ขาย
+                    </div>
+                </div>
+                <table class="table table-sm table-borderless mb-0" style="font-size:0.9rem;">
+                    <tr>
+                        <td class="text-muted" style="width:40%;">เลขที่ IMD:</td>
+                        <td class="fw-semibold" id="buyerConfirmImdNumber">—</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">สินค้า:</td>
+                        <td class="small" id="buyerConfirmProduct">—</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">น้ำหนัก (KGM):</td>
+                        <td class="fw-semibold text-primary" id="buyerConfirmQty">—</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">ผู้ขาย:</td>
+                        <td>บริษัท ยูนิไทย ชิปยาร์ด แอนด์ เอนจิเนียริ่ง จำกัด</td>
+                    </tr>
+                </table>
+                <div class="mt-3">
+                    <label class="form-label small fw-semibold">หมายเหตุ (ถ้ามี)</label>
+                    <textarea class="form-control form-control-sm" id="buyerConfirmNote" rows="2"
+                        placeholder="หมายเหตุการรับซื้อ (ไม่บังคับ)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success btn-sm" onclick="confirmBuyerReceive()">
+                    <i class="ri ri-check-double-line me-1"></i>ยืนยันรับซื้อ — รับเลขที่ P1
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: P1 ออกอัตโนมัติให้ผู้ซื้อ (TOR 1.6(5)) ==================== -->
+<div class="modal fade" id="modalP1BuyerAutoIssued" tabindex="-1" aria-labelledby="modalP1BuyerAutoIssuedLabel" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-primary">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalP1BuyerAutoIssuedLabel">
+                    <i class="ri ri-robot-line me-2"></i>ระบบออกเลขที่ P1 ให้ผู้ซื้ออัตโนมัติแล้ว
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="ri ri-file-list-3-line text-primary" style="font-size:3.5rem;"></i>
+                </div>
+                <p class="fw-semibold fs-6 mb-1">ระบบออกเลขที่ P1 ให้ผู้ซื้ออัตโนมัติเรียบร้อยแล้ว</p>
+                <p class="text-muted small mb-3">
+                    ระบบยืนยันการรับซื้อและออกเลขที่ P1 อัตโนมัติทันทีหลังบันทึกรับซื้อ
+                </p>
+                <div class="card border-0 bg-label-primary d-inline-block px-4 py-2 mb-3">
+                    <div class="text-muted small">เลขที่เอกสาร P1 (ผู้ซื้อ — ออกอัตโนมัติ)</div>
+                    <div class="fs-4 fw-bold text-primary" id="p1BuyerIssuedNumber">P1-2569-00133</div>
+                </div>
+                <div class="row text-start g-2 px-2">
+                    <div class="col-6 small">
+                        <span class="text-muted">วันที่รับซื้อ:</span>
+                        <div class="fw-semibold">@DateTime.Now.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="col-6 small">
+                        <span class="text-muted">เลขที่ IMD อ้างอิง:</span>
+                        <div class="fw-semibold" id="p1BuyerImdRef">—</div>
+                    </div>
+                    <div class="col-6 small">
+                        <span class="text-muted">น้ำหนักรับซื้อ (KGM):</span>
+                        <div class="fw-semibold text-primary" id="p1BuyerQtyRef">—</div>
+                    </div>
+                    <div class="col-6 small">
+                        <span class="text-muted">สถานะ P1:</span>
+                        <div class="fw-semibold text-success">รับซื้อแล้ว ✓</div>
+                    </div>
+                </div>
+                <div class="alert alert-success small py-2 px-3 mt-3 mb-0 text-start">
+                    <i class="ri ri-check-line me-1"></i>
+                    P1 นี้เป็นหลักฐานว่าผู้ซื้อได้รับผลิตภัณฑ์แปรรูปแล้ว สามารถดูรายละเอียดเพิ่มเติมได้ที่หน้า IndexP1
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <a href="@Url.Action("IndexP1", "ImportAdjustment")" class="btn btn-outline-primary btn-sm">
+                    <i class="ri ri-eye-line me-1"></i>ดูเอกสาร P1 ทั้งหมด
+                </a>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal"
+                    onclick="window.location.reload()">
+                    <i class="ri ri-refresh-line me-1"></i>รีเฟรชหน้า
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modals TOR 1.6(5) -->

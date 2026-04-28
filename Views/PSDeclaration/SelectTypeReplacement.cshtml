@@ -20,6 +20,68 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
 
+            <!-- TOR 1.9(1): เลือกประเภทคำขอ (Amendment vs Replacement) -->
+            <div class="card mb-4 border border-2 border-primary-subtle">
+                <div class="card-header bg-primary-subtle">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="ri ri-list-radio me-2 text-primary"></i>กรุณาเลือกประเภทคำขอ
+                        <span class="text-danger ms-1">●</span>
+                    </h6>
+                </div>
+                <div class="card-body pt-3">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="d-block border rounded p-3 h-100 request-type-card"
+                                   for="reqTypeAmendment" style="cursor:pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                                           name="requestType" id="reqTypeAmendment" value="amendment"
+                                           onchange="onRequestTypeChange(this.value)" />
+                                    <div>
+                                        <div class="fw-semibold mb-1">ขอเปลี่ยนแปลง (Amendment)</div>
+                                        <div class="small text-muted">ใบรับรองยังไม่ถูกสำแดง / ยังไม่เชื่อมโยงภายนอก
+                                            — แก้ไขข้อมูลหรือออกฉบับใหม่แทนฉบับเดิม</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="d-block border rounded p-3 h-100 request-type-card"
+                                   for="reqTypeReplacement" style="cursor:pointer;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                                           name="requestType" id="reqTypeReplacement" value="replacement" checked
+                                           onchange="onRequestTypeChange(this.value)" />
+                                    <div>
+                                        <div class="fw-semibold mb-1">ขอทดแทนฉบับเก่า (Replacement)</div>
+                                        <div class="small text-muted">ใบรับรองสูญหาย / ข้อมูลผิดพลาดหลังสินค้าออกจากไทย /
+                                            เชื่อมโยง/สำแดงกับลูกค้าแล้ว</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Alert: เงื่อนไขการขอทดแทน (TOR 1.9) — แสดงเมื่อเลือก Replacement -->
+                    <div id="alertReplacementConditions" class="alert alert-warning mt-3 mb-0 small">
+                        <i class="ri ri-information-line me-2"></i>
+                        <strong>เงื่อนไขที่สามารถขอใบรับรองทดแทนฉบับเก่าได้:</strong>
+                        <ul class="mb-0 mt-1 ps-3">
+                            <li>ใบรับรองสูญหาย</li>
+                            <li>ข้อมูลผิดพลาดหลังสินค้าออกจากประเทศไทยแล้ว</li>
+                            <li>ใบรับรองถูกเชื่อมโยง / แลกเปลี่ยน / ส่งต่อระบบภายนอกแล้ว</li>
+                            <li>สำแดงกับลูกค้าหรือหน่วยงานภายนอกแล้ว</li>
+                        </ul>
+                    </div>
+                    <!-- Alert: Amendment (TOR 1.8) — ซ่อนเป็นค่าเริ่มต้น -->
+                    <div id="alertAmendmentNote" class="alert alert-info mt-3 mb-0 small d-none">
+                        <i class="ri ri-information-line me-2"></i>
+                        <strong>การขอเปลี่ยนแปลง (Amendment)</strong> ใช้สำหรับใบรับรองที่
+                        <strong>ยังไม่ถูกสำแดงหรือเชื่อมโยงภายนอก</strong> — สามารถแก้ไขรายละเอียดและออกฉบับใหม่แทนฉบับเดิมได้
+                    </div>
+                </div>
+            </div>
+
             <!-- Info Banner -->
             <div class="alert alert-info d-flex align-items-start mb-5" role="alert">
                 <i class="ri ri-information-line me-2 mt-1 flex-shrink-0" style="font-size:1.1rem;"></i>
@@ -73,12 +135,76 @@
                                     </span>
                                 </div>
                                 <h5 class="card-title mb-2">ใบรับรองสัตว์น้ำไม่แปรรูป</h5>
-                                <p class="text-muted small mb-3">Declaration</p>
+                                <p class="text-muted small mb-3">Non-Manipulation Document (Declaration)</p>
                                 <p class="text-body-secondary small mb-4">
                                     ขอทดแทนใบรับรองสินค้าสัตว์น้ำสดที่ยังไม่ผ่านการแปรรูป<br>
                                     เช่น ปลาสด กุ้งสด หอยสด
                                 </p>
                                 <span class="btn btn-primary btn-sm mt-auto">
+                                    <i class="ri ri-arrow-right-line me-1"></i> เลือกประเภทนี้
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- TOR 1.8(2): PS Thailand -->
+                <div class="col-12 col-sm-6">
+                    <a href="@Url.Action("CreateReplacementProcessing", "PSDeclaration")" class="text-decoration-none">
+                        <div class="card card-hover-shadow h-100 border border-2 border-transparent"
+                             style="cursor: pointer; transition: border-color .2s, box-shadow .2s;"
+                             onmouseover="this.style.borderColor='var(--bs-success)'"
+                             onmouseout="this.style.borderColor='transparent'">
+                            <div class="card-body d-flex flex-column align-items-center text-center p-6">
+                                <div class="mb-3">
+                                    <span class="badge bg-label-success rounded-circle p-3">
+                                        <i class="ri ri-settings-3-line" style="font-size: 2rem;"></i>
+                                    </span>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="badge bg-label-success small">
+                                        <i class="ri ri-robot-line me-1"></i>ออกอัตโนมัติหลังอนุมัติ
+                                    </span>
+                                </div>
+                                <h5 class="card-title mb-2">ใบรับรองการแปรรูปสัตว์น้ำ (ไทย)</h5>
+                                <p class="text-muted small mb-3">Processing Statement Thailand (PS-TH)</p>
+                                <p class="text-body-secondary small mb-4">
+                                    สำหรับสินค้าปลายทางภายในประเทศไทย<br>
+                                    ระบบออกใบรับรองแบบอัตโนมัติหลังอนุมัติ
+                                </p>
+                                <span class="btn btn-success btn-sm mt-auto">
+                                    <i class="ri ri-arrow-right-line me-1"></i> เลือกประเภทนี้
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- TOR 1.8(2): NMD Thailand -->
+                <div class="col-12 col-sm-6">
+                    <a href="@Url.Action("CreateReplacementDeclaration", "PSDeclaration")" class="text-decoration-none">
+                        <div class="card card-hover-shadow h-100 border border-2 border-transparent"
+                             style="cursor: pointer; transition: border-color .2s, box-shadow .2s;"
+                             onmouseover="this.style.borderColor='var(--bs-success)'"
+                             onmouseout="this.style.borderColor='transparent'">
+                            <div class="card-body d-flex flex-column align-items-center text-center p-6">
+                                <div class="mb-3">
+                                    <span class="badge bg-label-success rounded-circle p-3">
+                                        <i class="ri ri-leaf-line" style="font-size: 2rem;"></i>
+                                    </span>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="badge bg-label-success small">
+                                        <i class="ri ri-robot-line me-1"></i>ออกอัตโนมัติหลังอนุมัติ
+                                    </span>
+                                </div>
+                                <h5 class="card-title mb-2">ใบรับรองสัตว์น้ำไม่แปรรูป (ไทย)</h5>
+                                <p class="text-muted small mb-3">Non-Manipulation Document Thailand (NMD-TH)</p>
+                                <p class="text-body-secondary small mb-4">
+                                    สำหรับสินค้าปลายทางภายในประเทศไทย (สัตว์น้ำไม่แปรรูป)<br>
+                                    ระบบออกใบรับรองแบบอัตโนมัติหลังอนุมัติ
+                                </p>
+                                <span class="btn btn-success btn-sm mt-auto">
                                     <i class="ri ri-arrow-right-line me-1"></i> เลือกประเภทนี้
                                 </span>
                             </div>
@@ -92,3 +218,19 @@
         </div>
     </div>
 </div>
+
+@section PageScripts {
+<script>
+    function onRequestTypeChange(value) {
+        var alertReplacement = document.getElementById('alertReplacementConditions');
+        var alertAmendment = document.getElementById('alertAmendmentNote');
+        if (value === 'replacement') {
+            alertReplacement.classList.remove('d-none');
+            alertAmendment.classList.add('d-none');
+        } else {
+            alertReplacement.classList.add('d-none');
+            alertAmendment.classList.remove('d-none');
+        }
+    }
+</script>
+}

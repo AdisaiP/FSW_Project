@@ -1,0 +1,9 @@
+# (1) ชื่อสถานประกอบการ ภาษาไทย-ภาษาอังกฤษ
+
+URL: http://localhost:5055/Admin/DofList
+
+จำนวนรูปที่ต้องแคป: 2 รูป
+
+รายการหน้าที่ต้องแคป
+1. ตารางหลัก DOF List: ชื่อไทยบรรทัดที่ 1 + ชื่อ EN บรรทัดที่ 2 (sub-text สีเทา)
+2. Detail modal > accordion 'ข้อมูลทั่วไป' > ฟิลด์ EstablishmentNameTH + EstablishmentNameEN

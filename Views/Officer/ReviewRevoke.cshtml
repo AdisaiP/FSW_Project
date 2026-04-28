@@ -1,0 +1,1012 @@
+@{
+    ViewData["Title"] = "พิจารณาคำขอยกเลิกใบรับรอง";
+
+    // ── Mock variables ──────────────────────────────────────────────────
+    var requestStatus = "อนุมัติ"; // mock: รออนุมัติ | อนุมัติ | ไม่อนุมัติ
+    var isReadOnly = requestStatus != "รออนุมัติ";
+
+    var requestNumber   = "10611180232800201";
+    var certNo          = "NMD-2569-HC821B211301";
+    var certType        = "NMD";
+    var certTypeName    = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)";
+    var establishment   = "บริษัท สยาม โปรเซสซิ่ง จำกัด";
+    var taxId           = "0105548054321";
+    var productName     = "กุ้งแช่แข็ง";
+    var destination     = "ญี่ปุ่น";
+    var revokeReason    = "ข้อมูลไม่ถูกต้อง";
+    var submittedDate   = "21/04/2569 (09:10)";
+    var receivedNo      = requestStatus == "อนุมัติ" ? "รบ-ยก.2569-00201" : "";
+    var isRegistered    = !string.IsNullOrEmpty(receivedNo);
+
+    // 2.7(4): quota/weight return data (mock)
+    var returnWeight = 500.0m; // กก. ที่คืนกลับ
+    var quotaReturned = 500.0m;
+
+    // 2.7(7): Health Certificate ที่อ้างอิง (สำหรับ NMD/PS ที่ผูกกับ HC)
+    var hasHcRef    = certType == "NMD" || certType == "PS";
+    var hcRefNo     = "HC821B211301";
+    var hcIssuedDate = "10/04/2569";
+    var hcStatus    = requestStatus == "อนุมัติ" ? "พร้อมใช้งาน" : "ถูกใช้งานโดยใบรับรองนี้";
+
+    // 2.7(8): ข้อมูลตรวจปล่อยจากด่านตรวจประมง
+    var hasInspectionData  = true;  // mock: มีข้อมูลตรวจปล่อยจากด่านฯ
+    var inspectionPort     = "ด่านตรวจประมงท่าเรือแหลมฉบัง";
+    var inspectionDate     = "18/04/2569";
+    var inspectionRefNo    = "TP-2569-LC-00823";
+    var inspectionOfficer  = "เจ้าหน้าที่ประมง สุรีย์ มั่นคง";
+    var inspectionWeight   = "500.00 กก.";
+    var inspectionResult   = "ผ่านการตรวจปล่อย";
+
+    // 2.7(9): แจ้งยกเลิกไปด่านตรวจประมง (ส่งข้อมูลออก)
+    var notifiedToPort     = requestStatus == "อนุมัติ";  // แจ้งอัตโนมัติหลังอนุมัติ
+    var notifyPortRefNo    = "NT-YK-2569-LC-00201";       // เลขที่แจ้งยกเลิก
+    var notifyPortDate     = "21/04/2569 14:05";
+    var notifyPortName     = "ด่านตรวจประมงท่าเรือแหลมฉบัง";
+
+    // ก่อน / คืนกลับ / หลัง (หน่วย: กก.)
+    var quotaRows = new[]
+    {
+        new { Label = "น้ำหนักปริมาณสัตว์น้ำที่โรงงานรับซื้อ-ขาย (คงเหลือ)",       Before = 1250.00m,  Returned = 500.00m, After = 1750.00m  },
+        new { Label = "โควตาสัตว์น้ำที่รับซื้อ (คงเหลือ)",                          Before = 3400.00m,  Returned = 500.00m, After = 3900.00m  },
+        new { Label = "ปริมาณ/โควตาสัตว์น้ำที่รับซื้อ ณ วันที่ CC/SCC มา (คงเหลือ)", Before = 2100.00m, Returned = 500.00m, After = 2600.00m  },
+        new { Label = "โควตา ณ วันที่ CC/SCC มา (คงเหลือ)",                         Before = 1800.00m,  Returned = 500.00m, After = 2300.00m  },
+        new { Label = "โควตาและปริมาณตามเอกสารแหล่งที่มาสัตว์น้ำนำเข้า",           Before = 4200.00m,  Returned = 500.00m, After = 4700.00m  },
+    };
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageStyles {
+<style>
+    .quota-table th, .quota-table td { padding: 0.5rem 0.75rem; vertical-align: middle; font-size: 0.83rem; }
+    .quota-table .col-before  { color: #6e7985; }
+    .quota-table .col-returned { color: #198754; font-weight: 600; }
+    .quota-table .col-after   { color: #0d6efd; font-weight: 700; }
+    .revoke-badge-auto {
+        background-color: rgba(25,135,84,0.12);
+        color: #198754;
+        border: 1px solid rgba(25,135,84,0.25);
+        padding: 0.35rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+</style>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-1">พิจารณาคำขอยกเลิกใบรับรอง</h4>
+<p class="mb-1">พิจารณาคำขอยกเลิกและผลการคืนน้ำหนัก/โควตาอัตโนมัติ</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="#" class="text-primary fw-semibold">เจ้าหน้าที่</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("IndexRevoke", "Officer")" class="text-primary fw-semibold">พิจารณายกเลิกใบรับรอง</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary">@requestNumber</li>
+    </ol>
+</nav>
+
+<!-- Status Banner -->
+@if (requestStatus == "อนุมัติ")
+{
+    <div class="alert alert-success d-flex align-items-center gap-2 mb-3" role="alert">
+        <i class="ri ri-checkbox-circle-line fs-5"></i>
+        <div>
+            <strong>อนุมัติยกเลิกแล้ว</strong> — ใบรับรอง @certNo ถูกยกเลิกเรียบร้อย
+            <span class="ms-2 revoke-badge-auto">
+                <i class="ri ri-arrow-go-back-line me-1"></i>คืนน้ำหนัก/โควตาอัตโนมัติแล้ว ✅
+            </span>
+        </div>
+    </div>
+    @* 2.7(4): alert ผลการคืนอัตโนมัติ *@
+    <div class="alert alert-success border border-success bg-success bg-opacity-10 d-flex align-items-center gap-2 mb-3" role="alert">
+        <i class="ri ri-checkbox-circle-fill text-success fs-5 flex-shrink-0"></i>
+        <span>
+            ✅ ยกเลิกใบรับรอง <strong>@certNo</strong> แล้ว —
+            คืนน้ำหนัก <strong>@returnWeight.ToString("N2") กก.</strong>
+            และโควตา <strong>@quotaReturned.ToString("N2") กก.</strong> อัตโนมัติ
+        </span>
+    </div>
+    @* 2.7(7): alert ผลการคืน HC *@
+    @if (hasHcRef)
+    {
+        <div class="alert alert-success border border-success bg-success bg-opacity-10 d-flex align-items-center gap-2 mb-3" role="alert">
+            <i class="ri ri-heart-pulse-line text-success fs-5 flex-shrink-0"></i>
+            <span>
+                ✅ คืน HC <strong class="font-monospace">@hcRefNo</strong> เรียบร้อยแล้ว —
+                สามารถนำไปใช้อ้างอิงในใบรับรองอื่นได้
+            </span>
+        </div>
+    }
+    @* 2.7(9): badge แจ้งยกเลิกไปด่านตรวจประมง *@
+    <div class="alert alert-info d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4" role="alert">
+        <div class="d-flex align-items-center gap-2">
+            <i class="ri ri-ship-2-line text-info fs-5 flex-shrink-0"></i>
+            <div>
+                <span class="badge bg-info text-white me-2">
+                    <i class="ri ri-send-plane-line me-1"></i>แจ้งยกเลิกไปด่านตรวจประมงแล้ว ✅
+                </span>
+                <span class="small text-muted">@notifyPortName — เลขที่แจ้ง: @notifyPortRefNo (@notifyPortDate)</span>
+            </div>
+        </div>
+        <a href="#" class="btn btn-outline-info btn-sm flex-shrink-0"
+           onclick="alert('TODO: ดูสถานะด่านตรวจปล่อย @notifyPortRefNo'); return false;">
+            <i class="ri ri-external-link-line me-1"></i>ดูสถานะด่านตรวจปล่อย →
+        </a>
+    </div>
+}
+else if (requestStatus == "ไม่อนุมัติ")
+{
+    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="ri ri-close-circle-line fs-5"></i>
+        <span><strong>ไม่อนุมัติ</strong> — คำขอยกเลิกนี้ถูกปฏิเสธ กรุณาดูเหตุผลในส่วนผลการพิจารณา</span>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="ri ri-time-line fs-5"></i>
+        <span><strong>รออนุมัติ</strong> — คำขอยกเลิกนี้รอการพิจารณาจากเจ้าหน้าที่</span>
+    </div>
+}
+
+<!-- Request Info Header -->
+<div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+    <div>
+        <span class="text-muted small">เลขที่คำขอ</span>
+        <div class="fw-bold text-primary fs-6">@requestNumber</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">ประเภทใบรับรอง</span>
+        <div class="fw-bold"><span class="badge cert-type-nmd">@certType</span> @certTypeName</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">เลขที่ใบรับรอง</span>
+        <div class="fw-bold">@certNo</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">ผู้ประกอบการ</span>
+        <div class="fw-bold">@establishment</div>
+    </div>
+    <div class="vr d-none d-md-block"></div>
+    <div>
+        <span class="text-muted small">วันที่ยื่นคำขอ</span>
+        <div class="fw-bold">@submittedDate</div>
+    </div>
+    @if (isRegistered)
+    {
+        <div class="vr d-none d-md-block"></div>
+        <div>
+            <span class="text-muted small">เลขที่รับคำขอ</span>
+            <div class="fw-bold text-success"><i class="ri ri-inbox-archive-line me-1"></i>@receivedNo</div>
+        </div>
+    }
+    else
+    {
+        <div class="vr d-none d-md-block"></div>
+        <div>
+            <span class="text-muted small">เลขที่รับคำขอ</span>
+            <div><span class="badge bg-label-warning"><i class="ri ri-time-line me-1"></i>ยังไม่ลงทะเบียน</span></div>
+        </div>
+    }
+</div>
+
+<!-- Action Bar (รออนุมัติ only) -->
+@if (!isReadOnly)
+{
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+        @if (!isRegistered)
+        {
+            <button type="button" class="btn btn-outline-secondary" id="btnRegister"
+                    data-bs-toggle="modal" data-bs-target="#modalRegisterRevoke">
+                <i class="ri ri-inbox-archive-line me-1"></i>ลงทะเบียนรับคำขอยกเลิก
+            </button>
+        }
+        else
+        {
+            <span class="btn btn-outline-success disabled">
+                <i class="ri ri-inbox-archive-line me-1"></i>ลงทะเบียนแล้ว: @receivedNo
+            </span>
+        }
+        <button type="button" class="btn btn-success" id="btnApprove"
+                onclick="if(confirm('ยืนยันอนุมัติคำขอยกเลิก @requestNumber ?')) alert('TODO: อนุมัติ')">
+            <i class="ri ri-checkbox-circle-line me-1"></i>อนุมัติยกเลิก
+        </button>
+        <button type="button" class="btn btn-danger" id="btnReject"
+                onclick="if(confirm('ยืนยันไม่อนุมัติคำขอยกเลิก @requestNumber ?')) alert('TODO: ไม่อนุมัติ')">
+            <i class="ri ri-close-circle-line me-1"></i>ไม่อนุมัติ
+        </button>
+    </div>
+}
+
+@* 2.7(5): Modal ลงทะเบียนรับคำขอยกเลิก *@
+<div class="modal fade" id="modalRegisterRevoke" tabindex="-1" aria-labelledby="modalRegisterRevokeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRegisterRevokeLabel">
+                    <i class="ri ri-inbox-archive-line me-2 text-primary"></i>ลงทะเบียนรับคำขอยกเลิก
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info d-flex align-items-center gap-2 mb-3">
+                    <i class="ri ri-information-line fs-5"></i>
+                    <span>ระบบจะสร้างเลขที่รับคำขออัตโนมัติและบันทึกวันที่รับคำขอ</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">เลขที่รับคำขอ (อัตโนมัติ)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="ri ri-barcode-line"></i></span>
+                            <input type="text" class="form-control bg-light fw-bold text-success"
+                                   id="generatedReceivedNo" value="รบ-ยก.2569-00208" readonly />
+                        </div>
+                        <div class="form-text">เลขที่รับคำขอที่ระบบสร้างให้อัตโนมัติตามลำดับ</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">เลขที่คำขอ</label>
+                        <input type="text" class="form-control bg-light" value="@requestNumber" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">วันที่รับคำขอ</label>
+                        <input type="text" class="form-control bg-light" id="registerDate" value="28/04/2569" readonly />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">ผู้รับคำขอ</label>
+                        <input type="text" class="form-control bg-light" value="นายสมชาย มีสุข (เจ้าหน้าที่กรมประมง)" readonly />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">หมายเหตุ</label>
+                        <textarea class="form-control" rows="2" id="registerNote" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmRegister"
+                        onclick="confirmRegister()">
+                    <i class="ri ri-save-line me-1"></i>ยืนยันลงทะเบียน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="row">
+    <div class="col-12">
+        <div class="nav-align-top nav-tabs-shadow mb-4">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#tab-detail" aria-controls="tab-detail" aria-selected="true">
+                        <i class="ri ri-file-list-2-line me-1"></i>รายละเอียดคำขอ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#tab-quota" aria-controls="tab-quota" aria-selected="false">
+                        <i class="ri ri-arrow-go-back-line me-1"></i>ผลการคืนน้ำหนัก/โควตา
+                        @if (requestStatus == "อนุมัติ")
+                        {
+                            <span class="badge bg-success rounded-pill ms-1" style="font-size:0.62rem;">✅ คืนแล้ว</span>
+                            @if (hasHcRef)
+                            {
+                                <span class="badge bg-danger rounded-pill ms-1" style="font-size:0.62rem;">HC คืนแล้ว</span>
+                            }
+                        }
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#tab-evidence" aria-controls="tab-evidence" aria-selected="false">
+                        <i class="ri ri-folder-open-line me-1"></i>หลักฐานประกอบ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#tab-review" aria-controls="tab-review" aria-selected="false">
+                        <i class="ri ri-shield-check-line me-1"></i>ผลการพิจารณา
+                        @if (requestStatus == "รออนุมัติ")
+                        {
+                            <span class="badge bg-warning rounded-pill ms-1" style="font-size:0.65rem;">รอ</span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                            data-bs-target="#tab-history" aria-controls="tab-history" aria-selected="false">
+                        <i class="ri ri-history-line me-1"></i>ประวัติการดำเนินการ
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+
+                <!-- ===== TAB 1: รายละเอียดคำขอ ===== -->
+                <div id="tab-detail" class="tab-pane fade show active" role="tabpanel">
+                    <div class="accordion accordion-custom-button" id="accordionRevokeDetail">
+
+                        <!-- ─── ข้อมูลใบรับรองที่ต้องการยกเลิก ─── -->
+                        <div class="accordion-item active">
+                            <h2 class="accordion-header">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseRevokeInfo" aria-expanded="true">
+                                    <i class="icon-base ri ri-file-close-line me-2"></i>ข้อมูลใบรับรองที่ต้องการยกเลิก
+                                </button>
+                            </h2>
+                            <div id="collapseRevokeInfo" class="accordion-collapse collapse show">
+                                <div class="accordion-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-8">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="@establishment (@taxId)" readonly />
+                                                <label>ผู้ประกอบการ</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="@taxId" readonly />
+                                                <label>เลขประจำตัวผู้เสียภาษี</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="@certTypeName" readonly />
+                                                <label>ประเภทใบรับรอง</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="@certNo" readonly />
+                                                <label>เลขที่ใบรับรอง</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="@productName" readonly />
+                                                <label>ชื่อสินค้า</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="@destination" readonly />
+                                                <label>ประเทศปลายทาง</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="500.00 กก." readonly />
+                                                <label>น้ำหนักสุทธิในใบรับรอง</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="15/04/2569" readonly />
+                                                <label>วันที่ออกใบรับรอง</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── เหตุผลการขอยกเลิก ─── -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseRevokeReason" aria-expanded="false">
+                                    <i class="icon-base ri ri-question-answer-line me-2"></i>เหตุผลการขอยกเลิก
+                                </button>
+                            </h2>
+                            <div id="collapseRevokeReason" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control bg-light" value="@revokeReason" readonly />
+                                                <label>เหตุผลการขอยกเลิก</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-floating form-floating-outline">
+                                                <textarea class="form-control bg-light" style="height:80px;" readonly>ข้อมูลชื่อสินค้าในใบรับรองไม่ตรงกับชื่อจริง ต้องการยกเลิกและออกใบรับรองฉบับใหม่ที่ถูกต้อง</textarea>
+                                                <label>รายละเอียดเพิ่มเติม</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* 2.7(8): ข้อมูลตรวจปล่อยจากด่านตรวจประมง *@
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseInspection" aria-expanded="false">
+                                    <i class="icon-base ri ri-ship-2-line me-2"></i>ข้อมูลตรวจปล่อยจากด่านตรวจประมง
+                                    @if (hasInspectionData)
+                                    {
+                                        <span class="badge bg-success rounded-pill ms-2" style="font-size:0.62rem;">
+                                            <i class="ri ri-checkbox-circle-line me-1"></i>รับแล้ว ✅
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-label-secondary rounded-pill ms-2" style="font-size:0.62rem;">
+                                            ยังไม่มีข้อมูล
+                                        </span>
+                                    }
+                                </button>
+                            </h2>
+                            <div id="collapseInspection" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+                                    @if (hasInspectionData)
+                                    {
+                                        <!-- Badge + link header -->
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <span class="badge bg-label-success px-3 py-2">
+                                                    <i class="ri ri-shield-check-line me-1"></i>ข้อมูลตรวจปล่อย (ด่านประมง) รับแล้ว ✅
+                                                </span>
+                                                <span class="badge bg-label-info px-2 py-2">
+                                                    <i class="ri ri-map-pin-line me-1"></i>@inspectionPort
+                                                </span>
+                                            </div>
+                                            <a href="#" class="btn btn-outline-primary btn-sm"
+                                               onclick="alert('TODO: ดูรายละเอียดตรวจปล่อย @inspectionRefNo'); return false;">
+                                                <i class="ri ri-external-link-line me-1"></i>ดูรายละเอียดตรวจปล่อย →
+                                            </a>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="@inspectionRefNo" readonly />
+                                                    <label>เลขที่เอกสารตรวจปล่อย</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="@inspectionDate" readonly />
+                                                    <label>วันที่ตรวจปล่อย</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="@inspectionPort" readonly />
+                                                    <label>ด่านตรวจประมง</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="@inspectionWeight" readonly />
+                                                    <label>น้ำหนักที่ตรวจปล่อย</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-success bg-opacity-10 fw-semibold" value="@inspectionResult" readonly />
+                                                    <label>ผลการตรวจปล่อย</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control bg-light" value="@inspectionOfficer" readonly />
+                                                    <label>เจ้าหน้าที่ตรวจปล่อย</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-secondary d-flex align-items-center gap-2">
+                                            <i class="ri ri-information-line fs-5"></i>
+                                            <span>ยังไม่มีข้อมูลตรวจปล่อยจากด่านตรวจประมงสำหรับใบรับรองนี้</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div><!-- /tab-detail -->
+
+                <!-- ===== TAB 2: ผลการคืนน้ำหนัก/โควตา (2.7(4)) ===== -->
+                <div id="tab-quota" class="tab-pane fade" role="tabpanel">
+                    <div class="p-1">
+
+                        @if (requestStatus == "อนุมัติ")
+                        {
+                            <!-- Alert อัตโนมัติ -->
+                            <div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+                                <i class="ri ri-checkbox-circle-fill fs-5 flex-shrink-0 text-success"></i>
+                                <div>
+                                    <strong>✅ คืนน้ำหนัก/โควตาอัตโนมัติสำเร็จ</strong><br />
+                                    <span class="small">
+                                        ยกเลิกใบรับรอง <strong>@certNo</strong> แล้ว —
+                                        คืนน้ำหนัก <strong>@returnWeight.ToString("N2") กก.</strong>
+                                        และโควตา <strong>@quotaReturned.ToString("N2") กก.</strong> เข้าระบบอัตโนมัติ
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Badge Summary -->
+                            <div class="d-flex flex-wrap gap-2 mb-4">
+                                <span class="revoke-badge-auto">
+                                    <i class="ri ri-arrow-go-back-line me-1"></i>คืนน้ำหนัก/โควตาอัตโนมัติแล้ว ✅
+                                </span>
+                                <span class="badge bg-label-success px-3 py-2 fs-6">
+                                    น้ำหนักคืน: +@returnWeight.ToString("N2") กก.
+                                </span>
+                                <span class="badge bg-label-primary px-3 py-2 fs-6">
+                                    โควตาคืน: +@quotaReturned.ToString("N2") กก.
+                                </span>
+                                <span class="badge bg-label-secondary px-3 py-2 fs-6">
+                                    วันที่คืน: 21/04/2569
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info d-flex align-items-center gap-2 mb-4" role="alert">
+                                <i class="ri ri-information-line fs-5"></i>
+                                <span>การคืนน้ำหนัก/โควตาจะดำเนินการอัตโนมัติหลังจากอนุมัติคำขอยกเลิก</span>
+                            </div>
+                        }
+
+                        <!-- ตาราง ก่อน/หลังยกเลิก -->
+                        <div class="card mb-4">
+                            <div class="card-header d-flex align-items-center gap-2">
+                                <i class="ri ri-table-line text-primary"></i>
+                                <h6 class="mb-0 fw-semibold">ผลการคืนน้ำหนักและโควตา — ก่อน/หลังยกเลิกใบรับรอง</h6>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle mb-0 quota-table">
+                                    <thead class="table-light text-center">
+                                        <tr>
+                                            <th style="min-width:260px;">รายการ</th>
+                                            <th style="min-width:120px;">ก่อนยกเลิก (กก.)</th>
+                                            <th style="min-width:120px;">ที่คืนกลับ (กก.)</th>
+                                            <th style="min-width:120px;">หลังยกเลิก (กก.)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var row in quotaRows)
+                                        {
+                                            <tr>
+                                                <td>@row.Label</td>
+                                                <td class="text-end col-before">@row.Before.ToString("N2")</td>
+                                                <td class="text-end col-returned">
+                                                    @if (requestStatus == "อนุมัติ")
+                                                    {
+                                                        <span>+@row.Returned.ToString("N2")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">(ยังไม่ได้คืน)</span>
+                                                    }
+                                                </td>
+                                                <td class="text-end col-after">
+                                                    @if (requestStatus == "อนุมัติ")
+                                                    {
+                                                        @row.After.ToString("N2")
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">—</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    @if (requestStatus == "อนุมัติ")
+                                    {
+                                        <tfoot class="table-light fw-bold">
+                                            <tr>
+                                                <td>รวมน้ำหนักที่คืนกลับ</td>
+                                                <td class="text-end">—</td>
+                                                <td class="text-end col-returned">+@quotaReturned.ToString("N2")</td>
+                                                <td class="text-end">—</td>
+                                            </tr>
+                                        </tfoot>
+                                    }
+                                </table>
+                            </div>
+                        </div>
+
+                        @* 2.7(7): section ผลการคืน Health Certificate *@
+                        @if (hasHcRef)
+                        {
+                            <div class="card mb-4">
+                                <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="ri ri-heart-pulse-line text-danger"></i>
+                                        <h6 class="mb-0 fw-semibold">ผลการคืน Health Certificate (HC)</h6>
+                                    </div>
+                                    @if (requestStatus == "อนุมัติ")
+                                    {
+                                        <span class="badge bg-label-success px-3 py-2">
+                                            <i class="ri ri-checkbox-circle-line me-1"></i>HC @hcRefNo คืนแล้ว ✅ พร้อมใช้งานในใบรับรองอื่น
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-label-warning px-3 py-2">
+                                            <i class="ri ri-time-line me-1"></i>รอการอนุมัติยกเลิก
+                                        </span>
+                                    }
+                                </div>
+                                @if (requestStatus != "อนุมัติ")
+                                {
+                                    <div class="card-body">
+                                        <div class="alert alert-info d-flex align-items-center gap-2 mb-0">
+                                            <i class="ri ri-information-line fs-5"></i>
+                                            <span>HC <strong class="font-monospace">@hcRefNo</strong> จะถูกคืนให้พร้อมใช้งานอัตโนมัติ เมื่อคำขอยกเลิกได้รับการอนุมัติ</span>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle mb-0 quota-table">
+                                        <thead class="table-light text-center">
+                                            <tr>
+                                                <th style="min-width:160px;">เลขที่ HC</th>
+                                                <th style="min-width:120px;">วันที่ออก HC</th>
+                                                <th style="min-width:200px;">ใบรับรองที่ใช้อ้างอิง (ยกเลิกแล้ว)</th>
+                                                <th style="min-width:150px;">สถานะหลังคืน</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="font-monospace fw-semibold">@hcRefNo</td>
+                                                <td class="text-center">@hcIssuedDate</td>
+                                                <td>
+                                                    <span class="badge bg-label-danger me-1">ยกเลิก</span>
+                                                    <span class="font-monospace small">@certNo</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (requestStatus == "อนุมัติ")
+                                                    {
+                                                        <span class="badge bg-label-success">
+                                                            <i class="ri ri-checkbox-circle-line me-1"></i>พร้อมใช้งาน ✅
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-label-warning">
+                                                            <i class="ri ri-time-line me-1"></i>รออนุมัติยกเลิก
+                                                        </span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- รายละเอียดเอกสารแหล่งที่มาสัตว์น้ำนำเข้า -->
+                        <div class="card">
+                            <div class="card-header d-flex align-items-center gap-2">
+                                <i class="ri ri-ship-line text-info"></i>
+                                <h6 class="mb-0 fw-semibold">เอกสารแหล่งที่มาสัตว์น้ำนำเข้า (ที่เกี่ยวข้อง)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" class="form-control bg-light" value="CC-2569-00123" readonly />
+                                            <label>เลขที่ CC/SCC</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" class="form-control bg-light" value="500.00 กก." readonly />
+                                            <label>โควตาที่ใช้ในใบรับรอง</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" class="form-control @(requestStatus == "อนุมัติ" ? "bg-success bg-opacity-10" : "bg-light")"
+                                                   value="@(requestStatus == "อนุมัติ" ? "500.00 กก. (คืนแล้ว ✅)" : "ยังไม่ได้คืน")" readonly />
+                                            <label>สถานะโควตา CC/SCC</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div><!-- /tab-quota -->
+
+                <!-- ===== TAB 3: หลักฐานประกอบ ===== -->
+                <div id="tab-evidence" class="tab-pane fade" role="tabpanel">
+                    <div class="p-3">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="ri ri-folder-open-line text-warning fs-5"></i>
+                            <h6 class="mb-0 fw-semibold">หลักฐานประกอบคำขอยกเลิก</h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0" style="font-size:0.83rem;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>ชื่อเอกสาร</th>
+                                        <th>ประเภท</th>
+                                        <th>ขนาด</th>
+                                        <th>วันที่อัปโหลด</th>
+                                        <th class="text-center">ดาวน์โหลด</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>หนังสือขอยกเลิกใบรับรอง.pdf</td>
+                                        <td><span class="badge bg-label-danger">PDF</span></td>
+                                        <td>245 KB</td>
+                                        <td>21/04/2569</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-icon btn-outline-primary" title="ดาวน์โหลด"
+                                                    onclick="alert('TODO: ดาวน์โหลดเอกสาร')">
+                                                <i class="ri ri-download-line"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>สำเนาใบรับรองฉบับที่ขอยกเลิก.pdf</td>
+                                        <td><span class="badge bg-label-danger">PDF</span></td>
+                                        <td>180 KB</td>
+                                        <td>21/04/2569</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-icon btn-outline-primary" title="ดาวน์โหลด"
+                                                    onclick="alert('TODO: ดาวน์โหลดเอกสาร')">
+                                                <i class="ri ri-download-line"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        @if (!isReadOnly)
+                        {
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                        onclick="alert('TODO: อัปโหลดหลักฐานเพิ่มเติม')">
+                                    <i class="ri ri-upload-cloud-line me-1"></i>อัปโหลดหลักฐานเพิ่มเติม
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div><!-- /tab-evidence -->
+
+                <!-- ===== TAB 4: ผลการพิจารณา ===== -->
+                <div id="tab-review" class="tab-pane fade" role="tabpanel">
+                    <div class="p-3">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="ri ri-shield-check-line text-primary fs-5"></i>
+                            <h6 class="mb-0 fw-semibold">ผลการพิจารณา</h6>
+                        </div>
+                        @if (requestStatus == "อนุมัติ")
+                        {
+                            <div class="alert alert-success mb-3">
+                                <i class="ri ri-checkbox-circle-line me-2"></i>
+                                <strong>อนุมัติยกเลิก</strong> — ผู้พิจารณา: นายสมชาย มีสุข | วันที่: 21/04/2569
+                            </div>
+                        }
+                        else if (requestStatus == "ไม่อนุมัติ")
+                        {
+                            <div class="alert alert-danger mb-3">
+                                <i class="ri ri-close-circle-line me-2"></i>
+                                <strong>ไม่อนุมัติ</strong> — ผู้พิจารณา: นายสมชาย มีสุข | วันที่: 21/04/2569
+                            </div>
+                        }
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control bg-light"
+                                           value="@(requestStatus == "อนุมัติ" ? "อนุมัติยกเลิก" : requestStatus == "ไม่อนุมัติ" ? "ไม่อนุมัติ" : "—")" readonly />
+                                    <label>ผลการพิจารณา</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control bg-light"
+                                           value="@(isReadOnly ? "นายสมชาย มีสุข (เจ้าหน้าที่กรมประมง)" : "—")" readonly />
+                                    <label>ผู้พิจารณา</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating form-floating-outline">
+                                    @if (isReadOnly)
+                                    {
+                                        <textarea class="form-control bg-light" style="height:80px;" readonly>@(requestStatus == "อนุมัติ" ? "ข้อมูลในใบรับรองไม่ถูกต้อง อนุมัติให้ยกเลิกได้" : "ไม่อนุมัติเนื่องจากข้อมูลไม่ครบถ้วน")</textarea>
+                                    }
+                                    else
+                                    {
+                                        <textarea class="form-control" style="height:80px;" placeholder="หมายเหตุ/เหตุผล"></textarea>
+                                    }
+                                    <label>หมายเหตุ/เหตุผล</label>
+                                </div>
+                            </div>
+                        </div>
+                        @if (!isReadOnly)
+                        {
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="button" class="btn btn-success"
+                                        onclick="if(confirm('ยืนยันอนุมัติคำขอยกเลิก @requestNumber ?')) alert('TODO: อนุมัติ')">
+                                    <i class="ri ri-checkbox-circle-line me-1"></i>อนุมัติยกเลิก
+                                </button>
+                                <button type="button" class="btn btn-danger"
+                                        onclick="if(confirm('ยืนยันไม่อนุมัติคำขอยกเลิก @requestNumber ?')) alert('TODO: ไม่อนุมัติ')">
+                                    <i class="ri ri-close-circle-line me-1"></i>ไม่อนุมัติ
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div><!-- /tab-review -->
+
+                <!-- ===== TAB 5: ประวัติการดำเนินการ ===== -->
+                <div id="tab-history" class="tab-pane fade" role="tabpanel">
+                    <div class="p-3">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="ri ri-history-line text-secondary fs-5"></i>
+                            <h6 class="mb-0 fw-semibold">ประวัติการดำเนินการ</h6>
+                        </div>
+                        <ul class="timeline mb-0" style="list-style:none; padding-left:1rem; border-left:2px solid #dee2e6;">
+                            <li class="mb-3 ps-3 position-relative">
+                                <span class="position-absolute start-0 translate-middle badge rounded-circle bg-success" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                <div class="small text-muted">21/04/2569 09:10</div>
+                                <div class="fw-semibold small">ผู้ประกอบการยื่นคำขอยกเลิก</div>
+                                <div class="small text-muted">ผู้ดำเนินการ: ผู้เข้าใช้ระบบ</div>
+                            </li>
+                            @* 2.7(8): ประวัติข้อมูลตรวจปล่อยจากด่านฯ *@
+                            @if (hasInspectionData)
+                            {
+                                <li class="mb-3 ps-3 position-relative">
+                                    <span class="position-absolute start-0 translate-middle badge rounded-circle bg-info" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                    <div class="small text-muted">@inspectionDate 08:45</div>
+                                    <div class="fw-semibold small">
+                                        รับข้อมูลตรวจปล่อยจากด่านตรวจประมง
+                                        <span class="badge bg-label-success ms-1">ผ่านตรวจปล่อย ✅</span>
+                                    </div>
+                                    <div class="small text-muted">@inspectionPort — @inspectionRefNo</div>
+                                </li>
+                            }
+                            @if (isRegistered)
+                            {
+                                <li class="mb-3 ps-3 position-relative">
+                                    <span class="position-absolute start-0 translate-middle badge rounded-circle bg-info" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                    <div class="small text-muted">21/04/2569 10:30</div>
+                                    <div class="fw-semibold small">ลงทะเบียนรับคำขอยกเลิก — <span class="text-success">@receivedNo</span></div>
+                                    <div class="small text-muted">ผู้ดำเนินการ: เจ้าหน้าที่กรมประมง</div>
+                                </li>
+                            }
+                            @if (requestStatus == "อนุมัติ")
+                            {
+                                <li class="mb-3 ps-3 position-relative">
+                                    <span class="position-absolute start-0 translate-middle badge rounded-circle bg-success" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                    <div class="small text-muted">21/04/2569 14:00</div>
+                                    <div class="fw-semibold small">อนุมัติยกเลิกใบรับรอง</div>
+                                    <div class="small text-muted">ผู้ดำเนินการ: นายสมชาย มีสุข</div>
+                                </li>
+                                <li class="mb-3 ps-3 position-relative">
+                                    <span class="position-absolute start-0 translate-middle badge rounded-circle bg-primary" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                    <div class="small text-muted">21/04/2569 14:00</div>
+                                    <div class="fw-semibold small">
+                                        คืนน้ำหนัก/โควตาอัตโนมัติสำเร็จ
+                                        <span class="revoke-badge-auto ms-1">✅ คืน @returnWeight.ToString("N2") กก.</span>
+                                    </div>
+                                    <div class="small text-muted">ระบบดำเนินการอัตโนมัติ</div>
+                                </li>
+                                @* 2.7(7): HC คืนในประวัติ *@
+                                @if (hasHcRef)
+                                {
+                                    <li class="mb-3 ps-3 position-relative">
+                                        <span class="position-absolute start-0 translate-middle badge rounded-circle bg-danger" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                        <div class="small text-muted">21/04/2569 14:00</div>
+                                        <div class="fw-semibold small">
+                                            คืน Health Certificate อัตโนมัติ
+                                            <span class="badge bg-label-success ms-1">HC @hcRefNo พร้อมใช้งาน ✅</span>
+                                        </div>
+                                        <div class="small text-muted">ระบบดำเนินการอัตโนมัติ</div>
+                                    </li>
+                                }
+                                @* 2.7(9): แจ้งยกเลิกไปด่านตรวจประมงในประวัติ *@
+                                @if (notifiedToPort)
+                                {
+                                    <li class="mb-3 ps-3 position-relative">
+                                        <span class="position-absolute start-0 translate-middle badge rounded-circle bg-info" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                        <div class="small text-muted">@notifyPortDate</div>
+                                        <div class="fw-semibold small">
+                                            แจ้งยกเลิกใบรับรองไปยังด่านตรวจประมงอัตโนมัติ
+                                            <span class="badge bg-label-info ms-1">แจ้งแล้ว ✅</span>
+                                        </div>
+                                        <div class="small text-muted">@notifyPortName — อ้างอิง: @notifyPortRefNo</div>
+                                    </li>
+                                }
+                            }
+                            else if (requestStatus == "ไม่อนุมัติ")
+                            {
+                                <li class="mb-3 ps-3 position-relative">
+                                    <span class="position-absolute start-0 translate-middle badge rounded-circle bg-danger" style="left:-0.05rem!important;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                    <div class="small text-muted">21/04/2569 14:00</div>
+                                    <div class="fw-semibold small">ไม่อนุมัติคำขอยกเลิก</div>
+                                    <div class="small text-muted">ผู้ดำเนินการ: นายสมชาย มีสุข</div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div><!-- /tab-history -->
+
+            </div><!-- /tab-content -->
+        </div><!-- /nav-align-top -->
+    </div>
+</div>
+
+@section PageStyles {
+<style>
+    .cert-type-nmd {
+        background-color: rgba(123,31,162,0.15);
+        color: #7b1fa2;
+    }
+    .quota-table th, .quota-table td { padding: 0.5rem 0.75rem; vertical-align: middle; font-size: 0.83rem; }
+    .quota-table .col-before  { color: #6e7985; }
+    .quota-table .col-returned { color: #198754; font-weight: 600; }
+    .quota-table .col-after   { color: #0d6efd; font-weight: 700; }
+    .revoke-badge-auto {
+        background-color: rgba(25,135,84,0.12);
+        color: #198754;
+        border: 1px solid rgba(25,135,84,0.25);
+        padding: 0.3rem 0.7rem;
+        border-radius: 0.45rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+</style>
+}
+
+@section PageScripts {
+<script>
+    // 2.7(5): ลงทะเบียนรับคำขอยกเลิก
+    function confirmRegister() {
+        var receivedNo = document.getElementById('generatedReceivedNo').value;
+        var note = document.getElementById('registerNote').value;
+        // TODO: POST to server
+        var modal = bootstrap.Modal.getInstance(document.getElementById('modalRegisterRevoke'));
+        if (modal) modal.hide();
+        alert('✅ ลงทะเบียนรับคำขอยกเลิกสำเร็จ\nเลขที่รับคำขอ: ' + receivedNo + '\nหมายเหตุ: ' + (note || '(ไม่มี)'));
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set today's date in Thai BE
+        var today = new Date();
+        var day   = today.getDate().toString().padStart(2, '0');
+        var month = (today.getMonth() + 1).toString().padStart(2, '0');
+        var year  = today.getFullYear() + 543;
+        var el = document.getElementById('registerDate');
+        if (el) el.value = day + '/' + month + '/' + year;
+
+        // Tooltips
+        if (window.bootstrap && bootstrap.Tooltip) {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (e) {
+                new bootstrap.Tooltip(e);
+            });
+        }
+    });
+</script>
+}

@@ -3,6 +3,46 @@
 
     var returnWeightStatus = "อยู่ระหว่างดำเนินการ"; // mock: อยู่ระหว่างดำเนินการ | อนุมัติให้คืนน้ำหนัก | อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข | ไม่อนุมัติให้คืนน้ำหนัก | ยกเลิก
     var isReadOnly = returnWeightStatus != "อยู่ระหว่างดำเนินการ";
+
+    // 2.8(1): แหล่งข้อมูลตั้งต้น (เชื่อมโยงจากระบบอื่น)
+    var sourceImportPermitNo  = "23501100116100110";               // ใบอนุญาตนำเข้า
+    var sourceApprovalRefNo   = "อนุมัติ-RW-2569-00099";           // ผลการพิจารณาอนุมัติ (pre-fill)
+    var sourceApprovalDate    = "19/04/2569";
+    var hasImd                = true;                               // พบเอกสาร IMD หรือไม่
+    var imdRefNo              = "IMD-2569-LC-04821";               // เลขที่เอกสาร IMD
+    var imdIssuedDate         = "16/04/2569";
+    var dataAutoLoaded        = true;                               // ดึงข้อมูลตั้งต้นอัตโนมัติแล้ว
+
+    // 2.8(5): วัตถุประสงค์การนำสินค้ากลับ
+    // mock: "destroy" | "export" | "domestic"
+    var returnPurpose         = "export";
+    var returnScope           = "ทั้งหมด";   // "ทั้งหมด" | "บางส่วน"
+    var returnWeightAmount    = 1750.0m;
+
+    // 2.8(6): RMBS2/RMBS1/P2/P1 ที่เกี่ยวข้อง (mock หลายใบรับรอง)
+    var rmbs2Rows = new[]
+    {
+        new { CertNo = "ใบรับรอง 1", Rmbs2No = "RMBS2-2569-OC-00881", Rmbs1No = "RMBS1-2569-OC-01105",
+              Batch = "OCP-2569-B001", WeightOrig = 1000.0m, WeightReturn = 1000.0m,
+              WeightRemain = 0.0m, ReturnMode = "ทั้งหมด" },
+        new { CertNo = "ใบรับรอง 1", Rmbs2No = "RMBS2-2569-OC-00882", Rmbs1No = "RMBS1-2569-OC-01106",
+              Batch = "OCP-2569-B002", WeightOrig = 750.0m, WeightReturn = 500.0m,
+              WeightRemain = 250.0m, ReturnMode = "บางส่วน" },
+        new { CertNo = "ใบรับรอง 2", Rmbs2No = "RMBS2-2569-OC-00895", Rmbs1No = "RMBS1-2569-OC-01120",
+              Batch = "OCP-2569-B003", WeightOrig = 500.0m, WeightReturn = 250.0m,
+              WeightRemain = 250.0m, ReturnMode = "บางส่วน" },
+    };
+    var certGroups = rmbs2Rows.Select(r => r.CertNo).Distinct().ToArray();
+
+    // 2.8(8): mock สถานะการสำเนา RMBS2/P2 → ตั้งต้นสินค้าส่งคืน
+    var copyDone = returnWeightStatus == "อนุมัติให้คืนน้ำหนัก"
+               || returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข";
+    var copiedRows = new[]
+    {
+        new { OrigNo = "RMBS2-2569-OC-00881", NewNo = "RMBS2-2569-OC-00881-RET", Rmbs1OrigNo = "RMBS1-2569-OC-01105", Rmbs1NewNo = "RMBS1-2569-OC-01105-RET", Batch = "OCP-2569-B001", Weight = 1000.0m },
+        new { OrigNo = "RMBS2-2569-OC-00882", NewNo = "RMBS2-2569-OC-00882-RET", Rmbs1OrigNo = "RMBS1-2569-OC-01106", Rmbs1NewNo = "RMBS1-2569-OC-01106-RET", Batch = "OCP-2569-B002", Weight = 500.0m  },
+        new { OrigNo = "RMBS2-2569-OC-00895", NewNo = "RMBS2-2569-OC-00895-RET", Rmbs1OrigNo = "RMBS1-2569-OC-01120", Rmbs1NewNo = "RMBS1-2569-OC-01120-RET", Batch = "OCP-2569-B003", Weight = 250.0m  },
+    };
 }
 
 @section VendorStyles {
@@ -91,6 +131,24 @@ else
                         <i class="ri ri-folder-open-line me-1"></i> หลักฐานประกอบ
                     </button>
                 </li>
+                @* 2.8(4): Tab ประวัติการดำเนินการ *@
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-history" aria-controls="tab-history" aria-selected="false">
+                        <i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ
+                    </button>
+                </li>
+                @* 2.8(12): Tab ผลการพิจารณา *@
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-result" aria-controls="tab-result" aria-selected="false">
+                        <i class="ri ri-award-line me-1"></i> ผลการพิจารณา
+                        @if (returnWeightStatus != "อยู่ระหว่างดำเนินการ")
+                        {
+                            <span class="badge bg-success ms-1 small">✅</span>
+                        }
+                    </button>
+                </li>
 
             </ul>
 
@@ -98,6 +156,102 @@ else
 
                 <!-- ==================== TAB 1: รายละเอียดคำขอ ==================== -->
                 <div id="tab-detail" class="tab-pane fade show active" role="tabpanel">
+
+                    @* 2.8(1): section แหล่งข้อมูลตั้งต้น *@
+                    <div class="card border border-primary border-opacity-50 mb-4">
+                        <div class="card-header bg-primary bg-opacity-10 d-flex align-items-center justify-content-between flex-wrap gap-2 py-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="ri ri-link text-primary fs-5"></i>
+                                <span class="fw-semibold text-primary">แหล่งข้อมูลตั้งต้น (เชื่อมโยงอัตโนมัติ)</span>
+                                @if (dataAutoLoaded)
+                                {
+                                    <span class="badge bg-success">โหลดแล้ว ✅</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">ยังไม่ได้โหลด</span>
+                                }
+                            </div>
+                            @if (!dataAutoLoaded)
+                            {
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="alert('TODO: โหลดข้อมูลตั้งต้นอัตโนมัติจากระบบ'); return false;">
+                                    <i class="ri ri-refresh-line me-1"></i>โหลดข้อมูลตั้งต้นอัตโนมัติ
+                                </button>
+                            }
+                        </div>
+                        <div class="card-body py-3">
+                            <div class="row g-3">
+                                @* ผลการพิจารณาอนุมัติ *@
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="ri ri-checkbox-circle-fill text-success mt-1 flex-shrink-0"></i>
+                                        <div>
+                                            <div class="small text-muted">ผลการพิจารณาอนุมัติ</div>
+                                            <span class="badge bg-label-success me-1">ดึงข้อมูลแล้ว ✅</span>
+                                            <div class="small fw-semibold font-monospace">@sourceApprovalRefNo</div>
+                                            <div class="small text-muted">วันที่อนุมัติ: @sourceApprovalDate</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @* ใบอนุญาตนำเข้า *@
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="ri ri-file-check-line text-success mt-1 flex-shrink-0"></i>
+                                        <div>
+                                            <div class="small text-muted">ใบอนุญาตนำเข้า</div>
+                                            <span class="badge bg-label-success me-1">ดึงข้อมูลแล้ว ✅</span>
+                                            <div class="small fw-semibold font-monospace">@sourceImportPermitNo</div>
+                                            <a href="#" class="small text-primary"
+                                               onclick="alert('TODO: ดูรายละเอียดใบอนุญาตนำเข้า @sourceImportPermitNo'); return false;">
+                                                ดูรายละเอียด →
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                @* เอกสาร IMD *@
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start gap-2">
+                                        @if (hasImd)
+                                        {
+                                            <i class="ri ri-file-text-line text-success mt-1 flex-shrink-0"></i>
+                                            <div>
+                                                <div class="small text-muted">เอกสาร IMD</div>
+                                                <span class="badge bg-label-success me-1">พบเอกสาร IMD ✅</span>
+                                                <div class="small fw-semibold font-monospace">@imdRefNo</div>
+                                                <div class="small text-muted">วันที่ออก: @imdIssuedDate</div>
+                                                <a href="#" class="small text-primary"
+                                                   onclick="alert('TODO: ดูเอกสาร IMD @imdRefNo'); return false;">
+                                                    ดูรายละเอียด →
+                                                </a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <i class="ri ri-file-warning-line text-danger mt-1 flex-shrink-0"></i>
+                                            <div>
+                                                <div class="small text-muted">เอกสาร IMD</div>
+                                                <span class="badge bg-label-danger">ไม่พบเอกสาร IMD ❌</span>
+                                                <div class="small text-muted mt-1">ไม่พบเอกสาร IMD ที่เชื่อมโยงกับใบอนุญาตนำเข้านี้</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            @if (dataAutoLoaded)
+                            {
+                                <hr class="my-3" />
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="ri ri-information-line text-primary"></i>
+                                    <span class="small text-muted">ระบบดึงข้อมูลตั้งต้นจากแหล่งข้อมูลข้างต้นอัตโนมัติแล้ว ข้อมูลในแบบฟอร์มด้านล่างถูก pre-fill เรียบร้อย</span>
+                                    <button type="button" class="btn btn-outline-primary btn-sm ms-auto"
+                                            onclick="alert('TODO: โหลดข้อมูลตั้งต้นใหม่อีกครั้ง'); return false;">
+                                        <i class="ri ri-refresh-line me-1"></i>โหลดข้อมูลตั้งต้นอีกครั้ง
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
 
                     <!-- Accordion: รายละเอียดคำขออนุมัติการคืนน้ำหนัก -->
                     <div class="accordion accordion-custom-button mb-4" id="accordionHeader">
@@ -283,7 +437,230 @@ else
                         </div>
                     </div>
 
+                    @* 2.8(5): section วัตถุประสงค์การนำสินค้ากลับประเทศ *@
+                    <div class="card border border-warning border-opacity-50 mt-4">
+                        <div class="card-header bg-warning bg-opacity-10 py-2 d-flex align-items-center gap-2">
+                            <i class="ri ri-focus-3-line text-warning fs-5"></i>
+                            <span class="fw-semibold text-warning-emphasis">วัตถุประสงค์การนำสินค้ากลับประเทศ</span>
+                        </div>
+                        <div class="card-body">
+                            @* ตัวเลือก radio *@
+                            <div class="row g-3 mb-3">
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">วัตถุประสงค์ <span class="text-danger">*</span></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check card border p-3 h-100 @(returnPurpose == "destroy" ? "border-danger bg-danger bg-opacity-10" : "")">
+                                        <input class="form-check-input" type="radio" name="returnPurposeRadio"
+                                               id="rdDestroy" value="destroy"
+                                               @(isReadOnly ? "disabled" : "") @(returnPurpose == "destroy" ? "checked" : "")
+                                               onchange="onReturnPurposeChange(this.value)" />
+                                        <label class="form-check-label fw-semibold" for="rdDestroy">
+                                            <i class="ri ri-delete-bin-line text-danger me-1"></i>นำกลับมาทำลาย
+                                        </label>
+                                        <div class="small text-muted mt-1">ระบบจะ<strong class="text-danger">ไม่คืนน้ำหนัก</strong>สินค้าที่ออกใบรับรองไปแล้ว</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check card border p-3 h-100 @(returnPurpose == "export" ? "border-success bg-success bg-opacity-10" : "")">
+                                        <input class="form-check-input" type="radio" name="returnPurposeRadio"
+                                               id="rdExport" value="export"
+                                               @(isReadOnly ? "disabled" : "") @(returnPurpose == "export" ? "checked" : "")
+                                               onchange="onReturnPurposeChange(this.value)" />
+                                        <label class="form-check-label fw-semibold" for="rdExport">
+                                            <i class="ri ri-ship-line text-success me-1"></i>นำกลับมาผลิต/แปรรูปเพื่อส่งออกอีกครั้ง
+                                        </label>
+                                        <div class="small text-muted mt-1"><span class="badge bg-label-success">คืนน้ำหนัก ✅</span> + ขอใบรับรองส่งออกใหม่</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check card border p-3 h-100 @(returnPurpose == "domestic" ? "border-primary bg-primary bg-opacity-10" : "")">
+                                        <input class="form-check-input" type="radio" name="returnPurposeRadio"
+                                               id="rdDomestic" value="domestic"
+                                               @(isReadOnly ? "disabled" : "") @(returnPurpose == "domestic" ? "checked" : "")
+                                               onchange="onReturnPurposeChange(this.value)" />
+                                        <label class="form-check-label fw-semibold" for="rdDomestic">
+                                            <i class="ri ri-store-2-line text-primary me-1"></i>นำกลับมาผลิต/แปรรูปเพื่อจำหน่ายในประเทศ
+                                        </label>
+                                        <div class="small text-muted mt-1"><span class="badge bg-label-primary">คืนน้ำหนัก ✅</span> + หนังสือรับรองตนเองขายในประเทศ</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* ส่วนแสดงผลตาม purpose (กรณีทำลาย) *@
+                            <div id="sectionDestroy" class="@(returnPurpose == "destroy" ? "" : "d-none")">
+                                <div class="alert alert-danger d-flex align-items-center gap-2 mb-3">
+                                    <i class="ri ri-error-warning-fill fs-5 flex-shrink-0"></i>
+                                    <span>⛔ <strong>กรณีทำลาย</strong> — ระบบจะ<strong>ไม่คืนน้ำหนัก</strong>สินค้าที่ออกใบรับรองไปแล้ว เจ้าหน้าที่ต้องบันทึกผลการทำลายแยกต่างหาก</span>
+                                </div>
+                                @if (!isReadOnly)
+                                {
+                                    <button type="button" class="btn btn-warning"
+                                            onclick="if(confirm('ยืนยันการอนุมัติ (ไม่คืนน้ำหนัก) — กรณีทำลายสินค้า?')) alert('TODO: อนุมัติ (ไม่คืนน้ำหนัก) เรียบร้อย')">
+                                        <i class="ri ri-delete-bin-line me-1"></i>อนุมัติ (ไม่คืนน้ำหนัก)
+                                    </button>
+                                }
+                            </div>
+
+                            @* ส่วนแสดงผลตาม purpose (กรณีส่งออก / จำหน่ายในประเทศ) *@
+                            <div id="sectionReturnWeight" class="@(returnPurpose == "destroy" ? "d-none" : "")">
+                                <div class="row g-3 mb-3 align-items-end">
+                                    <div class="col-auto">
+                                        <span class="badge bg-label-success fs-6">คืนน้ำหนัก ✅</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">ปริมาณที่คืน <span class="text-danger">*</span></label>
+                                        <select class="form-select @(isReadOnly ? "bg-light" : "")"
+                                                id="selectReturnScope"
+                                                @(isReadOnly ? "disabled" : "")>
+                                            <option value="ทั้งหมด" selected="@(returnScope == "ทั้งหมด")">คืนทั้งหมด</option>
+                                            <option value="บางส่วน" selected="@(returnScope == "บางส่วน")">คืนบางส่วน</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">น้ำหนักที่คืน (กก.) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control @(isReadOnly ? "bg-light" : "")"
+                                               id="inputReturnWeightAmt" value="@returnWeightAmount.ToString("F3")"
+                                               step="0.001" min="0" @(isReadOnly ? "readonly" : "") />
+                                    </div>
+                                </div>
+                                @if (!isReadOnly)
+                                {
+                                    <div id="btnSectionExport" class="@(returnPurpose == "export" ? "" : "d-none")">
+                                        <button type="button" class="btn btn-success"
+                                                onclick="alert('TODO: บันทึกข้อมูลการผลิตเพื่อขอใบรับรองส่งออกใหม่')">
+                                            <i class="ri ri-file-add-line me-1"></i>บันทึกข้อมูลการผลิตเพื่อขอใบรับรองส่งออกใหม่
+                                        </button>
+                                    </div>
+                                    <div id="btnSectionDomestic" class="@(returnPurpose == "domestic" ? "" : "d-none")">
+                                        <button type="button" class="btn btn-primary"
+                                                onclick="alert('TODO: บันทึกข้อมูลการผลิตเพื่อหนังสือรับรองตนเองขายในประเทศ')">
+                                            <i class="ri ri-file-add-line me-1"></i>บันทึกข้อมูลการผลิตเพื่อหนังสือรับรองตนเองขายในประเทศ
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
+                @* 2.8(15): Section ตรวจสอบมาตรการ *@
+                @{
+                    var tradeMeasurePass = true;      // มาตรการประเทศคู่ค้า
+                    var fisheryCheckPass = true;      // เงื่อนไขด่านตรวจประมง
+                    var exportIntentPass = true;      // ความประสงค์ส่งออก
+                    var iuuMeasurePass = true;        // มาตรการสุขอนามัย (IUU)
+                    var allMeasurePass = tradeMeasurePass && fisheryCheckPass && exportIntentPass && iuuMeasurePass;
+                }
+                <div class="card border @(allMeasurePass ? "border-success" : "border-danger") border-opacity-50 mb-3">
+                    <div class="card-header d-flex align-items-center justify-content-between py-2 @(allMeasurePass ? "bg-success" : "bg-danger") bg-opacity-10">
+                        <span class="fw-semibold @(allMeasurePass ? "text-success" : "text-danger")">
+                            <i class="ri ri-shield-check-line me-1"></i>ตรวจสอบมาตรการ / เงื่อนไข
+                        </span>
+                        @if (allMeasurePass)
+                        {
+                            <span class="badge bg-success px-3"><i class="ri ri-checkbox-circle-line me-1"></i>ผ่านทุกเงื่อนไข ✅</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger px-3"><i class="ri ri-close-circle-line me-1"></i>พบเงื่อนไขที่ไม่ผ่าน</span>
+                        }
+                    </div>
+                    <div class="card-body pb-2">
+                        <div class="row g-3">
+                            @* มาตรการประเทศคู่ค้า *@
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3 p-3 rounded border @(tradeMeasurePass ? "border-success bg-success bg-opacity-10" : "border-danger bg-danger bg-opacity-10")">
+                                    <i class="ri @(tradeMeasurePass ? "ri-earth-line text-success" : "ri-earth-line text-danger") fs-4 flex-shrink-0 mt-1"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold small mb-1">มาตรการประเทศคู่ค้า</div>
+                                        @if (tradeMeasurePass)
+                                        {
+                                            <span class="badge bg-success">ผ่าน ✅</span>
+                                            <div class="text-muted small mt-1">ไม่มีมาตรการห้ามนำเข้าจากประเทศคู่ค้า</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">ติดมาตรการ ❌</span>
+                                            <div class="text-danger small mt-1">ประเทศปลายทางมีมาตรการพิเศษ — กรุณาตรวจสอบก่อนอนุมัติ</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* เงื่อนไขด่านตรวจประมง *@
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3 p-3 rounded border @(fisheryCheckPass ? "border-success bg-success bg-opacity-10" : "border-danger bg-danger bg-opacity-10")">
+                                    <i class="ri @(fisheryCheckPass ? "ri-ship-line text-success" : "ri-ship-line text-danger") fs-4 flex-shrink-0 mt-1"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold small mb-1">เงื่อนไขด่านตรวจประมง</div>
+                                        @if (fisheryCheckPass)
+                                        {
+                                            <span class="badge bg-success">ผ่าน ✅</span>
+                                            <div class="text-muted small mt-1">ไม่ติดเงื่อนไขด่านตรวจประมง</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">ติดเงื่อนไข ❌</span>
+                                            <div class="text-danger small mt-1">พบเงื่อนไขที่ด่านตรวจประมง — กรุณาติดต่อด่านที่เกี่ยวข้อง</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* ความประสงค์ส่งออก *@
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3 p-3 rounded border @(exportIntentPass ? "border-success bg-success bg-opacity-10" : "border-warning bg-warning bg-opacity-10")">
+                                    <i class="ri @(exportIntentPass ? "ri-truck-line text-success" : "ri-truck-line text-warning") fs-4 flex-shrink-0 mt-1"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold small mb-1">ความประสงค์ส่งออก</div>
+                                        @if (exportIntentPass)
+                                        {
+                                            <span class="badge bg-success">ผ่าน ✅</span>
+                                            <div class="text-muted small mt-1">ความประสงค์ส่งออกสอดคล้องกับเงื่อนไขคำขอ</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">ไม่ตรงเงื่อนไข ❌</span>
+                                            <div class="text-warning-emphasis small mt-1">ความประสงค์ส่งออกไม่ตรงกับเงื่อนไขที่กำหนด</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* มาตรการสุขอนามัย (IUU) *@
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-3 p-3 rounded border @(iuuMeasurePass ? "border-success bg-success bg-opacity-10" : "border-danger bg-danger bg-opacity-10")">
+                                    <i class="ri @(iuuMeasurePass ? "ri-health-book-line text-success" : "ri-health-book-line text-danger") fs-4 flex-shrink-0 mt-1"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold small mb-1">มาตรการสุขอนามัย (IUU)</div>
+                                        @if (iuuMeasurePass)
+                                        {
+                                            <span class="badge bg-success">ผ่าน ✅</span>
+                                            <div class="text-muted small mt-1">ไม่พบรายการ IUU / ไม่ติดมาตรการสุขอนามัย</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">IUU ❌</span>
+                                            <div class="text-danger small mt-1">พบรายการ IUU หรือติดมาตรการสุขอนามัย — กรุณาตรวจสอบ</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!allMeasurePass)
+                        {
+                            <div class="alert alert-danger d-flex align-items-center gap-2 mt-3 mb-0">
+                                <i class="ri ri-error-warning-line fs-5 flex-shrink-0"></i>
+                                <div>พบเงื่อนไขที่ไม่ผ่านการตรวจสอบ — กรุณาแก้ไขก่อนดำเนินการอนุมัติ</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                @* /2.8(15) *@
+
                 <!-- /TAB 1 -->
 
                 <!-- ==================== TAB 2: รายการสินค้า/บัญชีแนบท้าย ==================== -->
@@ -365,7 +742,471 @@ else
                             </tfoot>
                         </table>
                     </div>
+
+                    @* 2.8(6): sub-section RMBS2/P2 ที่เกี่ยวข้อง (accordion แยกตามใบรับรอง) *@
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h6 class="mb-0 fw-semibold"><i class="ri ri-list-check-2 me-1 text-warning"></i>RMBS2/P2 ที่เกี่ยวข้องกับสินค้าส่งคืน</h6>
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-label-warning">@rmbs2Rows.Length รุ่น / @certGroups.Length ใบรับรอง</span>
+                                @if (!isReadOnly)
+                                {
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.querySelectorAll('.rmbs-check').forEach(c=>c.checked=true)">
+                                        <i class="ri ri-checkbox-multiple-line me-1"></i>เลือกทั้งหมด
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="accordion accordion-custom-button" id="accordionRmbs">
+                            @{ var certIdx = 0; }
+                            @foreach (var cert in certGroups)
+                            {
+                                certIdx++;
+                                var certRows  = rmbs2Rows.Where(r => r.CertNo == cert).ToArray();
+                                var totalOrig = certRows.Sum(r => r.WeightOrig);
+                                var totalRet  = certRows.Sum(r => r.WeightReturn);
+                                var totalRem  = certRows.Sum(r => r.WeightRemain);
+                                var allFull   = certRows.All(r => r.ReturnMode == "ทั้งหมด");
+                                var collapseId = $"collapseRmbs{certIdx}";
+                                var headingId  = $"headingRmbs{certIdx}";
+                                <div class="accordion-item mb-2">
+                                    <h2 class="accordion-header" id="@headingId">
+                                        <button type="button" class="accordion-button @(certIdx > 1 ? "collapsed" : "")"
+                                                data-bs-toggle="collapse" data-bs-target="#@collapseId"
+                                                aria-expanded="@(certIdx == 1 ? "true" : "false")"
+                                                aria-controls="@collapseId">
+                                            <i class="icon-base ri ri-file-2-line me-2"></i>
+                                            @cert
+                                            <span class="ms-2 badge @(allFull ? "bg-label-success" : "bg-label-warning")">
+                                                @(allFull ? "คืนทั้งหมด" : "คืนบางส่วน")
+                                            </span>
+                                            <span class="ms-2 badge bg-label-secondary small">@certRows.Length รุ่น</span>
+                                        </button>
+                                    </h2>
+                                    <div id="@collapseId" class="accordion-collapse collapse @(certIdx == 1 ? "show" : "")"
+                                         aria-labelledby="@headingId" data-bs-parent="#accordionRmbs">
+                                        <div class="accordion-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered align-middle mb-0 small">
+                                                    <thead class="table-light text-center">
+                                                        <tr>
+                                                            @if (!isReadOnly)
+                                                            {
+                                                                <th style="width:2.5rem;"><input type="checkbox" class="form-check-input"
+                                                                    onchange="this.closest('table').querySelectorAll('.rmbs-check').forEach(c=>c.checked=this.checked)" /></th>
+                                                            }
+                                                            <th>RMBS2/P2 เลขที่</th>
+                                                            <th>RMBS1/P1 เลขที่</th>
+                                                            <th>รุ่นการผลิต</th>
+                                                            <th>น้ำหนักเดิม (กก.)</th>
+                                                            <th>น้ำหนักที่คืน (กก.)</th>
+                                                            <th>คงเหลือ (กก.)</th>
+                                                            <th>ประเภทการคืน</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var row in certRows)
+                                                        {
+                                                            <tr>
+                                                                @if (!isReadOnly)
+                                                                {
+                                                                    <td class="text-center">
+                                                                        <input type="checkbox" class="form-check-input rmbs-check" checked />
+                                                                    </td>
+                                                                }
+                                                                <td class="font-monospace fw-semibold small text-nowrap">@row.Rmbs2No</td>
+                                                                <td class="font-monospace small text-nowrap text-muted">@row.Rmbs1No</td>
+                                                                <td class="text-nowrap">@row.Batch</td>
+                                                                <td class="text-end">@row.WeightOrig.ToString("N3")</td>
+                                                                <td class="text-end text-success fw-semibold">@row.WeightReturn.ToString("N3")</td>
+                                                                <td class="text-end @(row.WeightRemain > 0 ? "text-warning" : "text-muted")">@row.WeightRemain.ToString("N3")</td>
+                                                                <td class="text-center">
+                                                                    <span class="badge @(row.ReturnMode == "ทั้งหมด" ? "bg-label-success" : "bg-label-warning")">
+                                                                        @row.ReturnMode
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot class="table-light fw-semibold text-end small">
+                                                        <tr>
+                                                            @if (!isReadOnly) { <td></td> }
+                                                            <td colspan="3" class="text-end">รวม (@cert)</td>
+                                                            <td>@totalOrig.ToString("N3")</td>
+                                                            <td class="text-success">@totalRet.ToString("N3")</td>
+                                                            <td class="@(totalRem > 0 ? "text-warning" : "text-muted")">@totalRem.ToString("N3")</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        @* สรุปรวมทุกใบรับรอง *@
+                        <div class="alert alert-secondary d-flex align-items-center gap-3 mt-3 mb-0">
+                            <i class="ri ri-scales-line text-secondary fs-5 flex-shrink-0"></i>
+                            <div class="small">
+                                <span class="me-3">น้ำหนักรวมทั้งหมด: <strong>@rmbs2Rows.Sum(r => r.WeightOrig).ToString("N3") กก.</strong></span>
+                                <span class="me-3 text-success">คืนกลับ: <strong>@rmbs2Rows.Sum(r => r.WeightReturn).ToString("N3") กก.</strong></span>
+                                <span class="@(rmbs2Rows.Sum(r => r.WeightRemain) > 0 ? "text-warning" : "text-muted")">คงเหลือ: <strong>@rmbs2Rows.Sum(r => r.WeightRemain).ToString("N3") กก.</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* 2.8(7): ผลการคืนน้ำหนัก/โควตาอัตโนมัติ *@
+                    @{
+                        var autoReturnDone = returnWeightStatus == "อนุมัติให้คืนน้ำหนัก"
+                                         || returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข";
+                        var retW = 1750.0m;
+                        // mock ข้อมูล 6 รายการ before/after
+                        var autoReturnRows = new[]
+                        {
+                            new { Label = "น้ำหนักรับซื้อ-ขาย (คงเหลือ)",              Before = 12500.0m, Return = retW, After = 12500.0m + retW },
+                            new { Label = "โควตารับซื้อ (คงเหลือ)",                     Before = 8000.0m,  Return = retW, After = 8000.0m  + retW },
+                            new { Label = "ปริมาณรับซื้อ ณ วัน CC มา (คงเหลือ)",      Before = 5000.0m,  Return = retW, After = 5000.0m  + retW },
+                            new { Label = "โควตารับซื้อ ณ วัน CC มา (คงเหลือ)",       Before = 3500.0m,  Return = retW, After = 3500.0m  + retW },
+                            new { Label = "ปริมาณรับซื้อ ณ วัน SCC มา (คงเหลือ)",     Before = 2800.0m,  Return = retW, After = 2800.0m  + retW },
+                            new { Label = "โควตารับซื้อ ณ วัน SCC มา (คงเหลือ)",      Before = 2000.0m,  Return = retW, After = 2000.0m  + retW },
+                        };
+                    }
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h6 class="mb-0 fw-semibold">
+                                <i class="ri ri-arrow-go-back-line me-1 text-success"></i>ผลการคืนน้ำหนัก/โควตาอัตโนมัติ
+                            </h6>
+                            @if (autoReturnDone)
+                            {
+                                <span class="badge bg-success"><i class="ri ri-check-double-line me-1"></i>คืนน้ำหนัก/โควตาอัตโนมัติแล้ว ✅</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-warning"><i class="ri ri-time-line me-1"></i>รอการอนุมัติ</span>
+                            }
+                        </div>
+
+                        @if (autoReturnDone)
+                        {
+                            <div class="alert alert-success d-flex align-items-center gap-2 mb-3">
+                                <i class="ri ri-checkbox-circle-line fs-5 flex-shrink-0"></i>
+                                <div>✅ คืนน้ำหนัก <strong>@retW.ToString("N3") กก.</strong> และโควตา <strong>@retW.ToString("N3") กก.</strong> อัตโนมัติแล้ว</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+                                <i class="ri ri-information-line fs-5 flex-shrink-0"></i>
+                                <div>ระบบจะคืนน้ำหนัก/โควตาอัตโนมัติเมื่อได้รับการ<strong>อนุมัติ</strong></div>
+                            </div>
+                        }
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle small mb-0">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th style="min-width:240px;">รายการ</th>
+                                        <th style="min-width:130px;">ก่อนคืน (กก.)</th>
+                                        <th style="min-width:120px;">คืนกลับ (กก.)</th>
+                                        <th style="min-width:130px;">หลังคืน (กก.)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var r in autoReturnRows)
+                                    {
+                                        <tr>
+                                            <td>@r.Label</td>
+                                            <td class="text-end text-muted">@r.Before.ToString("N3")</td>
+                                            <td class="text-end @(autoReturnDone ? "text-success fw-semibold" : "text-muted fst-italic")">
+                                                @(autoReturnDone ? "+" : "(+)")@r.Return.ToString("N3")
+                                            </td>
+                                            <td class="text-end @(autoReturnDone ? "fw-semibold" : "text-muted fst-italic")">
+                                                @(autoReturnDone ? r.After.ToString("N3") : "-")
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    @* 2.8(8): สำเนาฐานข้อมูล RMBS2/P2 → ตั้งต้นสินค้าส่งคืน *@
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h6 class="mb-0 fw-semibold">
+                                <i class="ri ri-file-copy-line me-1 text-primary"></i>สำเนาฐานข้อมูล RMBS2/P2 → ตั้งต้นสินค้าส่งคืน
+                            </h6>
+                            @if (copyDone)
+                            {
+                                <span class="badge bg-success"><i class="ri ri-check-double-line me-1"></i>สำเนาข้อมูลแล้ว ✅</span>
+                            }
+                            else if (!isReadOnly)
+                            {
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCopyRmbs">
+                                    <i class="ri ri-file-copy-line me-1"></i>คัดลอก RMBS2/P2 เป็นข้อมูลสินค้าส่งคืน
+                                </button>
+                            }
+                        </div>
+
+                        @if (copyDone)
+                        {
+                            <div class="alert alert-success d-flex align-items-center gap-2 mb-3">
+                                <i class="ri ri-checkbox-circle-line fs-5 flex-shrink-0"></i>
+                                <div>สำเนาข้อมูล RMBS2/RMBS1/P2/P1 เป็นข้อมูลสินค้าส่งคืนแล้ว <strong>@copiedRows.Length รายการ</strong> — ข้อมูลต้นฉบับไม่ถูกกระทบ</div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle small mb-0">
+                                    <thead class="table-light text-center">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>RMBS2/P2 ต้นฉบับ</th>
+                                            <th>RMBS2/P2 สินค้าส่งคืน (ใหม่)</th>
+                                            <th>RMBS1/P1 ต้นฉบับ</th>
+                                            <th>RMBS1/P1 สินค้าส่งคืน (ใหม่)</th>
+                                            <th>รุ่นการผลิต</th>
+                                            <th>น้ำหนัก (กก.)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ var copyIdx = 0; }
+                                        @foreach (var c in copiedRows)
+                                        {
+                                            copyIdx++;
+                                            <tr>
+                                                <td class="text-center text-muted">@copyIdx</td>
+                                                <td class="font-monospace small text-muted text-nowrap">@c.OrigNo</td>
+                                                <td class="font-monospace small text-nowrap">
+                                                    <span class="badge bg-label-primary me-1">สินค้าส่งคืน</span>@c.NewNo
+                                                </td>
+                                                <td class="font-monospace small text-muted text-nowrap">@c.Rmbs1OrigNo</td>
+                                                <td class="font-monospace small text-nowrap">
+                                                    <span class="badge bg-label-primary me-1">สินค้าส่งคืน</span>@c.Rmbs1NewNo
+                                                </td>
+                                                <td class="text-nowrap">@c.Batch</td>
+                                                <td class="text-end">@c.Weight.ToString("N3")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info d-flex align-items-center gap-2 mb-0">
+                                <i class="ri ri-information-line fs-5 flex-shrink-0"></i>
+                                <div>ระบบจะสำเนาข้อมูล RMBS2/RMBS1/P2/P1 จำนวน <strong>@rmbs2Rows.Length รุ่น</strong> เป็นข้อมูลตั้งต้นสินค้าส่งคืน โดยไม่กระทบข้อมูลต้นฉบับ</div>
+                            </div>
+                        }
+                    </div>
+
+                    @* 2.8(9): รวม RMBS2/P2 สินค้าส่งคืน + สินค้าปกติ เพื่อขอใบรับรองชุดใหม่ *@
+                    @{
+                        var mergeDone = returnWeightStatus == "อนุมัติให้คืนน้ำหนัก"
+                                     || returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข";
+                        var mergedRows = new[]
+                        {
+                            new { RowType = "สินค้าส่งคืน", Rmbs2No = "RMBS2-2569-OC-00881-RET", Batch = "OCP-2569-B001", Weight = 1000.0m, BadgeClass = "bg-label-warning",  BadgeText = "ส่งคืน" },
+                            new { RowType = "สินค้าส่งคืน", Rmbs2No = "RMBS2-2569-OC-00882-RET", Batch = "OCP-2569-B002", Weight = 500.0m,  BadgeClass = "bg-label-warning",  BadgeText = "ส่งคืน" },
+                            new { RowType = "สินค้าส่งคืน", Rmbs2No = "RMBS2-2569-OC-00895-RET", Batch = "OCP-2569-B003", Weight = 250.0m,  BadgeClass = "bg-label-warning",  BadgeText = "ส่งคืน" },
+                            new { RowType = "สินค้าปกติ",   Rmbs2No = "RMBS2-2569-OC-00901",     Batch = "OCP-2569-B010", Weight = 800.0m,  BadgeClass = "bg-label-primary",   BadgeText = "ปกติ"   },
+                            new { RowType = "สินค้าปกติ",   Rmbs2No = "RMBS2-2569-OC-00902",     Batch = "OCP-2569-B011", Weight = 1200.0m, BadgeClass = "bg-label-primary",   BadgeText = "ปกติ"   },
+                        };
+                    }
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                            <h6 class="mb-0 fw-semibold">
+                                <i class="ri ri-git-merge-line me-1 text-primary"></i>รวม RMBS2/P2 สินค้าส่งคืน + สินค้าปกติ เพื่อขอใบรับรองชุดใหม่
+                            </h6>
+                            <div class="d-flex gap-2 flex-wrap">
+                                @if (mergeDone)
+                                {
+                                    <span class="badge bg-success"><i class="ri ri-check-double-line me-1"></i>รวมรายการแล้ว ✅</span>
+                                }
+                                @if (!isReadOnly)
+                                {
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalMergeRmbs">
+                                        <i class="ri ri-git-merge-line me-1"></i>รวมรายการเพื่อขอใบรับรองชุดใหม่
+                                    </button>
+                                }
+                                @* 2.8(10): ปุ่มพิมพ์ฟอร์มอิเล็กทรอนิกส์ RMBS2/P2 สินค้าส่งคืน *@
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalPrintRmbs">
+                                    <i class="ri ri-printer-line me-1"></i>พิมพ์แบบฟอร์ม RMBS2/P2 สินค้าส่งคืน
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle small mb-0">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        @if (!isReadOnly && !mergeDone)
+                                        {
+                                            <th style="width:2.5rem;">
+                                                <input type="checkbox" class="form-check-input"
+                                                       onchange="this.closest('table').querySelectorAll('.merge-check').forEach(c=>c.checked=this.checked)" />
+                                            </th>
+                                        }
+                                        <th>ประเภท</th>
+                                        <th>RMBS2/P2 เลขที่</th>
+                                        <th>รุ่นการผลิต</th>
+                                        <th>น้ำหนัก (กก.)</th>
+                                        <th>สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var m in mergedRows)
+                                    {
+                                        <tr class="@(m.RowType == "สินค้าส่งคืน" ? "table-warning bg-opacity-25" : "")">
+                                            @if (!isReadOnly && !mergeDone)
+                                            {
+                                                <td class="text-center">
+                                                    <input type="checkbox" class="form-check-input merge-check" checked />
+                                                </td>
+                                            }
+                                            <td><span class="badge @m.BadgeClass">@m.RowType</span></td>
+                                            <td class="font-monospace small text-nowrap">@m.Rmbs2No</td>
+                                            <td class="text-nowrap">@m.Batch</td>
+                                            <td class="text-end">@m.Weight.ToString("N3")</td>
+                                            <td class="text-center"><span class="badge @m.BadgeClass">@m.BadgeText</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-light fw-semibold text-end small">
+                                    <tr>
+                                        @if (!isReadOnly && !mergeDone) { <td></td> }
+                                        <td colspan="3" class="text-end">รวมน้ำหนักทั้งหมด</td>
+                                        <td>@mergedRows.Sum(m => m.Weight).ToString("N3")</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        @if (mergeDone)
+                        {
+                            <div class="alert alert-success d-flex align-items-center gap-2 mt-3 mb-0">
+                                <i class="ri ri-checkbox-circle-line fs-5 flex-shrink-0"></i>
+                                <div>รวมรายการ RMBS2/P2 สำเร็จ — <strong>@mergedRows.Sum(m => m.Weight).ToString("N3") กก.</strong> พร้อมใช้ขอใบรับรองชุดใหม่</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info d-flex align-items-center gap-2 mt-3 mb-0">
+                                <i class="ri ri-information-line fs-5 flex-shrink-0"></i>
+                                <div>เลือกรายการที่ต้องการรวม แล้วกด <strong>"รวมรายการเพื่อขอใบรับรองชุดใหม่"</strong></div>
+                            </div>
+                        }
+                    </div>
                 </div>
+
+                @* 2.8(14): Section ข้อมูลเศษเหลือจากการผลิต (RMBS1/P1) *@
+                @{
+                    var scrapsSubmitted = false; // TODO: ดึงจาก DB — ส่งข้อมูลเศษเหลือแล้วหรือยัง
+                    var scrapWeight = 85.5m;
+                    var scrapSentDate = "20/04/2569";
+                    var scrapRefNo = "FM-SCRAP-2569-00341";
+                }
+                <div class="card border border-secondary border-opacity-50 mb-3">
+                    <div class="card-header d-flex align-items-center justify-content-between py-2">
+                        <span class="fw-semibold">
+                            <i class="ri ri-recycle-line me-1 text-secondary"></i>
+                            ข้อมูลเศษเหลือจากการผลิต (RMBS1/P1)
+                        </span>
+                        @if (scrapsSubmitted)
+                        {
+                            <span class="badge bg-success px-3">
+                                <i class="ri ri-checkbox-circle-line me-1"></i>ส่งข้อมูลเศษเหลือแล้ว ✅
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-label-warning px-3">รอส่งข้อมูล</span>
+                        }
+                    </div>
+                    <div class="card-body">
+                        @if (scrapsSubmitted)
+                        {
+                            <div class="alert alert-success d-flex align-items-start gap-3 mb-3">
+                                <i class="ri ri-checkbox-circle-line fs-5 flex-shrink-0 mt-1"></i>
+                                <div>
+                                    <div class="fw-semibold mb-1">ส่งข้อมูลเศษเหลือไประบบออกหนังสือรับรองปลาป่นเรียบร้อยแล้ว</div>
+                                    <div class="small text-muted">เลขที่อ้างอิง: <strong class="font-monospace">@scrapRefNo</strong> &nbsp;|&nbsp; วันที่: @scrapSentDate &nbsp;|&nbsp; น้ำหนักเศษเหลือ: <strong>@scrapWeight.ToString("N3") กก.</strong></div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle small mb-0">
+                                    <thead class="table-light text-center">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>เลขที่ RMBS1/P1 (เศษเหลือ)</th>
+                                            <th>ประเภทเศษเหลือ</th>
+                                            <th>น้ำหนัก (กก.)</th>
+                                            <th>วันที่ส่งข้อมูล</th>
+                                            <th>ระบบปลายทาง</th>
+                                            <th>สถานะ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center text-muted">1</td>
+                                            <td class="font-monospace small">RMBS1-2569-OC-SCRAP-00341</td>
+                                            <td>ปลาป่น (Fish Meal)</td>
+                                            <td class="text-end fw-semibold">@scrapWeight.ToString("N3")</td>
+                                            <td class="text-center">@scrapSentDate</td>
+                                            <td>ระบบออกหนังสือรับรองปลาป่น</td>
+                                            <td class="text-center"><span class="badge bg-success">รับข้อมูลแล้ว ✅</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">น้ำหนักเศษเหลือ (กก.) <span class="text-danger">*</span></label>
+                                    <input type="number" id="scrapWeightInput" class="form-control" placeholder="0.000" step="0.001" min="0"
+                                           @(isReadOnly ? "disabled" : "") />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">ประเภทเศษเหลือ <span class="text-danger">*</span></label>
+                                    <select id="scrapTypeSelect" class="form-select" @(isReadOnly ? "disabled" : "")>
+                                        <option value="">-- เลือกประเภทเศษเหลือ --</option>
+                                        <option value="fishmeal">ปลาป่น (Fish Meal)</option>
+                                        <option value="fishoil">น้ำมันปลา (Fish Oil)</option>
+                                        <option value="scrap_frozen">เศษแช่แข็ง (Frozen Scrap)</option>
+                                        <option value="other">อื่นๆ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">หมายเหตุ</label>
+                                    <input type="text" id="scrapRemarkInput" class="form-control" placeholder="ระบุหมายเหตุ (ถ้ามี)"
+                                           @(isReadOnly ? "disabled" : "") />
+                                </div>
+                            </div>
+                            @if (!isReadOnly)
+                            {
+                                <button type="button" class="btn btn-outline-secondary"
+                                        onclick="submitScrapData()">
+                                    <i class="ri ri-send-plane-line me-1"></i>ส่งข้อมูลเศษเหลือไประบบออกหนังสือรับรองปลาป่น
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="alert alert-light d-flex align-items-center gap-2 mb-0">
+                                    <i class="ri ri-lock-line text-muted"></i>
+                                    <span class="text-muted small">ไม่สามารถแก้ไขได้ — สถานะคำขอไม่อนุญาตให้ดำเนินการ</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                @* /2.8(14) *@
+
                 <!-- /TAB 2 -->
 
                 <!-- ==================== TAB 3: หลักฐานประกอบ ==================== -->
@@ -428,32 +1269,948 @@ else
                 </div>
                 <!-- /TAB 3 -->
 
+                @* ==================== TAB 4: ประวัติการดำเนินการ (2.8(4)) ==================== *@
+                <div id="tab-history" class="tab-pane fade" role="tabpanel">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h6 class="mb-0 fw-semibold"><i class="ri ri-history-line me-1 text-secondary"></i>ประวัติการดำเนินการ</h6>
+                        <span class="badge bg-label-secondary small">เลขที่เอกสาร: 10611280616100005</span>
+                    </div>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle mb-0 small">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th style="width:2rem;">#</th>
+                                    <th style="min-width:140px;">วันที่/เวลา</th>
+                                    <th style="min-width:180px;">ผู้ดำเนินการ</th>
+                                    <th style="min-width:200px;">การกระทำ</th>
+                                    <th>หมายเหตุ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center text-muted">1</td>
+                                    <td class="text-nowrap">19/04/2569 08:20</td>
+                                    <td>ผู้ประกอบการ (Ocean Prime Export Co., Ltd.)</td>
+                                    <td><span class="badge bg-label-info">ยื่นคำขอ</span> ยื่นคำขอคืนน้ำหนักสินค้าส่งคืน</td>
+                                    <td class="text-muted">—</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center text-muted">2</td>
+                                    <td class="text-nowrap">19/04/2569 09:05</td>
+                                    <td>ระบบ (อัตโนมัติ)</td>
+                                    <td><span class="badge bg-label-primary">ดึงข้อมูล</span> ดึงข้อมูลตั้งต้นจากใบอนุญาตนำเข้า + IMD อัตโนมัติ</td>
+                                    <td class="text-muted">ใบอนุญาต: 23501100116100110 / IMD: IMD-2569-LC-04821</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center text-muted">3</td>
+                                    <td class="text-nowrap">19/04/2569 10:30</td>
+                                    <td>นายวิชัย ใจดี (เจ้าหน้าที่ตรวจสอบ)</td>
+                                    <td><span class="badge bg-label-warning">ตรวจสอบ</span> ตรวจสอบเอกสารและรายการสินค้า</td>
+                                    <td class="text-muted">ครบถ้วนถูกต้อง</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center text-muted">4</td>
+                                    <td class="text-nowrap">20/04/2569 09:15</td>
+                                    <td>นายวิชัย ใจดี (เจ้าหน้าที่ตรวจสอบ)</td>
+                                    <td><span class="badge bg-label-warning">แจ้งแก้ไข</span> แจ้งให้ผู้ประกอบการแก้ไขข้อมูล</td>
+                                    <td class="text-muted">ขอให้เพิ่มเอกสารใบส่งคืนฉบับจริง</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center text-muted">5</td>
+                                    <td class="text-nowrap">21/04/2569 14:00</td>
+                                    <td>ผู้ประกอบการ (Ocean Prime Export Co., Ltd.)</td>
+                                    <td><span class="badge bg-label-info">แนบเอกสาร</span> แนบเอกสารเพิ่มเติมตามที่แจ้ง</td>
+                                    <td class="text-muted">return_goods_original.pdf</td>
+                                </tr>
+                                @if (returnWeightStatus == "อยู่ระหว่างดำเนินการ")
+                                {
+                                    <tr>
+                                        <td class="text-center text-muted">6</td>
+                                        <td class="text-nowrap text-muted">— (รอดำเนินการ)</td>
+                                        <td class="text-muted">—</td>
+                                        <td><span class="badge bg-label-secondary">รออนุมัติ</span> <span class="text-muted">รอเจ้าหน้าที่พิจารณา</span></td>
+                                        <td class="text-muted">—</td>
+                                    </tr>
+                                }
+                                else if (returnWeightStatus == "อนุมัติให้คืนน้ำหนัก")
+                                {
+                                    <tr>
+                                        <td class="text-center text-muted">6</td>
+                                        <td class="text-nowrap">22/04/2569 10:00</td>
+                                        <td>นายสมชาย มีสุข (ผู้อำนวยการกอง)</td>
+                                        <td><span class="badge bg-label-success">อนุมัติ</span> อนุมัติให้คืนน้ำหนักสินค้าส่งคืน</td>
+                                        <td class="text-muted">—</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center text-muted">7</td>
+                                        <td class="text-nowrap">22/04/2569 10:01</td>
+                                        <td>ระบบ (อัตโนมัติ)</td>
+                                        <td><span class="badge bg-label-success">คืนน้ำหนัก</span> คืนน้ำหนัก/โควตาอัตโนมัติ 1,750.000 กก.</td>
+                                        <td class="text-muted">—</td>
+                                    </tr>
+                                }
+                                else if (returnWeightStatus == "ไม่อนุมัติให้คืนน้ำหนัก")
+                                {
+                                    <tr>
+                                        <td class="text-center text-muted">6</td>
+                                        <td class="text-nowrap">22/04/2569 10:00</td>
+                                        <td>นายสมชาย มีสุข (ผู้อำนวยการกอง)</td>
+                                        <td><span class="badge bg-label-danger">ไม่อนุมัติ</span> ไม่อนุมัติให้คืนน้ำหนักสินค้าส่งคืน</td>
+                                        <td class="text-muted">เอกสารไม่ครบถ้วน</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
+                    @* Timeline สรุป *@
+                    <h6 class="fw-semibold text-secondary mb-3"><i class="ri ri-git-branch-line me-1"></i>ไทม์ไลน์สรุป</h6>
+                    <ul class="list-unstyled ms-3 border-start border-2 border-light-subtle ps-4">
+                        <li class="mb-3 ps-2 position-relative">
+                            <span class="position-absolute badge rounded-circle bg-info" style="left:-1.2rem;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                            <div class="small text-muted">19/04/2569 08:20</div>
+                            <div class="fw-semibold small">ยื่นคำขอคืนน้ำหนัก</div>
+                            <div class="small text-muted">Ocean Prime Export Co., Ltd.</div>
+                        </li>
+                        <li class="mb-3 ps-2 position-relative">
+                            <span class="position-absolute badge rounded-circle bg-primary" style="left:-1.2rem;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                            <div class="small text-muted">19/04/2569 09:05</div>
+                            <div class="fw-semibold small">ดึงข้อมูลตั้งต้นอัตโนมัติ <span class="badge bg-label-primary ms-1">ใบอนุญาต + IMD</span></div>
+                            <div class="small text-muted">ระบบ (อัตโนมัติ)</div>
+                        </li>
+                        <li class="mb-3 ps-2 position-relative">
+                            <span class="position-absolute badge rounded-circle bg-warning" style="left:-1.2rem;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                            <div class="small text-muted">20/04/2569 09:15</div>
+                            <div class="fw-semibold small">แจ้งแก้ไขข้อมูล</div>
+                            <div class="small text-muted">นายวิชัย ใจดี</div>
+                        </li>
+                        <li class="mb-3 ps-2 position-relative">
+                            <span class="position-absolute badge rounded-circle bg-info" style="left:-1.2rem;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                            <div class="small text-muted">21/04/2569 14:00</div>
+                            <div class="fw-semibold small">แนบเอกสารเพิ่มเติม</div>
+                            <div class="small text-muted">Ocean Prime Export Co., Ltd.</div>
+                        </li>
+                        @if (returnWeightStatus == "อนุมัติให้คืนน้ำหนัก" || returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข")
+                        {
+                            <li class="mb-3 ps-2 position-relative">
+                                <span class="position-absolute badge rounded-circle bg-success" style="left:-1.2rem;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                <div class="small text-muted">22/04/2569 10:00</div>
+                                <div class="fw-semibold small">อนุมัติให้คืนน้ำหนัก <span class="badge bg-label-success ms-1">อนุมัติ ✅</span></div>
+                                <div class="small text-muted">นายสมชาย มีสุข (ผู้อำนวยการกอง)</div>
+                            </li>
+                        }
+                        else if (returnWeightStatus == "ไม่อนุมัติให้คืนน้ำหนัก")
+                        {
+                            <li class="mb-3 ps-2 position-relative">
+                                <span class="position-absolute badge rounded-circle bg-danger" style="left:-1.2rem;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                <div class="small text-muted">22/04/2569 10:00</div>
+                                <div class="fw-semibold small">ไม่อนุมัติ <span class="badge bg-label-danger ms-1">ไม่อนุมัติ ❌</span></div>
+                                <div class="small text-muted">นายสมชาย มีสุข (ผู้อำนวยการกอง)</div>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="mb-0 ps-2 position-relative">
+                                <span class="position-absolute badge rounded-circle bg-secondary" style="left:-1.2rem;top:0.15rem;width:0.75rem;height:0.75rem;padding:0;"></span>
+                                <div class="fw-semibold small text-muted">รอดำเนินการ...</div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                @* /TAB 4 *@
+
+                @* ==================== TAB 5: ผลการพิจารณา (2.8(12)) ==================== *@
+                @{
+                    var hasResult = returnWeightStatus != "อยู่ระหว่างดำเนินการ";
+                    var resultDate = "21/04/2569 (14:30)";
+                    var resultOfficer = "นายสมชาย วิชิตชัย";
+                    var resultOfficerDept = "กองตรวจสอบเรือประมง สินค้าสัตว์น้ำ และปัจจัยการผลิต";
+                    var resultRemark = returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข"
+                        ? "อนุมัติให้คืนน้ำหนักบางส่วน เนื่องจากเอกสารหลักฐานไม่ครบถ้วน"
+                        : returnWeightStatus == "ไม่อนุมัติให้คืนน้ำหนัก"
+                        ? "ไม่อนุมัติ เนื่องจากเอกสารหลักฐานไม่ถูกต้อง"
+                        : returnWeightStatus == "ยกเลิก" ? "ยกเลิกตามคำขอของผู้ประกอบการ"
+                        : "อนุมัติให้คืนน้ำหนักตามคำขอ";
+                    var resultWeight = returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข" ? 1200.0m : returnWeightStatus == "อนุมัติให้คืนน้ำหนัก" ? returnWeightAmount : 0.0m;
+                    string resultBadgeClass = returnWeightStatus switch {
+                        "อนุมัติให้คืนน้ำหนัก" => "bg-success",
+                        "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข" => "bg-primary",
+                        "ไม่อนุมัติให้คืนน้ำหนัก" => "bg-danger",
+                        "ยกเลิก" => "bg-secondary",
+                        _ => "bg-label-warning"
+                    };
+                    string resultIcon = returnWeightStatus switch {
+                        "อนุมัติให้คืนน้ำหนัก" => "ri-checkbox-circle-line",
+                        "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข" => "ri-check-double-line",
+                        "ไม่อนุมัติให้คืนน้ำหนัก" => "ri-close-circle-line",
+                        "ยกเลิก" => "ri-forbid-line",
+                        _ => "ri-time-line"
+                    };
+                }
+                <div id="tab-result" class="tab-pane fade" role="tabpanel">
+                    @if (!hasResult)
+                    {
+                        <div class="alert alert-warning d-flex align-items-center gap-2">
+                            <i class="ri ri-time-line fs-5 flex-shrink-0"></i>
+                            <div>คำขอนี้อยู่ระหว่างการพิจารณา — ยังไม่มีผลการพิจารณา</div>
+                        </div>
+                    }
+                    else
+                    {
+                        @* สรุปผลการพิจารณา *@
+                        <div class="card border border-2 @(returnWeightStatus.Contains("อนุมัติ") ? "border-success" : returnWeightStatus == "ยกเลิก" ? "border-secondary" : "border-danger") mb-4">
+                            <div class="card-header d-flex align-items-center gap-3 py-3">
+                                <span class="badge @resultBadgeClass px-3 py-2" style="font-size:1rem;">
+                                    <i class="ri @resultIcon me-1"></i>@returnWeightStatus
+                                </span>
+                                <div class="small text-muted">วันที่พิจารณา: <strong class="text-dark">@resultDate</strong></div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small mb-1">ผลการพิจารณา</label>
+                                        <div class="fw-semibold">@returnWeightStatus</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small mb-1">วันที่อนุมัติ / พิจารณา</label>
+                                        <div class="fw-semibold">@resultDate</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small mb-1">ผู้พิจารณา</label>
+                                        <div class="fw-semibold">@resultOfficer</div>
+                                        <div class="text-muted small">@resultOfficerDept</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small mb-1">น้ำหนักที่คืนจริง (กก.)</label>
+                                        @if (resultWeight > 0)
+                                        {
+                                            <div class="fw-semibold text-success fs-5">@resultWeight.ToString("N3") <span class="fs-6 text-muted fw-normal">กก.</span></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">— ไม่มีการคืนน้ำหนัก</div>
+                                        }
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-muted small mb-1">หมายเหตุ / เหตุผลประกอบ</label>
+                                        <div class="alert alert-light mb-0 py-2">@resultRemark</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* รายการที่อนุมัติแล้ว *@
+                        @if (returnWeightStatus == "อนุมัติให้คืนน้ำหนัก" || returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข")
+                        {
+                            <h6 class="fw-semibold mb-3"><i class="ri ri-list-check-2 me-1 text-success"></i>รายการที่อนุมัติให้คืนน้ำหนัก</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle small mb-0">
+                                    <thead class="table-light text-center">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>สินค้าประมง</th>
+                                            <th>น้ำหนักที่คืน (กก.)</th>
+                                            <th>RMBS2/P2</th>
+                                            <th>สถานะ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center text-muted">1</td>
+                                            <td>ปลาทูน่าตาโต ทั้งตัว แช่แข็ง<br /><span class="text-muted small">0303.44.00 000/KGM</span></td>
+                                            <td class="text-end fw-semibold text-success">@(returnWeightStatus == "อนุมัติให้คืนน้ำหนัก" ? "1,000.000" : "800.000")</td>
+                                            <td class="font-monospace small text-nowrap">RMBS2-2569-OC-00881-RET</td>
+                                            <td class="text-center"><span class="badge bg-success">คืนแล้ว ✅</span></td>
+                                        </tr>
+                                        @if (returnWeightStatus == "อนุมัติให้คืนน้ำหนัก")
+                                        {
+                                            <tr>
+                                                <td class="text-center text-muted">2</td>
+                                                <td>ปลาแซลมอน ทั้งตัว แช่แข็ง<br /><span class="text-muted small">0303.89.90 000/KGM</span></td>
+                                                <td class="text-end fw-semibold text-success">750.000</td>
+                                                <td class="font-monospace small text-nowrap">RMBS2-2569-OC-00882-RET</td>
+                                                <td class="text-center"><span class="badge bg-success">คืนแล้ว ✅</span></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot class="table-light fw-semibold text-end small">
+                                        <tr>
+                                            <td colspan="2" class="text-end">รวมน้ำหนักที่คืนจริง</td>
+                                            <td class="text-success">@resultWeight.ToString("N3") กก.</td>
+                                            <td colspan="2"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        }
+                    }
+
+                    @* 2.8(16): เชื่อมโยงผลการพิจารณาไปยังด่านตรวจประมง *@
+                    @{
+                        var sentToFisheryCheck = returnWeightStatus == "อนุมัติให้คืนน้ำหนัก" || returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข";
+                        var fisheryCheckSentDate = "21/04/2569 (14:35)";
+                        var fisheryCheckStationName = "ด่านตรวจประมงท่าเรือแหลมฉบัง";
+                        var fisheryCheckRefNo = "FC-LINK-2569-00219";
+                    }
+                    @if (hasResult)
+                    {
+                        <div class="card border @(sentToFisheryCheck ? "border-success" : "border-secondary") border-opacity-50 mt-4">
+                            <div class="card-header d-flex align-items-center justify-content-between py-2 @(sentToFisheryCheck ? "bg-success" : "bg-secondary") bg-opacity-10">
+                                <span class="fw-semibold @(sentToFisheryCheck ? "text-success" : "text-muted")">
+                                    <i class="ri ri-radar-line me-1"></i>การเชื่อมโยงผลการพิจารณาไปยังด่านตรวจประมง
+                                </span>
+                                @if (sentToFisheryCheck)
+                                {
+                                    <span class="badge bg-success px-3">
+                                        <i class="ri ri-checkbox-circle-line me-1"></i>ส่งผลการพิจารณาไปยังด่านตรวจประมงแล้ว ✅
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-label-secondary px-3">ไม่ส่งข้อมูล (ไม่อนุมัติ)</span>
+                                }
+                            </div>
+                            <div class="card-body">
+                                @if (sentToFisheryCheck)
+                                {
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <div class="text-muted small mb-1">ด่านตรวจประมงปลายทาง</div>
+                                            <div class="fw-semibold">@fisheryCheckStationName</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-muted small mb-1">เลขที่อ้างอิงการส่งข้อมูล</div>
+                                            <div class="fw-semibold font-monospace">@fisheryCheckRefNo</div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="text-muted small mb-1">วันที่/เวลาที่ส่ง</div>
+                                            <div class="fw-semibold">@fisheryCheckSentDate</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                                        <div class="alert alert-success d-flex align-items-center gap-2 mb-0 py-2 flex-grow-1">
+                                            <i class="ri ri-checkbox-circle-line flex-shrink-0"></i>
+                                            <span class="small">ส่งผลการพิจารณาคืนน้ำหนัก <strong>@returnWeightAmount.ToString("N3") กก.</strong> ไปยัง <strong>@fisheryCheckStationName</strong> เรียบร้อยแล้ว — ด่านตรวจรับข้อมูลแล้ว</span>
+                                        </div>
+                                        <a href="#" class="btn btn-sm btn-outline-success text-nowrap"
+                                           onclick="alert('TODO: เปิดหน้าสถานะด่านตรวจประมง @fisheryCheckStationName'); return false;">
+                                            <i class="ri ri-external-link-line me-1"></i>ดูสถานะด่านตรวจประมง →
+                                        </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-secondary d-flex align-items-center gap-2 mb-0">
+                                        <i class="ri ri-information-line fs-5 flex-shrink-0"></i>
+                                        <div class="small">ไม่ส่งข้อมูลไปยังด่านตรวจประมง เนื่องจากผลการพิจารณาเป็น <strong>@returnWeightStatus</strong></div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    @* /2.8(16) *@
+                </div>
+                @* /TAB 5 *@
 
             </div><!-- /tab-content -->
         </div><!-- /nav-align-top -->
 
-        <!-- Action Buttons -->
+        <!-- Action Buttons / Action Bar -->
+        @* 2.8(3): Action bar เต็ม (เมื่อสถานะ อยู่ระหว่างดำเนินการ) *@
+        @if (!isReadOnly)
+        {
+            <div class="card border border-warning border-opacity-50 mt-4">
+                <div class="card-header bg-warning bg-opacity-10 py-2">
+                    <span class="fw-semibold text-warning-emphasis"><i class="ri ri-tools-line me-1"></i>การดำเนินการ (เจ้าหน้าที่)</span>
+                </div>
+                <div class="card-body d-flex flex-wrap gap-2 align-items-center">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalApprove">
+                        <i class="ri ri-checkbox-circle-line me-1"></i>อนุมัติให้คืนน้ำหนัก
+                    </button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalApproveCondition">
+                        <i class="ri ri-check-double-line me-1"></i>อนุมัติแบบมีเงื่อนไข
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalReject">
+                        <i class="ri ri-close-circle-line me-1"></i>ไม่อนุมัติ
+                    </button>
+                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalRequestEdit">
+                        <i class="ri ri-edit-2-line me-1"></i>แจ้งแก้ไขข้อมูล
+                    </button>
+                    <div class="vr mx-1"></div>
+                    <button type="button" class="btn btn-outline-secondary" id="btnToggleSign">
+                        <i class="ri ri-pen-nib-line me-1"></i>เสนอลงนาม
+                    </button>
+                </div>
+            </div>
+
+            @* 2.8(3): section เสนอลงนาม *@
+            <div id="sectionSubmitSign" class="card border border-secondary border-opacity-50 mt-3 d-none">
+                <div class="card-header py-2 bg-secondary bg-opacity-10">
+                    <span class="fw-semibold"><i class="ri ri-pen-nib-line me-1"></i>เสนอลงนาม</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label">ผู้ลงนาม <span class="text-danger">*</span></label>
+                            <select class="form-select" id="selectSigner">
+                                <option value="">-- เลือกผู้ลงนาม --</option>
+                                <option value="1">นายสมชาย มีสุข (ผู้อำนวยการกอง)</option>
+                                <option value="2">นางสาวสุดา รักดี (รองผู้อำนวยการ)</option>
+                                <option value="3">นายวิชัย ใจดี (ผู้เชี่ยวชาญ)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">หมายเหตุ</label>
+                            <input type="text" class="form-control" id="signRemark" placeholder="ระบุหมายเหตุ (ถ้ามี)" />
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-secondary w-100" id="btnConfirmSign">
+                                <i class="ri ri-send-plane-line me-1"></i>เสนอให้ลงนาม
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
         <div class="d-flex justify-content-end gap-2 mt-3">
-            <a href="@Url.Action("IndexReturnWeight", "Officer")" class="btn btn-outline-secondary">
-                <i class="ri ri-arrow-left-line me-1"></i> ยกเลิก
-            </a>
-            @if (!isReadOnly)
+            @* 2.8(13): ปุ่มพิมพ์ฟอร์มคืนน้ำหนัก (PDF) เฉพาะสถานะอนุมัติ *@
+            @if (returnWeightStatus == "อนุมัติให้คืนน้ำหนัก" || returnWeightStatus == "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข")
             {
-                <button type="button" class="btn btn-outline-danger" id="btnRejectRequest">
-                    <i class="ri ri-close-circle-line me-1"></i> ไม่อนุมัติ
-                </button>
-                <button type="button" class="btn btn-success" id="btnApproveRequest">
-                    <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติ
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalPrintReturnWeight">
+                    <i class="ri ri-file-pdf-line me-1"></i>พิมพ์ฟอร์มคืนน้ำหนัก (PDF)
                 </button>
             }
+            <a href="@Url.Action("IndexReturnWeight", "Officer")" class="btn btn-outline-secondary">
+                <i class="ri ri-arrow-left-line me-1"></i> กลับรายการ
+            </a>
         </div>
 
     </div><!-- /col -->
 </div><!-- /row -->
 
-@section PageScripts {
-    <script>
+@* 2.8(3): Modals *@
+<!-- Modal: อนุมัติให้คืนน้ำหนัก -->
+<div class="modal fade" id="modalApprove" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success bg-opacity-10">
+                <h5 class="modal-title"><i class="ri ri-checkbox-circle-line text-success me-2"></i>อนุมัติให้คืนน้ำหนัก</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">หมายเหตุ / เงื่อนไขการอนุมัติ</label>
+                    <textarea class="form-control" id="approveRemark" rows="3" placeholder="ระบุหมายเหตุ (ถ้ามี)"></textarea>
+                </div>
+                <div class="alert alert-success d-flex align-items-center gap-2 mb-0">
+                    <i class="ri ri-information-line"></i>
+                    <span class="small">เมื่อยืนยัน ระบบจะอนุมัติและดำเนินการคืนน้ำหนัก/โควตาอัตโนมัติ</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success" id="btnConfirmApprove">
+                    <i class="ri ri-checkbox-circle-line me-1"></i>ยืนยันอนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: อนุมัติแบบมีเงื่อนไข -->
+<div class="modal fade" id="modalApproveCondition" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary bg-opacity-10">
+                <h5 class="modal-title"><i class="ri ri-check-double-line text-primary me-2"></i>อนุมัติแบบมีเงื่อนไข</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">เงื่อนไขประกอบการอนุมัติ <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="approveConditionText" rows="3" placeholder="ระบุเงื่อนไขที่ผู้ประกอบการต้องปฏิบัติ"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">หมายเหตุ</label>
+                    <textarea class="form-control" id="approveConditionRemark" rows="2" placeholder="ระบุหมายเหตุ (ถ้ามี)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmApproveCondition">
+                    <i class="ri ri-check-double-line me-1"></i>ยืนยันอนุมัติแบบมีเงื่อนไข
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: ไม่อนุมัติ -->
+<div class="modal fade" id="modalReject" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger bg-opacity-10">
+                <h5 class="modal-title"><i class="ri ri-close-circle-line text-danger me-2"></i>ไม่อนุมัติให้คืนน้ำหนัก</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">เหตุผลการปฏิเสธ <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="rejectReason" rows="3" placeholder="ระบุเหตุผลที่ไม่อนุมัติ"></textarea>
+                </div>
+                <div class="alert alert-danger d-flex align-items-center gap-2 mb-0">
+                    <i class="ri ri-alert-line"></i>
+                    <span class="small">การไม่อนุมัติจะแจ้งกลับไปยังผู้ประกอบการ</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmReject">
+                    <i class="ri ri-close-circle-line me-1"></i>ยืนยันไม่อนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: แจ้งแก้ไขข้อมูล -->
+<div class="modal fade" id="modalRequestEdit" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning bg-opacity-10">
+                <h5 class="modal-title"><i class="ri ri-edit-2-line text-warning me-2"></i>แจ้งแก้ไขข้อมูล</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">รายละเอียดที่ต้องแก้ไข <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="editRequestDetail" rows="4" placeholder="ระบุรายละเอียดข้อมูลที่ต้องการให้ผู้ประกอบการแก้ไข"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">แนบหลักฐานประกอบ (ถ้ามี)</label>
+                    <input type="file" class="form-control" id="editRequestFile" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" />
+                    <div class="form-text">รองรับไฟล์ PDF, JPG, PNG, DOC, DOCX</div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">หมายเหตุ</label>
+                    <textarea class="form-control" id="editRequestRemark" rows="2" placeholder="ระบุหมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-warning" id="btnConfirmRequestEdit">
+                    <i class="ri ri-send-plane-line me-1"></i>แจ้งให้แก้ไข
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: คัดลอก RMBS2/P2 → ตั้งต้นสินค้าส่งคืน -->
+<div class="modal fade" id="modalCopyRmbs" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary bg-opacity-10">
+                <h5 class="modal-title"><i class="ri ri-file-copy-line text-primary me-2"></i>สำเนาฐานข้อมูล RMBS2/P2 → ตั้งต้นสินค้าส่งคืน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="ri ri-shield-check-line me-2"></i>
+                    ระบบจะ<strong>สำเนา</strong>ฐานข้อมูลต่อไปนี้เป็น <strong>RMBS2/RMBS1/P2/P1 สินค้าส่งคืน</strong><br />
+                    โดยไม่กระทบข้อมูลต้นฉบับ และจะสร้างรายการใหม่แบบอิสระ
+                </div>
+                <div class="table-responsive mb-3">
+                    <table class="table table-bordered align-middle small mb-0">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>#</th>
+                                <th>RMBS2/P2 ต้นฉบับ</th>
+                                <th>RMBS1/P1 ต้นฉบับ</th>
+                                <th>รุ่นการผลิต</th>
+                                <th>น้ำหนัก (กก.)</th>
+                                <th>จะสร้างเป็น</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ var modalIdx = 0; }
+                            @foreach (var row in rmbs2Rows)
+                            {
+                                modalIdx++;
+                                <tr>
+                                    <td class="text-center text-muted">@modalIdx</td>
+                                    <td class="font-monospace small text-nowrap">@row.Rmbs2No</td>
+                                    <td class="font-monospace small text-muted text-nowrap">@row.Rmbs1No</td>
+                                    <td class="text-nowrap">@row.Batch</td>
+                                    <td class="text-end">@row.WeightReturn.ToString("N3")</td>
+                                    <td><span class="badge bg-label-primary">RMBS2 สินค้าส่งคืน</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">หมายเหตุ (ถ้ามี)</label>
+                    <input type="text" class="form-control" id="copyRmbsRemark" placeholder="ระบุหมายเหตุเพิ่มเติม" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmCopyRmbs"
+                        onclick="alert('สำเนาฐานข้อมูล RMBS2/P2 → ตั้งต้นสินค้าส่งคืนเรียบร้อยแล้ว'); bootstrap.Modal.getInstance(document.getElementById('modalCopyRmbs')).hide();">
+                    <i class="ri ri-file-copy-line me-1"></i>ยืนยันสำเนาข้อมูล
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: รวม RMBS2/P2 สินค้าส่งคืน + สินค้าปกติ -->
+<div class="modal fade" id="modalMergeRmbs" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary bg-opacity-10">
+                <h5 class="modal-title"><i class="ri ri-git-merge-line text-primary me-2"></i>รวมรายการเพื่อขอใบรับรองชุดใหม่</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-3">
+                    <i class="ri ri-information-line me-2"></i>
+                    ระบบจะ<strong>รวม</strong> RMBS2/P2 สินค้าส่งคืน เข้ากับ RMBS2/P2 สินค้าปกติ<br />
+                    เพื่อใช้เป็นฐานข้อมูลสำหรับ<strong>ขอใบรับรองส่งออกชุดใหม่</strong>
+                </div>
+                <div class="table-responsive mb-3">
+                    <table class="table table-bordered align-middle small mb-0">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>ประเภท</th>
+                                <th>RMBS2/P2 เลขที่</th>
+                                <th>รุ่นการผลิต</th>
+                                <th>น้ำหนัก (กก.)</th>
+                                <th>สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-warning bg-opacity-25">
+                                <td><span class="badge bg-label-warning">สินค้าส่งคืน</span></td>
+                                <td class="font-monospace small text-nowrap">RMBS2-2569-OC-00881-RET</td>
+                                <td>OCP-2569-B001</td>
+                                <td class="text-end">1,000.000</td>
+                                <td class="text-center"><span class="badge bg-label-warning">ส่งคืน</span></td>
+                            </tr>
+                            <tr class="table-warning bg-opacity-25">
+                                <td><span class="badge bg-label-warning">สินค้าส่งคืน</span></td>
+                                <td class="font-monospace small text-nowrap">RMBS2-2569-OC-00882-RET</td>
+                                <td>OCP-2569-B002</td>
+                                <td class="text-end">500.000</td>
+                                <td class="text-center"><span class="badge bg-label-warning">ส่งคืน</span></td>
+                            </tr>
+                            <tr class="table-warning bg-opacity-25">
+                                <td><span class="badge bg-label-warning">สินค้าส่งคืน</span></td>
+                                <td class="font-monospace small text-nowrap">RMBS2-2569-OC-00895-RET</td>
+                                <td>OCP-2569-B003</td>
+                                <td class="text-end">250.000</td>
+                                <td class="text-center"><span class="badge bg-label-warning">ส่งคืน</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-label-primary">สินค้าปกติ</span></td>
+                                <td class="font-monospace small text-nowrap">RMBS2-2569-OC-00901</td>
+                                <td>OCP-2569-B010</td>
+                                <td class="text-end">800.000</td>
+                                <td class="text-center"><span class="badge bg-label-primary">ปกติ</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-label-primary">สินค้าปกติ</span></td>
+                                <td class="font-monospace small text-nowrap">RMBS2-2569-OC-00902</td>
+                                <td>OCP-2569-B011</td>
+                                <td class="text-end">1,200.000</td>
+                                <td class="text-center"><span class="badge bg-label-primary">ปกติ</span></td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="table-light fw-semibold text-end small">
+                            <tr>
+                                <td colspan="3" class="text-end">รวมน้ำหนักทั้งหมด</td>
+                                <td>3,750.000</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">หมายเหตุ (ถ้ามี)</label>
+                    <input type="text" class="form-control" id="mergeRmbsRemark" placeholder="ระบุหมายเหตุเพิ่มเติม" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary"
+                        onclick="alert('รวมรายการ RMBS2/P2 สำเร็จ — พร้อมใช้ขอใบรับรองชุดใหม่'); bootstrap.Modal.getInstance(document.getElementById('modalMergeRmbs')).hide();">
+                    <i class="ri ri-git-merge-line me-1"></i>ยืนยันรวมรายการ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: พิมพ์แบบฟอร์ม RMBS2/P2 สินค้าส่งคืน (2.8(10)) -->
+<div class="modal fade" id="modalPrintRmbs" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ri ri-printer-line text-primary me-2"></i>ฟอร์มอิเล็กทรอนิกส์ RMBS2/P2 สินค้าส่งคืน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @* Preview ฟอร์ม *@
+                <div class="border rounded p-4" style="font-family: 'TH Sarabun New', sans-serif; min-height: 400px; background: #fff;">
+                    @* Header กรมประมง *@
+                    <div class="text-center mb-3 pb-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                            <i class="ri ri-government-line text-primary" style="font-size:2.5rem;"></i>
+                            <div>
+                                <div class="fw-bold" style="font-size:1.1rem;">กรมประมง</div>
+                                <div class="text-muted small">Department of Fisheries</div>
+                            </div>
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size:1rem;">บัญชีรายการวัตถุดิบในกระบวนการผลิตสัตว์น้ำ (RMBS2)</h6>
+                        <div>
+                            <span class="badge bg-danger px-3 py-2" style="font-size:0.9rem; letter-spacing:0.5px;">
+                                ⚠️ สินค้าส่งคืน (RETURNED GOODS)
+                            </span>
+                        </div>
+                    </div>
+
+                    @* ข้อมูลเอกสาร *@
+                    <div class="row g-3 mb-3 small">
+                        <div class="col-6">
+                            <div class="text-muted">เลขที่ RMBS2</div>
+                            <div class="fw-semibold font-monospace">RMBS2-2569-OC-00881-RET</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">เลขที่ RMBS1</div>
+                            <div class="fw-semibold font-monospace">RMBS1-2569-OC-01105-RET</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">สถานประกอบการ</div>
+                            <div class="fw-semibold">@{ var establishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด"; }@establishmentName</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">รุ่นการผลิต</div>
+                            <div class="fw-semibold">OCP-2569-B001</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">วันที่อนุมัติคืนน้ำหนัก</div>
+                            <div class="fw-semibold">21/04/2569</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">อ้างอิงคำขอคืนน้ำหนัก</div>
+                            <div class="fw-semibold font-monospace">@sourceImportPermitNo</div>
+                        </div>
+                    </div>
+
+                    @* ตารางรายการสินค้า *@
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle small mb-0">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th>#</th>
+                                    <th>ชนิดสัตว์น้ำ</th>
+                                    <th>รหัสสินค้า</th>
+                                    <th>น้ำหนัก (กก.)</th>
+                                    <th>วันที่รับ</th>
+                                    <th>หมายเหตุ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">1</td>
+                                    <td>ปลาทูน่าตาโต ทั้งตัว แช่แข็ง</td>
+                                    <td class="font-monospace small">0303.44.00 000/KGM</td>
+                                    <td class="text-end fw-semibold">1,000.000</td>
+                                    <td class="text-nowrap">15/03/2569</td>
+                                    <td><span class="badge bg-danger small">สินค้าส่งคืน</span></td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="table-light fw-semibold text-end small">
+                                <tr>
+                                    <td colspan="3" class="text-end">รวมน้ำหนักสุทธิ</td>
+                                    <td>1,000.000 กก.</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    @* ลายเซ็น *@
+                    <div class="row mt-4 pt-3 border-top small">
+                        <div class="col-6 text-center">
+                            <div class="border-bottom border-dark mb-1" style="height:40px;"></div>
+                            <div>ลายมือชื่อผู้ประกอบการ</div>
+                            <div class="text-muted">วันที่ ......................</div>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div class="border-bottom border-dark mb-1" style="height:40px;"></div>
+                            <div>ลายมือชื่อเจ้าหน้าที่กรมประมงผู้อนุมัติ</div>
+                            <div class="text-muted">วันที่ ......................</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-primary"
+                        onclick="alert('ดาวน์โหลดฟอร์ม RMBS2/P2 สินค้าส่งคืน (PDF)')">
+                    <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด PDF
+                </button>
+                <button type="button" class="btn btn-primary"
+                        onclick="window.print()">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 2.8(13): Modal พิมพ์ฟอร์มคืนน้ำหนัก (PDF) *@
+<div class="modal fade" id="modalPrintReturnWeight" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-danger bg-opacity-10">
+                <h5 class="modal-title">
+                    <i class="ri ri-file-pdf-line text-danger me-2"></i>ฟอร์มอิเล็กทรอนิกส์การคืนน้ำหนักสินค้าส่งคืน
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @* Preview ฟอร์ม *@
+                <div class="border rounded p-4" style="font-family: 'TH Sarabun New', sans-serif; min-height: 500px; background: #fff;">
+                    @* Header กรมประมง *@
+                    <div class="text-center mb-4 pb-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                            <i class="ri ri-government-line text-primary" style="font-size:2.5rem;"></i>
+                            <div>
+                                <div class="fw-bold" style="font-size:1.1rem;">กรมประมง</div>
+                                <div class="text-muted small">Department of Fisheries</div>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold mb-1">แบบฟอร์มการคืนน้ำหนักสินค้าส่งคืน</h5>
+                        <div class="text-muted small">Return Weight Approval Form</div>
+                        <div class="mt-2">
+                            <span class="badge bg-success px-3 py-2" style="font-size:0.85rem;">
+                                <i class="ri ri-checkbox-circle-line me-1"></i>@returnWeightStatus
+                            </span>
+                        </div>
+                    </div>
+
+                    @* ข้อมูลคำขอ *@
+                    <div class="row g-3 mb-4 small">
+                        <div class="col-6 col-md-4">
+                            <div class="text-muted">เลขที่อ้างอิงคำขอ</div>
+                            <div class="fw-semibold font-monospace">@sourceApprovalRefNo</div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="text-muted">เลขที่ใบอนุญาตนำเข้า</div>
+                            <div class="fw-semibold font-monospace">@sourceImportPermitNo</div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="text-muted">วันที่อนุมัติ</div>
+                            <div class="fw-semibold">@sourceApprovalDate</div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="text-muted">สถานประกอบการ</div>
+                            <div class="fw-semibold">บริษัท สยาม โปรเซสซิ่ง จำกัด</div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="text-muted">วัตถุประสงค์การคืน</div>
+                            <div class="fw-semibold">@(returnPurpose == "export" ? "ส่งออก (Export)" : returnPurpose == "destroy" ? "ทำลาย (Destroy)" : "ใช้ภายในประเทศ (Domestic)")</div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="text-muted">น้ำหนักที่คืนจริง</div>
+                            <div class="fw-semibold text-success">@returnWeightAmount.ToString("N3") กก.</div>
+                        </div>
+                    </div>
+
+                    @* ตารางรายการสินค้าส่งคืน *@
+                    <h6 class="fw-semibold mb-2 border-bottom pb-1">รายการสินค้าส่งคืนที่ได้รับการอนุมัติ</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle small mb-0">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th>#</th>
+                                    <th>สินค้าประมง</th>
+                                    <th>รหัสพิกัด</th>
+                                    <th>น้ำหนักที่คืน (กก.)</th>
+                                    <th>เลขที่ RMBS2-RET</th>
+                                    <th>เลขที่ใบรับรองอ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">1</td>
+                                    <td>ปลาทูน่าตาโต ทั้งตัว แช่แข็ง</td>
+                                    <td class="font-monospace text-center">0303.44.00 000/KGM</td>
+                                    <td class="text-end fw-semibold text-success">1,000.000</td>
+                                    <td class="font-monospace small">RMBS2-2569-OC-00881-RET</td>
+                                    <td class="font-monospace small">NMD-2569-OC-00551</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">2</td>
+                                    <td>ปลาแซลมอน ทั้งตัว แช่แข็ง</td>
+                                    <td class="font-monospace text-center">0303.89.90 000/KGM</td>
+                                    <td class="text-end fw-semibold text-success">750.000</td>
+                                    <td class="font-monospace small">RMBS2-2569-OC-00882-RET</td>
+                                    <td class="font-monospace small">NMD-2569-OC-00552</td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="table-light fw-semibold">
+                                <tr>
+                                    <td colspan="3" class="text-end">รวมน้ำหนักที่คืนจริง</td>
+                                    <td class="text-end text-success">@returnWeightAmount.ToString("N3") กก.</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    @* ลายเซ็นผู้อนุมัติ *@
+                    <div class="row mt-4 pt-3 border-top text-center small">
+                        <div class="col-4">
+                            <div class="border-bottom mb-1 mx-4" style="height:40px;"></div>
+                            <div class="fw-semibold">ผู้ยื่นคำขอ</div>
+                            <div class="text-muted">บริษัท สยาม โปรเซสซิ่ง จำกัด</div>
+                            <div class="text-muted">วันที่: @sourceApprovalDate</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border-bottom mb-1 mx-4" style="height:40px;"></div>
+                            <div class="fw-semibold">เจ้าหน้าที่ผู้ตรวจสอบ</div>
+                            <div class="text-muted">นายสมชาย วิชิตชัย</div>
+                            <div class="text-muted">วันที่: @sourceApprovalDate</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border-bottom mb-1 mx-4" style="height:40px;"></div>
+                            <div class="fw-semibold">ผู้อนุมัติ</div>
+                            <div class="text-muted">กองตรวจสอบเรือประมงฯ</div>
+                            <div class="text-muted">วันที่: @sourceApprovalDate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="alert('TODO: ดาวน์โหลดฟอร์มคืนน้ำหนัก PDF (ชื่อไฟล์: @(sourceApprovalRefNo).pdf)')">
+                    <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด PDF
+                </button>
+                <button type="button" class="btn btn-danger"
+                        onclick="window.print()">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
         document.addEventListener('DOMContentLoaded', function () {
 
             // Flatpickr
@@ -470,75 +2227,125 @@ else
                 });
             }
 
-            // Toggle condition section
-            document.querySelectorAll('input[name="reviewResult"]').forEach(function (radio) {
-                radio.addEventListener('change', function () {
-                    var conditionSection = document.getElementById('conditionSection');
-                    if (conditionSection) {
-                        conditionSection.classList.toggle('d-none', this.value !== 'approve_condition');
-                        var conditionTextarea = document.getElementById('reviewCondition');
-                        if (conditionTextarea) {
-                            conditionTextarea.required = this.value === 'approve_condition';
-                        }
-                    }
+            // 2.8(5): toggle วัตถุประสงค์ section
+            window.onReturnPurposeChange = function (value) {
+                var secDestroy = document.getElementById('sectionDestroy');
+                var secReturn  = document.getElementById('sectionReturnWeight');
+                var btnExport  = document.getElementById('btnSectionExport');
+                var btnDomestic = document.getElementById('btnSectionDomestic');
+                if (!secDestroy || !secReturn) return;
+                secDestroy.classList.toggle('d-none', value !== 'destroy');
+                secReturn.classList.toggle('d-none', value === 'destroy');
+                if (btnExport)  btnExport.classList.toggle('d-none', value !== 'export');
+                if (btnDomestic) btnDomestic.classList.toggle('d-none', value !== 'domestic');
+            };
+
+            // 2.8(3): toggle เสนอลงนาม section
+            var btnToggleSign = document.getElementById('btnToggleSign');
+            if (btnToggleSign) {
+                btnToggleSign.addEventListener('click', function () {
+                    var sec = document.getElementById('sectionSubmitSign');
+                    if (sec) { sec.classList.toggle('d-none'); }
                 });
-            });
+            }
 
-            function validateAndConfirm(resultValue, confirmMessage, successMessage) {
-                var resultRadio = document.querySelector('input[name="reviewResult"][value="' + resultValue + '"]');
-                if (resultRadio) {
-                    resultRadio.checked = true;
-                    resultRadio.dispatchEvent(new Event('change'));
-                }
-
-                var remark = document.getElementById('reviewRemark');
-                if (!remark || remark.value.trim() === '') {
-                    alert('กรุณาระบุหมายเหตุ/เหตุผลประกอบการพิจารณาก่อนดำเนินการ');
-                    document.querySelector('button[data-bs-target="#tab-review"]').click();
-                    if (remark) { remark.focus(); }
-                    return;
-                }
-
-                if (resultValue === 'approve_condition') {
-                    var condition = document.getElementById('reviewCondition');
-                    if (!condition || condition.value.trim() === '') {
-                        alert('กรุณาระบุเงื่อนไขประกอบการอนุมัติแบบมีเงื่อนไข');
-                        if (condition) { condition.focus(); }
+            // 2.8(3): ยืนยันเสนอลงนาม
+            var btnConfirmSign = document.getElementById('btnConfirmSign');
+            if (btnConfirmSign) {
+                btnConfirmSign.addEventListener('click', function () {
+                    var signer = document.getElementById('selectSigner');
+                    if (!signer || !signer.value) {
+                        alert('กรุณาเลือกผู้ลงนามก่อนดำเนินการ');
+                        signer && signer.focus();
                         return;
                     }
+                    if (confirm('ยืนยันการเสนอให้ "' + signer.options[signer.selectedIndex].text + '" ลงนาม?')) {
+                        alert('TODO: เสนอลงนามเรียบร้อย');
+                    }
+                });
+            }
+
+            // 2.8(3): Modal อนุมัติ
+            var btnConfirmApprove = document.getElementById('btnConfirmApprove');
+            if (btnConfirmApprove) {
+                btnConfirmApprove.addEventListener('click', function () {
+                    if (confirm('ยืนยันการอนุมัติให้คืนน้ำหนักสินค้าส่งคืนคำขอนี้?')) {
+                        alert('TODO: บันทึกผลการอนุมัติให้คืนน้ำหนักเรียบร้อย');
+                        bootstrap.Modal.getInstance(document.getElementById('modalApprove')).hide();
+                    }
+                });
+            }
+
+            // 2.8(3): Modal อนุมัติแบบมีเงื่อนไข
+            var btnConfirmApproveCondition = document.getElementById('btnConfirmApproveCondition');
+            if (btnConfirmApproveCondition) {
+                btnConfirmApproveCondition.addEventListener('click', function () {
+                    var condition = document.getElementById('approveConditionText');
+                    if (!condition || condition.value.trim() === '') {
+                        alert('กรุณาระบุเงื่อนไขประกอบการอนุมัติแบบมีเงื่อนไข');
+                        condition && condition.focus();
+                        return;
+                    }
+                    if (confirm('ยืนยันการอนุมัติแบบมีเงื่อนไขสำหรับคำขอนี้?')) {
+                        alert('TODO: บันทึกผลการอนุมัติแบบมีเงื่อนไขเรียบร้อย');
+                        bootstrap.Modal.getInstance(document.getElementById('modalApproveCondition')).hide();
+                    }
+                });
+            }
+
+            // 2.8(3): Modal ไม่อนุมัติ
+            var btnConfirmReject = document.getElementById('btnConfirmReject');
+            if (btnConfirmReject) {
+                btnConfirmReject.addEventListener('click', function () {
+                    var reason = document.getElementById('rejectReason');
+                    if (!reason || reason.value.trim() === '') {
+                        alert('กรุณาระบุเหตุผลการปฏิเสธก่อนดำเนินการ');
+                        reason && reason.focus();
+                        return;
+                    }
+                    if (confirm('ยืนยันการไม่อนุมัติให้คืนน้ำหนักสำหรับคำขอนี้?')) {
+                        alert('TODO: บันทึกผลการไม่อนุมัติเรียบร้อย');
+                        bootstrap.Modal.getInstance(document.getElementById('modalReject')).hide();
+                    }
+                });
+            }
+
+            // 2.8(3): Modal แจ้งแก้ไขข้อมูล
+            var btnConfirmRequestEdit = document.getElementById('btnConfirmRequestEdit');
+            if (btnConfirmRequestEdit) {
+                btnConfirmRequestEdit.addEventListener('click', function () {
+                    var detail = document.getElementById('editRequestDetail');
+                    if (!detail || detail.value.trim() === '') {
+                        alert('กรุณาระบุรายละเอียดที่ต้องการให้แก้ไขก่อนดำเนินการ');
+                        detail && detail.focus();
+                        return;
+                    }
+                    if (confirm('ยืนยันการแจ้งให้ผู้ประกอบการแก้ไขข้อมูล?')) {
+                        alert('TODO: แจ้งแก้ไขข้อมูลเรียบร้อย');
+                        bootstrap.Modal.getInstance(document.getElementById('modalRequestEdit')).hide();
+                    }
+                });
+            }
+
+            // 2.8(14): ส่งข้อมูลเศษเหลือไประบบปลาป่น
+            window.submitScrapData = function () {
+                var wt = document.getElementById('scrapWeightInput');
+                var tp = document.getElementById('scrapTypeSelect');
+                if (!wt || !wt.value || parseFloat(wt.value) <= 0) {
+                    alert('กรุณาระบุน้ำหนักเศษเหลือให้ถูกต้อง (มากกว่า 0)');
+                    wt && wt.focus();
+                    return;
                 }
-
-                if (confirm(confirmMessage)) {
-                    alert(successMessage);
+                if (!tp || !tp.value) {
+                    alert('กรุณาเลือกประเภทเศษเหลือ');
+                    tp && tp.focus();
+                    return;
                 }
-            }
-
-            var btnApprove = document.getElementById('btnApproveRequest');
-            if (btnApprove) {
-                btnApprove.addEventListener('click', function () {
-                    validateAndConfirm('approve',
-                        'ยืนยันการอนุมัติให้คืนน้ำหนักสินค้าส่งคืนคำขอนี้?',
-                        'บันทึกผลการอนุมัติให้คืนน้ำหนักเรียบร้อย');
-                });
-            }
-
-            var btnApproveCondition = document.getElementById('btnApproveConditionRequest');
-            if (btnApproveCondition) {
-                btnApproveCondition.addEventListener('click', function () {
-                    validateAndConfirm('approve_condition',
-                        'ยืนยันการอนุมัติแบบมีเงื่อนไขสำหรับคำขอนี้?',
-                        'บันทึกผลการอนุมัติแบบมีเงื่อนไขเรียบร้อย');
-                });
-            }
-
-            var btnReject = document.getElementById('btnRejectRequest');
-            if (btnReject) {
-                btnReject.addEventListener('click', function () {
-                    validateAndConfirm('reject',
-                        'ยืนยันการไม่อนุมัติให้คืนน้ำหนักสำหรับคำขอนี้?',
-                        'บันทึกผลการไม่อนุมัติเรียบร้อย');
-                });
-            }
+                var typeName = tp.options[tp.selectedIndex].text;
+                if (confirm('ยืนยันการส่งข้อมูลเศษเหลือ "' + typeName + '" น้ำหนัก ' + parseFloat(wt.value).toFixed(3) + ' กก. ไประบบออกหนังสือรับรองปลาป่น?')) {
+                    alert('TODO: ส่งข้อมูลเศษเหลือเรียบร้อย — ระบบออกหนังสือรับรองปลาป่นรับข้อมูลแล้ว');
+                }
+            };
 
         });
     </script>

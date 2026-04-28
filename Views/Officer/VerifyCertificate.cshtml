@@ -1,0 +1,604 @@
+@{
+    ViewData["Title"] = "ตรวจสอบใบรับรอง (สาธารณะ)";
+    Layout = "_BlankLayout";
+
+    var certnoParam = ViewData["CertNo"]?.ToString() ?? "";
+
+    // Mockup: ค้นหาข้อมูลใบรับรองจากเลขที่ (hard-coded demo)
+    var certFound = !string.IsNullOrEmpty(certnoParam);
+
+    // Fields per cert: [0]certNo [1]typeFull [2]product [3]country [4]requestedAt [5]issuedAt
+    //                  [6]expiredAt [7]status [8]signedBy [9]signPosition [10]signedAt [11]signType
+    //                  [12]hcNo [13]company [14]factoryReg [15]exportPort [16]weightKg [17]destCountryCode
+    var mockCerts = new System.Collections.Generic.Dictionary<string, object[]>
+    {
+        { "PS-TH-2569-002", new object[] {
+            "PS-TH-2569-002", "PS — Processing Statement", "กุ้งแช่แข็ง (Frozen Shrimp)", "ญี่ปุ่น (Japan)",
+            "20/04/2569", "21/04/2569", "21/04/2570", "มีผลบังคับ",
+            "นางสาวพรทิพย์ วงศ์ดี", "ผู้อำนวยการกองตรวจสอบคุณภาพสินค้าประมง",
+            "21/04/2569 09:42", "ลายเซ็นดิจิทัล (e-Signature)",
+            "HA-2569-00157", "บริษัท ซีฟู้ดส์ ไทยแลนด์ จำกัด",
+            "TH-1-6100-10-401/22", "ท่าเรือแหลมฉบัง (Laem Chabang Port)", "12,500", "JP"
+        }},
+        { "PS-TH-2569-004", new object[] {
+            "PS-TH-2569-004", "PS — Processing Statement", "ปลาทูน่ากระป๋อง (Canned Tuna)", "สหรัฐอเมริกา (USA)",
+            "15/04/2569", "16/04/2569", "16/04/2570", "มีผลบังคับ",
+            "นายวิชัย ประเสริฐ", "หัวหน้ากลุ่มงานรับรองคุณภาพ",
+            "16/04/2569 14:15", "ลายเซ็นดิจิทัล (e-Signature)",
+            "HA-2569-00134", "บริษัท ทูน่า เพรสทีจ จำกัด",
+            "TH-1-7400-10-201/22", "ท่าเรือกรุงเทพ (Bangkok Port)", "38,200", "US"
+        }},
+        { "NMD-TH-2569-014", new object[] {
+            "NMD-TH-2569-014", "NMD — Non-Manipulation Document", "ปลาแมคเคอเรล (Mackerel)", "สหภาพยุโรป (EU)",
+            "22/04/2569", "23/04/2569", "23/04/2570", "มีผลบังคับ",
+            "นางสาวพรทิพย์ วงศ์ดี", "ผู้อำนวยการกองตรวจสอบคุณภาพสินค้าประมง",
+            "23/04/2569 10:08", "ลายเซ็นดิจิทัล (e-Signature)",
+            "HA-2569-00201", "บริษัท ไทย ซีฟู้ด เอ็กซ์พอร์ต จำกัด",
+            "TH-1-8400-10-101/22", "ท่าเรือแหลมฉบัง (Laem Chabang Port)", "5,800", "EU"
+        }},
+        { "PS-TH-2569-007", new object[] {
+            "PS-TH-2569-007", "PS — Processing Statement", "ปลาหมึกแช่แข็ง (Frozen Squid)", "จีน (China)",
+            "18/04/2569", "19/04/2569", "19/04/2570", "มีผลบังคับ",
+            "นายสมชาย ชัยวงศ์", "เจ้าหน้าที่ตรวจสอบคุณภาพอาวุโส",
+            "19/04/2569 11:30", "ลายเซ็นดิจิทัล (e-Signature)",
+            "HA-2569-00178", "บริษัท โอเชี่ยน ฟู้ด จำกัด",
+            "TH-1-7300-10-301/21", "ท่าเรือแหลมฉบัง (Laem Chabang Port)", "9,100", "CN"
+        }},
+        { "NMD-TH-2569-021", new object[] {
+            "NMD-TH-2569-021", "NMD — Non-Manipulation Document", "ปลาทูน่า (Fresh Tuna)", "เกาหลีใต้ (Korea)",
+            "24/04/2569", "25/04/2569", "25/04/2570", "รอออก",
+            "", "", "", "",
+            "", "บริษัท ทูน่า โปรดักส์ จำกัด",
+            "TH-1-7400-10-405/20", "ท่าเรือกรุงเทพ (Bangkok Port)", "4,200", "KR"
+        }},
+    };
+
+    object[]? cert = certFound && mockCerts.ContainsKey(certnoParam) ? mockCerts[certnoParam] : null;
+    bool certValid = cert != null && cert[7]?.ToString() == "มีผลบังคับ";
+}
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] — กรมประมง</title>
+    <link rel="stylesheet" href="~/vendor/css/core.css">
+    <link rel="stylesheet" href="~/vendor/fonts/remixicon/remixicon.css">
+    <style>
+        body { background: linear-gradient(135deg,#eef2ff 0%,#f0faf8 100%); min-height: 100vh; font-family: 'Prompt', 'Sarabun', sans-serif; }
+        .verify-wrapper { max-width: 780px; margin: 0 auto; padding: 32px 16px 48px; }
+        .verify-header { background: linear-gradient(135deg,#1a3c6d 0%,#1e7e7e 100%); color: #fff; border-radius: 14px 14px 0 0; padding: 28px 32px; }
+        .verify-body { background: #fff; border-radius: 0 0 14px 14px; box-shadow: 0 4px 24px rgba(0,0,0,.10); padding: 28px 32px; }
+        .tab-search .nav-link { border-radius: 8px 8px 0 0; font-size: 0.88rem; padding: 8px 16px; color: #555; }
+        .tab-search .nav-link.active { background: #1a3c6d; color: #fff; border-color: #1a3c6d; }
+        .tab-search .nav-link:not(.active):hover { background: #eef2ff; }
+        .cert-field-label { color: #6c757d; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+        .cert-field-value { font-size: 0.9rem; font-weight: 500; }
+        .badge-valid { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 5px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; }
+        .badge-pending { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 5px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; }
+        .badge-invalid { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 5px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; }
+        .esign-box { background: linear-gradient(135deg,#f8f9fa,#eef2ff); border: 1.5px solid #c7d2fe; border-radius: 10px; padding: 16px 20px; }
+        .qr-box { background: #fff; border: 1.5px dashed #adb5bd; border-radius: 10px; padding: 16px; text-align: center; }
+        .divider-label { border: 0; border-top: 1.5px solid #e0e7ef; position: relative; margin: 20px 0; }
+        .divider-label::after { content: attr(data-label); position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 10px; font-size: 0.75rem; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+        .result-list-item { background: #f8faff; border: 1px solid #dee2ef; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; cursor: pointer; transition: background .15s,box-shadow .15s; }
+        .result-list-item:hover { background: #eef2ff; box-shadow: 0 2px 8px rgba(26,60,109,.12); }
+        .qr-scan-mock { background: #111; border-radius: 10px; padding: 20px; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+        .scan-line { width: 100%; height: 2px; background: linear-gradient(90deg,transparent,#00ff88,transparent); animation: scanMove 2s linear infinite; margin-top: 8px; }
+        @@keyframes scanMove { 0% { opacity: 0; } 30% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+        .cert-type-ps { background:#e8f4fd; color:#1a5276; border:1px solid #aed6f1; font-size:.75rem; padding:2px 8px; border-radius:4px; font-weight:700; }
+        .cert-type-nmd { background:#fef9e7; color:#7d6608; border:1px solid #f9e79f; font-size:.75rem; padding:2px 8px; border-radius:4px; font-weight:700; }
+        @@media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            .verify-header { background: #1a3c6d !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+<div class="verify-wrapper">
+
+    <!-- ── Header ── -->
+    <div class="verify-header d-flex align-items-center gap-3">
+        <img src="~/img/fisheries-logo.png" alt="กรมประมง" height="52" onerror="this.style.display='none'" />
+        <div>
+            <h4 class="mb-0 fw-bold">ตรวจสอบใบรับรอง (สาธารณะ)</h4>
+            <div style="opacity:.8;font-size:.84rem;">Verify Certificate — Processing Statement / Non-Manipulation Document</div>
+        </div>
+        <div class="ms-auto text-end no-print" style="font-size:.75rem;opacity:.75;line-height:1.5;">
+            กรมประมง<br>กระทรวงเกษตรและสหกรณ์
+        </div>
+    </div>
+
+    <div class="verify-body">
+
+        <!-- ── Search section ── -->
+        <div class="no-print">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs tab-search mb-0" id="searchTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tab-certno-btn" data-bs-toggle="tab" data-bs-target="#tab-certno" type="button" role="tab">
+                        <i class="ri ri-award-line me-1"></i>ค้นหาด้วยเลขที่ใบรับรอง
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-detail-btn" data-bs-toggle="tab" data-bs-target="#tab-detail" type="button" role="tab">
+                        <i class="ri ri-search-2-line me-1"></i>ค้นหาจากรายละเอียด
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-qr-btn" data-bs-toggle="tab" data-bs-target="#tab-qr" type="button" role="tab">
+                        <i class="ri ri-qr-scan-2-line me-1"></i>สแกน QR Code
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content border border-top-0 rounded-bottom p-3 mb-4" id="searchTabsContent">
+                <!-- Tab 1: ค้นหาด้วยเลขที่ -->
+                <div class="tab-pane fade show active" id="tab-certno" role="tabpanel">
+                    <form method="get" action="/Officer/VerifyCertificate" class="d-flex gap-2 mt-1">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="ri ri-award-line text-muted"></i></span>
+                            <input type="text" class="form-control" name="certno"
+                                   id="inputCertNo"
+                                   value="@certnoParam"
+                                   placeholder="เช่น PS-TH-2569-002 หรือ NMD-TH-2569-014"
+                                   style="font-family:monospace;font-size:.9rem;" autocomplete="off" />
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="ri ri-search-line me-1"></i>ตรวจสอบ
+                            </button>
+                        </div>
+                    </form>
+                    <div class="form-text text-muted small mt-2">
+                        <i class="ri ri-information-line me-1"></i>ตัวอย่างเลขที่ทดสอบ:
+                        <a href="/Officer/VerifyCertificate?certno=PS-TH-2569-002" class="text-decoration-none me-2">PS-TH-2569-002</a>
+                        <a href="/Officer/VerifyCertificate?certno=PS-TH-2569-004" class="text-decoration-none me-2">PS-TH-2569-004</a>
+                        <a href="/Officer/VerifyCertificate?certno=NMD-TH-2569-014" class="text-decoration-none me-2">NMD-TH-2569-014</a>
+                        <a href="/Officer/VerifyCertificate?certno=PS-TH-2569-007" class="text-decoration-none me-2">PS-TH-2569-007</a>
+                        <a href="/Officer/VerifyCertificate?certno=NMD-TH-2569-021" class="text-decoration-none">NMD-TH-2569-021</a>
+                    </div>
+                </div>
+
+                <!-- Tab 2: ค้นหาจากรายละเอียด -->
+                <div class="tab-pane fade" id="tab-detail" role="tabpanel">
+                    <div class="row g-2 mt-1">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">ชื่อบริษัท / ผู้ประกอบการ</label>
+                            <input type="text" class="form-control form-control-sm" id="dtlCompany" placeholder="เช่น ซีฟู้ดส์ ไทยแลนด์" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">ชนิดสินค้า</label>
+                            <input type="text" class="form-control form-control-sm" id="dtlProduct" placeholder="เช่น กุ้ง / Tuna" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-semibold">ประเทศปลายทาง</label>
+                            <select class="form-select form-select-sm" id="dtlCountry">
+                                <option value="">ทั้งหมด</option>
+                                <option value="ญี่ปุ่น">ญี่ปุ่น</option>
+                                <option value="สหรัฐอเมริกา">สหรัฐอเมริกา</option>
+                                <option value="สหภาพยุโรป">สหภาพยุโรป</option>
+                                <option value="จีน">จีน</option>
+                                <option value="เกาหลีใต้">เกาหลีใต้</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">เลขที่ HC สุขอนามัย</label>
+                            <input type="text" class="form-control form-control-sm" id="dtlHcNo" placeholder="เช่น HA-2569-00157" style="font-family:monospace;" />
+                        </div>
+                        <div class="col-12 d-flex gap-2 align-items-center">
+                            <button type="button" class="btn btn-primary btn-sm px-4" id="btnDetailSearch">
+                                <i class="ri ri-search-2-line me-1"></i>ค้นหา
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnDetailReset">
+                                <i class="ri ri-refresh-line me-1"></i>ล้าง
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Detail search results -->
+                    <div id="detailResults" class="mt-3" style="display:none;">
+                        <div class="small text-muted fw-semibold mb-2">
+                            <i class="ri ri-list-check me-1"></i>ผลการค้นหา: <span id="detailCount">0</span> รายการ
+                        </div>
+                        <div id="detailResultList"></div>
+                    </div>
+                    <div id="detailNoResult" class="alert alert-warning small mt-3" style="display:none;">
+                        <i class="ri ri-error-warning-line me-1"></i>ไม่พบข้อมูลที่ตรงกับเงื่อนไขที่ระบุ
+                    </div>
+                </div>
+
+                <!-- Tab 3: สแกน QR Code -->
+                <div class="tab-pane fade" id="tab-qr" role="tabpanel">
+                    <div class="row g-3 mt-1 align-items-center">
+                        <div class="col-md-5">
+                            <div class="qr-scan-mock" id="qrScanBox">
+                                <i class="ri ri-qr-scan-2-line" style="font-size:2.5rem;opacity:.6;"></i>
+                                <div class="small mt-2" style="opacity:.7;">ตำแหน่งกล้อง / Camera Preview</div>
+                                <div class="scan-line" id="scanLine" style="display:none;"></div>
+                                <div class="small mt-2" id="scanStatus" style="opacity:.6;">กดปุ่มเพื่อเริ่มสแกน</div>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="text-muted small mb-2">
+                                <i class="ri ri-information-line me-1 text-primary"></i>
+                                นำ QR Code บนใบรับรองมาสแกนเพื่อตรวจสอบความถูกต้องของใบรับรองโดยอัตโนมัติ
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm mb-3" id="btnStartScan">
+                                <i class="ri ri-camera-line me-1"></i>เริ่มสแกน QR Code
+                            </button>
+                            <div class="mb-2 small fw-semibold text-muted">— หรือกรอกเลขที่จาก QR Code —</div>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control form-control-sm" id="qrManualInput"
+                                       placeholder="เลขที่ใบรับรองจาก QR Code" style="font-family:monospace;" />
+                                <button type="button" class="btn btn-outline-primary btn-sm px-3" id="btnQrVerify">
+                                    <i class="ri ri-check-line me-1"></i>ตรวจสอบ
+                                </button>
+                            </div>
+                            <div id="qrScanResult" class="mt-2 small text-muted"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /no-print -->
+
+        <!-- ── Result section ── -->
+        @if (certFound)
+        {
+            @if (cert != null)
+            {
+                var statusBadgeClass = certValid ? "badge-valid" : (cert[7]?.ToString() == "รอออก" ? "badge-pending" : "badge-invalid");
+                var statusIcon = certValid ? "ri-checkbox-circle-fill" : (cert[7]?.ToString() == "รอออก" ? "ri-time-line" : "ri-close-circle-line");
+                var isSigned = !string.IsNullOrEmpty(cert[8]?.ToString());
+                var certTypeCode = cert[0]?.ToString()?.StartsWith("NMD") == true ? "NMD" : "PS";
+                var verifyUrl = $"http://localhost:5055/Officer/VerifyCertificate?certno={cert[0]}";
+                var qrSrc = $"https://api.qrserver.com/v1/create-qr-code/?size=130x130&margin=4&data={Uri.EscapeDataString(verifyUrl)}";
+
+                <!-- Valid/Invalid banner -->
+                @if (certValid)
+                {
+                    <div class="alert alert-success d-flex align-items-center gap-3 py-3 mb-4" role="alert" style="border-radius:10px;">
+                        <i class="ri ri-shield-check-fill fs-3 text-success flex-shrink-0"></i>
+                        <div>
+                            <div class="fw-bold">ใบรับรองนี้ถูกต้องและมีผลบังคับใช้</div>
+                            <div class="small text-muted">ข้อมูลตรงกับฐานข้อมูลกรมประมง — ออกโดยเจ้าหน้าที่ที่ได้รับมอบอำนาจ</div>
+                        </div>
+                        <div class="ms-auto text-end no-print">
+                            <button class="btn btn-sm btn-outline-success" onclick="window.print()">
+                                <i class="ri ri-printer-line me-1"></i>พิมพ์
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary ms-1">
+                                <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด PDF
+                            </button>
+                        </div>
+                    </div>
+                }
+                else if (cert[7]?.ToString() == "รอออก")
+                {
+                    <div class="alert alert-warning d-flex align-items-center gap-3 py-3 mb-4" role="alert" style="border-radius:10px;">
+                        <i class="ri ri-time-line fs-3 text-warning flex-shrink-0"></i>
+                        <div>
+                            <div class="fw-bold">ใบรับรองอยู่ระหว่างดำเนินการ</div>
+                            <div class="small text-muted">ยังไม่ได้ออกใบรับรอง / รอลงนาม</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger d-flex align-items-center gap-3 py-3 mb-4" role="alert" style="border-radius:10px;">
+                        <i class="ri ri-close-circle-line fs-3 text-danger flex-shrink-0"></i>
+                        <div>
+                            <div class="fw-bold">ใบรับรองไม่มีผลบังคับใช้</div>
+                            <div class="small text-muted">ถูกยกเลิก / หมดอายุ</div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Cert info grid -->
+                <hr class="divider-label" data-label="ข้อมูลใบรับรอง" />
+                <div class="row g-3 mb-3">
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">เลขที่ใบรับรอง</div>
+                        <div class="cert-field-value" style="font-family:monospace;color:#1a3c6d;font-size:.95rem;font-weight:700;">
+                            <i class="ri ri-award-line me-1 text-muted"></i>@cert[0]
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">ประเภทใบรับรอง</div>
+                        <div class="cert-field-value">
+                            <span class="@(certTypeCode=="PS"?"cert-type-ps":"cert-type-nmd")">@certTypeCode</span>
+                            <span class="small text-muted ms-1">@cert[1]?.ToString()?.Split('—').LastOrDefault()?.Trim()</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">สถานะ</div>
+                        <div><span class="@statusBadgeClass"><i class="ri @statusIcon me-1"></i>@cert[7]</span></div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="cert-field-label">ผู้ประกอบการ / บริษัท</div>
+                        <div class="cert-field-value">
+                            <i class="ri ri-building-2-line me-1 text-muted"></i>@cert[13]
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="cert-field-label">เลขทะเบียนโรงงาน</div>
+                        <div class="cert-field-value" style="font-family:monospace;font-size:.82rem;">@cert[14]</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">สินค้า / ชนิดสัตว์น้ำ</div>
+                        <div class="cert-field-value"><i class="ri ri-fish-line me-1 text-muted"></i>@cert[2]</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">น้ำหนัก (กก.)</div>
+                        <div class="cert-field-value">@cert[16] กก.</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">ประเทศปลายทาง</div>
+                        <div class="cert-field-value"><i class="ri ri-map-pin-line me-1 text-muted"></i>@cert[3]</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">ท่าส่งออก</div>
+                        <div class="cert-field-value small">@cert[15]</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">เลขที่ HC สุขอนามัย</div>
+                        <div class="cert-field-value" style="font-family:monospace;color:#b02a37;font-weight:700;">
+                            @if (!string.IsNullOrEmpty(cert[12]?.ToString())) {
+                                <i class="ri ri-heart-pulse-line me-1"></i>@cert[12]
+                            } else {
+                                <span class="text-muted small">—</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">วันที่ยื่นคำขอ</div>
+                        <div class="cert-field-value"><i class="ri ri-calendar-line me-1 text-muted"></i>@cert[4]</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">วันที่ออกใบรับรอง</div>
+                        <div class="cert-field-value fw-semibold text-success"><i class="ri ri-calendar-check-line me-1"></i>@cert[5]</div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="cert-field-label">วันที่หมดอายุ</div>
+                        <div class="cert-field-value text-danger"><i class="ri ri-calendar-event-line me-1"></i>@cert[6]</div>
+                    </div>
+                </div>
+
+                <!-- e-Signature info -->
+                @if (isSigned)
+                {
+                    <hr class="divider-label" data-label="ข้อมูลลายเซ็นดิจิทัล" />
+                    <div class="esign-box mb-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <div style="font-size:2.2rem;color:#4f46e5;line-height:1;">
+                                <i class="ri ri-pen-nib-fill"></i>
+                            </div>
+                            <div class="flex-fill">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <div class="cert-field-label">ลงนามโดย</div>
+                                        <div class="cert-field-value fw-bold">@cert[8]</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="cert-field-label">ตำแหน่ง</div>
+                                        <div class="cert-field-value small">@cert[9]</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="cert-field-label">วันที่ / เวลาลงนาม</div>
+                                        <div class="cert-field-value"><i class="ri ri-time-line me-1 text-muted"></i>@cert[10]</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="cert-field-label">ประเภทลายเซ็น</div>
+                                        <div class="cert-field-value">
+                                            <span class="badge bg-label-primary">
+                                                <i class="ri ri-fingerprint-line me-1"></i>@cert[11]
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 text-end no-print">
+                                <span class="badge bg-success py-2 px-3" style="font-size:.78rem;">
+                                    <i class="ri ri-checkbox-circle-fill me-1"></i>ลงนามแล้ว ✅
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-secondary small d-flex gap-2 align-items-center mb-4">
+                        <i class="ri ri-pen-nib-line fs-5 text-muted flex-shrink-0"></i>
+                        <span>ยังไม่มีข้อมูลลายเซ็น — ใบรับรองนี้ยังไม่ได้รับการลงนาม</span>
+                    </div>
+                }
+
+                <!-- QR Code re-display -->
+                <hr class="divider-label no-print" data-label="QR Code" />
+                <div class="row g-3 no-print">
+                    <div class="col-auto">
+                        <div class="qr-box">
+                            <img src="@qrSrc" alt="QR Code" width="130" height="130"
+                                 onerror="this.style.display='none'" />
+                            <div class="text-muted" style="font-size:.72rem;margin-top:6px;">
+                                <i class="ri ri-qr-code-line me-1"></i>QR Code ของใบรับรองนี้
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col d-flex flex-column justify-content-center gap-2">
+                        <div class="small text-muted">URL ตรวจสอบสาธารณะ:</div>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control form-control-sm" id="verifyUrlInput"
+                                   value="@verifyUrl" readonly style="font-family:monospace;font-size:.78rem;" />
+                            <button class="btn btn-outline-secondary btn-sm" type="button" id="btnCopyUrl"
+                                    onclick="navigator.clipboard.writeText(document.getElementById('verifyUrlInput').value); this.innerHTML='<i class=\'ri ri-check-line\'></i> คัดลอกแล้ว'; setTimeout(()=>this.innerHTML='<i class=\'ri ri-file-copy-line\'></i> คัดลอก',1800);">
+                                <i class="ri ri-file-copy-line"></i> คัดลอก
+                            </button>
+                        </div>
+                        <a href="@verifyUrl" target="_blank" class="btn btn-outline-info btn-sm w-auto">
+                            <i class="ri ri-external-link-line me-1"></i>เปิดในแท็บใหม่
+                        </a>
+                        <a href="@qrSrc" download="QR-@(cert[0]).png" class="btn btn-outline-secondary btn-sm w-auto">
+                            <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด QR Code
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Footer note -->
+                <div class="alert alert-light border d-flex align-items-start gap-2 mt-4 py-2 small" role="alert">
+                    <i class="ri ri-shield-check-line text-success fs-5 flex-shrink-0 mt-1"></i>
+                    <div class="text-muted">
+                        ข้อมูลนี้ดึงจากฐานข้อมูลกรมประมงแบบ real-time
+                        หากพบความผิดปกติกรุณาติดต่อ <strong>กองตรวจสอบคุณภาพสินค้าประมง</strong>
+                        โทร. 0-2562-0600 ต่อ 3401 &nbsp;|&nbsp;
+                        อีเมล: qc.fisheries@@dof.mail.go.th
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Not found -->
+                <div class="alert alert-danger d-flex align-items-start gap-3 py-3" role="alert" style="border-radius:10px;">
+                    <i class="ri ri-close-circle-line fs-2 text-danger flex-shrink-0"></i>
+                    <div>
+                        <div class="fw-bold fs-6">ไม่พบข้อมูลใบรับรอง</div>
+                        <div class="text-muted small mt-1">
+                            ไม่พบเลขที่ใบรับรอง <code class="text-danger">@certnoParam</code> ในฐานข้อมูล
+                        </div>
+                        <ul class="small text-muted mt-2 mb-0">
+                            <li>ตรวจสอบเลขที่ใบรับรองอีกครั้ง</li>
+                            <li>ใบรับรองอาจถูกยกเลิกหรือยังไม่ได้ออก</li>
+                            <li>ติดต่อกองตรวจสอบคุณภาพสินค้าประมง โทร. 0-2562-0600 ต่อ 3401</li>
+                        </ul>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Default / empty state -->
+            <div class="text-center py-5 text-muted">
+                <i class="ri ri-shield-check-line" style="font-size:3.5rem;opacity:.25;color:#1a3c6d;"></i>
+                <div class="mt-3 fw-semibold" style="font-size:1rem;color:#6c757d;">ระบบตรวจสอบใบรับรองออนไลน์</div>
+                <div class="small mt-1 text-muted">
+                    ค้นหาด้วยเลขที่ใบรับรอง, รายละเอียดสินค้า/บริษัท, หรือสแกน QR Code<br>
+                    เพื่อยืนยันความถูกต้องและสถานะของใบรับรอง PS / NMD
+                </div>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <div class="text-center px-3">
+                        <i class="ri ri-award-line" style="font-size:1.8rem;color:#4f46e5;opacity:.6;"></i>
+                        <div class="small mt-1">PS — Processing Statement</div>
+                    </div>
+                    <div class="text-center px-3">
+                        <i class="ri ri-file-shield-2-line" style="font-size:1.8rem;color:#1e7e7e;opacity:.6;"></i>
+                        <div class="small mt-1">NMD — Non-Manipulation Document</div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div><!-- /verify-body -->
+
+    <div class="text-center mt-3 text-muted no-print" style="font-size:.73rem;">
+        &copy; @(DateTime.Now.Year + 543) กรมประมง กระทรวงเกษตรและสหกรณ์ — ระบบ FSW v2.0
+        &nbsp;|&nbsp; ตรวจสอบโดยสาธารณะ
+    </div>
+</div><!-- /verify-wrapper -->
+
+<script src="~/vendor/libs/jquery/jquery.js"></script>
+<script src="~/vendor/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    // ── Detail search mockup ──
+    var mockList = [
+        { certNo:"PS-TH-2569-002",  type:"PS",  company:"บริษัท ซีฟู้ดส์ ไทยแลนด์ จำกัด",      product:"กุ้งแช่แข็ง",      country:"ญี่ปุ่น",      hcNo:"HA-2569-00157", status:"มีผลบังคับ", issuedAt:"21/04/2569" },
+        { certNo:"PS-TH-2569-004",  type:"PS",  company:"บริษัท ทูน่า เพรสทีจ จำกัด",           product:"ปลาทูน่ากระป๋อง", country:"สหรัฐอเมริกา",  hcNo:"HA-2569-00134", status:"มีผลบังคับ", issuedAt:"16/04/2569" },
+        { certNo:"NMD-TH-2569-014", type:"NMD", company:"บริษัท ไทย ซีฟู้ด เอ็กซ์พอร์ต จำกัด", product:"ปลาแมคเคอเรล",   country:"สหภาพยุโรป",   hcNo:"HA-2569-00201", status:"มีผลบังคับ", issuedAt:"23/04/2569" },
+        { certNo:"PS-TH-2569-007",  type:"PS",  company:"บริษัท โอเชี่ยน ฟู้ด จำกัด",            product:"ปลาหมึกแช่แข็ง",  country:"จีน",           hcNo:"HA-2569-00178", status:"มีผลบังคับ", issuedAt:"19/04/2569" },
+        { certNo:"NMD-TH-2569-021", type:"NMD", company:"บริษัท ทูน่า โปรดักส์ จำกัด",          product:"ปลาทูน่าสด",      country:"เกาหลีใต้",     hcNo:"",              status:"รอออก",       issuedAt:"—" },
+    ];
+
+    document.getElementById('btnDetailSearch').addEventListener('click', function () {
+        var co = (document.getElementById('dtlCompany').value || '').trim().toLowerCase();
+        var pr = (document.getElementById('dtlProduct').value || '').trim().toLowerCase();
+        var ct = (document.getElementById('dtlCountry').value || '').trim();
+        var hc = (document.getElementById('dtlHcNo').value || '').trim().toLowerCase();
+
+        var results = mockList.filter(function (m) {
+            return (!co || m.company.toLowerCase().includes(co)) &&
+                   (!pr || m.product.toLowerCase().includes(pr)) &&
+                   (!ct || m.country.includes(ct)) &&
+                   (!hc || m.hcNo.toLowerCase().includes(hc));
+        });
+
+        var list = document.getElementById('detailResultList');
+        var box = document.getElementById('detailResults');
+        var none = document.getElementById('detailNoResult');
+        document.getElementById('detailCount').textContent = results.length;
+
+        if (results.length === 0) {
+            box.style.display = 'none';
+            none.style.display = '';
+            return;
+        }
+        none.style.display = 'none';
+
+        var html = results.map(function (r) {
+            var stClass = r.status === 'มีผลบังคับ' ? 'text-success' : 'text-warning';
+            var stIcon  = r.status === 'มีผลบังคับ' ? 'ri-checkbox-circle-fill' : 'ri-time-line';
+            return '<div class="result-list-item" onclick="window.location=\'/Officer/VerifyCertificate?certno=' + r.certNo + '\'">' +
+                '<div class="d-flex align-items-center gap-2">' +
+                '<span class="badge ' + (r.type==='PS'?'bg-label-primary':'bg-label-warning') + '">' + r.type + '</span>' +
+                '<span class="fw-semibold" style="font-family:monospace;font-size:.88rem;">' + r.certNo + '</span>' +
+                '<span class="' + stClass + ' small ms-1"><i class="ri ' + stIcon + ' me-1"></i>' + r.status + '</span>' +
+                '<span class="ms-auto text-muted small">' + r.issuedAt + '</span>' +
+                '</div>' +
+                '<div class="small text-muted mt-1">' + r.company + ' &nbsp;|&nbsp; ' + r.product + ' &nbsp;→&nbsp; ' + r.country + '</div>' +
+                (r.hcNo ? '<div class="small" style="color:#b02a37;"><i class="ri ri-heart-pulse-line me-1"></i>HC: ' + r.hcNo + '</div>' : '') +
+                '</div>';
+        }).join('');
+
+        list.innerHTML = html;
+        box.style.display = '';
+    });
+
+    document.getElementById('btnDetailReset').addEventListener('click', function () {
+        ['dtlCompany','dtlProduct','dtlHcNo'].forEach(function(id){ document.getElementById(id).value=''; });
+        document.getElementById('dtlCountry').value = '';
+        document.getElementById('detailResults').style.display = 'none';
+        document.getElementById('detailNoResult').style.display = 'none';
+    });
+
+    // ── QR scan simulation ──
+    var scanTimer = null;
+    var sampleCerts = ['PS-TH-2569-002','PS-TH-2569-004','NMD-TH-2569-014','PS-TH-2569-007'];
+    document.getElementById('btnStartScan').addEventListener('click', function () {
+        var btn = this;
+        var line = document.getElementById('scanLine');
+        var status = document.getElementById('scanStatus');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> กำลังสแกน...';
+        line.style.display = '';
+        status.textContent = 'กำลังตรวจจับ QR Code...';
+        scanTimer = setTimeout(function () {
+            var picked = sampleCerts[Math.floor(Math.random() * sampleCerts.length)];
+            document.getElementById('qrManualInput').value = picked;
+            document.getElementById('qrScanResult').innerHTML =
+                '<span class="text-success"><i class="ri ri-checkbox-circle-fill me-1"></i>สแกนสำเร็จ: <strong>' + picked + '</strong></span>';
+            status.textContent = 'สแกนสำเร็จ ✓';
+            line.style.display = 'none';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ri ri-camera-line me-1"></i>เริ่มสแกนใหม่';
+        }, 2000);
+    });
+
+    document.getElementById('btnQrVerify').addEventListener('click', function () {
+        var val = (document.getElementById('qrManualInput').value || '').trim();
+        if (val) window.location.href = '/Officer/VerifyCertificate?certno=' + encodeURIComponent(val);
+    });
+    document.getElementById('qrManualInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') document.getElementById('btnQrVerify').click();
+    });
+})();
+</script>
+</body>
+</html>

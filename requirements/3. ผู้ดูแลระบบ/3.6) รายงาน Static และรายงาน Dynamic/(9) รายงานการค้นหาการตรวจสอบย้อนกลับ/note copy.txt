@@ -1,0 +1,12 @@
+# (9) รายงานการค้นหาการตรวจสอบย้อนกลับ (Traceability)
+
+URL: http://localhost:5055/Admin/Reports
+
+รหัสรายงาน: ST-014
+
+จำนวนรูปที่ต้องแคป: 2 รูป
+
+รายการหน้าที่ต้องแคป
+1. หน้า Reports > แถว ST-014 'รายงานการตรวจสอบย้อนกลับ (Traceability Search)'
+2. Modal #rptViewerModal > ST-014: ตาราง Trace Code/โรงงาน/ชนิดสัตว์น้ำ/แหล่งที่มา/จำนวน Supplier/วันตรวจล่าสุด/ระดับ Trace/สถานะ
+   summary: รวม 5 รายการ | ผ่าน 3 / รอตรวจ 1 / ไม่ผ่าน 1 | Supplier 14 ราย

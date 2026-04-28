@@ -1,0 +1,983 @@
+@{
+    ViewData["Title"] = "พิจารณาอนุมัติ %Yield";
+
+    // ── Mockup data ──
+    string requestNo      = "YLD-2026-00201";
+    string companyName    = "บริษัท สยาม มารีน ฟู้ดส์ จำกัด";
+    string companyReg     = "0105535012345";
+    string certType       = "DOF รับรองโรงงาน (ทูน่า/ปลาเนื้อขาว)";
+    string areaResponsible= "กองตรวจสอบคุณภาพสินค้าประมง (กตส.)";
+    string requestTypeText= "คำขอใหม่";
+    string requestTypeClass="bg-label-primary";
+    string rawMaterialType= "วัตถุดิบนำเข้า";
+    decimal previousYield = 70.0m;
+    decimal requestedYield= 72.5m;
+    decimal tolerance     = 2.0m;
+    decimal approvedYield = 72.5m;          // last approved yield
+    decimal calculatedYield = 65.2m;        // system-calculated actual yield
+    decimal deviationPct  = 7.3m;           // abs deviation
+    bool    isOverTolerance = true;          // 7.3 > 2.0 → over tolerance
+    string  effectiveDateFrom = "01/05/2569";
+    string  effectiveDateTo   = "30/04/2570";
+    string submittedDate  = "18 เมษายน 2569  เวลา 09:00 น.";
+    string statusText     = "รออนุมัติ";
+    string statusClass    = "bg-label-warning";
+}
+
+@section PageStyles {
+<style>
+    .field-display {
+        font-size: 0.875rem;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.375rem;
+        padding: 0.4375rem 0.875rem;
+        min-height: 2.375rem;
+        display: flex;
+        align-items: center;
+        word-break: break-word;
+    }
+    .field-display.text-end   { justify-content: flex-end; }
+    .field-display.text-center { justify-content: center; }
+    .form-label.small { font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem; }
+
+    .decision-card { border: 2px solid var(--bs-primary); }
+    .decision-card .card-header { background: rgba(var(--bs-primary-rgb), .08); }
+
+    .review-banner { border-left: 4px solid; padding: 1rem 1.25rem; border-radius: 0.5rem; }
+    .review-banner.pending  { border-color: #fd7e14; background: rgba(253,126,20,.06); }
+    .review-banner.approved { border-color: #28a745; background: rgba(40,167,69,.06); }
+    .review-banner.rejected { border-color: #dc3545; background: rgba(220,53,69,.06); }
+    .review-banner.returned { border-color: #ffc107; background: rgba(255,193,7,.06); }
+    .review-banner.suspended { border-color: #fd7e14; background: rgba(253,126,20,.08); }
+
+    .history-timeline { list-style: none; padding-left: 0; position: relative; }
+    .history-timeline::before { content: ''; position: absolute; left: 1rem; top: 0; bottom: 0; width: 2px; background: var(--bs-border-color); }
+    .history-timeline li { position: relative; padding-left: 2.5rem; margin-bottom: 1.2rem; }
+    .history-timeline li::before { content: ''; position: absolute; left: 0.55rem; top: 0.3rem; width: 0.9rem; height: 0.9rem; border-radius: 50%; background: var(--bs-primary); border: 2px solid #fff; box-shadow: 0 0 0 2px var(--bs-primary); }
+    .history-timeline li.success::before { background: #28a745; box-shadow: 0 0 0 2px #28a745; }
+    .history-timeline li.warning::before { background: #ffc107; box-shadow: 0 0 0 2px #ffc107; }
+    .history-timeline li.danger::before  { background: #dc3545; box-shadow: 0 0 0 2px #dc3545; }
+
+    .yield-diff-up   { color: #28a745; font-weight: 600; }
+    .yield-diff-down { color: #dc3545; font-weight: 600; }
+
+    /* ─── Print ─── */
+    @@media print {
+        body * { visibility: hidden !important; }
+        #printYieldArea, #printYieldArea * { visibility: visible !important; }
+        #printYieldArea { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; font-size: 11pt; }
+        .modal-backdrop { display: none !important; }
+    }
+    .print-form-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 16px; }
+    .print-form-table th, .print-form-table td { border: 1px solid #999; padding: 5px 8px; font-size: 0.82rem; }
+    .print-form-table { border-collapse: collapse; width: 100%; }
+    .sign-box { border: 1px solid #999; min-height: 70px; border-radius: 4px; }
+</style>
+}
+
+@* ===== Content ===== *@
+<div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+    <h4 class="mb-0">พิจารณาอนุมัติ %Yield</h4>
+</div>
+<p class="mb-1 text-muted">ตรวจสอบและพิจารณาอนุมัติคำขอ %Yield ของสถานประกอบการ ครอบคลุมวัตถุดิบทุกประเภท และกำหนดค่าการยอมรับ (%Tolerance)</p>
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="@Url.Action("IndexApproveYield","Officer")" class="text-primary fw-semibold">อนุมัติ %Yield</a></li>
+        <li class="breadcrumb-item active text-secondary">@requestNo</li>
+    </ol>
+</nav>
+
+<!-- ─── Status Banner ─── -->
+<div class="review-banner pending mb-4 d-flex align-items-center gap-3" id="statusBanner">
+    <i class="ri ri-time-line fs-4 text-warning"></i>
+    <div>
+        <div class="fw-semibold">รออนุมัติ</div>
+        <div class="small text-muted">คำขอนี้รอการพิจารณา — <span class="badge @requestTypeClass">@requestTypeText</span> <span class="badge bg-label-secondary ms-1">@rawMaterialType</span></div>
+    </div>
+</div>
+
+<!-- ─── Header Meta ─── -->
+<div class="row g-2 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">เลขที่คำขอ</div>
+        <div class="fw-semibold text-primary">@requestNo</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">ผู้ประกอบการ</div>
+        <div class="fw-semibold">@companyName</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">วันที่ยื่นคำขอ</div>
+        <div class="fw-semibold">@submittedDate</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">ประเภทคำขอ</div>
+        <div><span class="badge @requestTypeClass">@requestTypeText</span></div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">ประเภทวัตถุดิบ</div>
+        <div><span class="badge bg-label-secondary">@rawMaterialType</span></div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">สถานะ</div>
+        <div><span class="badge @statusClass">@statusText</span></div>
+    </div>
+</div>
+
+<!-- ─── Action Buttons ─── -->
+<div class="d-flex flex-wrap gap-2 mb-4" id="actionBar">
+    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalApprove">
+        <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติ
+    </button>
+    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalReject">
+        <i class="ri ri-close-circle-line me-1"></i> ไม่อนุมัติ
+    </button>
+    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalReturn">
+        <i class="ri ri-reply-line me-1"></i> ส่งคืนแก้ไข
+    </button>
+    <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalSuspend">
+        <i class="ri ri-pause-circle-line me-1"></i> ระงับ
+    </button>
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalPrintYield">
+        <i class="ri ri-printer-line me-1"></i> พิมพ์ฟอร์ม %Yield
+    </button>
+    <a href="@Url.Action("IndexApproveYield","Officer")" class="btn btn-outline-secondary btn-sm ms-auto">
+        <i class="ri ri-arrow-left-line me-1"></i> กลับรายการ
+    </a>
+</div>
+
+<!-- ─── Tabs ─── -->
+<ul class="nav nav-tabs mb-4" id="yieldTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">
+            <i class="ri ri-file-list-3-line me-1"></i> รายละเอียดคำขอ
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">
+            <i class="ri ri-attachment-line me-1"></i> หลักฐานประกอบ
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">
+            <i class="ri ri-scales-line me-1"></i> ผลการพิจารณา
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab">
+            <i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="yieldTabsContent">
+
+    <!-- ============================================================ -->
+    <!-- TAB 1: รายละเอียดคำขอ -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+
+        <!-- ── ข้อมูลสถานประกอบการ ── -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-building-line me-1 text-primary"></i> ข้อมูลสถานประกอบการ
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small">ชื่อสถานประกอบการ</label>
+                        <div class="field-display fw-semibold">@companyName</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">เลขทะเบียน</label>
+                        <div class="field-display">@companyReg</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">ประเภทรับรอง DOF</label>
+                        <div class="field-display"><span class="badge bg-label-primary">ในรับรอง DOF</span></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">ประเภทสินค้าที่รับรอง</label>
+                        <div class="field-display">@certType</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">พื้นที่รับผิดชอบ</label>
+                        <div class="field-display">@areaResponsible</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── รายละเอียดคำขอ %Yield ── -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-percent-line me-1 text-warning"></i> รายละเอียดคำขอ %Yield
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label small">ประเภทคำขอ</label>
+                        <div class="field-display"><span class="badge @requestTypeClass">@requestTypeText</span></div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">ประเภทวัตถุดิบ</label>
+                        <div class="field-display"><span class="badge bg-label-secondary">@rawMaterialType</span></div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">%Yield เดิม</label>
+                        <div class="field-display text-center fw-semibold text-muted">@previousYield.ToString("F1")%</div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">%Yield ที่ขอ</label>
+                        <div class="field-display text-center fw-bold text-primary">@requestedYield.ToString("F1")%
+                            <span class="yield-diff-up ms-1 small">(+@((requestedYield - previousYield).ToString("F1"))%)</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">%Tolerance ที่กำหนด</label>
+                        <div class="field-display text-center">
+                            <input type="number" class="form-control form-control-sm text-center" id="toleranceInput" value="@tolerance.ToString("F1")" step="0.5" min="0" max="10" style="max-width:80px;" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label small">เหตุผลการขอเปลี่ยนแปลง</label>
+                    <div class="field-display" style="min-height:3rem;align-items:flex-start;padding-top:.5rem;">
+                        ข้อมูลเชิงเทคนิคการผลิตเปลี่ยนแปลงตามฤดูกาล ทำให้ %Yield เฉลี่ยเพิ่มขึ้นจาก 70.0% เป็น 72.5% จากการปรับปรุงกระบวนการผลิตรุ่น 2566
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ตาราง %Yield รายผลิตภัณฑ์ ── -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-table-line me-1 text-success"></i> %Yield รายผลิตภัณฑ์ที่ขอ
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>รหัสผลิตภัณฑ์</th>
+                                <th>ชื่อผลิตภัณฑ์</th>
+                                <th>ประเภทวัตถุดิบ</th>
+                                <th class="text-center">%Yield เดิม</th>
+                                <th class="text-center">%Yield ขอ</th>
+                                <th class="text-center">%Tolerance ขอ</th>
+                                <th class="text-center">ช่วงที่ยอมรับ</th>
+                                <th class="text-center">ผลตรวจสอบ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>3AASNNBELNNPP</td>
+                                <td>CANNED O LIGHTMEAT SHREDDED IN TABASCO</td>
+                                <td><span class="badge bg-label-secondary">วัตถุดิบนำเข้า</span></td>
+                                <td class="text-center text-muted">70.0%</td>
+                                <td class="text-center fw-bold text-primary">72.5%</td>
+                                <td class="text-center">±2.0%</td>
+                                <td class="text-center small">70.5% – 74.5%</td>
+                                <td class="text-center"><span class="badge bg-label-warning">รอพิจารณา</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>3AASNNBELNNKK</td>
+                                <td>CANNED O SLICE IN XO SAUCE</td>
+                                <td><span class="badge bg-label-secondary">วัตถุดิบนำเข้า</span></td>
+                                <td class="text-center text-muted">68.5%</td>
+                                <td class="text-center fw-bold text-primary">71.0%</td>
+                                <td class="text-center">±2.0%</td>
+                                <td class="text-center small">69.0% – 73.0%</td>
+                                <td class="text-center"><span class="badge bg-label-warning">รอพิจารณา</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>3BAASLIGHTMEAT</td>
+                                <td>CANNED TUNA LIGHTMEAT IN BRINE (EU)</td>
+                                <td><span class="badge bg-label-info">ผลิตภัณฑ์แปรรูปเบื้องต้น</span></td>
+                                <td class="text-center text-muted">74.0%</td>
+                                <td class="text-center fw-bold text-primary">74.0%</td>
+                                <td class="text-center">±2.5%</td>
+                                <td class="text-center small">71.5% – 76.5%</td>
+                                <td class="text-center"><span class="badge bg-label-warning">รอพิจารณา</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ผลการตรวจสอบ %Yield (vs คำนวณจริง) ── -->
+        <div class="card shadow-sm mb-3" id="yieldCheckSection">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-bar-chart-line me-1 text-danger"></i> ผลการตรวจสอบ %Yield เทียบ %Yield อนุมัติ vs คำนวณจากระบบ
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-4">
+                        <div class="p-3 rounded border text-center">
+                            <div class="text-muted small mb-1">%Yield อนุมัติ (อ้างอิง)</div>
+                            <div class="fw-bold fs-4 text-success">@approvedYield.ToString("F1")%</div>
+                            <div class="text-muted small">ช่วงวันที่มีผล: @effectiveDateFrom – @effectiveDateTo</div>
+                            <div class="text-muted small mt-1">Tolerance: ±@tolerance.ToString("F1")%</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 rounded border text-center">
+                            <div class="text-muted small mb-1">%Yield จากการคำนวณจริง (ล่าสุด)</div>
+                            <div class="fw-bold fs-4 @(isOverTolerance ? "text-danger" : "text-success")">@calculatedYield.ToString("F1")%</div>
+                            <div class="text-muted small">คำนวณ ณ 24/04/2569 14:30 น.</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 rounded border text-center">
+                            <div class="text-muted small mb-1">เบี่ยงเบนจากค่าอ้างอิง</div>
+                            <div class="fw-bold fs-4 @(isOverTolerance ? "text-danger" : "text-success")">@deviationPct.ToString("F1")%</div>
+                            @if (isOverTolerance)
+                            {
+                                <span class="badge bg-label-danger">เกินค่า Tolerance ❌</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-success">อยู่ในเกณฑ์ ✅</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @if (isOverTolerance)
+                {
+                <div class="alert alert-danger d-flex gap-3 py-3 mb-3">
+                    <i class="ri ri-error-warning-fill fs-4 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <div class="fw-semibold">⛔ %Yield เบี่ยงเบนเกินกำหนด — ระบบไม่สามารถบันทึกข้อมูลการผลิตได้</div>
+                        <div class="small mt-1">%Yield คำนวณจริง (@calculatedYield.ToString("F1")%) เบี่ยงเบนจากค่าอนุมัติ (@approvedYield.ToString("F1")%) เกิน Tolerance (±@tolerance.ToString("F1")%)
+                            — กรุณายื่นคำขอแก้ไข %Yield ใหม่ หรือติดต่อเจ้าหน้าที่ผู้รับผิดชอบ</div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalNewYieldRequest">
+                                <i class="ri ri-add-circle-line me-1"></i> 📝 สร้างคำขอแก้ไข %Yield ใหม่
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                }
+                else
+                {
+                <div class="alert alert-success d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-checkbox-circle-line mt-1 flex-shrink-0"></i>
+                    <span>%Yield จากการคำนวณจริงอยู่ในเกณฑ์ Tolerance — สามารถบันทึกข้อมูลการผลิตได้ตามปกติ</span>
+                </div>
+                }
+            </div>
+        </div>
+
+    </div><!-- /tab1 -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade" id="tab2" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-attachment-line me-1 text-primary"></i> หลักฐานประกอบคำขอ
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>ชื่อไฟล์</th>
+                                <th>ประเภทหลักฐาน</th>
+                                <th class="text-center">ขนาด</th>
+                                <th class="text-center">วันที่แนบ</th>
+                                <th class="text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><i class="ri ri-file-excel-line text-success me-1"></i> yield_calculation_2566.xlsx</td>
+                                <td>ตารางคำนวณ %Yield จากการผลิตจริง</td>
+                                <td class="text-center">380 KB</td>
+                                <td class="text-center">18/04/2569</td>
+                                <td class="text-center">
+                                    <button class="btn btn-xs btn-outline-primary me-1" data-bs-toggle="tooltip" title="ดาวน์โหลด"><i class="ri ri-download-line"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><i class="ri ri-file-pdf-line text-danger me-1"></i> production_report_q4_2566.pdf</td>
+                                <td>รายงานการผลิตรายไตรมาส Q4/2566</td>
+                                <td class="text-center">1.2 MB</td>
+                                <td class="text-center">18/04/2569</td>
+                                <td class="text-center">
+                                    <button class="btn btn-xs btn-outline-primary me-1" data-bs-toggle="tooltip" title="ดาวน์โหลด"><i class="ri ri-download-line"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td><i class="ri ri-file-word-line text-primary me-1"></i> technical_justification.docx</td>
+                                <td>หนังสือชี้แจงเหตุผลทางเทคนิค</td>
+                                <td class="text-center">95 KB</td>
+                                <td class="text-center">18/04/2569</td>
+                                <td class="text-center">
+                                    <button class="btn btn-xs btn-outline-primary me-1" data-bs-toggle="tooltip" title="ดาวน์โหลด"><i class="ri ri-download-line"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB 3: ผลการพิจารณา -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade" id="tab3" role="tabpanel">
+
+        <div class="card shadow-sm decision-card mb-3" id="cardDecision">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-scales-line me-1 text-primary"></i> ผลการพิจารณา
+                <span class="badge bg-label-warning ms-2">รอพิจารณา</span>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-time-line mt-1 flex-shrink-0"></i>
+                    <span>คำขอนี้อยู่ระหว่างรอการพิจารณา — กรุณากดปุ่ม <strong>อนุมัติ / ไม่อนุมัติ / ส่งคืนแก้ไข</strong> ด้านบน</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small">ผลการพิจารณา</label>
+                        <select class="form-select form-select-sm" id="decisionSelect">
+                            <option value="">— เลือกผล —</option>
+                            <option value="approved">อนุมัติ</option>
+                            <option value="rejected">ไม่อนุมัติ</option>
+                            <option value="returned">ส่งคืนแก้ไข</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">%Yield ที่อนุมัติ</label>
+                        <div class="input-group input-group-sm">
+                            <input type="number" class="form-control" id="approvedYield" value="@requestedYield.ToString("F1")" step="0.1" min="0" max="100" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">%Tolerance ที่อนุมัติ</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">±</span>
+                            <input type="number" class="form-control" id="approvedTolerance" value="@tolerance.ToString("F1")" step="0.5" min="0" max="10" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">วันที่เริ่มมีผล</label>
+                        <input type="text" class="form-control form-control-sm" value="01/05/2569" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">วันที่สิ้นสุด</label>
+                        <input type="text" class="form-control form-control-sm" value="30/04/2570" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small">หมายเหตุผู้พิจารณา</label>
+                        <textarea class="form-control" rows="3" placeholder="ระบุหมายเหตุ (ไม่บังคับ)"></textarea>
+                    </div>
+                </div>
+
+                <!-- Approved result (hidden) -->
+                <div class="alert alert-success d-flex gap-2 py-2 mt-3 d-none" id="decisionResultBanner">
+                    <i class="ri ri-checkbox-circle-line fs-5 flex-shrink-0 text-success mt-1"></i>
+                    <div class="small">
+                        <div class="fw-semibold">อนุมัติคำขอ %Yield แล้ว</div>
+                        <div class="text-muted mt-1">%Yield ที่อนุมัติ: <strong id="approvedYieldDisplay">72.5%</strong> &nbsp;|&nbsp; Tolerance: <strong id="approvedToleranceDisplay">±2.0%</strong> &nbsp;|&nbsp; มีผลถึง: <strong>30/04/2570</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB 4: ประวัติการดำเนินการ -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade" id="tab4" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-history-line me-1 text-primary"></i> ประวัติการดำเนินการ
+            </div>
+            <div class="card-body">
+                <ul class="history-timeline mt-2" id="historyList">
+                    <li>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">รับเรื่องคำขอ %Yield เข้าระบบ</div>
+                                <div class="text-muted small">คำขอ @requestNo ถูกสร้างในระบบและรอการพิจารณา</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: @companyName</div>
+                            </div>
+                            <span class="badge bg-label-secondary text-nowrap ms-3">18/04/2569 09:00</span>
+                        </div>
+                    </li>
+                    <li class="warning">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">แนบหลักฐานประกอบ</div>
+                                <div class="text-muted small">แนบไฟล์ 3 รายการ: yield_calculation, production_report, technical_justification</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: @companyName</div>
+                            </div>
+                            <span class="badge bg-label-warning text-nowrap ms-3">18/04/2569 09:05</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">ส่งคำขอให้เจ้าหน้าที่พิจารณา</div>
+                                <div class="text-muted small">ผู้ประกอบการส่งคำขอ @requestNo พร้อมหลักฐานครบถ้วน</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: @companyName</div>
+                            </div>
+                            <span class="badge bg-label-primary text-nowrap ms-3">18/04/2569 09:10</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">เจ้าหน้าที่รับเรื่องและเปิดตรวจสอบเบื้องต้น</div>
+                                <div class="text-muted small">ตรวจสอบเอกสารและความถูกต้องของสถานประกอบการและ %Yield สำเร็จ</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: น.ส.สมใจ พิจารณ์ (เจ้าหน้าที่ กตส.)</div>
+                            </div>
+                            <span class="badge bg-label-info text-nowrap ms-3">25/04/2569 10:30</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== Modal: คำขอแก้ไข %Yield ใหม่ ==================== -->
+<div class="modal fade" id="modalNewYieldRequest" tabindex="-1" aria-labelledby="modalNewYieldRequestLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalNewYieldRequestLabel">
+                    <i class="ri ri-add-circle-line me-1 text-danger"></i> สร้างคำขอแก้ไข %Yield ใหม่
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <span>ระบบจะสร้างคำขอแก้ไข %Yield ใหม่และส่งแจ้งเจ้าหน้าที่ให้พิจารณาโดยอัตโนมัติ</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small">เหตุผลการขอแก้ไข %Yield <span class="text-danger">*</span></label>
+                    <textarea id="newYieldReason" class="form-control" rows="3" placeholder="อธิบายเหตุผลที่ %Yield เบี่ยงเบน เช่น เปลี่ยนสูตรการผลิต, วัตถุดิบชุดใหม่..."></textarea>
+                    <div id="newYieldReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผล</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small">%Yield ใหม่ที่ต้องการขอ
+                        <span class="text-muted">(mockup เท่านั้น — อ้างอิงจากคำนวณจริง)</span>
+                    </label>
+                    <input type="number" id="newYieldValue" class="form-control" value="65.2" step="0.1" min="0" max="100" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small">แนบไฟล์ประกอบ</label>
+                    <div id="newYieldDropzone" class="border rounded p-3 text-center" style="cursor:pointer; border-style:dashed !important;">
+                        <i class="ri ri-cloud-upload-line fs-4 text-muted"></i>
+                        <div class="text-muted small mt-1">ลากไฟล์มาวางหรือคลิกเพื่อเลือก (.pdf, .xlsx, .jpg — ไม่เกิน 5 MB)</div>
+                        <input type="file" id="newYieldFile" class="d-none" accept=".pdf,.xlsx,.jpg,.png" />
+                        <div id="newYieldFileLabel" class="mt-1 small text-primary d-none"></div>
+                    </div>
+                </div>
+                <div class="p-2 bg-light rounded small">
+                    <div class="fw-semibold mb-1">รายละเอียดคำขอที่จะสร้างโดยอัตโนมัติ:</div>
+                    <div class="text-muted">เลขที่อ้างอิง: @requestNo &nbsp;|&nbsp; บริษัท: @companyName</div>
+                    <div class="text-muted">%Yield เดิม (อนุมัติ): @approvedYield.ToString("F1")% &nbsp;|&nbsp; %Yield คำนวณจริง: @calculatedYield.ToString("F1")%</div>
+                    <div class="text-danger">เบี่ยงเบน: @deviationPct.ToString("F1")% — เกินค่า Tolerance ±@tolerance.ToString("F1")%</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnSubmitNewYieldRequest" class="btn btn-danger">
+                    <i class="ri ri-send-plane-line me-1"></i> ส่งคำขอและแจ้งเตือนเจ้าหน้าที่
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: พิมพ์ฟอร์ม %Yield ==================== -->
+<div class="modal fade" id="modalPrintYield" tabindex="-1" aria-labelledby="modalPrintYieldLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalPrintYieldLabel">
+                    <i class="ri ri-printer-line me-1 text-secondary"></i> พรีวิวแบบฟอร์มการแจ้ง %ผลผลิต (Yield)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- PRINT AREA -->
+                <div id="printYieldArea" style="font-family: 'TH Sarabun New', sans-serif; font-size: 13pt; color: #111; background: #fff; padding: 20px;">
+                    <!-- หัวแบบฟอร์ม -->
+                    <div class="print-form-header">
+                        <div style="font-size: 1.4rem;">&#x1F41F;</div>
+                        <div class="fw-bold" style="font-size:1.05rem;">กรมประมง กระทรวงเกษตรและสหกรณ์</div>
+                        <div class="fw-bold" style="font-size:1.15rem; margin-top:4px;">แบบฟอร์มการแจ้ง %ผลผลิต (Yield)</div>
+                        <div class="text-muted small">Department of Fisheries, Ministry of Agriculture and Cooperatives</div>
+                    </div>
+
+                    <!-- ข้อมูลสถานประกอบการ -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 small">
+                            <strong>เลขที่คำขอ:</strong> @requestNo
+                        </div>
+                        <div class="col-6 small text-end">
+                            <strong>วันที่ยื่น:</strong> @submittedDate
+                        </div>
+                        <div class="col-12 small">
+                            <strong>ชื่อสถานประกอบการ:</strong> @companyName
+                        </div>
+                        <div class="col-6 small">
+                            <strong>เลขทะเบียนนิติบุคคล:</strong> @companyReg
+                        </div>
+                        <div class="col-6 small">
+                            <strong>ประเภทใบรับรอง:</strong> @certType
+                        </div>
+                        <div class="col-6 small">
+                            <strong>ประเภทวัตถุดิบ:</strong> @rawMaterialType
+                        </div>
+                        <div class="col-6 small">
+                            <strong>ประเภทคำขอ:</strong> @requestTypeText
+                        </div>
+                    </div>
+
+                    <!-- ตาราง %Yield รายผลิตภัณฑ์ -->
+                    <div class="fw-bold small mb-1">รายละเอียด %Yield รายผลิตภัณฑ์</div>
+                    <table class="print-form-table mb-3">
+                        <thead style="background: #f0f0f0;">
+                            <tr>
+                                <th>รหัสสินค้า</th>
+                                <th>ชื่อผลิตภัณฑ์</th>
+                                <th class="text-center">%Yield เดิม</th>
+                                <th class="text-center">%Yield ที่ขอ</th>
+                                <th class="text-center">%Yield อนุมัติ</th>
+                                <th class="text-center">%Tolerance</th>
+                                <th class="text-center">ช่วงวันที่มีผล</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3AASNNBELNNPP</td>
+                                <td>สัตว์น้ำ ทูน่า (บรรจุภัณฑ์ มินามสตริป) 185g</td>
+                                <td class="text-center">@previousYield%</td>
+                                <td class="text-center">@requestedYield%</td>
+                                <td class="text-center">@approvedYield%</td>
+                                <td class="text-center">&plusmn;@tolerance%</td>
+                                <td class="text-center">@effectiveDateFrom &ndash; @effectiveDateTo</td>
+                            </tr>
+                            <tr>
+                                <td>3AASNNBELNNKK</td>
+                                <td>สัตว์น้ำ ทูน่า (บรรจุภัณฑ์ มินามสตริป) 340g</td>
+                                <td class="text-center">@previousYield%</td>
+                                <td class="text-center">@requestedYield%</td>
+                                <td class="text-center">@approvedYield%</td>
+                                <td class="text-center">&plusmn;@tolerance%</td>
+                                <td class="text-center">@effectiveDateFrom &ndash; @effectiveDateTo</td>
+                            </tr>
+                            <tr>
+                                <td>3BAASLIGHTMEAT</td>
+                                <td>สัตว์น้ำ ทูน่า (เนื้อสีอ่อน) 150g</td>
+                                <td class="text-center">68.0%</td>
+                                <td class="text-center">70.0%</td>
+                                <td class="text-center">70.0%</td>
+                                <td class="text-center">&plusmn;2.0%</td>
+                                <td class="text-center">@effectiveDateFrom &ndash; @effectiveDateTo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ลายมือชื่อ -->
+                    <div class="row g-3 mt-2">
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อผู้ประกอบการ / ผู้มอบอำนาจ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">(...............................................)</div></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อเจ้าหน้าที่ผู้อนุมัติ / ตราประทับ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">สำนักงานประมงจังหวัดสมุทรสาคร</div></div>
+                        </div>
+                    </div>
+
+                    <div class="small text-muted text-center mt-3">เอกสารนี้สร้างโดยระบบตรวจสอบสินค้าประมง (FSW) — วันที่พิมพ์: @DateTime.Now.ToString("dd/MM/yyyy")</div>
+                </div>
+                <!-- / PRINT AREA -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-secondary" id="btnDownloadPdf">
+                    <i class="ri ri-file-pdf-line me-1"></i> ดาวน์โหลด PDF
+                </button>
+                <button type="button" class="btn btn-primary" id="btnPrintYield">
+                    <i class="ri ri-printer-line me-1"></i> สั่งพิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ระงับ ==================== -->
+<div class="modal fade" id="modalSuspend" tabindex="-1" aria-labelledby="modalSuspendLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalSuspendLabel">
+                    <i class="ri ri-pause-circle-line me-1 text-warning"></i> ยืนยันระงับ %Yield
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <span>การระงับจะหยุดการดำเนินการชั่วคราว ผู้ประกอบการสามารถยื่นคำขอใหม่ได้ภายหลัง</span>
+                </div>
+                <label class="form-label small">เหตุผลการระงับ <span class="text-danger">*</span></label>
+                <textarea id="reviewSuspendReason" class="form-control" rows="3" placeholder="ระบุเหตุผล..."></textarea>
+                <div id="reviewSuspendReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผลการระงับ</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmSuspend" class="btn btn-warning">
+                    <i class="ri ri-pause-circle-line me-1"></i> ยืนยันระงับ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: อนุมัติ ==================== -->
+<div class="modal fade" id="modalApprove" tabindex="-1" aria-labelledby="modalApproveLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalApproveLabel">
+                    <i class="ri ri-checkbox-circle-line me-1 text-success"></i> ยืนยันอนุมัติ %Yield
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span>เมื่ออนุมัติ ระบบจะบันทึก %Yield และ %Tolerance ที่กำหนดไว้ และแจ้งผลให้ผู้ประกอบการโดยอัตโนมัติ</span>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="form-label small">%Yield ที่อนุมัติ</label>
+                        <div class="input-group input-group-sm">
+                            <input type="number" class="form-control" id="modalApprovedYield" value="@requestedYield.ToString("F1")" step="0.1" min="0" max="100" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small">%Tolerance ที่อนุมัติ</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text">±</span>
+                            <input type="number" class="form-control" id="modalApprovedTolerance" value="@tolerance.ToString("F1")" step="0.5" min="0" max="10" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </div>
+                <label class="form-label small">หมายเหตุ (ไม่บังคับ)</label>
+                <textarea id="approveRemark" class="form-control" rows="2" placeholder="ระบุหมายเหตุ"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmApprove" class="btn btn-success">
+                    <i class="ri ri-checkbox-circle-line me-1"></i> ยืนยันอนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ไม่อนุมัติ ==================== -->
+<div class="modal fade" id="modalReject" tabindex="-1" aria-labelledby="modalRejectLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalRejectLabel">
+                    <i class="ri ri-close-circle-line me-1 text-danger"></i> ยืนยันไม่อนุมัติ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label small">เหตุผลการไม่อนุมัติ <span class="text-danger">*</span></label>
+                <textarea id="rejectReason" class="form-control" rows="3" placeholder="ระบุเหตุผล..."></textarea>
+                <div id="rejectReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผล</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmReject" class="btn btn-danger">
+                    <i class="ri ri-close-circle-line me-1"></i> ยืนยันไม่อนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ส่งคืนแก้ไข ==================== -->
+<div class="modal fade" id="modalReturn" tabindex="-1" aria-labelledby="modalReturnLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalReturnLabel">
+                    <i class="ri ri-reply-line me-1 text-warning"></i> ส่งคืนให้แก้ไข
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label small">รายละเอียดที่ต้องแก้ไข <span class="text-danger">*</span></label>
+                <textarea id="returnDetail" class="form-control" rows="3" placeholder="ระบุสิ่งที่ต้องแก้ไข..."></textarea>
+                <div id="returnDetailError" class="text-danger small d-none mt-1">กรุณาระบุรายละเอียด</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmReturn" class="btn btn-warning">
+                    <i class="ri ri-send-plane-line me-1"></i> ส่งแจ้งกลับ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Tooltips
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+        new bootstrap.Tooltip(el, { trigger: 'hover' });
+    });
+
+    function showToast(msg, type) {
+        var bg   = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+        var icon = type === 'success' ? 'ri-checkbox-circle-line' : type === 'danger' ? 'ri-close-circle-line' : 'ri-error-warning-line';
+        var el = document.createElement('div');
+        el.className = 'position-fixed bottom-0 end-0 p-3'; el.style.zIndex = 9999;
+        el.innerHTML = '<div class="toast show align-items-center text-white ' + bg + ' border-0" role="alert">' +
+            '<div class="d-flex"><div class="toast-body d-flex align-items-center gap-2">' +
+            '<i class="ri ' + icon + ' fs-5"></i> ' + msg + '</div>' +
+            '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+            '</div></div>';
+        document.body.appendChild(el); setTimeout(function () { el.remove(); }, 4000);
+    }
+
+    function setBanner(type, title, sub) {
+        var banner = document.getElementById('statusBanner');
+        var icons = { approved: 'ri-checkbox-circle-fill text-success', rejected: 'ri-close-circle-fill text-danger', returned: 'ri-reply-fill text-warning', pending: 'ri-time-line text-warning', suspended: 'ri-pause-circle-fill text-warning' };
+        banner.className = 'review-banner ' + type + ' mb-4 d-flex align-items-center gap-3';
+        banner.innerHTML = '<i class="ri ' + icons[type] + ' fs-4"></i><div><div class="fw-semibold">' + title + '</div><div class="small text-muted">' + sub + '</div></div>';
+    }
+
+    function addHistory(title, desc, type, time) {
+        var li = document.createElement('li');
+        if (type) li.className = type;
+        li.innerHTML = '<div class="d-flex justify-content-between align-items-start">' +
+            '<div><div class="fw-semibold small">' + title + '</div>' +
+            '<div class="text-muted small">' + desc + '</div>' +
+            '<div class="text-muted small">ผู้ดำเนินการ: น.ส.สมใจ พิจารณ์ (เจ้าหน้าที่)</div></div>' +
+            '<span class="badge bg-label-secondary text-nowrap ms-3">' + time + '</span></div>';
+        var list = document.getElementById('historyList');
+        list.appendChild(li);
+        list.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    // ── Approve ──
+    document.getElementById('btnConfirmApprove').addEventListener('click', function () {
+        var yld = document.getElementById('modalApprovedYield').value;
+        var tol = document.getElementById('modalApprovedTolerance').value;
+        bootstrap.Modal.getInstance(document.getElementById('modalApprove')).hide();
+        showToast('อนุมัติ %Yield เรียบร้อยแล้ว — %Yield: ' + yld + '% ±' + tol + '%', 'success');
+        setBanner('approved', 'อนุมัติแล้ว', '%Yield ที่อนุมัติ: ' + yld + '% &nbsp;|&nbsp; Tolerance: ±' + tol + '%');
+        document.getElementById('approvedYieldDisplay').textContent = yld + '%';
+        document.getElementById('approvedToleranceDisplay').textContent = '±' + tol + '%';
+        document.getElementById('decisionResultBanner').classList.remove('d-none');
+        var now = new Date(); var ts = ('0'+now.getDate()).slice(-2)+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+(now.getFullYear()+543)+' '+ ('0'+now.getHours()).slice(-2)+':'+ ('0'+now.getMinutes()).slice(-2);
+        addHistory('อนุมัติ %Yield เรียบร้อยแล้ว', '%Yield ที่อนุมัติ: ' + yld + '% &nbsp;±' + tol + '% &nbsp;| มีผลถึง: 30/04/2570', 'success', ts);
+    });
+
+    // ── Reject ──
+    document.getElementById('btnConfirmReject').addEventListener('click', function () {
+        var reason = document.getElementById('rejectReason').value.trim();
+        if (!reason) { document.getElementById('rejectReasonError').classList.remove('d-none'); return; }
+        document.getElementById('rejectReasonError').classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('modalReject')).hide();
+        showToast('ไม่อนุมัติ %Yield เรียบร้อยแล้ว', 'danger');
+        setBanner('rejected', 'ไม่อนุมัติ', 'เหตุผล: ' + reason.substring(0, 60) + (reason.length > 60 ? '...' : ''));
+        var now = new Date(); var ts = ('0'+now.getDate()).slice(-2)+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+(now.getFullYear()+543)+' '+ ('0'+now.getHours()).slice(-2)+':'+ ('0'+now.getMinutes()).slice(-2);
+        addHistory('ไม่อนุมัติ %Yield', 'เหตุผล: ' + reason.substring(0, 80), 'danger', ts);
+    });
+
+    // ── Return ──
+    document.getElementById('btnConfirmReturn').addEventListener('click', function () {
+        var detail = document.getElementById('returnDetail').value.trim();
+        if (!detail) { document.getElementById('returnDetailError').classList.remove('d-none'); return; }
+        document.getElementById('returnDetailError').classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('modalReturn')).hide();
+        showToast('ส่งคืนแก้ไขเรียบร้อยแล้ว', 'warning');
+        setBanner('returned', 'ส่งคืนแก้ไข', 'รอผู้ประกอบการแก้ไขและส่งกลับมาใหม่');
+        var now = new Date(); var ts = ('0'+now.getDate()).slice(-2)+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+(now.getFullYear()+543)+' '+ ('0'+now.getHours()).slice(-2)+':'+ ('0'+now.getMinutes()).slice(-2);
+        addHistory('ส่งคืนเพื่อแก้ไข', 'รายละเอียด: ' + detail.substring(0, 80), 'warning', ts);
+    });
+
+    // ── Suspend ──
+    document.getElementById('btnConfirmSuspend').addEventListener('click', function () {
+        var reason = document.getElementById('reviewSuspendReason').value.trim();
+        if (!reason) { document.getElementById('reviewSuspendReasonError').classList.remove('d-none'); return; }
+        document.getElementById('reviewSuspendReasonError').classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('modalSuspend')).hide();
+        showToast('ระงับ %Yield เรียบร้อยแล้ว', 'warning');
+        setBanner('suspended', 'ระงับ 🚫', 'เหตุผล: ' + reason.substring(0, 60) + (reason.length > 60 ? '...' : ''));
+        var now = new Date(); var ts = ('0'+now.getDate()).slice(-2)+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+(now.getFullYear()+543)+' '+ ('0'+now.getHours()).slice(-2)+':'+ ('0'+now.getMinutes()).slice(-2);
+        addHistory('ระงับ %Yield', 'เหตุผล: ' + reason.substring(0, 80), 'warning', ts);
+    });
+
+    // ── New Yield Request ──
+    document.getElementById('newYieldDropzone').addEventListener('click', function () {
+        document.getElementById('newYieldFile').click();
+    });
+    document.getElementById('newYieldFile').addEventListener('change', function () {
+        var lbl = document.getElementById('newYieldFileLabel');
+        if (this.files.length > 0) {
+            lbl.textContent = 'ไฟล์: ' + this.files[0].name;
+            lbl.classList.remove('d-none');
+        }
+    });
+    document.getElementById('btnSubmitNewYieldRequest').addEventListener('click', function () {
+        var reason = document.getElementById('newYieldReason').value.trim();
+        if (!reason) { document.getElementById('newYieldReasonError').classList.remove('d-none'); return; }
+        document.getElementById('newYieldReasonError').classList.add('d-none');
+        var newYld = document.getElementById('newYieldValue').value;
+        bootstrap.Modal.getInstance(document.getElementById('modalNewYieldRequest')).hide();
+        showToast('สร้างคำขอแก้ไข %Yield ใหม่เรียบร้อย — แจ้งเตือนเจ้าหน้าที่แล้ว', 'warning');
+        var now = new Date();
+        var ts = ('0'+now.getDate()).slice(-2)+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+(now.getFullYear()+543)+' '+('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
+        addHistory('สร้างคำขอแก้ไข %Yield ใหม่', 'YLD ใหม่: ' + newYld + '% | เหตุผล: ' + reason.substring(0, 60) + ' — แจ้งเตือนเจ้าหน้าที่แล้ว', 'danger', ts);
+        // TODO: submit new yield change request to API
+    });
+
+    // ─── Print Yield Form ───
+    document.getElementById('btnPrintYield').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalPrintYield')).hide();
+        setTimeout(function () { window.print(); }, 300);
+    });
+    document.getElementById('btnDownloadPdf').addEventListener('click', function () {
+        // TODO: generate and download PDF via server API
+        alert('TODO: ดาวน์โหลด PDF — เชื่อมต่อ API สร้างเอกสาร PDF จริง');
+    });
+});
+</script>
+}

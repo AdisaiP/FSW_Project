@@ -1,0 +1,15 @@
+# (2) กำหนดบทบาท หน้าที่ของเจ้าหน้าที่สังกัด กตส. และ ศตส.
+
+URL: http://localhost:5055/Officer/IndexUserData
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. หน้า Officer/IndexUserData > filter 'สังกัดหน่วยงาน' (dropdown กตส./ศตส.)
+   - ตารางรายชื่อเจ้าหน้าที่ + badge บทบาทพิเศษ (ผู้ลงนาม/ผู้อนุมัติ)
+2. ปุ่ม 'ดูรายละเอียด' > #userDetailModal > section 'บทบาทและสังกัด'
+   - ข้อมูลสังกัดหน่วยงาน + badge บทบาทหน้าที่ + switch toggle
+3. #userDetailModal > card 'การจัดการสิทธิ์' > select บทบาทหลัก
+   - dropdown บทบาท: เจ้าหน้าที่ทั่วไป / เจ้าหน้าที่อาวุโส / หัวหน้างาน
+4. #userDetailModal > switch 'ผู้ลงนามใบรับรอง' + switch 'ผู้อนุมัติ RMBS1'
+   - badge 'ผู้ลงนาม' / 'ผู้อนุมัติ' ใน modal header

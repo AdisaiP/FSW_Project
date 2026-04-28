@@ -534,6 +534,450 @@
 </div>
 <!-- /Modal Add -->
 
+<!-- ======================================================
+     TOR 2.15(1) — ต้นแบบการลงทะเบียนรับเรื่อง [TOR 2.15(1)]
+     ====================================================== -->
+<div class="card mt-4">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h5 class="card-title mb-1">
+                <i class="ri ri-number-1 me-1 text-primary"></i>
+                ต้นแบบการลงทะเบียนรับเรื่อง
+                <span class="badge bg-label-info ms-2 align-middle" style="font-size:0.65rem;">TOR 2.15(1)</span>
+            </h5>
+            <p class="text-muted small mb-0">กำหนดรูปแบบเลขที่รับคำขออัตโนมัติที่ระบบจะสร้างเมื่อรับเรื่องใหม่</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info border-0 py-2 mb-4 small">
+            <i class="ri ri-information-line me-1"></i>
+            <strong>รูปแบบเลขที่:</strong> [Prefix]-[ปีพ.ศ.]-[NNNNN] &nbsp;|&nbsp;
+            ตัวอย่าง: <code>กตส.-2569-00001</code> / <code>ศตส.-2569-00001</code> / <code>DOF-2569-00001</code>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- กตส. -->
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-2 border-primary h-100">
+                    <div class="card-body">
+                        <h6 class="fw-semibold mb-3 text-primary">
+                            <i class="ri ri-building-line me-1"></i>กตส. (ส่วนกลาง)
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Prefix</label>
+                            <input type="text" class="form-control" value="กตส." placeholder="เช่น กตส., DOF" />
+                            <div class="form-text">ตัวอักษรนำหน้าเลขที่รับ</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">เลขที่เริ่มต้น (Running No.)</label>
+                            <input type="number" class="form-control font-monospace" value="1" min="1" />
+                            <div class="form-text">ระบบจะ pad ด้วย 0 ให้ครบ 5 หลัก เช่น 00001</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">ปีพ.ศ.</label>
+                            <div class="d-flex gap-2">
+                                <select class="form-select">
+                                    <option value="auto" selected>ปัจจุบัน (2569) — อัตโนมัติ</option>
+                                    <option value="manual">ระบุเอง</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkResetGtsCentral" checked>
+                                <label class="form-check-label small" for="chkResetGtsCentral">
+                                    <i class="ri ri-refresh-line me-1 text-warning"></i>
+                                    รีเซ็ตเลขที่ทุกต้นปีงบประมาณ (1 ต.ค.)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="alert alert-success border-0 py-2 small mb-3">
+                            <strong>ตัวอย่าง:</strong> <code>กตส.-2569-00001</code>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm w-100"
+                                onclick="alert('// TODO: บันทึกรูปแบบเลขที่ กตส.')">
+                            <i class="ri ri-save-line me-1"></i>บันทึกรูปแบบเลขที่
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ศตส. -->
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-2 border-warning h-100">
+                    <div class="card-body">
+                        <h6 class="fw-semibold mb-3 text-warning">
+                            <i class="ri ri-map-pin-line me-1"></i>ศตส. (ศูนย์ตรวจสอบ)
+                        </h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Prefix</label>
+                            <input type="text" class="form-control" value="ศตส." placeholder="เช่น ศตส., ศตส.1" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">เลขที่เริ่มต้น (Running No.)</label>
+                            <input type="number" class="form-control font-monospace" value="1" min="1" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">ปีพ.ศ.</label>
+                            <select class="form-select">
+                                <option value="auto" selected>ปัจจุบัน (2569) — อัตโนมัติ</option>
+                                <option value="manual">ระบุเอง</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkResetGtsRegion" checked>
+                                <label class="form-check-label small" for="chkResetGtsRegion">
+                                    <i class="ri ri-refresh-line me-1 text-warning"></i>
+                                    รีเซ็ตเลขที่ทุกต้นปีงบประมาณ (1 ต.ค.)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="alert alert-success border-0 py-2 small mb-3">
+                            <strong>ตัวอย่าง:</strong> <code>ศตส.-2569-00001</code>
+                        </div>
+                        <button type="button" class="btn btn-warning btn-sm w-100"
+                                onclick="alert('// TODO: บันทึกรูปแบบเลขที่ ศตส.')">
+                            <i class="ri ri-save-line me-1"></i>บันทึกรูปแบบเลขที่
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ข้อมูลที่แสดงบนใบรับรอง -->
+            <div class="col-md-12 col-xl-4">
+                <div class="card border-2 border-secondary h-100">
+                    <div class="card-body">
+                        <h6 class="fw-semibold mb-3 text-secondary">
+                            <i class="ri ri-file-list-3-line me-1"></i>ข้อมูลที่แสดงบนใบรับเรื่อง
+                        </h6>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkShowReceiveDate" checked>
+                                <label class="form-check-label small" for="chkShowReceiveDate">
+                                    <i class="ri ri-calendar-line me-1"></i>แสดงวันที่รับเรื่อง
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkShowReceiver" checked>
+                                <label class="form-check-label small" for="chkShowReceiver">
+                                    <i class="ri ri-user-line me-1"></i>แสดงชื่อเจ้าหน้าที่ผู้รับเรื่อง
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkShowBarcode" checked>
+                                <label class="form-check-label small" for="chkShowBarcode">
+                                    <i class="ri ri-barcode-line me-1"></i>แสดง Barcode / QR Code
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkShowAgency" checked>
+                                <label class="form-check-label small" for="chkShowAgency">
+                                    <i class="ri ri-building-2-line me-1"></i>แสดงชื่อหน่วยงาน / ตราสัญลักษณ์
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">หมายเหตุบนใบรับเรื่อง</label>
+                            <textarea class="form-control" rows="2"
+                                      placeholder="ข้อความหมายเหตุ (ถ้ามี)">กรุณาเก็บใบนี้ไว้เป็นหลักฐาน</textarea>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm w-100"
+                                onclick="alert('// TODO: บันทึกการตั้งค่าใบรับเรื่อง')">
+                            <i class="ri ri-save-line me-1"></i>บันทึกการตั้งค่า
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================
+     TOR 2.15(1) — กำหนดผู้ทำหน้าที่แทน (Acting Officer) [TOR 2.15(1)]
+     ====================================================== -->
+<div class="card mt-4">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h5 class="card-title mb-1">
+                <i class="ri ri-user-follow-line me-1 text-warning"></i>
+                กำหนดผู้ทำหน้าที่แทน (Acting Officer)
+                <span class="badge bg-label-info ms-2 align-middle" style="font-size:0.65rem;">TOR 2.15(1)</span>
+            </h5>
+            <p class="text-muted small mb-0">กำหนดผู้ทำหน้าที่แทนเจ้าหน้าที่หลักในกรณีลา / อบรม / อื่นๆ</p>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                data-bs-toggle="modal" data-bs-target="#modalActingOfficer">
+            <i class="ri ri-user-add-line me-1"></i>เพิ่มผู้ทำหน้าที่แทน
+        </button>
+    </div>
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0" style="font-size:0.82rem;">
+            <thead class="text-center table-light">
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>ตำแหน่ง / หน้าที่</th>
+                    <th>ผู้ทำหน้าที่หลัก</th>
+                    <th>ผู้ทำหน้าที่แทน</th>
+                    <th>ช่วงวันที่</th>
+                    <th>เหตุผล</th>
+                    <th>สถานะ</th>
+                    <th style="width:90px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center text-muted">1</td>
+                    <td>
+                        <span class="badge bg-label-primary">ลงนามใบรับรอง</span>
+                    </td>
+                    <td>
+                        <div class="fw-semibold">นายวิชัย กุลสุรกาญจน์</div>
+                        <div class="text-muted small">ผู้อำนวยการกองตรวจ (กตส.)</div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold">นางสาวสุภาพร มั่นคง</div>
+                        <div class="text-muted small">ผู้ช่วย กตส.</div>
+                    </td>
+                    <td class="text-center">
+                        <div class="small">01/05/2569</div>
+                        <div class="text-muted small">—</div>
+                        <div class="small">10/05/2569</div>
+                    </td>
+                    <td class="text-center"><span class="badge bg-label-secondary small">ลาพักร้อน</span></td>
+                    <td class="text-center">
+                        <span class="badge bg-label-success rounded-pill">ทำหน้าที่แทนอยู่ ✅</span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-icon btn-sm btn-outline-warning"
+                                data-bs-toggle="tooltip" title="แก้ไข"
+                                data-bs-toggle2="modal" data-bs-target2="#modalActingOfficer"
+                                onclick="new bootstrap.Modal(document.getElementById('modalActingOfficer')).show();">
+                            <i class="ri ri-pencil-line text-warning"></i>
+                        </button>
+                        <button class="btn btn-icon btn-sm btn-outline-danger"
+                                data-bs-toggle="tooltip" title="ยกเลิก"
+                                onclick="alert('// TODO: ยกเลิกการมอบหมายหน้าที่แทน')">
+                            <i class="ri ri-close-circle-line text-danger"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center text-muted">2</td>
+                    <td>
+                        <span class="badge bg-label-info">ลงทะเบียนรับเรื่อง</span>
+                    </td>
+                    <td>
+                        <div class="fw-semibold">นางมณีรัตน์ สุขใจ</div>
+                        <div class="text-muted small">เจ้าหน้าที่รับเรื่อง (ศตส. เขต 1)</div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold">นายสมศักดิ์ ตั้งใจดี</div>
+                        <div class="text-muted small">เจ้าหน้าที่รับเรื่อง (สำรอง)</div>
+                    </td>
+                    <td class="text-center">
+                        <div class="small">03/05/2569</div>
+                        <div class="text-muted small">—</div>
+                        <div class="small">07/05/2569</div>
+                    </td>
+                    <td class="text-center"><span class="badge bg-label-secondary small">อบรม</span></td>
+                    <td class="text-center">
+                        <span class="badge bg-label-success rounded-pill">ทำหน้าที่แทนอยู่ ✅</span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-icon btn-sm btn-outline-warning"
+                                data-bs-toggle="tooltip" title="แก้ไข"
+                                onclick="new bootstrap.Modal(document.getElementById('modalActingOfficer')).show();">
+                            <i class="ri ri-pencil-line text-warning"></i>
+                        </button>
+                        <button class="btn btn-icon btn-sm btn-outline-danger"
+                                data-bs-toggle="tooltip" title="ยกเลิก"
+                                onclick="alert('// TODO: ยกเลิก')">
+                            <i class="ri ri-close-circle-line text-danger"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center text-muted">3</td>
+                    <td>
+                        <span class="badge bg-label-warning">พิจารณาอนุมัติ</span>
+                    </td>
+                    <td>
+                        <div class="fw-semibold">นายกิตติพงษ์ สุขสวัสดิ์</div>
+                        <div class="text-muted small">ผู้อนุมัติ (กตส.)</div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold">นางสาวพิมพ์ใจ รักชาติ</div>
+                        <div class="text-muted small">ผู้อนุมัติสำรอง (กตส.)</div>
+                    </td>
+                    <td class="text-center">
+                        <div class="small">15/03/2569</div>
+                        <div class="text-muted small">—</div>
+                        <div class="small">20/03/2569</div>
+                    </td>
+                    <td class="text-center"><span class="badge bg-label-secondary small">ราชการ</span></td>
+                    <td class="text-center">
+                        <span class="badge bg-label-danger rounded-pill">หมดอายุ 🔴</span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-icon btn-sm btn-outline-warning"
+                                data-bs-toggle="tooltip" title="แก้ไข"
+                                onclick="new bootstrap.Modal(document.getElementById('modalActingOfficer')).show();">
+                            <i class="ri ri-pencil-line text-warning"></i>
+                        </button>
+                        <button class="btn btn-icon btn-sm btn-outline-danger"
+                                data-bs-toggle="tooltip" title="ลบ"
+                                onclick="alert('// TODO: ลบ')">
+                            <i class="ri ri-delete-bin-line text-danger"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer py-2">
+        <div class="alert alert-secondary border-0 py-2 mb-0 small">
+            <i class="ri ri-information-line me-1"></i>
+            <strong>หมายเหตุ:</strong> ผู้ทำหน้าที่แทนจะมีสิทธิ์เทียบเท่าผู้ทำหน้าที่หลักในช่วงเวลาที่กำหนดเท่านั้น
+            — ระบบจะเปลี่ยนสถานะเป็น "หมดอายุ" อัตโนมัติเมื่อถึงวันที่สิ้นสุด
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================
+     Modal: กำหนดผู้ทำหน้าที่แทน (TOR 2.15(1))
+     ====================================================== -->
+<div class="modal fade" id="modalActingOfficer" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-user-follow-line me-2"></i>กำหนดผู้ทำหน้าที่แทน
+                    <span class="badge bg-label-info ms-1 align-middle" style="font-size:0.65rem;">TOR 2.15(1)</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info border-0 py-2 mb-4 small">
+                    <i class="ri ri-information-line me-1"></i>
+                    ผู้ทำหน้าที่แทนจะมีสิทธิ์ดำเนินการเทียบเท่าผู้ทำหน้าที่หลักในช่วงวันที่ที่กำหนด
+                </div>
+
+                <!-- หน้าที่ที่มอบหมาย -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">หน้าที่ / ตำแหน่ง <span class="text-danger">*</span></label>
+                    <select class="form-select">
+                        <option value="">— เลือกหน้าที่ —</option>
+                        <option value="sign" selected>ลงนามใบรับรอง</option>
+                        <option value="receive">ลงทะเบียนรับเรื่อง</option>
+                        <option value="approve">พิจารณาอนุมัติ</option>
+                        <option value="review">ตรวจสอบเอกสาร</option>
+                        <option value="trace">ตรวจสอบ Traceability</option>
+                        <option value="admin">จัดการข้อมูลระบบ</option>
+                    </select>
+                </div>
+
+                <!-- ผู้ทำหน้าที่หลัก + ผู้แทน -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ผู้ทำหน้าที่หลัก <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">— เลือกเจ้าหน้าที่หลัก —</option>
+                            <option value="1" selected>นายวิชัย กุลสุรกาญจน์ (กตส.)</option>
+                            <option value="2">นางมณีรัตน์ สุขใจ (ศตส. เขต 1)</option>
+                            <option value="3">นายกิตติพงษ์ สุขสวัสดิ์ (กตส.)</option>
+                            <option value="4">นายศุภชัย มือเย็น (ศตส. เขต 4)</option>
+                            <option value="5">นางสาววรัญญา ดีประเสริฐ (กตส.)</option>
+                        </select>
+                        <div class="form-text">เจ้าหน้าที่ที่กำลังไม่อยู่</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ผู้ทำหน้าที่แทน <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">— เลือกผู้ทำหน้าที่แทน —</option>
+                            <option value="11">นางสาวสุภาพร มั่นคง (กตส.)</option>
+                            <option value="12" selected>นายสมศักดิ์ ตั้งใจดี (ศตส. เขต 1)</option>
+                            <option value="13">นางสาวพิมพ์ใจ รักชาติ (กตส.)</option>
+                            <option value="14">นายธนวัต สุขเจริญ (ศตส. เขต 2)</option>
+                            <option value="15">นางรัตนา ขยันทำ (กตส.)</option>
+                        </select>
+                        <div class="form-text">เจ้าหน้าที่ที่รับมอบหมายหน้าที่</div>
+                    </div>
+                </div>
+
+                <!-- ช่วงวันที่ -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">วันที่เริ่มต้น <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="01/05/2569" placeholder="DD/MM/YYYY (พ.ศ.)" />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">วันที่สิ้นสุด <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="10/05/2569" placeholder="DD/MM/YYYY (พ.ศ.)" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">สถานะ</label>
+                        <select class="form-select">
+                            <option value="active" selected>ใช้งาน</option>
+                            <option value="inactive">ระงับ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- เหตุผล -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เหตุผล / สาเหตุ <span class="text-danger">*</span></label>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="actingReason" id="reasonVacation" value="ลาพักร้อน" checked>
+                            <label class="form-check-label" for="reasonVacation">ลาพักร้อน</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="actingReason" id="reasonTraining" value="อบรม">
+                            <label class="form-check-label" for="reasonTraining">อบรม / สัมมนา</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="actingReason" id="reasonOfficialTrip" value="ราชการ">
+                            <label class="form-check-label" for="reasonOfficialTrip">ไปราชการ</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="actingReason" id="reasonSick" value="ลาป่วย">
+                            <label class="form-check-label" for="reasonSick">ลาป่วย</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="actingReason" id="reasonOther" value="อื่นๆ">
+                            <label class="form-check-label" for="reasonOther">อื่นๆ</label>
+                        </div>
+                    </div>
+                    <textarea class="form-control" rows="2"
+                              placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)"></textarea>
+                </div>
+
+                <!-- หมายเหตุ -->
+                <div class="alert alert-warning border-0 py-2 small">
+                    <i class="ri ri-error-warning-line me-1"></i>
+                    <strong>ข้อควรระวัง:</strong> กรุณาตรวจสอบสิทธิ์และความสามารถของผู้ทำหน้าที่แทนก่อนกำหนด
+                    — ผู้ทำหน้าที่แทนจะได้รับการแจ้งเตือนทางอีเมลโดยอัตโนมัติ
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        onclick="alert('// TODO: บันทึกผู้ทำหน้าที่แทน')">
+                    <i class="ri ri-save-line me-1"></i>บันทึกผู้ทำหน้าที่แทน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- ==================== Modal: แก้ไขรูปแบบใบรับรอง ==================== -->
 <div class="modal fade" id="modalEditTemplate" tabindex="-1" aria-labelledby="modalEditTemplateLabel" aria-hidden="true">

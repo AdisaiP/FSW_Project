@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "ใบรับรองฯ";
 
+    // TOR 1.7(28): expanded mockup data with IssuedDate, ApprovalNo, HCIssuedDate
     var requests = new[]
     {
         new
@@ -16,6 +17,9 @@
             FisheryProducts = "SLICE TUNA",
             Establishment = "บริษัท อินโนเวชั่นส์ โซลูชั่น แอนด์ เซอร์วิส จำกัด",
             EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-001",
+            IssuedDate = new DateTime(2026, 4, 22),
+            HCIssuedDate = new DateTime(2026, 4, 21),
             DraftedAt = new DateTime(2026, 4, 20, 9, 32, 10),
             StatusText = "ร่างคำขอ",
             StatusClass = "bg-label-secondary",
@@ -40,6 +44,356 @@
         new
         {
             RequestNumber = "10611080319000003",
+            ReceiveNo = 150,
+            CertificateKey = "declaration",
+            CertificateName = "ใบแทนรับรอง",
+            HealthCertificateNumber = "HC821B211414",
+            HsCode = "0303.42",
+            Country = "ญี่ปุ่น",
+            CountryCode = "JAPAN",
+            FisheryProducts = "FROZEN TUNA LOIN",
+            Establishment = "บริษัท เบตา ซีฟู้ด เอ็กซ์พอร์ต จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-002",
+            IssuedDate = new DateTime(2026, 4, 21),
+            HCIssuedDate = new DateTime(2026, 4, 20),
+            DraftedAt = new DateTime(2026, 4, 19, 10, 5, 0),
+            StatusText = "ส่งคำขอแล้ว",
+            StatusClass = "bg-label-success",
+            SignatureStatusText = "ลงลายมือชื่อแล้ว",
+            SignatureStatusClass = "bg-label-success",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = false,
+            AllowCancel = true,
+            AllowSubmit = false,
+            AllowDelete = false,
+            WrittenByText = "ผู้เข้าใช้ระบบ",
+            WrittenByClass = "bg-label-danger",
+            WrittenByIcon = "ri-user-3-line",
+            AutoProcessText = "อัตโนมัติหลังลงทะเบียนรับเรื่อง",
+            AutoProcessClass = "bg-label-warning",
+            AutoProcessIcon = "ri-settings-2-line",
+            PaymentText = "กำหนดให้มีการชำระเงิน",
+            PaymentClass = "bg-label-success",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080320000004",
+            ReceiveNo = 75,
+            CertificateKey = "processing",
+            CertificateName = "ใบรับรอง",
+            HealthCertificateNumber = "AC821B2171102",
+            HsCode = "1604.14",
+            Country = "สเปน",
+            CountryCode = "SPAIN",
+            FisheryProducts = "CANNED TUNA IN OIL",
+            Establishment = "บริษัท แกมมา ฟิช โปรเซสซิ่ง จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-003",
+            IssuedDate = new DateTime(2026, 4, 22),
+            HCIssuedDate = new DateTime(2026, 4, 21),
+            DraftedAt = new DateTime(2026, 4, 20, 11, 45, 30),
+            StatusText = "ร่างคำขอ",
+            StatusClass = "bg-label-secondary",
+            SignatureStatusText = "ยังไม่ลง",
+            SignatureStatusClass = "bg-label-warning",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = true,
+            AllowCancel = false,
+            AllowSubmit = true,
+            AllowDelete = true,
+            WrittenByText = "เจ้าหน้าที่",
+            WrittenByClass = "bg-label-primary",
+            WrittenByIcon = "ri-user-star-line",
+            AutoProcessText = "ไม่มีคุณสมบัติอัตโนมัติ",
+            AutoProcessClass = "bg-label-danger",
+            AutoProcessIcon = "ri-close-circle-line",
+            PaymentText = "กำหนดไม่ให้มีการชำระเงิน",
+            PaymentClass = "bg-label-secondary",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080321000005",
+            ReceiveNo = 200,
+            CertificateKey = "declaration",
+            CertificateName = "ใบแทนรับรอง",
+            HealthCertificateNumber = "HC821B211415",
+            HsCode = "0304.87",
+            Country = "สหรัฐอเมริกา",
+            CountryCode = "USA",
+            FisheryProducts = "YELLOWFIN TUNA STEAK",
+            Establishment = "บริษัท เดลตา มารีน โปรดักส์ จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-004",
+            IssuedDate = new DateTime(2026, 4, 23),
+            HCIssuedDate = new DateTime(2026, 4, 22),
+            DraftedAt = new DateTime(2026, 4, 21, 8, 20, 12),
+            StatusText = "ส่งคำขอแล้ว",
+            StatusClass = "bg-label-success",
+            SignatureStatusText = "ลงลายมือชื่อแล้ว",
+            SignatureStatusClass = "bg-label-success",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = false,
+            AllowCancel = true,
+            AllowSubmit = false,
+            AllowDelete = false,
+            WrittenByText = "ผู้เข้าใช้ระบบ",
+            WrittenByClass = "bg-label-danger",
+            WrittenByIcon = "ri-user-3-line",
+            AutoProcessText = "อัตโนมัติทั้งกระบวนการ",
+            AutoProcessClass = "bg-label-success",
+            AutoProcessIcon = "ri-robot-line",
+            PaymentText = "กำหนดให้มีการชำระเงิน",
+            PaymentClass = "bg-label-success",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080321000006",
+            ReceiveNo = 88,
+            CertificateKey = "processing",
+            CertificateName = "ใบรับรอง",
+            HealthCertificateNumber = "AC821B2171103",
+            HsCode = "1604.20",
+            Country = "อิตาลี",
+            CountryCode = "ITALY",
+            FisheryProducts = "TUNA SALAD MIX",
+            Establishment = "บริษัท เอปซิลอน ซีฟู้ด เอ็กซ์พอร์ต จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-005",
+            IssuedDate = new DateTime(2026, 4, 23),
+            HCIssuedDate = new DateTime(2026, 4, 22),
+            DraftedAt = new DateTime(2026, 4, 21, 13, 9, 47),
+            StatusText = "ร่างคำขอ",
+            StatusClass = "bg-label-secondary",
+            SignatureStatusText = "ยังไม่ลง",
+            SignatureStatusClass = "bg-label-warning",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = true,
+            AllowCancel = false,
+            AllowSubmit = true,
+            AllowDelete = true,
+            WrittenByText = "เจ้าหน้าที่",
+            WrittenByClass = "bg-label-primary",
+            WrittenByIcon = "ri-user-star-line",
+            AutoProcessText = "ไม่มีคุณสมบัติอัตโนมัติ",
+            AutoProcessClass = "bg-label-danger",
+            AutoProcessIcon = "ri-close-circle-line",
+            PaymentText = "กำหนดไม่ให้มีการชำระเงิน",
+            PaymentClass = "bg-label-secondary",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080322000007",
+            ReceiveNo = 225,
+            CertificateKey = "declaration",
+            CertificateName = "ใบแทนรับรอง",
+            HealthCertificateNumber = "HC821B211416",
+            HsCode = "0303.89",
+            Country = "เกาหลีใต้",
+            CountryCode = "SOUTH KOREA",
+            FisheryProducts = "FROZEN SKIPJACK",
+            Establishment = "บริษัท ซีตา ฟิช อินดัสทรี จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-006",
+            IssuedDate = new DateTime(2026, 4, 24),
+            HCIssuedDate = new DateTime(2026, 4, 23),
+            DraftedAt = new DateTime(2026, 4, 22, 9, 55, 18),
+            StatusText = "ส่งคำขอแล้ว",
+            StatusClass = "bg-label-success",
+            SignatureStatusText = "ลงลายมือชื่อแล้ว",
+            SignatureStatusClass = "bg-label-success",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = false,
+            AllowCancel = true,
+            AllowSubmit = false,
+            AllowDelete = false,
+            WrittenByText = "เจ้าหน้าที่",
+            WrittenByClass = "bg-label-primary",
+            WrittenByIcon = "ri-user-star-line",
+            AutoProcessText = "อัตโนมัติหลังลงทะเบียนรับเรื่อง",
+            AutoProcessClass = "bg-label-warning",
+            AutoProcessIcon = "ri-settings-2-line",
+            PaymentText = "กำหนดให้มีการชำระเงิน",
+            PaymentClass = "bg-label-success",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080322000008",
+            ReceiveNo = 101,
+            CertificateKey = "processing",
+            CertificateName = "ใบรับรอง",
+            HealthCertificateNumber = "AC821B2171104",
+            HsCode = "1604.19",
+            Country = "เยอรมนี",
+            CountryCode = "GERMANY",
+            FisheryProducts = "SMOKED TUNA FLAKES",
+            Establishment = "บริษัท อีตา มารีน เอ็กซ์พอร์ต จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-007",
+            IssuedDate = new DateTime(2026, 4, 24),
+            HCIssuedDate = new DateTime(2026, 4, 23),
+            DraftedAt = new DateTime(2026, 4, 22, 14, 30, 5),
+            StatusText = "ร่างคำขอ",
+            StatusClass = "bg-label-secondary",
+            SignatureStatusText = "ยังไม่ลง",
+            SignatureStatusClass = "bg-label-warning",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = true,
+            AllowCancel = false,
+            AllowSubmit = true,
+            AllowDelete = true,
+            WrittenByText = "ผู้เข้าใช้ระบบ",
+            WrittenByClass = "bg-label-danger",
+            WrittenByIcon = "ri-user-3-line",
+            AutoProcessText = "ไม่มีคุณสมบัติอัตโนมัติ",
+            AutoProcessClass = "bg-label-danger",
+            AutoProcessIcon = "ri-close-circle-line",
+            PaymentText = "กำหนดไม่ให้มีการชำระเงิน",
+            PaymentClass = "bg-label-secondary",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080323000009",
+            ReceiveNo = 175,
+            CertificateKey = "declaration",
+            CertificateName = "ใบแทนรับรอง",
+            HealthCertificateNumber = "HC821B211417",
+            HsCode = "0304.99",
+            Country = "แคนาดา",
+            CountryCode = "CANADA",
+            FisheryProducts = "TUNA FILLET",
+            Establishment = "บริษัท ไอโอตา ฟิช โปรดักส์ จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-008",
+            IssuedDate = new DateTime(2026, 4, 25),
+            HCIssuedDate = new DateTime(2026, 4, 24),
+            DraftedAt = new DateTime(2026, 4, 23, 7, 42, 33),
+            StatusText = "ส่งคำขอแล้ว",
+            StatusClass = "bg-label-success",
+            SignatureStatusText = "ลงลายมือชื่อแล้ว",
+            SignatureStatusClass = "bg-label-success",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = false,
+            AllowCancel = true,
+            AllowSubmit = false,
+            AllowDelete = false,
+            WrittenByText = "ผู้เข้าใช้ระบบ",
+            WrittenByClass = "bg-label-danger",
+            WrittenByIcon = "ri-user-3-line",
+            AutoProcessText = "อัตโนมัติทั้งกระบวนการ",
+            AutoProcessClass = "bg-label-success",
+            AutoProcessIcon = "ri-robot-line",
+            PaymentText = "กำหนดให้มีการชำระเงิน",
+            PaymentClass = "bg-label-success",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080323000010",
+            ReceiveNo = 60,
+            CertificateKey = "processing",
+            CertificateName = "ใบรับรอง",
+            HealthCertificateNumber = "AC821B2171105",
+            HsCode = "1604.20",
+            Country = "เนเธอร์แลนด์",
+            CountryCode = "NETHERLANDS",
+            FisheryProducts = "TUNA CHUNK IN BRINE",
+            Establishment = "บริษัท แคปปา มารีน อินดัสทรี จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-009",
+            IssuedDate = new DateTime(2026, 4, 25),
+            HCIssuedDate = new DateTime(2026, 4, 24),
+            DraftedAt = new DateTime(2026, 4, 23, 15, 11, 26),
+            StatusText = "ร่างคำขอ",
+            StatusClass = "bg-label-secondary",
+            SignatureStatusText = "ยังไม่ลง",
+            SignatureStatusClass = "bg-label-warning",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = true,
+            AllowCancel = false,
+            AllowSubmit = true,
+            AllowDelete = true,
+            WrittenByText = "เจ้าหน้าที่",
+            WrittenByClass = "bg-label-primary",
+            WrittenByIcon = "ri-user-star-line",
+            AutoProcessText = "ไม่มีคุณสมบัติอัตโนมัติ",
+            AutoProcessClass = "bg-label-danger",
+            AutoProcessIcon = "ri-close-circle-line",
+            PaymentText = "กำหนดไม่ให้มีการชำระเงิน",
+            PaymentClass = "bg-label-secondary",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        },
+        new
+        {
+            RequestNumber = "10611080324000011",
+            ReceiveNo = 300,
+            CertificateKey = "declaration",
+            CertificateName = "ใบแทนรับรอง",
+            HealthCertificateNumber = "HC821B211418",
+            HsCode = "0303.43",
+            Country = "ออสเตรเลีย",
+            CountryCode = "AUSTRALIA",
+            FisheryProducts = "WHOLE ROUND TUNA",
+            Establishment = "บริษัท แลมบ์ดา ซีฟู้ด โปรเซสซิ่ง จำกัด",
+            EstablishmentBranch = "สาขา 00001",
+            ApprovalNo = "AP-74110-010",
+            IssuedDate = new DateTime(2026, 4, 26),
+            HCIssuedDate = new DateTime(2026, 4, 25),
+            DraftedAt = new DateTime(2026, 4, 24, 10, 0, 0),
+            StatusText = "ส่งคำขอแล้ว",
+            StatusClass = "bg-label-success",
+            SignatureStatusText = "ลงลายมือชื่อแล้ว",
+            SignatureStatusClass = "bg-label-success",
+            DetailUrl = Url.Action("CreateManageCertificatePS", "PSDeclaration"),
+            AllowClone = true,
+            AllowEdit = false,
+            AllowCancel = true,
+            AllowSubmit = false,
+            AllowDelete = false,
+            WrittenByText = "ผู้เข้าใช้ระบบ",
+            WrittenByClass = "bg-label-danger",
+            WrittenByIcon = "ri-user-3-line",
+            AutoProcessText = "อัตโนมัติหลังลงทะเบียนรับเรื่อง",
+            AutoProcessClass = "bg-label-warning",
+            AutoProcessIcon = "ri-settings-2-line",
+            PaymentText = "กำหนดให้มีการชำระเงิน",
+            PaymentClass = "bg-label-success",
+            PaymentIcon = "ri-money-dollar-circle-line"
+        }
+    };
+
+    var submittedCount = requests.Count(r => r.StatusText == "ส่งคำขอแล้ว");
+
+    var totalRequestCount = requests.Length;
+    var declarationCount = requests.Count(r => r.CertificateKey == "declaration");
+    var processingCount = requests.Count(r => r.CertificateKey == "processing");
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section PageStyles {
+<style>
+    .request-table-compact {
+        font-size: 0.78rem;
+    }
+
+    .request-table-compact th,
             ReceiveNo = 150,
             CertificateKey = "declaration",
             CertificateName = "ใบแทนรับรอง",
@@ -347,6 +701,8 @@
 
     var submittedCount = requests.Count(r => r.StatusText == "ส่งคำขอแล้ว");
 
+    // TOR 1.10(3): ใบรับรองที่ถูกยกเลิก (mockup)
+    var cancelledCertNos = new[] { "AC821B2171102", "AC821B2171201" };
     var totalRequestCount = requests.Length;
     var declarationCount = requests.Count(r => r.CertificateKey == "declaration");
     var processingCount = requests.Count(r => r.CertificateKey == "processing");
@@ -430,22 +786,10 @@
 @section PageScripts {
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var fromInput = document.getElementById('filterDraftDateFrom');
-        var toInput = document.getElementById('filterDraftDateTo');
-
-        if (fromInput) {
-            flatpickr(fromInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
-
-        if (toInput) {
-            flatpickr(toInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
+        // Init flatpickr for all date filter inputs (TOR 1.7(28))
+        document.querySelectorAll('.flatpickr-date').forEach(function(el) {
+            flatpickr(el, { dateFormat: 'd/m/Y', allowInput: true });
+        });
 
         if (window.bootstrap && bootstrap.Tooltip) {
             document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
@@ -475,60 +819,70 @@
         }
 
         function filterRows() {
-            var certificate = (document.getElementById('filterCertificate').value || '').trim();
-            var status = (document.getElementById('filterStatus').value || '').trim();
-            var fromDate = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
-            var toDate = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
-            var excludeRange = document.getElementById('filterDateExclude').checked;
+            var certificate  = (document.getElementById('filterCertificate').value || '').trim();
+            var certNo       = (document.getElementById('filterCertNo').value || '').trim().toLowerCase();
+            var issuedFrom   = parseDateInput(document.getElementById('filterIssuedDateFrom').value, false);
+            var issuedTo     = parseDateInput(document.getElementById('filterIssuedDateTo').value, true);
+            var estab        = (document.getElementById('filterEstablishment').value || '').trim().toLowerCase();
+            var approvalNo   = (document.getElementById('filterApprovalNo').value || '').trim().toLowerCase();
+            var product      = (document.getElementById('filterProduct').value || '').trim().toLowerCase();
+            var country      = (document.getElementById('filterCountry').value || '').trim().toLowerCase();
+            var hcNo         = (document.getElementById('filterHCNo').value || '').trim().toLowerCase();
+            var hcIssuedFrom = parseDateInput(document.getElementById('filterHCIssuedDateFrom').value, false);
+            var hcIssuedTo   = parseDateInput(document.getElementById('filterHCIssuedDateTo').value, true);
+            var status       = (document.getElementById('filterStatus').value || '').trim();
+            var inspStatus   = (document.getElementById('filterInspectionStatus').value || '').trim();
             var rows = document.querySelectorAll('#requestTableBody tr[data-certificate]');
             var visibleCount = 0;
 
             rows.forEach(function (row) {
-                var rowCertificate = row.dataset.certificate || '';
-                var rowStatus = row.dataset.status || '';
-                var rowDraftDate = new Date(row.dataset.draftDate || '');
-                var certificateMatch = !certificate || rowCertificate === certificate;
-                var statusMatch = !status || rowStatus === status;
-                var dateMatch;
-                if (!fromDate && !toDate) {
-                    dateMatch = true;
-                } else if (excludeRange) {
-                    var inRange = (!fromDate || rowDraftDate >= fromDate) && (!toDate || rowDraftDate <= toDate);
-                    dateMatch = !inRange;
-                } else {
-                    dateMatch = (!fromDate || rowDraftDate >= fromDate) && (!toDate || rowDraftDate <= toDate);
-                }
-                var isVisible = certificateMatch && statusMatch && dateMatch;
+                var certTypeMatch   = !certificate  || (row.dataset.certificate || '') === certificate;
+                var certNoMatch     = !certNo       || (row.dataset.certNo || '').toLowerCase().includes(certNo);
+                var estabMatch      = !estab        || (row.dataset.establishment || '').toLowerCase().includes(estab);
+                var approvalMatch   = !approvalNo   || (row.dataset.approvalNo || '').toLowerCase().includes(approvalNo);
+                var productMatch    = !product      || (row.dataset.product || '').toLowerCase().includes(product);
+                var countryMatch    = !country      || (row.dataset.country || '').toLowerCase().includes(country);
+                var hcNoMatch       = !hcNo         || (row.dataset.hcNo || '').toLowerCase().includes(hcNo);
+                var statusMatch     = !status       || (row.dataset.status || '') === status;
+                var inspMatch       = !inspStatus   || (row.dataset.inspectionSent || '') === inspStatus;
+                // TOR 1.10(3): filter สถานะการยกเลิก
+                var cancelStatus = (document.getElementById('filterCancelStatus').value || '').trim();
+                var cancelMatch  = !cancelStatus || (row.dataset.isCancelled || 'false') === cancelStatus;
+
+                var rowIssued   = new Date(row.dataset.issuedDate || '');
+                var rowHCIssued = new Date(row.dataset.hcIssuedDate || '');
+                var issuedMatch   = (!issuedFrom   && !issuedTo)   || ((!issuedFrom   || rowIssued   >= issuedFrom)   && (!issuedTo   || rowIssued   <= issuedTo));
+                var hcIssuedMatch = (!hcIssuedFrom && !hcIssuedTo) || ((!hcIssuedFrom || rowHCIssued >= hcIssuedFrom) && (!hcIssuedTo  || rowHCIssued <= hcIssuedTo));
+
+                var isVisible = certTypeMatch && certNoMatch && estabMatch && approvalMatch && productMatch && countryMatch && hcNoMatch && statusMatch && inspMatch && issuedMatch && hcIssuedMatch && cancelMatch;
 
                 row.classList.toggle('d-none', !isVisible);
-                if (isVisible) {
-                    visibleCount += 1;
-                }
+                if (isVisible) { visibleCount += 1; }
             });
 
             document.getElementById('requestTableEmpty').classList.toggle('d-none', visibleCount !== 0);
         }
 
         document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
-        document.getElementById('filterCertificate').addEventListener('change', filterRows);
-        document.getElementById('filterStatus').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateFrom').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateTo').addEventListener('change', filterRows);
-        document.getElementById('filterDateExclude').addEventListener('change', filterRows);
-        document.querySelectorAll('#filterCertificate, #filterStatus, #filterDraftDateFrom, #filterDraftDateTo').forEach(function (element) {
-            element.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    filterRows();
-                }
+        ['filterCertificate','filterStatus','filterInspectionStatus','filterCancelStatus','filterCertNo','filterEstablishment','filterApprovalNo',
+         'filterProduct','filterCountry','filterHCNo',
+         'filterIssuedDateFrom','filterIssuedDateTo','filterHCIssuedDateFrom','filterHCIssuedDateTo'
+        ].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('change', filterRows);
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
         document.getElementById('btnResetRequests').addEventListener('click', function () {
+            ['filterCertNo','filterEstablishment','filterApprovalNo','filterProduct','filterCountry',
+             'filterHCNo','filterIssuedDateFrom','filterIssuedDateTo','filterHCIssuedDateFrom','filterHCIssuedDateTo'
+            ].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
             document.getElementById('filterCertificate').value = '';
             document.getElementById('filterStatus').value = '';
-            document.getElementById('filterDraftDateFrom').value = '';
-            document.getElementById('filterDraftDateTo').value = '';
-            document.getElementById('filterDateExclude').checked = false;
+            document.getElementById('filterInspectionStatus').value = '';
+            document.getElementById('filterCancelStatus').value = '';
             filterRows();
         });
     });
@@ -552,18 +906,61 @@
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h5 class="card-title mb-1">ตัวกรองการค้นหา</h5>
-            <p class="text-muted small mb-0">ค้นหารายการคำขอตามประเภทใบรับรองและช่วงวันที่ร่างคำขอ</p>
+            <p class="text-muted small mb-0">ค้นหาใบรับรองที่ออกแล้ว (TOR 1.7(28))</p>
         </div>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end">
+            @* Row 1 *@
             <div class="col-md-4 col-lg-3">
-                <label for="filterCertificate" class="form-label">ใบรับรอง</label>
+                <label for="filterCertificate" class="form-label">ประเภทใบรับรอง</label>
                 <select id="filterCertificate" class="form-select">
                     <option value="">ทั้งหมด</option>
-                    <option value="declaration">ใบแทนรับรอง</option>
-                    <option value="processing">ใบรับรอง</option>
+                    <option value="declaration">ใบแทนรับรอง (Declaration)</option>
+                    <option value="processing">ใบรับรอง (PS)</option>
                 </select>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterCertNo" class="form-label">เลขที่ใบรับรอง</label>
+                <input type="text" id="filterCertNo" class="form-control" placeholder="เช่น AC821B2171101" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterIssuedDateFrom" class="form-label">วันที่ออกใบรับรอง (ตั้งแต่)</label>
+                <input type="text" id="filterIssuedDateFrom" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterIssuedDateTo" class="form-label">วันที่ออกใบรับรอง (ถึง)</label>
+                <input type="text" id="filterIssuedDateTo" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            @* Row 2 *@
+            <div class="col-md-4 col-lg-3">
+                <label for="filterEstablishment" class="form-label">ชื่อสถานประกอบการ</label>
+                <input type="text" id="filterEstablishment" class="form-control" placeholder="ชื่อสถานประกอบการ" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterApprovalNo" class="form-label">หมายเลขรับรองโรงงาน</label>
+                <input type="text" id="filterApprovalNo" class="form-control" placeholder="เช่น AP-74110-001" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterProduct" class="form-label">ชื่อสินค้า</label>
+                <input type="text" id="filterProduct" class="form-control" placeholder="ชื่อสินค้า / HS Code" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterCountry" class="form-label">ประเทศปลายทาง</label>
+                <input type="text" id="filterCountry" class="form-control" placeholder="เช่น ญี่ปุ่น / JAPAN" />
+            </div>
+            @* Row 3 *@
+            <div class="col-md-4 col-lg-3">
+                <label for="filterHCNo" class="form-label">เลขที่ใบรับรองสุขอนามัย</label>
+                <input type="text" id="filterHCNo" class="form-control" placeholder="เช่น HC821B211414" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterHCIssuedDateFrom" class="form-label">วันที่ออกใบรับรองสุขอนามัย (ตั้งแต่)</label>
+                <input type="text" id="filterHCIssuedDateFrom" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterHCIssuedDateTo" class="form-label">วันที่ออกใบรับรองสุขอนามัย (ถึง)</label>
+                <input type="text" id="filterHCIssuedDateTo" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
             </div>
             <div class="col-md-4 col-lg-3">
                 <label for="filterStatus" class="form-label">สถานะ</label>
@@ -573,32 +970,32 @@
                     <option value="ร่างคำขอ">ร่างคำขอ</option>
                 </select>
             </div>
-            <div class="col-md-12 col-lg-6">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-4">
-                        <label for="filterDraftDateFrom" class="form-label">วันที่ยื่นคำขอ</label>
-                        <input type="text" id="filterDraftDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
-                    </div>
-                    <div class="col-md-4">
-                        <label for="filterDraftDateTo" class="form-label">ถึงวันที่</label>
-                        <input type="text" id="filterDraftDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
-                    </div>
-                    <div class="col-auto">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="filterDateExclude" />
-                            <label class="form-check-label small" for="filterDateExclude">ไม่อยู่ในช่วง</label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <div class="d-flex gap-2 filter-action-buttons">
-                            <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
-                                <i class="ri ri-search-line"></i>
-                            </button>
-                            <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square">
-                                <i class="ri ri-refresh-line"></i>
-                            </button>
-                        </div>
-                    </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterInspectionStatus" class="form-label">สถานะด่านตรวจ</label>
+                <select id="filterInspectionStatus" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="sent">ส่งด่านตรวจแล้ว</option>
+                    <option value="not-sent">ยังไม่ส่ง</option>
+                </select>
+            </div>
+            @* TOR 1.10(3): สถานะการยกเลิก *@
+            <div class="col-md-4 col-lg-3">
+                <label for="filterCancelStatus" class="form-label">สถานะการยกเลิก</label>
+                <select id="filterCancelStatus" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="true">ยกเลิกแล้ว 🚫</option>
+                    <option value="false">ยังไม่ถูกยกเลิก</option>
+                </select>
+            </div>
+            @* Action buttons *@
+            <div class="col-12">
+                <div class="d-flex gap-2 filter-action-buttons">
+                    <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
+                        <i class="ri ri-search-line"></i>
+                    </button>
+                    <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square" title="ล้างการค้นหา">
+                        <i class="ri ri-refresh-line"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -606,30 +1003,57 @@
 </div>
 
 <div class="card">
+@{
+    var cancelledCertNos = new[] { "AC821B2171102", "AC821B2171201" };
+}
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
             <h5 class="card-title mb-1">รายการใบรับรอง</h5>
             <p class="text-muted small mb-0">แสดงรายการใบรับรองการแปรรูปสัตว์นํ้า (PS) และใบรับรองไม่แปรรูปสัตว์นํ้า (Declaration)</p>
+        </div>
+        <!-- TOR 1.7(34): Export Excel -->
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-success btn-sm"
+                onclick="alert('Export Excel รายการใบรับรอง PS/NMD (mockup)\n\nรายการที่ export:\n- เลขที่ใบรับรอง\n- ชื่อสถานประกอบการ\n- เลขที่อนุมัติ\n- สินค้า / HS Code\n- ประเทศปลายทาง\n- วันที่ออกใบรับรอง\n- สถานะ')">
+                <i class="ri ri-file-excel-2-line me-1"></i> Export Excel
+            </button>
         </div>
     </div>
     <div class="table-responsive p-1">
         <table class="table table-bordered align-middle mb-0 request-table-compact">
             <thead class="text-center">
                 <tr>
-                    <th style="min-width:220px;">Doc No.</th>
-                    <th style="min-width:180px;">Plant</th>
+                    <th style="min-width:220px;">Doc No. / สถานะ</th>
+                    <th style="min-width:160px;">Plant / รับรองโรงงาน</th>
                     <th style="width:70px;">TH No.</th>
                     <th style="width:90px;">HS Code</th>
                     <th style="min-width:140px;">HC No.</th>
+                    <th style="min-width:120px;">วันที่ออก HC</th>
                     <th style="min-width:160px;">Product Name</th>
-                    <th style="min-width:180px;">Exporter</th>
                     <th style="min-width:120px;">Country</th>
+                    <th style="min-width:120px;">วันที่ออกใบรับรอง</th>
+                    <th style="min-width:130px;">สถานะด่านตรวจ</th>
                 </tr>
             </thead>
             <tbody id="requestTableBody">
                 @foreach (var request in requests)
                 {
-                    <tr data-certificate="@request.CertificateKey" data-status="@request.StatusText" data-draft-date="@request.DraftedAt.ToString("yyyy-MM-ddTHH:mm:ss")">
+                    var inspSent = request.StatusText == "ส่งคำขอแล้ว";
+                    var inspSentValue = inspSent ? "true" : "false";
+                    var isCancelledCert = cancelledCertNos.Contains(request.HealthCertificateNumber);
+                    <tr data-certificate="@request.CertificateKey"
+                        data-status="@request.StatusText"
+                        data-draft-date="@request.DraftedAt.ToString("yyyy-MM-ddTHH:mm:ss")"
+                        data-cert-no="@request.HealthCertificateNumber"
+                        data-issued-date="@request.IssuedDate.ToString("yyyy-MM-dd")"
+                        data-establishment="@request.Establishment"
+                        data-approval-no="@request.ApprovalNo"
+                        data-product="@request.FisheryProducts"
+                        data-country="@request.Country"
+                        data-hc-no="@request.HealthCertificateNumber"
+                        data-hc-issued-date="@request.HCIssuedDate.ToString("yyyy-MM-dd")"
+                        data-inspection-sent="@inspSentValue"
+                        data-is-cancelled="@isCancelledCert.ToString().ToLower()">
                         <td>
                             <a href="@(request.CertificateKey == "processing" ? Url.Action("CreateManageCertificatePS", "PSDeclaration") : Url.Action("CreateManageCertificateNoPS", "PSDeclaration"))" class="fw-semibold text-primary text-decoration-none d-block mb-1">@request.RequestNumber</a>
                             <div class="d-flex flex-column gap-1">
@@ -661,6 +1085,15 @@
                                     </span>
                                     <span><span class="fw-semibold">สถานะ:</span> @request.StatusText</span>
                                 </div>
+                                @* TOR 1.10(3): badge ยกเลิกแล้ว *@
+                                @if (isCancelledCert)
+                                {
+                                    <div class="d-flex align-items-center gap-1 small mt-1">
+                                        <span class="badge bg-label-danger">
+                                            <i class="ri ri-forbid-2-line me-1"></i>ยกเลิกแล้ว 🚫
+                                        </span>
+                                    </div>
+                                }
                                 <!-- ลายมือชื่อ -->
                                 <div class="d-flex align-items-center gap-1 small text-muted">
                                     @if (request.SignatureStatusText == "ลงลายมือชื่อแล้ว")
@@ -680,25 +1113,61 @@
                             </div>
                         </td>
                         <td>
-                            <div>@request.Establishment</div>
-                            <div class="small text-muted">(@request.EstablishmentBranch)</div>
+                            <div class="fw-semibold">@request.Establishment</div>
+                            <div class="small text-muted">@request.ApprovalNo</div>
                         </td>
                         <td class="text-center text-muted">@request.ReceiveNo</td>
                         <td class="text-center">@request.HsCode</td>
-                        <td>@request.HealthCertificateNumber</td>
-                        <td>@request.FisheryProducts</td>
-                        <td>
-                            <div>@request.Establishment</div>
-                            <div class="small text-muted">(@request.EstablishmentBranch)</div>
+                        <td class="small">
+                            <div>@request.HealthCertificateNumber</div>
                         </td>
-                        <td>
+                        <td class="text-center small text-nowrap text-muted">
+                            @request.HCIssuedDate.ToString("dd/MM/yyyy")
+                        </td>
+                        <td class="small">@request.FisheryProducts</td>
+                        <td class="small">
                             <div>@request.Country</div>
                             <div class="small text-muted">(@request.CountryCode)</div>
+                        </td>
+                        <td class="text-center small text-nowrap text-muted">
+                            @request.IssuedDate.ToString("dd/MM/yyyy")
+                        </td>
+                        <td class="text-center">
+                            @* TOR 1.10(12): สถานะด่านตรวจ + link ดูการตรวจปล่อย *@
+                            @if (isCancelledCert)
+                            {
+                                <span class="badge bg-label-danger small">
+                                    <i class="ri ri-forbid-line me-1"></i>ถูกยกเลิก 🚫
+                                </span>
+                            }
+                            else if (inspSent)
+                            {
+                                <div class="d-flex flex-column align-items-center gap-1">
+                                    <span class="badge bg-success small">
+                                        <i class="ri ri-checkbox-circle-line me-1"></i>ส่งด่านตรวจแล้ว ✅
+                                    </span>
+                                    <a href="@Url.Action("IndexApproveReturnWeight", "PSDeclaration")"
+                                       class="btn btn-xs btn-outline-success py-0 px-1" style="font-size:0.7rem;"
+                                       data-bs-toggle="tooltip" title="ดูรายการตรวจปล่อยที่เชื่อมโยง">
+                                        <i class="ri ri-eye-line me-1"></i>ดูการตรวจปล่อย
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex flex-column align-items-center gap-1">
+                                    <span class="badge bg-label-secondary small">ยังไม่ส่ง</span>
+                                    <button type="button" class="btn btn-xs btn-outline-primary py-0 px-1" style="font-size:0.7rem;"
+                                        onclick="alert('ส่งข้อมูลใบรับรอง @request.RequestNumber ไปด่านตรวจ (mockup)')">
+                                        <i class="ri ri-send-plane-line me-1"></i>ส่งไปด่านตรวจ
+                                    </button>
+                                </div>
+                            }
                         </td>
                     </tr>
                 }
                 <tr id="requestTableEmpty" class="d-none">
-                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="10" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>

@@ -1,0 +1,9 @@
+# (3) เลขประจำตัวผู้เสียภาษี และลำดับสาขา
+
+URL: http://localhost:5055/Admin/TraceabilityList
+
+จำนวนรูปที่ต้องแคป: 2 รูป
+
+รายการหน้าที่ต้องแคป
+1. Detail modal > accordion 'ข้อมูลทั่วไป' > TaxId + BranchCode
+2. Search box ค้นหาด้วยเลขภาษี

@@ -1,5 +1,7 @@
 @{
     ViewData["Title"] = "ขอเปลี่ยนสถานะ RMBS1 จาก NoPS เป็น PS";
+    var changePsOperatorType = Convert.ToString(ViewData["ChangePsOperatorType"]) ?? "โรงงาน";
+    var changePsOperatorName = Convert.ToString(ViewData["ChangePsOperatorName"]) ?? "Alpha Office Automation Co., Ltd.";
 
     var imdRecords = new[]
     {
@@ -18,7 +20,9 @@
             QtyEnteringFactory = 240000m,
             DocumentType = "cc",
             StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning"
+            StatusClass = "bg-label-warning",
+            ApprovalDate = (DateTime?)null,
+            ApprovedBy = ""
         },
         new
         {
@@ -35,7 +39,9 @@
             QtyEnteringFactory = 60000m,
             DocumentType = "cc",
             StatusText = "อนุมัติแล้ว",
-            StatusClass = "bg-label-success"
+            StatusClass = "bg-label-success",
+            ApprovalDate = (DateTime?)new DateTime(2018, 7, 12),
+            ApprovedBy = "นายสมชาย แสนดี (เจ้าหน้าที่ กตส.)"
         },
         new
         {
@@ -52,7 +58,9 @@
             QtyEnteringFactory = 120000m,
             DocumentType = "scc",
             StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning"
+            StatusClass = "bg-label-warning",
+            ApprovalDate = (DateTime?)null,
+            ApprovedBy = ""
         },
         new
         {
@@ -69,7 +77,9 @@
             QtyEnteringFactory = 45000m,
             DocumentType = "cc",
             StatusText = "อนุมัติแล้ว",
-            StatusClass = "bg-label-success"
+            StatusClass = "bg-label-success",
+            ApprovalDate = (DateTime?)new DateTime(2018, 7, 22),
+            ApprovedBy = "นางสาวอารีย์ ใจดี (เจ้าหน้าที่ กตส.)"
         },
         new
         {
@@ -86,7 +96,9 @@
             QtyEnteringFactory = 180000m,
             DocumentType = "cc",
             StatusText = "ไม่อนุมัติ",
-            StatusClass = "bg-label-danger"
+            StatusClass = "bg-label-danger",
+            ApprovalDate = (DateTime?)null,
+            ApprovedBy = ""
         }
     };
 }
@@ -250,6 +262,25 @@
                 if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
+
+        var changePdfModalEl = document.getElementById('modalChangePsPdfPreview');
+        var changePdfModal = changePdfModalEl && window.bootstrap ? new bootstrap.Modal(changePdfModalEl) : null;
+
+        document.querySelectorAll('.btn-change-pdf').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = btn.closest('tr');
+                if (!row) return;
+                document.getElementById('pdfChangeImd').textContent = row.dataset.imdNumber || '-';
+                document.getElementById('pdfChangeCc').textContent = row.dataset.ccNumber || '-';
+                document.getElementById('pdfChangeApproveDate').textContent = row.dataset.approvalDate || '-';
+                document.getElementById('pdfChangeApprovedBy').textContent = row.dataset.approvedBy || '-';
+                document.getElementById('pdfChangeStatus').textContent = row.dataset.status || '-';
+
+                if (changePdfModal) {
+                    changePdfModal.show();
+                }
+            });
+        });
     });
 </script>
 }
@@ -265,6 +296,11 @@
         </li>
     </ol>
 </nav>
+
+<div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-3" role="alert">
+    <i class="ri ri-information-line"></i>
+    <span>หน้านี้สำหรับสถานประกอบการประเภทโรงงานเท่านั้น</span>
+</div>
 
 <!-- Filter card -->
 <div class="card mb-4">
@@ -389,6 +425,8 @@
                         data-imd-number="@rec.ImdNumber"
                         data-doc-type="@rec.DocumentType"
                         data-status="@rec.StatusText"
+                        data-approval-date="@(rec.ApprovalDate.HasValue ? rec.ApprovalDate.Value.ToString("dd/MM/yyyy") : "-")"
+                        data-approved-by="@rec.ApprovedBy"
                         data-vessel="@rec.VesselName"
                         data-gear="@rec.GearType"
                         data-captain=""
@@ -441,16 +479,27 @@
                         <td class="text-end">@rec.QtyEnteringFactory.ToString("N2")</td>
                         <td>
                             <div class="d-flex gap-1 justify-content-center">
-                                <a href="@Url.Action("ChangeCCSCC", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-info" title="รายละเอียด" data-bs-toggle="tooltip" data-bs-placement="top">
+                                <a href="@Url.Action("CreateChangeRMBS1", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-info" title="รายละเอียด" data-bs-toggle="tooltip" data-bs-placement="top">
                                     <i class="ri ri-eye-line text-info"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top">
+                                <a href="@Url.Action("CreateChangeRMBS1", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top">
                                     <i class="ri ri-pencil-line text-warning"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="คัดลอก" data-bs-toggle="tooltip" data-bs-placement="top">
-                                    <i class="ri ri-file-copy-line text-secondary"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="ลบ" data-bs-toggle="tooltip" data-bs-placement="top">
+                                </a>
+                                @if (rec.StatusText == "รออนุมัติ")
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="ยกเลิกคำขอ" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="if(confirm('ยืนยันยกเลิกคำขอเปลี่ยนแปลง RMBS1:PS นี้?')) alert('ยกเลิกคำขอเรียบร้อย (mockup)')">
+                                        <i class="ri ri-close-circle-line text-secondary"></i>
+                                    </button>
+                                }
+                                @if (rec.StatusText == "อนุมัติแล้ว")
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-change-pdf" title="พรีวิว PDF ผลการเปลี่ยนแปลง" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-file-pdf-line text-danger"></i>
+                                    </button>
+                                }
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="ลบ" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    onclick="if(confirm('ต้องการลบรายการคำขอนี้ใช่หรือไม่?')) alert('ลบรายการเรียบร้อย (mockup)')">
                                     <i class="ri ri-delete-bin-line text-danger"></i>
                                 </button>
                             </div>
@@ -462,5 +511,74 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- ==================== Modal: พรีวิว PDF ผลการเปลี่ยนแปลง RMBS1:PS ==================== -->
+<div class="modal fade" id="modalChangePsPdfPreview" tabindex="-1" aria-labelledby="modalChangePsPdfPreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalChangePsPdfPreviewLabel">
+                    <i class="ri ri-file-pdf-line me-2"></i>พรีวิว PDF ผลการพิจารณาเปลี่ยนแปลง RMBS1:PS
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="background:#f8f9fa;">
+                <div id="changePsPdfDoc" style="background:#fff;border:1px solid #d9dee3;padding:1.5rem 2rem;">
+                    <div class="text-center mb-3">
+                        <h5 class="mb-1 fw-bold">กรมประมง กระทรวงเกษตรและสหกรณ์</h5>
+                        <div class="small text-muted">เอกสารผลการพิจารณาคำขอเปลี่ยนแปลง RMBS1:PS (Mockup)</div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6"><strong>เลขที่ IMD:</strong> <span id="pdfChangeImd">-</span></div>
+                        <div class="col-md-6"><strong>เลขที่ CC/SCC:</strong> <span id="pdfChangeCc">-</span></div>
+                        <div class="col-md-6"><strong>วันที่อนุมัติ:</strong> <span id="pdfChangeApproveDate">-</span></div>
+                        <div class="col-md-6"><strong>ผู้อนุมัติ:</strong> <span id="pdfChangeApprovedBy">-</span></div>
+                        <div class="col-md-6"><strong>สถานะคำขอ:</strong> <span class="badge bg-success" id="pdfChangeStatus">อนุมัติแล้ว</span></div>
+                        <div class="col-md-6"><strong>ประเภทการเปลี่ยนแปลง:</strong> เปลี่ยนความประสงค์/ประเทศปลายทาง/มาตรการ</div>
+                    </div>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>หัวข้อที่เปลี่ยน</th>
+                                    <th>ก่อนเปลี่ยน</th>
+                                    <th>หลังเปลี่ยน</th>
+                                    <th>ผลการพิจารณา</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ความประสงค์</td>
+                                    <td>ส่งออกสินค้า</td>
+                                    <td>แปรรูปส่งออก EU</td>
+                                    <td><span class="badge bg-success">อนุมัติ</span></td>
+                                </tr>
+                                <tr>
+                                    <td>ประเทศปลายทาง</td>
+                                    <td>US</td>
+                                    <td>EU</td>
+                                    <td><span class="badge bg-success">อนุมัติ</span></td>
+                                </tr>
+                                <tr>
+                                    <td>มาตรการสุขอนามัย</td>
+                                    <td>IUU + MMPA</td>
+                                    <td>IUU (EU) + MMPA (US)</td>
+                                    <td><span class="badge bg-success">ผ่านเกณฑ์</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="small text-muted">หมายเหตุ: เอกสารนี้เป็นตัวอย่างเพื่อแสดงผลการพิจารณาการเปลี่ยนแปลง RMBS1:PS เท่านั้น</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-info" onclick="alert('พิมพ์/ดาวน์โหลด PDF สำเร็จ (mockup)')">
+                    <i class="ri ri-printer-line me-1"></i> พิมพ์/ดาวน์โหลด
+                </button>
+            </div>
+        </div>
     </div>
 </div>

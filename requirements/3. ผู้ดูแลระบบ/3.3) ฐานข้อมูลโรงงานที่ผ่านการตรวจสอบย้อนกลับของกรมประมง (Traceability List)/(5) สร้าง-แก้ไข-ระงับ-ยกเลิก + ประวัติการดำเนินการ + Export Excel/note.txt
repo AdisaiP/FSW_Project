@@ -1,0 +1,11 @@
+# (5) สร้าง-แก้ไข-ระงับ-ยกเลิก + ประวัติการดำเนินการ + Export Excel
+
+URL: http://localhost:5055/Admin/TraceabilityList
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. ตารางหลัก + action column: ปุ่ม ดูรายละเอียด/แก้ไข/ระงับ/ยกเลิก
+2. Modal #traceSuspendModal: เหตุผลระงับ + วันที่มีผล
+3. Modal #traceCancelModal: เหตุผลยกเลิก + alert 'ไม่สามารถกู้คืนได้'
+4. Detail modal > Tab 'ประวัติการเปลี่ยนสถานะ' + Export Excel dropdown

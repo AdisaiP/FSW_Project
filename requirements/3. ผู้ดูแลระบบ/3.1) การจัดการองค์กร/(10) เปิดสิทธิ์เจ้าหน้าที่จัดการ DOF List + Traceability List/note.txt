@@ -1,0 +1,19 @@
+# (10) เปิดสิทธิ์เจ้าหน้าที่จัดการ DOF List + Traceability List
+
+URL 1: http://localhost:5055/Officer/IndexUserData
+URL 2: http://localhost:5055/Admin/DofList
+URL 3: http://localhost:5055/Admin/TraceabilityList
+
+จำนวนรูปที่ต้องแคป: 5 รูป
+
+รายการหน้าที่ต้องแคป
+1. IndexUserData > #dataAccessModal > Section 4 'สิทธิ์จัดการฐานข้อมูล'
+   - switch DOF Manager + switch Trace Manager + badge ปัจจุบัน
+2. Admin/DofList > card 'ผู้จัดการฐานข้อมูล DOF List'
+   - รายชื่อผู้จัดการ + ปุ่ม 'กำหนดผู้จัดการ'
+3. Modal #dofAssignManagerModal
+   - multi-select เจ้าหน้าที่ + ช่วงวันที่ + สิทธิ์ย่อย (เพิ่ม/แก้ไข/ลบ/Import)
+4. Admin/TraceabilityList > card 'ผู้จัดการฐานข้อมูล Traceability List'
+   - รายชื่อผู้จัดการ + badge สิทธิ์
+5. Modal #traceAssignManagerModal
+   - multi-select เจ้าหน้าที่ + สิทธิ์ย่อย + ช่วงวันที่

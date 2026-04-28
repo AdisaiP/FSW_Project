@@ -1,0 +1,16 @@
+# (3) ระงับการออกใบรับรองตามรูปแบบ หรือตามประเทศปลายทาง ระดับโรงงาน
+
+URL: http://localhost:5055/Admin/CertificateTemplate
+
+จำนวนรูปที่ต้องแคป: 5 รูป
+
+รายการหน้าที่ต้องแคป
+1. ตาราง CertificateTemplate + badge 'มีข้อจำกัด: N โรงงาน' (สีส้ม) + ปุ่ม 'จัดการข้อจำกัด'
+2. Modal #modalRestriction > Tab 'ระงับตามโรงงาน'
+   - ตารางโรงงานที่ระงับ: FactoryCode/ประเทศที่ระงับ/เหตุผล/วันที่/มีผลถึง
+   - badge ประเทศ: 'ทุกประเทศ' (danger) / ระบุประเทศ (warning)
+3. Sub-modal #modalAddFactoryRestriction
+   - select โรงงาน (multiple) + radio ขอบเขต (ทุกประเทศ/เฉพาะประเทศ) + multi-select ประเทศ + เหตุผล
+4. Tab 'ประเทศที่ถูกปิดกั้น (global)' + ตารางประเทศปิดกั้น
+5. Sub-modal #modalBlockCountry
+   - select ประเทศ + เหตุผล + วันที่เริ่ม-สิ้นสุด + alert 'ทุกโรงงานจะหยุดออกใบรับรองไปยังประเทศนี้'

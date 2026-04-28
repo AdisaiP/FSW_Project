@@ -117,4 +117,21 @@ public class PSDeclarationController : Controller
     return View();
   }
 
+  // TOR 1.10: ขอยกเลิกใบรับรอง (Certificate Cancellation)
+  public IActionResult IndexCancelCertificate()
+  {
+    return View();
+  }
+
+  // TOR 1.10(2): เลือกประเภทใบรับรองที่จะยกเลิก
+  public IActionResult SelectTypeCancellation()
+  {
+    return View();
+  }
+
+  public IActionResult CreateCancelCertificate()
+  {
+    return View();
+  }
+
 }

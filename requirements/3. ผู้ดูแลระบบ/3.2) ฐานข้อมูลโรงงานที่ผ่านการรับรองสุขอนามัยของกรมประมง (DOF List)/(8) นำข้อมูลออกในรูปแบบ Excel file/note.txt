@@ -1,0 +1,11 @@
+# (8) นำข้อมูลออกในรูปแบบ Excel file
+
+URL: http://localhost:5055/Admin/DofList
+
+จำนวนรูปที่ต้องแคป: 3 รูป
+
+รายการหน้าที่ต้องแคป
+1. Checkbox column ในตารางหลัก (#dofSelectAll) + Export Excel dropdown (4 ตัวเลือก)
+   ตัวเลือก: Export ทั้งหมด / Export เฉพาะที่กรอง / Export เฉพาะที่เลือก / Export Template
+2. Header checkbox + partial selection (indeterminate state)
+3. Toast 'กำลัง Export...' (info) > toast 'Export สำเร็จ N รายการ' (success, delay 900ms)

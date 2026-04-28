@@ -3,16 +3,26 @@
 
     var records = new[]
     {
-        new { RowNo=1, RequestNo="YLD-2026-00201", CompanyName="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", ProductType="ทูน่ากระป๋อง", RequestedYield=72.5m, PreviousYield=70.0m, WeightKg=240000m, SubmittedAt=new DateTime(2026,4,18,9,0,0), StatusText="รออนุมัติ", StatusClass="bg-label-warning" },
-        new { RowNo=2, RequestNo="YLD-2026-00202", CompanyName="บริษัท กัลฟ์ แคทช์ โปรเซสซิ่ง จำกัด", ProductType="ทูน่าแช่แข็ง", RequestedYield=68.0m, PreviousYield=68.0m, WeightKg=90000m, SubmittedAt=new DateTime(2026,4,19,14,30,0), StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
-        new { RowNo=3, RequestNo="YLD-2026-00203", CompanyName="บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", ProductType="ปลาแปรรูป", RequestedYield=65.0m, PreviousYield=66.5m, WeightKg=60000m, SubmittedAt=new DateTime(2026,4,20,10,15,0), StatusText="รออนุมัติ", StatusClass="bg-label-warning" },
-        new { RowNo=4, RequestNo="YLD-2026-00204", CompanyName="บริษัท อันดามัน โคลด์สโตเรจ จำกัด", ProductType="กุ้งแปรรูป", RequestedYield=78.0m, PreviousYield=75.0m, WeightKg=30000m, SubmittedAt=new DateTime(2026,4,21,8,30,0), StatusText="ส่งคืนแก้ไข", StatusClass="bg-label-danger" },
-        new { RowNo=5, RequestNo="YLD-2026-00205", CompanyName="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", ProductType="ปลาหมึกแปรรูป", RequestedYield=60.5m, PreviousYield=60.5m, WeightKg=15000m, SubmittedAt=new DateTime(2026,4,22,15,0,0), StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
+        new { RowNo=1, RequestNo="YLD-2026-00201", CompanyName="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", Province="สมุทรสาคร", ProductType="ทูน่ากระป๋อง", RequestTypeText="คำขอใหม่", RequestTypeClass="bg-label-primary", RawMaterialType="วัตถุดิบนำเข้า", RequestedYield=72.5m, PreviousYield=70.0m, Tolerance=2.0m, WeightKg=240000m, SubmittedAt=new DateTime(2026,4,18,9,0,0), StatusText="รออนุมัติ", StatusClass="bg-label-warning", BypassType="" },
+        new { RowNo=2, RequestNo="YLD-2026-00202", CompanyName="บริษัท กัลฟ์ แคทช์ โปรเซสซิ่ง จำกัด", Province="ระยอง", ProductType="ทูน่าแช่แข็ง", RequestTypeText="ขอเปลี่ยนแปลง", RequestTypeClass="bg-label-info", RawMaterialType="ผลิตภัณฑ์แปรรูปเบื้องต้น", RequestedYield=68.0m, PreviousYield=68.0m, Tolerance=1.5m, WeightKg=90000m, SubmittedAt=new DateTime(2026,4,19,14,30,0), StatusText="อนุมัติแล้ว", StatusClass="bg-label-success", BypassType="" },
+        new { RowNo=3, RequestNo="YLD-2026-00203", CompanyName="บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", Province="สมุทรสาคร", ProductType="ปลาแปรรูป", RequestTypeText="ขอเปลี่ยนแปลง", RequestTypeClass="bg-label-info", RawMaterialType="ผลิตภัณฑ์สำเร็จรูป", RequestedYield=65.0m, PreviousYield=66.5m, Tolerance=2.5m, WeightKg=60000m, SubmittedAt=new DateTime(2026,4,20,10,15,0), StatusText="รออนุมัติ", StatusClass="bg-label-warning", BypassType="" },
+        new { RowNo=4, RequestNo="YLD-2026-00204", CompanyName="บริษัท อันดามัน โคลด์สโตเรจ จำกัด", Province="ภูเก็ต", ProductType="กุ้งแปรรูป", RequestTypeText="คำขอใหม่", RequestTypeClass="bg-label-primary", RawMaterialType="วัตถุดิบนำเข้า", RequestedYield=78.0m, PreviousYield=75.0m, Tolerance=3.0m, WeightKg=30000m, SubmittedAt=new DateTime(2026,4,21,8,30,0), StatusText="ส่งคืนแก้ไข", StatusClass="bg-label-danger", BypassType="" },
+        new { RowNo=5, RequestNo="YLD-2026-00205", CompanyName="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", Province="สมุทรสาคร", ProductType="ปลาหมึกแปรรูป", RequestTypeText="คำขอใหม่", RequestTypeClass="bg-label-primary", RawMaterialType="ผลิตภัณฑ์แปรรูปเบื้องต้น", RequestedYield=60.5m, PreviousYield=60.5m, Tolerance=2.0m, WeightKg=15000m, SubmittedAt=new DateTime(2026,4,22,15,0,0), StatusText="อนุมัติแล้ว", StatusClass="bg-label-success", BypassType="" },
+        new { RowNo=6, RequestNo="YLD-2026-00206", CompanyName="บริษัท ชลบุรี ซีฟู้ด โปรเซสซิ่ง จำกัด", Province="ชลบุรี", ProductType="ทูน่ากระป๋อง", RequestTypeText="คำขอใหม่", RequestTypeClass="bg-label-primary", RawMaterialType="วัตถุดิบนำเข้า", RequestedYield=71.0m, PreviousYield=70.0m, Tolerance=2.0m, WeightKg=50000m, SubmittedAt=new DateTime(2026,4,22,16,0,0), StatusText="ระงับ 🚫", StatusClass="bg-label-warning", BypassType="" },
+        new { RowNo=7, RequestNo="YLD-2026-00207", CompanyName="บริษัท สงขลา ซี โปรดักส์ จำกัด", Province="สงขลา", ProductType="ผลิตภัณฑ์กุ้ง", RequestTypeText="ขอเปลี่ยนแปลง", RequestTypeClass="bg-label-info", RawMaterialType="ผลิตภัณฑ์สำเร็จรูป", RequestedYield=62.0m, PreviousYield=63.0m, Tolerance=1.5m, WeightKg=20000m, SubmittedAt=new DateTime(2026,4,23,9,0,0), StatusText="ยกเลิกแล้ว", StatusClass="bg-label-secondary", BypassType="" },
+        new { RowNo=8, RequestNo="YLD-2026-00208", CompanyName="บริษัท แปซิฟิก มารีน ฟิช จำกัด", Province="สมุทรสาคร", ProductType="ปลาแห้ง", RequestTypeText="คำขอใหม่", RequestTypeClass="bg-label-primary", RawMaterialType="ผลิตภัณฑ์สำเร็จรูป", RequestedYield=55.0m, PreviousYield=0.0m, Tolerance=0.0m, WeightKg=8000m, SubmittedAt=new DateTime(2026,4,23,11,0,0), StatusText="ยกเว้น %Yield (นอกรับรอง)", StatusClass="bg-label-secondary", BypassType="นอกรับรอง DOF" },
+        new { RowNo=9, RequestNo="YLD-2026-00209", CompanyName="ห้างหุ้นส่วน สมุทร ฟิชเชอรี่", Province="สมุทรสาคร", ProductType="ปลาต้มเกลือ (Self-Decl.)", RequestTypeText="คำขอใหม่", RequestTypeClass="bg-label-primary", RawMaterialType="ผลิตภัณฑ์แปรรูปเบื้องต้น", RequestedYield=58.0m, PreviousYield=0.0m, Tolerance=0.0m, WeightKg=5000m, SubmittedAt=new DateTime(2026,4,24,9,30,0), StatusText="ยกเว้น %Yield (Self-Decl.)", StatusClass="bg-label-secondary", BypassType="หนังสือรับรองตนเอง" },
     };
+
+    var officerOfficeName = "ด่านตรวจสัตว์น้ำสมุทรสาคร";
+    var officerProvince = "สมุทรสาคร";
 
     var totalCount = records.Length;
     var pendingCount = records.Count(x => x.StatusText == "รออนุมัติ");
     var approvedCount = records.Count(x => x.StatusText == "อนุมัติแล้ว");
+    var suspendedCount = records.Count(x => x.StatusText == "ระงับ 🚫");
+    var cancelledCount = records.Count(x => x.StatusText == "ยกเลิกแล้ว");
+    var autoBypassCount = records.Count(x => x.BypassType != "");
 }
 
 @section PageStyles {
@@ -21,21 +31,137 @@
     .yield-table th, .yield-table td { padding: 0.4rem 0.5rem; vertical-align: middle; }
     .yield-table .btn-icon { width: 1.65rem; height: 1.65rem; }
     .filter-sq { width: 48px; height: 48px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+    /* ─── Print ─── */
+    @@media print {
+        body * { visibility: hidden !important; }
+        #printYieldArea, #printYieldArea * { visibility: visible !important; }
+        #printYieldArea { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; font-size: 11pt; }
+        .modal-backdrop { display: none !important; }
+    }
+    .print-form-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 16px; }
+    .print-form-table th, .print-form-table td { border: 1px solid #999; padding: 5px 8px; font-size: 0.82rem; }
+    .print-form-table { border-collapse: collapse; width: 100%; }
+    .sign-box { border: 1px solid #999; min-height: 70px; border-radius: 4px; }
 </style>
 }
 
 @section PageScripts {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ─── Import Template Modal ───
+    var importDropzone = document.getElementById('importDropzone');
+    var importFileInput = document.getElementById('importFileInput');
+    var btnConfirmImport = document.getElementById('btnConfirmImport');
+
+    // Download template mock
+    document.getElementById('btnDownloadTemplate').addEventListener('click', function () {
+        showImportToast('ดาวน์โหลด Template — TODO: provide actual xlsx file', 'info');
+    });
+
+    // Dropzone click / file select
+    importDropzone.addEventListener('click', function () { importFileInput.click(); });
+    importDropzone.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        importDropzone.style.background = 'rgba(var(--bs-primary-rgb),.06)';
+    });
+    importDropzone.addEventListener('dragleave', function () {
+        importDropzone.style.background = '';
+    });
+    importDropzone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        importDropzone.style.background = '';
+        if (e.dataTransfer.files.length) handleImportFile(e.dataTransfer.files[0]);
+    });
+    importFileInput.addEventListener('change', function () {
+        if (this.files.length) handleImportFile(this.files[0]);
+    });
+
+    function handleImportFile(file) {
+        var allowed = ['.xlsx', '.csv'];
+        var ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+        var errEl = document.getElementById('importFileError');
+        if (!allowed.includes(ext)) {
+            errEl.classList.remove('d-none');
+            return;
+        }
+        errEl.classList.add('d-none');
+        // Update dropzone UI
+        document.getElementById('importDropzoneIcon').className = 'ri ri-file-excel-line fs-3 text-success';
+        document.getElementById('importDropzoneText').innerHTML =
+            '<span class="text-success fw-semibold">' + file.name + '</span>' +
+            ' <span class="text-muted small">(' + (file.size / 1024).toFixed(1) + ' KB)</span>';
+        // Show preview
+        document.getElementById('importPreviewSection').classList.remove('d-none');
+        document.getElementById('importResultSection').classList.add('d-none');
+        btnConfirmImport.disabled = false;
+    }
+
+    // Confirm import
+    btnConfirmImport.addEventListener('click', function () {
+        btnConfirmImport.disabled = true;
+        btnConfirmImport.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> กำลังนำเข้า...';
+        setTimeout(function () {
+            document.getElementById('importPreviewSection').classList.add('d-none');
+            document.getElementById('importResultSection').classList.remove('d-none');
+            document.getElementById('importModalFooter').innerHTML =
+                '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">ปิดหน้าต่าง</button>';
+            showImportToast('นำเข้าสำเร็จ 3 รายการ — ข้าม 1 รายการ (ผิดพลาด)', 'success');
+        }, 800);
+    });
+
+    // Reset modal on close
+    document.getElementById('modalImportYield').addEventListener('hidden.bs.modal', function () {
+        importFileInput.value = '';
+        document.getElementById('importDropzoneIcon').className = 'ri ri-cloud-upload-line fs-3 text-muted';
+        document.getElementById('importDropzoneText').textContent = 'ลากไฟล์มาวางหรือคลิกเพื่อเลือกไฟล์ (.xlsx, .csv — ไม่เกิน 5 MB)';
+        importDropzone.style.background = '';
+        document.getElementById('importPreviewSection').classList.add('d-none');
+        document.getElementById('importResultSection').classList.add('d-none');
+        document.getElementById('importFileError').classList.add('d-none');
+        btnConfirmImport.disabled = true;
+        btnConfirmImport.innerHTML = '<i class="ri ri-check-double-line me-1"></i> ยืนยันนำเข้า';
+        document.getElementById('importModalFooter').innerHTML =
+            '<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>' +
+            '<button type="button" class="btn btn-primary" id="btnConfirmImport" disabled>' +
+            '<i class="ri ri-check-double-line me-1"></i> ยืนยันนำเข้า</button>';
+        // Re-attach event
+        document.getElementById('btnConfirmImport').addEventListener('click', arguments.callee);
+    });
+
+    function showImportToast(msg, type) {
+        var bg = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : 'bg-info';
+        var icon = type === 'success' ? 'ri-checkbox-circle-line' : type === 'danger' ? 'ri-close-circle-line' : 'ri-information-line';
+        var el = document.createElement('div');
+        el.className = 'position-fixed bottom-0 end-0 p-3'; el.style.zIndex = 9999;
+        el.innerHTML = '<div class="toast show align-items-center text-white ' + bg + ' border-0" role="alert">' +
+            '<div class="d-flex"><div class="toast-body d-flex align-items-center gap-2">' +
+            '<i class="ri ' + icon + ' fs-5"></i> ' + msg + '</div>' +
+            '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+            '</div></div>';
+        document.body.appendChild(el); setTimeout(function () { el.remove(); }, 4000);
+    }
+
+    // ─── Table filter ───
     function filterRows() {
         var keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
         var status = (document.getElementById('filterStatus').value || '').trim();
+        var reqType = (document.getElementById('filterRequestType').value || '').trim();
+        var rawType = (document.getElementById('filterRawMaterial').value || '').trim();
+        var province = (document.getElementById('filterProvince').value || '').trim();
         var rows = document.querySelectorAll('#yieldTableBody tr[data-id]');
         var count = 0;
         rows.forEach(function (row) {
             var text = (row.dataset.searchText || '').toLowerCase();
             var rowStatus = row.dataset.status || '';
-            var show = (!keyword || text.includes(keyword)) && (!status || rowStatus === status);
+            var rowReqType = row.dataset.reqtype || '';
+            var rowRawType = row.dataset.rawtype || '';
+            var rowProvince = row.dataset.province || '';
+            var show = (!keyword || text.includes(keyword)) &&
+                       (!status  || rowStatus === status || (status === 'ยกเว้น %Yield' && rowStatus.startsWith('ยกเว้น %Yield'))) &&
+                       (!reqType || rowReqType === reqType)  &&
+                       (!rawType || rowRawType === rawType) &&
+                       (!province || rowProvince === province);
             row.classList.toggle('d-none', !show);
             if (show) count++;
         });
@@ -45,27 +171,445 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnReset').addEventListener('click', function () {
         document.getElementById('filterKeyword').value = '';
         document.getElementById('filterStatus').value = '';
+        document.getElementById('filterRequestType').value = '';
+        document.getElementById('filterRawMaterial').value = '';
+        document.getElementById('filterProvince').value = 'สมุทรสาคร';
         filterRows();
     });
     document.getElementById('filterKeyword').addEventListener('keydown', function (e) { if (e.key === 'Enter') filterRows(); });
     document.getElementById('filterStatus').addEventListener('change', filterRows);
-    if (window.bootstrap && bootstrap.Tooltip) {
+    document.getElementById('filterRequestType').addEventListener('change', filterRows);
+    document.getElementById('filterRawMaterial').addEventListener('change', filterRows);
+    document.getElementById('filterProvince').addEventListener('change', function () {
+        var lbl = document.getElementById('areaFilterLabel');
+        var v = this.value;
+        lbl.textContent = v ? '📍 ' + v : '📍 ทั้งหมด';
+        lbl.className = v ? 'badge bg-primary ms-2 small' : 'badge bg-secondary ms-2 small';
+        filterRows();
+    });
+
+    // ── "My Area" toggle (area banner) ──
+    document.getElementById('toggleMyArea').addEventListener('change', function () {
+        var sel = document.getElementById('filterProvince');
+        sel.value = this.checked ? 'สมุทรสาคร' : '';
+        sel.dispatchEvent(new Event('change'));
+    });
+    document.getElementById('filterProvince').addEventListener('change', function () {
+        // sync myArea toggle (avoid double-binding, check value)
+    });
+
+    // ── Settings toggles ──
+    document.getElementById('toggleDOFOnly').addEventListener('change', function () {
+        var fb = document.getElementById('dofToggleFeedback');
+        if (this.checked) {
+            fb.innerHTML = '<span class="badge bg-label-secondary">ยกเว้น %Yield (นอกรับรอง) ✅ — ผ่านอัตโนมัติ</span>';
+        } else {
+            fb.innerHTML = '<span class="badge bg-label-warning">ตรวจสอบ %Yield ทุกโรงงาน (รวมนอกรับรอง)</span>';
+        }
+    });
+    document.getElementById('toggleSelfDecl').addEventListener('change', function () {
+        var fb = document.getElementById('selfDeclToggleFeedback');
+        if (this.checked) {
+            fb.innerHTML = '<span class="badge bg-label-warning">ตรวจสอบ %Yield หนังสือรับรองตนเอง</span>';
+        } else {
+            fb.innerHTML = '<span class="badge bg-label-secondary">ยกเว้น %Yield (Self-Decl.) ✅ — ผ่านอัตโนมัติ</span>';
+        }
+    });
+
+    // ── Non-DOF table search ──
+    document.getElementById('nonDofSearch').addEventListener('input', function () {
+        var kw = this.value.trim().toLowerCase();
+        document.querySelectorAll('#nonDofTableBody tr').forEach(function (row) {
+            var name = (row.dataset.name || '').toLowerCase();
+            row.classList.toggle('d-none', kw && !name.includes(kw));
+        });
+    });
+
+    // ── Dim non-DOF tab pane when DOF-only toggle is off ──
+    document.getElementById('toggleDOFOnly').addEventListener('change', function () {
+        document.getElementById('pane-nonDOF').style.opacity = this.checked ? '1' : '0.5';
+    });
+
+    // ─── Print Yield Form ───
+    document.getElementById('btnPrintYield').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalPrintYield')).hide();
+        setTimeout(function () { window.print(); }, 300);
+    });
+    document.getElementById('btnDownloadPdf').addEventListener('click', function () {
+        // TODO: generate and download PDF via server API
+        alert('TODO: ดาวน์โหลด PDF — เชื่อมต่อ API สร้างเอกสาร PDF จริง');
+    });
+
+    // ─── Row-level action buttons ───
+    var currentRowReqNo = '';
+
+    document.querySelectorAll('.btn-row-approve').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            currentRowReqNo = this.dataset.reqno;
+            document.getElementById('approveReqNoDisplay').textContent = currentRowReqNo;
+            document.getElementById('rowApproveRemark').value = '';
+            new bootstrap.Modal(document.getElementById('modalRowApprove')).show();
+        });
+    });
+
+    document.querySelectorAll('.btn-row-suspend').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            currentRowReqNo = this.dataset.reqno;
+            document.getElementById('suspendReqNoDisplay').textContent = currentRowReqNo;
+            document.getElementById('suspendReason').value = '';
+            document.getElementById('suspendReasonError').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('modalRowSuspend')).show();
+        });
+    });
+
+    document.querySelectorAll('.btn-row-cancel').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            currentRowReqNo = this.dataset.reqno;
+            document.getElementById('cancelReqNoDisplay').textContent = currentRowReqNo;
+            document.getElementById('cancelReason').value = '';
+            document.getElementById('cancelReasonError').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('modalRowCancel')).show();
+        });
+    });
+
+    document.getElementById('btnConfirmRowApprove').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalRowApprove')).hide();
+        showImportToast('อนุมัติ ' + currentRowReqNo + ' เรียบร้อยแล้ว', 'success');
+        var row = document.querySelector('tr[data-id="' + currentRowReqNo + '"]');
+        if (row) {
+            var badge = row.querySelector('td .badge.rounded-pill');
+            if (badge) { badge.className = 'badge rounded-pill bg-label-success'; badge.textContent = 'อนุมัติแล้ว'; }
+            row.querySelectorAll('.btn-row-approve, .btn-row-suspend, .btn-row-cancel').forEach(function (b) { b.style.display = 'none'; });
+        }
+    });
+
+    document.getElementById('btnConfirmRowSuspend').addEventListener('click', function () {
+        var reason = document.getElementById('suspendReason').value.trim();
+        if (!reason) { document.getElementById('suspendReasonError').classList.remove('d-none'); return; }
+        document.getElementById('suspendReasonError').classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('modalRowSuspend')).hide();
+        showImportToast('ระงับ ' + currentRowReqNo + ' เรียบร้อยแล้ว', 'warning');
+        var row = document.querySelector('tr[data-id="' + currentRowReqNo + '"]');
+        if (row) {
+            var badge = row.querySelector('td .badge.rounded-pill');
+            if (badge) { badge.className = 'badge rounded-pill bg-label-warning'; badge.textContent = 'ระงับ 🚫'; }
+            row.querySelectorAll('.btn-row-approve, .btn-row-suspend, .btn-row-cancel').forEach(function (b) { b.style.display = 'none'; });
+        }
+    });
+
+    document.getElementById('btnConfirmRowCancel').addEventListener('click', function () {
+        var reason = document.getElementById('cancelReason').value.trim();
+        if (!reason) { document.getElementById('cancelReasonError').classList.remove('d-none'); return; }
+        document.getElementById('cancelReasonError').classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('modalRowCancel')).hide();
+        showImportToast('ยกเลิก ' + currentRowReqNo + ' เรียบร้อยแล้ว', 'danger');
+        var row = document.querySelector('tr[data-id="' + currentRowReqNo + '"]');
+        if (row) {
+            var badge = row.querySelector('td .badge.rounded-pill');
+            if (badge) { badge.className = 'badge rounded-pill bg-label-secondary'; badge.textContent = 'ยกเลิกแล้ว'; }
+            row.querySelectorAll('.btn-row-approve, .btn-row-suspend, .btn-row-cancel').forEach(function (b) { b.style.display = 'none'; });
+        }
+    });
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) { new bootstrap.Tooltip(el); });
     }
 });
 </script>
 }
 
-<h4 class="mb-1">อนุมัติ %Yield</h4>
-<p class="mb-1 text-muted">พิจารณาอนุมัติอัตราส่วนผลผลิต (%Yield) ที่สมาชิกยื่นขอ</p>
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+    <div>
+        <h4 class="mb-0">อนุมัติ %Yield</h4>
+        <p class="mb-0 text-muted">พิจารณาอนุมัติอัตราส่วนผลผลิต (%Yield) ที่สมาชิกยื่นขอ</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalImportYield">
+        <i class="ri ri-upload-2-line me-1"></i> นำเข้าข้อมูล Template
+    </button>
+</div>
+
+<!-- ==================== Modal: นำเข้าข้อมูล %Yield จาก Template ==================== -->
+<div class="modal fade" id="modalImportYield" tabindex="-1" aria-labelledby="modalImportYieldLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold" id="modalImportYieldLabel">
+                    <i class="ri ri-upload-2-line me-1 text-primary"></i> นำเข้าข้อมูล %Yield หลายรายการด้วย Template file
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Step 1: ดาวน์โหลด Template -->
+                <div class="alert alert-info d-flex align-items-center gap-3 py-2 mb-3">
+                    <i class="ri ri-information-line fs-5 flex-shrink-0"></i>
+                    <div class="small">
+                        <strong>ขั้นที่ 1</strong> — ดาวน์โหลดไฟล์ Template กรอกข้อมูลตามตัวอย่างในไฟล์ จากนั้นบันทึกข้อมูลแล้วอัปโหลดไฟล์ในขั้นที่ 2
+                    </div>
+                    <button type="button" class="btn btn-sm btn-success ms-auto text-nowrap flex-shrink-0" id="btnDownloadTemplate">
+                        <i class="ri ri-file-excel-line me-1"></i> ดาวน์โหลด Template (.xlsx)
+                    </button>
+                </div>
+
+                <!-- Step 2: Upload -->
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">ขั้นที่ 2 — เลือกไฟล์ที่กรอกข้อมูลแล้ว <span class="text-danger">*</span></label>
+                    <div class="border rounded p-4 text-center" id="importDropzone" style="border-style:dashed!important;cursor:pointer;transition:background .2s;">
+                        <i class="ri ri-cloud-upload-line fs-3 text-muted" id="importDropzoneIcon"></i>
+                        <div class="text-muted small mt-1" id="importDropzoneText">ลากไฟล์มาวางหรือคลิกเพื่อเลือกไฟล์ (.xlsx, .csv — ไม่เกิน 5 MB)</div>
+                        <input type="file" id="importFileInput" accept=".xlsx,.csv" class="d-none" />
+                    </div>
+                    <div class="text-danger small d-none mt-1" id="importFileError">กรุณาเลือกไฟล์ (.xlsx หรือ .csv) ก่อนดำเนินการ</div>
+                </div>
+
+                <!-- Step 3: Preview table (shown after file selected) -->
+                <div id="importPreviewSection" class="d-none">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <label class="form-label small fw-semibold mb-0">ขั้นที่ 3 — ตรวจสอบข้อมูลก่อนยืนยันนำเข้า</label>
+                        <span class="small text-muted" id="importRowCount">พบ 4 รายการ (ผ่าน 3 / ผิดพลาด 1)</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;" id="importPreviewTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>เลขที่คำขอ</th>
+                                    <th>ชื่อบริษัท</th>
+                                    <th>ประเภทสินค้า</th>
+                                    <th class="text-center">%Yield ขอ</th>
+                                    <th class="text-end">น้ำหนัก (กก.)</th>
+                                    <th class="text-center">ผลตรวจสอบ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>YLD-2026-00210</td>
+                                    <td>บริษัท สยาม มารีน ฟู้ดส์ จำกัด</td>
+                                    <td>ทูน่ากระป๋อง</td>
+                                    <td class="text-center fw-semibold">72.0%</td>
+                                    <td class="text-end">180,000</td>
+                                    <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>YLD-2026-00211</td>
+                                    <td>บริษัท กัลฟ์ แคทช์ โปรเซสซิ่ง จำกัด</td>
+                                    <td>ทูน่าแช่แข็ง</td>
+                                    <td class="text-center fw-semibold">67.5%</td>
+                                    <td class="text-end">95,000</td>
+                                    <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>YLD-2026-00212</td>
+                                    <td>บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด</td>
+                                    <td>ปลาแปรรูป</td>
+                                    <td class="text-center fw-semibold">64.0%</td>
+                                    <td class="text-end">55,000</td>
+                                    <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <td>4</td>
+                                    <td>YLD-2026-00213</td>
+                                    <td>บริษัท อันดามัน โคลด์สโตเรจ จำกัด</td>
+                                    <td>กุ้งแปรรูป</td>
+                                    <td class="text-center fw-semibold text-danger">105.0%</td>
+                                    <td class="text-end">25,000</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-danger">ข้อผิดพลาด ❌</span>
+                                        <div class="text-danger small mt-1">%Yield เกิน 100%</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Summary alert -->
+                    <div class="alert alert-warning d-flex gap-2 py-2 mt-3 small">
+                        <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                        <span>พบข้อผิดพลาด <strong>1 รายการ</strong> (แถวที่ 4) — รายการที่มีข้อผิดพลาดจะถูกข้าม — คลิก "ยืนยันนำเข้า" เพื่อบันทึก <strong>3 รายการที่ผ่าน</strong></span>
+                    </div>
+                </div>
+
+                <!-- Import result (shown after confirm) -->
+                <div id="importResultSection" class="d-none">
+                    <div class="alert alert-success d-flex gap-2 py-2">
+                        <i class="ri ri-checkbox-circle-line fs-5 flex-shrink-0 text-success mt-1"></i>
+                        <div>
+                            <div class="fw-semibold">นำเข้าข้อมูลเรียบร้อยแล้ว</div>
+                            <div class="small text-muted mt-1">นำเข้าสำเร็จ 3 รายการ &nbsp;|&nbsp; ข้อผิดพลาดและถูกข้าม 1 รายการ &nbsp;|&nbsp; สังเกต: YLD-2026-00213 (%Yield เกิน 100%)</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer" id="importModalFooter">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmImport" disabled>
+                    <i class="ri ri-check-double-line me-1"></i> ยืนยันนำเข้า
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Breadcrumb -->
-<nav aria-label="breadcrumb" class="mb-4">
+<nav aria-label="breadcrumb" class="mb-2">
     <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
         <li class="breadcrumb-item"><a href="#" class="text-primary fw-semibold">เจ้าหน้าที่</a></li>
         <li class="breadcrumb-item active text-secondary">อนุมัติ %Yield</li>
     </ol>
 </nav>
+
+<!-- Area Badge Banner -->
+<div class="alert alert-primary d-flex align-items-center justify-content-between gap-3 py-2 mb-4">
+    <div class="d-flex align-items-center gap-2">
+        <i class="ri ri-map-pin-2-line fs-5"></i>
+        <span class="small">พื้นที่รับผิดชอบของคุณ: <strong>@officerOfficeName</strong> <span class="badge bg-primary ms-1">📍 @officerProvince</span></span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" id="toggleMyArea" checked>
+            <label class="form-check-label small" for="toggleMyArea">แสดงเฉพาะพื้นที่ของฉัน</label>
+        </div>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalYieldDatabase">
+            <i class="ri ri-database-2-line me-1"></i> ดูฐานข้อมูล %Yield รวม
+        </button>
+    </div>
+</div>
+
+<!-- Main 3-Tab Card -->
+<div class="nav-align-top nav-tabs-shadow mb-4" id="cardMainTabs">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button type="button" class="nav-link waves-effect active" id="tab-approveList" role="tab" data-bs-toggle="tab" data-bs-target="#pane-approveList" aria-controls="pane-approveList" aria-selected="true">
+                <i class="ri ri-list-check-2 me-1"></i> รายการขออนุมัติ
+                <span class="badge bg-label-warning ms-1 small">@pendingCount รออนุมัติ</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button type="button" class="nav-link waves-effect" id="tab-yieldSettings" role="tab" data-bs-toggle="tab" data-bs-target="#pane-yieldSettings" aria-controls="pane-yieldSettings" aria-selected="false" tabindex="-1">
+                <i class="ri ri-settings-4-line me-1 text-primary"></i> การตั้งค่าการตรวจสอบ %Yield
+                <span class="badge bg-label-primary ms-1 small">อัตโนมัติ</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button type="button" class="nav-link waves-effect" id="tab-nonDOF" role="tab" data-bs-toggle="tab" data-bs-target="#pane-nonDOF" aria-controls="pane-nonDOF" aria-selected="false" tabindex="-1">
+                <i class="ri ri-shield-cross-line me-1 text-warning"></i> การจัดการโรงงานนอกรับรองกรมประมง
+                <span class="badge bg-label-warning ms-1 small">DOF</span>
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content" id="mainTabContent">
+
+        <!-- ── Tab 2: การตั้งค่าการตรวจสอบ %Yield ── -->
+        <div class="tab-pane fade" id="pane-yieldSettings" role="tabpanel" aria-labelledby="tab-yieldSettings">
+        <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex align-items-start gap-3 p-3 rounded border">
+                            <div class="form-check form-switch mb-0 mt-1">
+                                <input class="form-check-input" type="checkbox" id="toggleDOFOnly" checked>
+                            </div>
+                            <div>
+                                <div class="fw-semibold small">ตรวจสอบ %Yield เฉพาะโรงงานในรับรอง DOF</div>
+                                <div class="text-muted small mb-2">เมื่อ <strong>เปิด</strong>: โรงงานที่ไม่อยู่ในรับรองของกรมประมง → ข้ามการตรวจสอบ %Yield โดยอัตโนมัติ</div>
+                                <div id="dofToggleFeedback">
+                                    <span class="badge bg-label-secondary">ยกเว้น %Yield (นอกรับรอง) ✅ — ผ่านอัตโนมัติ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex align-items-start gap-3 p-3 rounded border">
+                            <div class="form-check form-switch mb-0 mt-1">
+                                <input class="form-check-input" type="checkbox" id="toggleSelfDecl">
+                            </div>
+                            <div>
+                                <div class="fw-semibold small">ตรวจสอบ %Yield สำหรับหนังสือรับรองตนเอง (Self-Decl.)</div>
+                                <div class="text-muted small mb-2">เมื่อ <strong>ปิด</strong>: ผลิตภัณฑ์ที่ขอหนังสือรับรองตนเอง → ข้ามการตรวจสอบ %Yield โดยอัตโนมัติ</div>
+                                <div id="selfDeclToggleFeedback">
+                                    <span class="badge bg-label-secondary">ยกเว้น %Yield (Self-Decl.) ✅ — ผ่านอัตโนมัติ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info d-flex gap-2 py-2 mt-3 mb-0 small">
+                    <i class="ri ri-robot-line mt-1 flex-shrink-0"></i>
+                    <span>รายการที่อยู่ในเกณฑ์ข้างต้นจะแสดง <span class="badge bg-label-secondary">ยกเว้น %Yield</span> ในตารางรายการด้านล่าง — <strong>ไม่ต้องการการดำเนินการจากเจ้าหน้าที่</strong></span>
+                </div>
+        </div><!-- /p-3 settings -->
+        </div><!-- /pane-yieldSettings -->
+
+        <!-- ── Tab 3: การจัดการโรงงานนอกรับรองกรมประมง ── -->
+        <div class="tab-pane fade" id="pane-nonDOF" role="tabpanel" aria-labelledby="tab-nonDOF">
+        <div class="p-3">
+                <div class="alert alert-primary d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span>ℹ️ โรงงานที่ไม่อยู่ในรับรองของกรมประมงจะถูกข้ามการตรวจสอบ %Yield โดยอัตโนมัติ — <strong>ไม่ต้องดำเนินการอนุมัติโดยเจ้าหน้าที่</strong></span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="small text-muted">รายการโรงงานที่ไม่อยู่ในรับรอง DOF ในพื้นที่ความรับผิดชอบ</div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input id="nonDofSearch" type="text" class="form-control form-control-sm" style="width:200px" placeholder="ค้นหาชื่อโรงงาน..." />
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0" style="font-size:0.78rem;" id="nonDofTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ชื่อโรงงาน</th>
+                                <th>เลขทะเบียน</th>
+                                <th class="text-center">สถานะ DOF</th>
+                                <th class="text-center">ผล %Yield</th>
+                                <th>หมายเหตุ</th>
+                                <th class="text-center">การดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nonDofTableBody">
+                            <tr data-name="บริษัท แปซิฟิค มารีน ฟิช จำกัด">
+                                <td class="fw-semibold">บริษัท แปซิฟิค มารีน ฟิช จำกัด</td>
+                                <td>0115565078901</td>
+                                <td class="text-center"><span class="badge bg-label-danger">ไม่อยู่ในรับรอง DOF</span></td>
+                                <td class="text-center"><span class="badge bg-label-secondary">ข้าม %Yield อัตโนมัติ ✅</span></td>
+                                <td class="text-muted small">ไม่อยู่ในรับรอง — ข้ามการตรวจสอบตาม toggle</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="alert('ดูรายละเอียด — TODO')">ดูรายละเอียด</button>
+                                </td>
+                            </tr>
+                            <tr data-name="ห้างหุ้นส่วน สมุทร ฟิชเชอรี่">
+                                <td class="fw-semibold">ห้างหุ้นส่วน สมุทร ฟิชเชอรี่</td>
+                                <td>0993563011234</td>
+                                <td class="text-center"><span class="badge bg-label-danger">ไม่อยู่ในรับรอง DOF</span></td>
+                                <td class="text-center"><span class="badge bg-label-secondary">ข้าม %Yield อัตโนมัติ ✅</span></td>
+                                <td class="text-muted small">ผลิตภัณฑ์ Self-Decl. — ไม่อยู่ในรับรองและ Self-Decl.</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="alert('ดูรายละเอียด — TODO')">ดูรายละเอียด</button>
+                                </td>
+                            </tr>
+                            <tr data-name="บริษัท นอร์ทเอิร์น ซีฟู้ด จำกัด">
+                                <td class="fw-semibold">บริษัท นอร์ทเอิร์น ซีฟู้ด จำกัด</td>
+                                <td>0205565099210</td>
+                                <td class="text-center"><span class="badge bg-label-warning">รอตรวจสอบสถานะ</span></td>
+                                <td class="text-center"><span class="badge bg-label-warning">รอผลการตรวจสอบ</span></td>
+                                <td class="text-muted small">อยู่ระหว่างตรวจสอบสถานะรับรอง DOF — ยัง hold %Yield</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="alert('ดูรายละเอียด — TODO')">ดูรายละเอียด</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted small mt-2">
+                    <i class="ri ri-information-line me-1"></i>
+                    สถานะการรับรองอ้างอิงจากฐานข้อมูล DOF — อัปเดตอัตโนมัติทุก 24 ชั่วโมง
+                </div>
+        </div><!-- /p-3 nonDOF -->
+        </div><!-- /pane-nonDOF -->
+
+        <!-- ── Tab 1: รายการขออนุมัติ ── -->
+        <div class="tab-pane fade show active" id="pane-approveList" role="tabpanel" aria-labelledby="tab-approveList">
+        <div class="p-3">
 
 <!-- Summary Cards -->
 <div class="row g-3 mb-4">
@@ -93,6 +637,30 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         </div>
     </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-warning"><i class="ri ri-pause-circle-line ri-22px"></i></span></div>
+                <div><p class="mb-0 small text-muted">ระงับ</p><h5 class="mb-0">@suspendedCount</h5></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-secondary"><i class="ri ri-close-circle-line ri-22px"></i></span></div>
+                <div><p class="mb-0 small text-muted">ยกเลิกแล้ว</p><h5 class="mb-0">@cancelledCount</h5></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-secondary"><i class="ri ri-skip-forward-line ri-22px"></i></span></div>
+                <div><p class="mb-0 small text-muted">ยกเว้น %Yield (อัตโนมัติ)</p><h5 class="mb-0">@autoBypassCount</h5></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Filter -->
@@ -104,12 +672,45 @@ document.addEventListener('DOMContentLoaded', function () {
                 <input id="filterKeyword" type="text" class="form-control form-control-sm" placeholder="เลขที่คำขอ / ชื่อบริษัท / ประเภทสินค้า" />
             </div>
             <div class="col-12 col-sm-3">
+                <label class="form-label small mb-1">ประเภทคำขอ</label>
+                <select id="filterRequestType" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    <option value="คำขอใหม่">คำขอใหม่</option>
+                    <option value="ขอเปลี่ยนแปลง">ຂอเปลี่ยนแปลง</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-3">
+                <label class="form-label small mb-1">ประเภทวัตถุดิบ</label>
+                <select id="filterRawMaterial" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    <option value="วัตถุดิบนำเข้า">วัตถุดิบนำเข้า</option>
+                    <option value="ผลิตภัณฑ์แปรรูปเบื้องต้น">ผลิตภัณฑ์แปรรูปเบื้องต้น</option>
+                    <option value="ผลิตภัณฑ์สำเร็จรูป">ผลิตภัณฑ์สำเร็จรูป</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-3">
+                <label class="form-label small mb-1">จังหวัด / สำนักงาน</label>
+                <select id="filterProvince" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    <option value="สมุทรสาคร" selected>สมุทรสาคร (พื้นที่ของฉัน)</option>
+                    <option value="ระยอง">ระยอง</option>
+                    <option value="ภูเก็ต">ภูเก็ต</option>
+                    <option value="ชลบุรี">ชลบุรี</option>
+                    <option value="สงขลา">สงขลา</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-3">
                 <label class="form-label small mb-1">สถานะ</label>
                 <select id="filterStatus" class="form-select form-select-sm">
                     <option value="">ทั้งหมด</option>
                     <option value="รออนุมัติ">รออนุมัติ</option>
                     <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
                     <option value="ส่งคืนแก้ไข">ส่งคืนแก้ไข</option>
+                    <option value="ระงับ 🚫">ระงับ 🚫</option>
+                    <option value="ยกเลิกแล้ว">ยกเลิกแล้ว</option>
+                    <option value="ยกเว้น %Yield">ยกเว้น %Yield (อัตโนมัติ ทั้งหมด)</option>
+                    <option value="ยกเว้น %Yield (นอกรับรอง)">ยกเว้น %Yield (นอกรับรอง)</option>
+                    <option value="ยกเว้น %Yield (Self-Decl.)">ยกเว้น %Yield (Self-Decl.)</option>
                 </select>
             </div>
             <div class="col-auto d-flex gap-2">
@@ -122,7 +723,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <!-- Table -->
 <div class="card">
-    <div class="card-header"><h6 class="mb-0">รายการขออนุมัติ %Yield</h6></div>
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h6 class="mb-0">รายการขออนุมัติ %Yield <span id="areaFilterLabel" class="badge bg-primary ms-2 small">📍 สมุทรสาคร</span></h6>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalPrintYield">
+            <i class="ri ri-printer-line me-1"></i> พิมพ์ฟอร์ม %Yield
+        </button>
+    </div>
     <div class="table-responsive">
         <table class="table table-hover yield-table mb-0">
             <thead class="table-light">
@@ -130,38 +736,359 @@ document.addEventListener('DOMContentLoaded', function () {
                     <th class="text-center" style="width:50px">ลำดับ</th>
                     <th>เลขที่คำขอ</th>
                     <th>บริษัท</th>
+                    <th>จังหวัด / สำนักงาน</th>
                     <th>ประเภทสินค้า</th>
-                    <th class="text-center">%Yield ขอ</th>
+                    <th>ประเภทคำขอ</th>
+                    <th>ประเภทวัตถุดิบ</th>
+                    <th class="text-center">%Yield ຂอ</th>
                     <th class="text-center">%Yield เดิม</th>
+                    <th class="text-center">%Tolerance</th>
                     <th class="text-end">น้ำหนัก (กก.)</th>
                     <th>วันที่ยื่น</th>
+                    <th class="text-center">ช่วงวันที่มีผล</th>
                     <th class="text-center">สถานะ</th>
-                    <th class="text-center" style="width:100px">จัดการ</th>
+                    <th class="text-center" style="width:120px">จัดการ</th>
                 </tr>
             </thead>
             <tbody id="yieldTableBody">
                 @foreach (var r in records)
                 {
-                    <tr data-id="@r.RequestNo" data-status="@r.StatusText" data-search-text="@r.RequestNo.ToLower() @r.CompanyName.ToLower() @r.ProductType.ToLower()">
+                    <tr data-id="@r.RequestNo" data-status="@r.StatusText" data-reqtype="@r.RequestTypeText" data-rawtype="@r.RawMaterialType" data-bypass="@r.BypassType" data-province="@r.Province" data-search-text="@r.RequestNo.ToLower() @r.CompanyName.ToLower() @r.ProductType.ToLower() @r.BypassType.ToLower() @r.Province.ToLower()">
                         <td class="text-center text-muted">@r.RowNo</td>
-                        <td><span class="fw-semibold text-primary">@r.RequestNo</span></td>
+                        <td>
+                            <a href="@Url.Action("ReviewApproveYield","Officer")" class="fw-semibold text-primary">@r.RequestNo</a>
+                        </td>
                         <td>@r.CompanyName</td>
+                        <td>
+                            <span class="badge @(r.Province == officerProvince ? "bg-label-primary" : "bg-label-secondary")">
+                                @if (r.Province == officerProvince) { <text>📍 </text> }
+                                @r.Province
+                            </span>
+                        </td>
                         <td>@r.ProductType</td>
+                        <td><span class="badge @r.RequestTypeClass">@r.RequestTypeText</span></td>
+                        <td><span class="badge bg-label-secondary">@r.RawMaterialType</span></td>
                         <td class="text-center fw-bold">@r.RequestedYield.ToString("F1")%</td>
                         <td class="text-center text-muted">@r.PreviousYield.ToString("F1")%</td>
+                        <td class="text-center">±@r.Tolerance.ToString("F1")%</td>
                         <td class="text-end">@r.WeightKg.ToString("N0")</td>
                         <td>@r.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td class="text-center"><span class="badge rounded-pill @r.StatusClass">@r.StatusText</span></td>
+                        <td class="text-center small">
+                            @if (r.StatusText == "อนุมัติแล้ว")
+                            {
+                                <span class="text-success fw-semibold">01/05/2569</span><br />
+                                <span class="text-muted">– 30/04/2570</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
                         <td class="text-center">
-                            <button class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="ดูรายละเอียด"><i class="ri ri-eye-line ri-16px"></i></button>
-                            <button class="btn btn-icon btn-sm btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ"><i class="ri ri-check-line ri-16px"></i></button>
+                            <span class="badge rounded-pill @r.StatusClass">@r.StatusText</span>
+                            @if (r.BypassType != "")
+                            {
+                                <br /><span class="badge bg-label-info mt-1" style="font-size:0.62rem">⚡ @r.BypassType</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a href="@Url.Action("ReviewApproveYield","Officer")" class="btn btn-icon btn-sm btn-outline-primary" title="ดูรายละเอียด"><i class="ri ri-eye-line ri-16px"></i></a>
+                            @if (r.StatusText == "รออนุมัติ" || r.StatusText == "ส่งคืนแก้ไข")
+                            {
+                            <button class="btn btn-icon btn-sm btn-outline-success btn-row-approve" data-reqno="@r.RequestNo" title="อนุมัติ"><i class="ri ri-check-line ri-16px"></i></button>
+                            <button class="btn btn-icon btn-sm btn-outline-warning btn-row-suspend" data-reqno="@r.RequestNo" title="ระงับ"><i class="ri ri-pause-circle-line ri-16px"></i></button>
+                            <button class="btn btn-icon btn-sm btn-outline-danger btn-row-cancel" data-reqno="@r.RequestNo" title="ยกเลิก"><i class="ri ri-close-circle-line ri-16px"></i></button>
+                            }
                         </td>
                     </tr>
                 }
             </tbody>
             <tbody id="yieldTableEmpty" class="d-none">
-                <tr><td colspan="10" class="text-center text-muted py-4">ไม่พบข้อมูล</td></tr>
+                <tr><td colspan="15" class="text-center text-muted py-4">ไม่พบข้อมูล</td></tr>
             </tbody>
         </table>
+    </div>
+</div>
+        </div><!-- /p-3 approveList -->
+        </div><!-- /pane-approveList -->
+
+    </div><!-- /mainTabContent -->
+</div><!-- /cardMainTabs nav-align-top -->
+
+<!-- ==================== Modal: ฐานข้อมูล %Yield รวม ==================== -->
+<div class="modal fade" id="modalYieldDatabase" tabindex="-1" aria-labelledby="modalYieldDatabaseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalYieldDatabaseLabel">
+                    <i class="ri ri-database-2-line me-1 text-primary"></i> ฐานข้อมูล %Yield ทุกโรงงานในพื้นที่: สมุทรสาคร
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-primary d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-map-pin-2-line mt-1 flex-shrink-0"></i>
+                    <span>รายงานสรุป %Yield ทุกโรงงานในพื้นที่ความรับผิดชอบของคุณ — <strong>สำนักงานประมงจังหวัดสมุทรสาคร</strong></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm yield-table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ชื่อโรงงาน</th>
+                                <th>ประเภทสินค้า</th>
+                                <th class="text-center">%Yield อนุมัติ</th>
+                                <th class="text-center">%Yield ล่าสุด (คำนวณ)</th>
+                                <th class="text-center">เบี่ยงเบน</th>
+                                <th>วันที่อนุมัติ</th>
+                                <th>ช่วงวันที่มีผล</th>
+                                <th class="text-center">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-semibold">บริษัท สยาม มารีน ฟู้ดส์ จำกัด</td>
+                                <td>ทูน่ากระป๋อง</td>
+                                <td class="text-center fw-bold">72.5%</td>
+                                <td class="text-center">71.8%</td>
+                                <td class="text-center"><span class="badge bg-label-success">อยู่ในเกณฑ์ ✅</span></td>
+                                <td>01/05/2569</td>
+                                <td>01/05/2569 – 30/04/2570</td>
+                                <td class="text-center"><span class="badge bg-label-success">อนุมัติแล้ว</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold">บริษัท สยาม มารีน ฟู้ดส์ จำกัด</td>
+                                <td>ปลาหมึกแปรรูป</td>
+                                <td class="text-center fw-bold">60.5%</td>
+                                <td class="text-center">60.1%</td>
+                                <td class="text-center"><span class="badge bg-label-success">อยู่ในเกณฑ์ ✅</span></td>
+                                <td>01/05/2569</td>
+                                <td>01/05/2569 – 30/04/2570</td>
+                                <td class="text-center"><span class="badge bg-label-success">อนุมัติแล้ว</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold">กัลฟ์ แคทช์ โปรเซสซิ่ง จำกัด <small class="text-muted">(สแขนง)</small></td>
+                                <td>ทูน่าแช่แข็ง</td>
+                                <td class="text-center fw-bold">68.0%</td>
+                                <td class="text-center text-danger fw-bold">61.2%</td>
+                                <td class="text-center"><span class="badge bg-label-danger">เกิน Tolerance ❌</span></td>
+                                <td>01/01/2569</td>
+                                <td>01/01/2569 – 31/12/2569</td>
+                                <td class="text-center"><span class="badge bg-label-warning">รอตรวจสอบ</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold">แปซิฟิค มารีน ฟิช จำกัด</td>
+                                <td>ปลาแห้ง</td>
+                                <td class="text-center text-muted">—</td>
+                                <td class="text-center text-muted">—</td>
+                                <td class="text-center"><span class="badge bg-label-secondary">ยกเว้น (DOF)</span></td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td class="text-center"><span class="badge bg-label-secondary">ยกเว้น %Yield</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                    <i class="ri ri-printer-line me-1"></i> พิมพ์รายงาน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: อนุมัติ (row) ==================== -->
+<div class="modal fade" id="modalRowApprove" tabindex="-1" aria-labelledby="modalRowApproveLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalRowApproveLabel">
+                    <i class="ri ri-checkbox-circle-line me-1 text-success"></i> ยืนยันอนุมัติ %Yield
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2 small">เลขที่คำขอ: <strong id="approveReqNoDisplay">—</strong></p>
+                <div class="alert alert-success d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span>เมื่ออนุมัติ ระบบจะบันทึก %Yield และแจ้งผลให้ผู้ประกอบการโดยอัตโนมัติ</span>
+                </div>
+                <label class="form-label small">หมายเหตุ (ไม่บังคับ)</label>
+                <textarea id="rowApproveRemark" class="form-control" rows="2" placeholder="ระบุหมายเหตุ"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmRowApprove" class="btn btn-success">
+                    <i class="ri ri-checkbox-circle-line me-1"></i> ยืนยันอนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ระงับ (row) ==================== -->
+<div class="modal fade" id="modalRowSuspend" tabindex="-1" aria-labelledby="modalRowSuspendLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalRowSuspendLabel">
+                    <i class="ri ri-pause-circle-line me-1 text-warning"></i> ยืนยันระงับ %Yield
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2 small">เลขที่คำขอ: <strong id="suspendReqNoDisplay">—</strong></p>
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <span>การระงับจะหยุดการดำเนินการชั่วคราว ผู้ประกอบการสามารถยื่นคำขอใหม่ได้</span>
+                </div>
+                <label class="form-label small">เหตุผลการระงับ <span class="text-danger">*</span></label>
+                <textarea id="suspendReason" class="form-control" rows="3" placeholder="ระบุเหตุผล..."></textarea>
+                <div id="suspendReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผลการระงับ</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmRowSuspend" class="btn btn-warning">
+                    <i class="ri ri-pause-circle-line me-1"></i> ยืนยันระงับ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ยกเลิก (row) ==================== -->
+<div class="modal fade" id="modalRowCancel" tabindex="-1" aria-labelledby="modalRowCancelLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalRowCancelLabel">
+                    <i class="ri ri-close-circle-line me-1 text-danger"></i> ยืนยันยกเลิก %Yield
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2 small">เลขที่คำขอ: <strong id="cancelReqNoDisplay">—</strong></p>
+                <div class="alert alert-danger d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <span>การยกเลิกไม่สามารถย้อนกลับได้ คำขอจะถูกปิดและต้องยื่นใหม่</span>
+                </div>
+                <label class="form-label small">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                <textarea id="cancelReason" class="form-control" rows="3" placeholder="ระบุเหตุผล..."></textarea>
+                <div id="cancelReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผลการยกเลิก</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmRowCancel" class="btn btn-danger">
+                    <i class="ri ri-close-circle-line me-1"></i> ยืนยันยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: พิมพ์ฟอร์ม %Yield ==================== -->
+<div class="modal fade" id="modalPrintYield" tabindex="-1" aria-labelledby="modalPrintYieldLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalPrintYieldLabel">
+                    <i class="ri ri-printer-line me-1 text-secondary"></i> พรีวิวแบบฟอร์มการแจ้ง %ผลผลิต (Yield)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- PRINT AREA -->
+                <div id="printYieldArea" style="font-family: 'TH Sarabun New', sans-serif; font-size: 13pt; color: #111; background: #fff; padding: 20px;">
+                    <!-- หัวแบบฟอร์ม -->
+                    <div class="print-form-header">
+                        <div style="font-size: 1.4rem;">&#x1F41F;</div>
+                        <div class="fw-bold" style="font-size:1.05rem;">กรมประมง กระทรวงเกษตรและสหกรณ์</div>
+                        <div class="fw-bold" style="font-size:1.15rem; margin-top:4px;">แบบฟอร์มการแจ้ง %ผลผลิต (Yield)</div>
+                        <div class="text-muted small">Department of Fisheries, Ministry of Agriculture and Cooperatives</div>
+                    </div>
+
+                    <!-- ข้อมูลสถานประกอบการ (mockup) -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 small"><strong>เลขที่คำขอ:</strong> YLD-2026-00201</div>
+                        <div class="col-6 small text-end"><strong>วันที่ยื่น:</strong> 18 เมษายน 2569</div>
+                        <div class="col-12 small"><strong>ชื่อสถานประกอบการ:</strong> บริษัท สยาม มารีน ฟู้ดส์ จำกัด</div>
+                        <div class="col-6 small"><strong>เลขทะเบียนนิติบุคคล:</strong> 0105535012345</div>
+                        <div class="col-6 small"><strong>ประเภทใบรับรอง:</strong> DOF รับรองโรงงาน (ทูน่า/ปลาเนื้อขาว)</div>
+                        <div class="col-6 small"><strong>ประเภทวัตถุดิบ:</strong> วัตถุดิบนำเข้า</div>
+                        <div class="col-6 small"><strong>ประเภทคำขอ:</strong> คำขอใหม่</div>
+                    </div>
+
+                    <!-- ตาราง %Yield รายผลิตภัณฑ์ -->
+                    <div class="fw-bold small mb-1">รายละเอียด %Yield รายผลิตภัณฑ์</div>
+                    <table class="print-form-table mb-3">
+                        <thead style="background: #f0f0f0;">
+                            <tr>
+                                <th>รหัสสินค้า</th>
+                                <th>ชื่อผลิตภัณฑ์</th>
+                                <th class="text-center">%Yield เดิม</th>
+                                <th class="text-center">%Yield ที่ขอ</th>
+                                <th class="text-center">%Yield อนุมัติ</th>
+                                <th class="text-center">%Tolerance</th>
+                                <th class="text-center">ช่วงวันที่มีผล</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3AASNNBELNNPP</td>
+                                <td>สัตว์น้ำ ทูน่า (บรรจุภัณฑ์ มินามสตริป) 185g</td>
+                                <td class="text-center">70.0%</td>
+                                <td class="text-center">72.5%</td>
+                                <td class="text-center">72.5%</td>
+                                <td class="text-center">&plusmn;2.0%</td>
+                                <td class="text-center">01/05/2569 &ndash; 30/04/2570</td>
+                            </tr>
+                            <tr>
+                                <td>3AASNNBELNNKK</td>
+                                <td>สัตว์น้ำ ทูน่า (บรรจุภัณฑ์ มินามสตริป) 340g</td>
+                                <td class="text-center">70.0%</td>
+                                <td class="text-center">72.5%</td>
+                                <td class="text-center">72.5%</td>
+                                <td class="text-center">&plusmn;2.0%</td>
+                                <td class="text-center">01/05/2569 &ndash; 30/04/2570</td>
+                            </tr>
+                            <tr>
+                                <td>3BAASLIGHTMEAT</td>
+                                <td>สัตว์น้ำ ทูน่า (เนื้อสีอ่อน) 150g</td>
+                                <td class="text-center">68.0%</td>
+                                <td class="text-center">70.0%</td>
+                                <td class="text-center">70.0%</td>
+                                <td class="text-center">&plusmn;2.0%</td>
+                                <td class="text-center">01/05/2569 &ndash; 30/04/2570</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ลายมือชื่อ -->
+                    <div class="row g-3 mt-2">
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อผู้ประกอบการ / ผู้มอบอำนาจ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">(...............................................)</div></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อเจ้าหน้าที่ผู้อนุมัติ / ตราประทับ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">สำนักงานประมงจังหวัดสมุทรสาคร</div></div>
+                        </div>
+                    </div>
+                    <div class="small text-muted text-center mt-3">เอกสารนี้สร้างโดยระบบตรวจสอบสินค้าประมง (FSW)</div>
+                </div>
+                <!-- / PRINT AREA -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-secondary" id="btnDownloadPdf">
+                    <i class="ri ri-file-pdf-line me-1"></i> ดาวน์โหลด PDF
+                </button>
+                <button type="button" class="btn btn-primary" id="btnPrintYield">
+                    <i class="ri ri-printer-line me-1"></i> สั่งพิมพ์
+                </button>
+            </div>
+        </div>
     </div>
 </div>

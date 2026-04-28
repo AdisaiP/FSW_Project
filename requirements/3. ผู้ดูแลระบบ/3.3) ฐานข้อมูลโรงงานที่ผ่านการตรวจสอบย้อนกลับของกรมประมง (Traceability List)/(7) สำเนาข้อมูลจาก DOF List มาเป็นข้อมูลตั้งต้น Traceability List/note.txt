@@ -1,0 +1,11 @@
+# (7) สำเนาข้อมูลโรงงานจาก DOF List
+
+URL: http://localhost:5055/Admin/TraceabilityList
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. ปุ่ม 'สำเนาจาก DOF List' + modal #traceCopyFromDofModal Step 1: ตารางเลือกโรงงาน DOF
+2. Step 2: กำหนดระดับ Traceability (Level 1/2/3) + ฟิลด์เพิ่มเติม
+3. Step 3: Field Mapping preview (ฟิลด์ DOF > ฟิลด์ Trace)
+4. Step 4: ยืนยัน + progress bar + badge 'สำเนาจาก DOF List' บน record ใหม่

@@ -1,0 +1,259 @@
+@{
+    Layout = null; // หน้าสาธารณะ ไม่ใช้ Layout หลัก
+    var certNo = ViewData["CertNo"]?.ToString() ?? "";
+
+    // TOR 1.7(29): Mockup certificate data — ค้นจากเลขที่ใบรับรอง
+    var isFound = !string.IsNullOrWhiteSpace(certNo);
+    var certData = new
+    {
+        CertNo           = "AC821B2171101",
+        RequestNo        = "10611080320000049",
+        CertType         = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
+        Establishment    = "บริษัท อินโนเวชั่นส์ โซลูชั่น แอนด์ เซอร์วิส จำกัด",
+        ApprovalNo       = "AP-74110-001",
+        FisheryProduct   = "SLICE TUNA",
+        HsCode           = "1604.14",
+        Country          = "อาร์เจนตินา (ARGENTINA)",
+        IssuedDate       = "22/04/2569",
+        ExportDate       = "25/04/2569",
+        StatusText       = "มีผลบังคับใช้",
+        StatusClass      = "success",
+        SignatureStatus  = "ลงลายมือชื่อแล้ว",
+        HealthCertNo     = "HC-TH-2569-00847",
+        HCIssuedDate     = "21/04/2569",
+        IssuedBy         = "กรมประมง กระทรวงเกษตรและสหกรณ์",
+        VerifiedAt       = DateTime.Now.ToString("dd/MM/yyyy HH:mm น.")
+    };
+
+    // ถ้าเลขที่ไม่ตรงกับ mockup ให้แสดง "ไม่พบ"
+    var matched = isFound && certNo.Trim().ToUpper() == certData.CertNo.ToUpper();
+}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ตรวจสอบใบรับรอง @certNo — กรมประมง</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #f4f5fb;
+            min-height: 100vh;
+        }
+        .verify-header {
+            background: linear-gradient(135deg, #1a6f3c 0%, #2d9d5c 100%);
+            color: #fff;
+            padding: 1.5rem 0;
+        }
+        .verify-card {
+            max-width: 720px;
+            margin: 2rem auto;
+        }
+        .status-badge-lg {
+            font-size: 1rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 2rem;
+        }
+        .field-label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .field-value {
+            font-size: 0.93rem;
+            color: #212529;
+        }
+        .divider-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #888;
+        }
+        .watermark-note {
+            font-size: 0.7rem;
+            color: #adb5bd;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="verify-header">
+        <div class="container">
+            <div class="d-flex align-items-center gap-3">
+                <i class="ri ri-government-line" style="font-size:2rem;"></i>
+                <div>
+                    <div class="fw-bold" style="font-size:1.1rem;">กรมประมง กระทรวงเกษตรและสหกรณ์</div>
+                    <div style="font-size:0.85rem;opacity:0.85;">ระบบตรวจสอบสถานะใบรับรองออนไลน์ (RMBS — Certificate Verification)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="container verify-card">
+
+        @if (!isFound)
+        {
+            <!-- ไม่ได้ระบุเลขที่ -->
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="ri ri-search-line text-muted" style="font-size:3.5rem;"></i>
+                    <h5 class="mt-3 text-muted">กรุณาระบุเลขที่ใบรับรอง</h5>
+                    <p class="text-muted small">สแกน QR Code จากใบรับรองต้นฉบับเพื่อตรวจสอบสถานะ</p>
+                </div>
+            </div>
+        }
+        else if (!matched)
+        {
+            <!-- ไม่พบเลขที่ใบรับรองนี้ -->
+            <div class="card shadow-sm border-danger">
+                <div class="card-body text-center py-5">
+                    <i class="ri ri-error-warning-line text-danger" style="font-size:3.5rem;"></i>
+                    <h5 class="mt-3 text-danger">ไม่พบใบรับรอง</h5>
+                    <p class="text-muted small">เลขที่ใบรับรอง <strong>@certNo</strong> ไม่มีในระบบ หรืออาจไม่ถูกต้อง<br/>
+                    กรุณาตรวจสอบกับกรมประมงโดยตรง</p>
+                    <div class="mt-3">
+                        <span class="badge bg-label-danger status-badge-lg">
+                            <i class="ri ri-close-circle-line me-1"></i>ไม่พบข้อมูล
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- พบใบรับรอง — แสดงรายละเอียด -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <!-- Status Banner -->
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 p-3 rounded-3"
+                         style="background:#f0faf4;border:1px solid #d1e9dc;">
+                        <div>
+                            <div class="fw-bold text-success" style="font-size:1.05rem;">
+                                <i class="ri ri-shield-check-line me-1"></i>ใบรับรองนี้มีผลบังคับใช้
+                            </div>
+                            <div class="small text-muted mt-1">
+                                ตรวจสอบเมื่อ: @certData.VerifiedAt
+                            </div>
+                        </div>
+                        <span class="badge bg-success status-badge-lg">
+                            <i class="ri ri-checkbox-circle-line me-1"></i>@certData.StatusText
+                        </span>
+                    </div>
+
+                    <!-- ข้อมูลใบรับรอง -->
+                    <div class="mb-3">
+                        <div class="divider-label mb-2">ข้อมูลใบรับรอง</div>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="field-label">เลขที่ใบรับรอง</div>
+                                <div class="field-value fw-bold text-primary">@certData.CertNo</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">เลขที่คำขอ</div>
+                                <div class="field-value">@certData.RequestNo</div>
+                            </div>
+                            <div class="col-12">
+                                <div class="field-label">ประเภทใบรับรอง</div>
+                                <div class="field-value">@certData.CertType</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">วันที่ออกใบรับรอง</div>
+                                <div class="field-value">@certData.IssuedDate</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">วันที่ส่งออก</div>
+                                <div class="field-value">@certData.ExportDate</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">สถานะลายมือชื่อ</div>
+                                <div class="field-value">
+                                    <span class="badge bg-label-success">@certData.SignatureStatus</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">หน่วยงานออกใบรับรอง</div>
+                                <div class="field-value">@certData.IssuedBy</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <!-- ข้อมูลสถานประกอบการ -->
+                    <div class="mb-3">
+                        <div class="divider-label mb-2">ข้อมูลสถานประกอบการ</div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="field-label">ชื่อสถานประกอบการ</div>
+                                <div class="field-value fw-semibold">@certData.Establishment</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">หมายเลขรับรองโรงงาน</div>
+                                <div class="field-value">@certData.ApprovalNo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <!-- ข้อมูลสินค้า -->
+                    <div class="mb-3">
+                        <div class="divider-label mb-2">ข้อมูลสินค้า / ปลายทาง</div>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="field-label">ชื่อสินค้า</div>
+                                <div class="field-value">@certData.FisheryProduct</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">HS Code</div>
+                                <div class="field-value">@certData.HsCode</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">ประเทศปลายทาง</div>
+                                <div class="field-value">@certData.Country</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <!-- ใบรับรองสุขอนามัย -->
+                    <div class="mb-2">
+                        <div class="divider-label mb-2">ใบรับรองสุขอนามัย (Health Certificate)</div>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="field-label">เลขที่ใบรับรองสุขอนามัย</div>
+                                <div class="field-value">@certData.HealthCertNo</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="field-label">วันที่ออก</div>
+                                <div class="field-value">@certData.HCIssuedDate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer text-center watermark-note py-2">
+                    ข้อมูลนี้ออกโดยระบบ RMBS — กรมประมง &nbsp;|&nbsp; สำหรับการตรวจสอบความถูกต้องเท่านั้น
+                    &nbsp;|&nbsp; หากมีข้อสงสัยกรุณาติดต่อ กรมประมง โทร. 0-2562-0600
+                </div>
+            </div>
+        }
+
+        <div class="text-center mt-3 watermark-note">
+            <small>© กรมประมง กระทรวงเกษตรและสหกรณ์ — RMBS Certificate Verification (Mockup)</small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

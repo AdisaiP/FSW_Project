@@ -1,0 +1,9 @@
+# (1) ชื่อสถานประกอบการ ภาษาไทย-ภาษาอังกฤษ
+
+URL: http://localhost:5055/Admin/TraceabilityList
+
+จำนวนรูปที่ต้องแคป: 2 รูป
+
+รายการหน้าที่ต้องแคป
+1. ตารางหลัก Traceability List: ชื่อไทย + ชื่อ EN (sub-text)
+2. Detail modal > accordion 'ข้อมูลทั่วไป' > ฟิลด์ NameTH + NameEN

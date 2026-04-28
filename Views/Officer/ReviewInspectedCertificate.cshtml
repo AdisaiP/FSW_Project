@@ -1,0 +1,931 @@
+@{
+    ViewData["Title"] = "รายละเอียดใบรับรองที่ผ่านตรวจปล่อย";
+
+    // ── Mock data — ในระบบจริงรับจาก Model ──
+    var certNo          = "PS-2026-00401";
+    var certType        = "PS"; // PS | NMD
+    var certTypeFull    = "Processing Statement (PS)";
+    var requestNo       = "10611080326000401";
+    var receiptNo       = "รบ. 2026-00401";
+    var statusText      = "ผ่านตรวจปล่อยแล้ว";
+    var statusClass     = "bg-label-success";
+    var statusIcon      = "ri-shield-check-line";
+
+    // คำขอ / บริษัท
+    var companyName     = "บริษัท สยาม มารีน ฟู้ดส์ จำกัด";
+    var companyBranch   = "สำนักงานใหญ่";
+    var factoryRegNo    = "TH-1-6100-10-401/22";
+    var contactPerson   = "นางสาวสมหญิง มีสุข";
+    var contactTel      = "02-123-4567";
+    var issuedByName    = "นายสมชาย ใจดี";
+
+    // วันที่สำคัญ
+    var requestedAtStr  = "15/04/2569";
+    var receivedAtStr   = "16/04/2569";
+    var issuedAtStr     = "20/04/2569";
+    var expiredAtStr    = "19/04/2570";
+
+    // ข้อมูลตรวจปล่อย (ด่านตรวจประมง)
+    var inspectionPort      = "ท่าเรือแหลมฉบัง";
+    var inspectionDateStr   = "22/04/2569";
+    var loadingDateStr      = "21/04/2569";
+    var exportDateStr       = "22/04/2569";
+    var issueDateStr        = inspectionDateStr; // Issue date = วันที่ตรวจปล่อย
+    var vesselName          = "MV Ocean Star VII";
+
+    // ปริมาณน้ำหนัก
+    var requestedWeightKg   = 15000m;
+    var inspectedWeightKg   = 14850m; // น้ำหนักที่ผ่านตรวจปล่อย (อาจน้อยกว่าที่ขอ)
+
+    // ข้อมูลสินค้า
+    var productDesc     = "CANNED TUNA IN OIL";
+    var hsCode          = "1604.14";
+    var destCountry     = "ญี่ปุ่น";
+    var destCountryCode = "JAPAN";
+    var refCertNo       = ""; // เลขที่ใบรับรองอ้างอิง (กรณี PS อ้างอิง Declaration)
+
+    var destPort        = "Port of Osaka, Japan";
+    var packageDesc     = "Cartons × 600 cases, 24.75 kg/case";
+
+    // 2.9(2): Role-based access control (mock)
+    // เปลี่ยน currentViewRole เพื่อดูมุมมองต่าง role
+    var currentViewRole = "other"; // "owner" | "other" | "กตส"
+    var viewerAgencyName = "กรมศุลกากร";
+    var canViewEvidence = currentViewRole == "owner";  // Tab หลักฐานประกอบ — เฉพาะเจ้าของข้อมูล
+    var canEdit = currentViewRole == "owner";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section PageStyles {
+<style>
+    .review-insp-section { font-size: 0.83rem; }
+    .review-insp-section .form-label { font-weight: 600; font-size: 0.78rem; margin-bottom: 0.2rem; color: #444; }
+    .review-insp-section .form-control-plaintext { font-size: 0.83rem; padding: 0.25rem 0; }
+    .review-insp-section .form-control { font-size: 0.83rem; }
+    .section-heading {
+        font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+        text-transform: uppercase; color: #1e6fc5;
+        padding-bottom: 0.35rem;
+        border-bottom: 2px solid #d0e4f7;
+        margin-bottom: 1rem;
+    }
+    .weight-bar { height: 10px; border-radius: 5px; background: #e9ecef; overflow: hidden; }
+    .weight-bar-fill { height: 100%; background: linear-gradient(90deg,#28a745,#20c997); border-radius: 5px; }
+    @@media print {
+        .no-print { display: none !important; }
+        .card { border: none !important; box-shadow: none !important; }
+    }
+</style>
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Tooltip ──
+    if (window.bootstrap && bootstrap.Tooltip) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            new bootstrap.Tooltip(el);
+        });
+    }
+
+    // ── Issue date validation: ≥ วันโหลดสินค้า AND ≤ วันส่งออก ──
+    var LOADING_DATE    = '2026-04-21'; // yyyy-MM-dd
+    var EXPORT_DATE     = '2026-04-22';
+
+    var issueDateInput  = document.getElementById('inputIssueDate');
+    var alertBefore     = document.getElementById('alertIssueDateBefore');
+    var alertAfter      = document.getElementById('alertIssueDateAfter');
+    var alertOk         = document.getElementById('alertIssueDateOk');
+
+    if (issueDateInput) {
+        flatpickr(issueDateInput, {
+            dateFormat: 'd/m/Y',
+            allowInput: true,
+            onChange: validateIssueDate
+        });
+    }
+
+    function parseLocalDate(str) {
+        if (!str) return null;
+        var p = str.split('/');
+        if (p.length === 3) {
+            var yr = parseInt(p[2]); if (yr > 2500) yr -= 543;
+            return new Date(yr, parseInt(p[1]) - 1, parseInt(p[0]));
+        }
+        return new Date(str); // ISO
+    }
+
+    function validateIssueDate() {
+        var val   = issueDateInput.value;
+        var dt    = parseLocalDate(val);
+        var dLoad = parseLocalDate(LOADING_DATE.split('-').reverse().join('/'));
+        var dExp  = parseLocalDate(EXPORT_DATE.split('-').reverse().join('/'));
+        alertBefore.classList.add('d-none');
+        alertAfter.classList.add('d-none');
+        alertOk.classList.add('d-none');
+        if (!val || !dt) return;
+        if (dt < dLoad) {
+            alertBefore.classList.remove('d-none');
+        } else if (dt > dExp) {
+            alertAfter.classList.remove('d-none');
+        } else {
+            alertOk.classList.remove('d-none');
+        }
+    }
+
+    // ── น้ำหนักตรวจปล่อย — อัปเดต progress bar + badge ──
+    var MAX_WEIGHT      = @requestedWeightKg;
+    var weightInput     = document.getElementById('inputInspectedWeight');
+    var weightBar       = document.getElementById('weightBarFill');
+    var weightPctLabel  = document.getElementById('weightPctLabel');
+    var weightExceed    = document.getElementById('alertWeightExceed');
+    var weightOk        = document.getElementById('alertWeightOk');
+
+    function updateWeightBar() {
+        if (!weightInput) return;
+        var val = parseFloat(weightInput.value) || 0;
+        var pct = Math.min((val / MAX_WEIGHT) * 100, 100);
+        if (weightBar) { weightBar.style.width = pct + '%'; weightBar.style.background = val > MAX_WEIGHT ? '#dc3545' : ''; }
+        if (weightPctLabel) weightPctLabel.textContent = val.toLocaleString('th-TH', {minimumFractionDigits:2,maximumFractionDigits:2}) + ' กก. (' + pct.toFixed(1) + '%)';
+        if (weightExceed) weightExceed.classList.toggle('d-none', val <= MAX_WEIGHT);
+        if (weightOk) weightOk.classList.toggle('d-none', val > MAX_WEIGHT || val <= 0);
+    }
+    if (weightInput) {
+        weightInput.addEventListener('input', updateWeightBar);
+        updateWeightBar();
+    }
+
+    // ── ปุ่มบันทึกน้ำหนัก ──
+    var btnSaveWeight = document.getElementById('btnSaveWeight');
+    if (btnSaveWeight) {
+        btnSaveWeight.addEventListener('click', function () {
+            var val = parseFloat(weightInput.value) || 0;
+            if (val <= 0) { alert('กรุณาระบุน้ำหนักที่ถูกต้อง'); return; }
+            if (val > MAX_WEIGHT) { alert('น้ำหนักเกินกว่าที่ขอ'); return; }
+            document.getElementById('savedWeightMsg').classList.remove('d-none');
+            setTimeout(function () { document.getElementById('savedWeightMsg').classList.add('d-none'); }, 3000);
+            // TODO: submit form or call API — update inspected weight
+        });
+    }
+
+    // ── Modal ออกใบรับรอง — Original/Copy toggle ──
+    var CERT_TITLES = { PS: 'Processing Statement', NMD: 'Non-Manipulation Document' };
+    document.querySelectorAll('input[name="issueCopyType"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            var isCopy = this.value === 'copy';
+            document.getElementById('issueCopyCountWrap').classList.toggle('d-none', !isCopy);
+            var label = isCopy ? 'COPY' : 'ORIGINAL';
+            document.getElementById('issueCopyBadge').textContent = label;
+            document.getElementById('issueCopyBadge').className = isCopy ? 'badge bg-label-secondary ms-1' : 'badge bg-label-success ms-1';
+        });
+    });
+
+    // Download PDF mockup
+    document.querySelectorAll('.btn-download-cert-pdf').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            alert('mockup — ระบบจริงจะสร้างไฟล์ PDF/A-3 และดาวน์โหลดอัตโนมัติ');
+            // TODO: call API /api/certificate/download-pdf
+        });
+    });
+
+    // ── แจ้งแก้ไข ──
+    var btnConfirmNotify = document.getElementById('btnConfirmNotify');
+    if (btnConfirmNotify) {
+        btnConfirmNotify.addEventListener('click', function () {
+            var reason = document.getElementById('notifyReason').value.trim();
+            if (!reason) { alert('กรุณาระบุเหตุผลการแจ้งแก้ไข'); return; }
+            document.getElementById('notifySuccessMsg').classList.remove('d-none');
+            this.disabled = true;
+            // TODO: submit form or call API
+        });
+    }
+});
+</script>
+}
+
+@* ──────────────── Content ──────────────── *@
+<h4 class="mb-1">รายละเอียดใบรับรองที่ผ่านตรวจปล่อย</h4>
+<p class="mb-1 text-muted">ตรวจสอบข้อมูลใบรับรอง ปรับน้ำหนักตามตรวจปล่อย และออกใบรับรองฉบับจริง</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="@Url.Action("IndexSearchCertificate","Officer")" class="text-primary fw-semibold">ค้นหาใบรับรอง</a></li>
+        <li class="breadcrumb-item active text-secondary">รายละเอียด @certNo</li>
+    </ol>
+</nav>
+
+@* 2.9(2): Role banner สำหรับหน่วยงานอื่น *@
+@if (currentViewRole == "other")
+{
+    <div class="alert alert-warning d-flex align-items-center gap-3 mb-4">
+        <span class="badge bg-warning text-dark px-3 py-2 flex-shrink-0">
+            <i class="ri ri-building-line me-1"></i>หน่วยงานอื่น
+        </span>
+        <div>
+            <div class="fw-semibold mb-0"><strong>@viewerAgencyName</strong> — ดูรายละเอียดใบรับรองในฐานะผู้อ่าน (readonly)</div>
+            <div class="small text-muted">ดูได้ทุก Tab ยกเว้น <strong>Tab หลักฐานประกอบ</strong> (ข้อมูลเป็นความลับ เฉพาะเจ้าของข้อมูลและผู้มีสิทธิ์)</div>
+        </div>
+    </div>
+}
+@if (currentViewRole == "กตส")
+{
+    <div class="alert alert-primary d-flex align-items-center gap-3 mb-4">
+        <span class="badge px-3 py-2 flex-shrink-0" style="background-color:#6f42c1;">
+            <i class="ri ri-shield-user-line me-1"></i>กตส.
+        </span>
+        <div>
+            <div class="fw-semibold mb-0">กรมควบคุมการส่งออกสินค้าประมง (กตส.) — สิทธิ์ดูตามเงื่อนไขที่กรมประมงกำหนด</div>
+            <div class="small text-muted">ดูรายละเอียดใบรับรองและ RMBS2/RMBS1/P2/P1 ได้ในฐานะผู้อ่าน</div>
+        </div>
+    </div>
+}
+
+<!-- ── Status Banner ── -->
+<div class="card mb-4 border-0 shadow-none" style="background:linear-gradient(135deg,#f0fff4 0%,#e6faf0 100%);">
+    <div class="card-body py-3">
+        <div class="row align-items-center g-3">
+            <div class="col-auto">
+                <span class="badge @statusClass rounded-pill px-3 py-2 fs-6">
+                    <i class="ri @statusIcon me-1"></i>@statusText
+                </span>
+            </div>
+            <div class="col">
+                <div class="d-flex flex-wrap gap-4 small">
+                    <div>
+                        <span class="text-muted">เลขที่ใบรับรอง:</span>
+                        <span class="fw-semibold ms-1">@certNo</span>
+                        <span class="badge bg-label-info ms-1">@certType</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">เลขที่คำขอ:</span>
+                        <span class="fw-semibold ms-1">@requestNo</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">เลขที่รับคำขอ:</span>
+                        <span class="fw-semibold ms-1">@receiptNo</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">ผู้ออก:</span>
+                        <span class="fw-semibold ms-1">@issuedByName</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">วันที่ออก:</span>
+                        <span class="fw-semibold ms-1">@issuedAtStr</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">วันหมดอายุ:</span>
+                        <span class="fw-semibold ms-1">@expiredAtStr</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto no-print">
+                @if (canEdit)
+                {
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalIssueCert">
+                        <i class="ri ri-award-line me-1"></i>ออกใบรับรอง Original/Copy
+                    </button>
+                    <button class="btn btn-outline-warning btn-sm ms-1" data-bs-toggle="modal" data-bs-target="#modalNotifyFix">
+                        <i class="ri ri-error-warning-line me-1"></i>แจ้งแก้ไข
+                    </button>
+                }
+                else
+                {
+                    <span class="badge bg-label-secondary px-3 py-2">
+                        <i class="ri ri-eye-line me-1"></i>ดูเท่านั้น (readonly)
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 review-insp-section">
+
+    <!-- ════════════ COL LEFT ════════════ -->
+    <div class="col-lg-7">
+
+        <!-- ── Section 1: ข้อมูลสถานประกอบการ ── -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="section-heading">1. ข้อมูลสถานประกอบการ</div>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">ชื่อสถานประกอบการ</label>
+                        <div class="form-control-plaintext fw-semibold">@companyName (@companyBranch)</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">เลขทะเบียนโรงงาน</label>
+                        <div class="form-control-plaintext"><span class="badge bg-label-secondary">@factoryRegNo</span></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ผู้ติดต่อ</label>
+                        <div class="form-control-plaintext">@contactPerson &nbsp;<a href="tel:@contactTel" class="text-muted small">@contactTel</a></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ประเภทใบรับรอง</label>
+                        <div class="form-control-plaintext">@certTypeFull</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Section 2: ข้อมูลสินค้า ── -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="section-heading">2. ข้อมูลสินค้า / ผลิตภัณฑ์</div>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label">ชื่อสินค้า / รายละเอียด</label>
+                        <div class="form-control-plaintext fw-semibold">@productDesc</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">HS Code</label>
+                        <div class="form-control-plaintext"><span class="badge bg-label-secondary rounded-pill">@hsCode</span></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ประเทศปลายทาง</label>
+                        <div class="form-control-plaintext">@destCountry <span class="text-muted small">(@destCountryCode)</span></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ท่าเรือปลายทาง</label>
+                        <div class="form-control-plaintext">@destPort</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">ชื่อเรือ / ยานพาหนะ</label>
+                        <div class="form-control-plaintext fw-semibold"><i class="ri ri-ship-2-line me-1 text-primary"></i>@vesselName</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">รายละเอียดบรรจุภัณฑ์</label>
+                        <div class="form-control-plaintext text-muted">@packageDesc</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(refCertNo)) {
+                        <div class="col-12">
+                            <label class="form-label">เลขที่ใบรับรองอ้างอิง (Declaration)</label>
+                            <div class="form-control-plaintext"><a href="#" class="text-primary fw-semibold">@refCertNo</a></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Section 3: ข้อมูลตรวจปล่อย (ด่านตรวจประมง) ── -->
+        <div class="card mb-4 border-primary" style="border-width:2px!important;">
+            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f0f7ff;">
+                <i class="ri ri-shield-check-line text-primary"></i>
+                <span class="fw-semibold">3. ข้อมูลตรวจปล่อย (ด่านตรวจประมง)</span>
+                <a href="#" class="btn btn-outline-primary btn-sm ms-auto no-print" style="font-size:0.75rem;">
+                    <i class="ri ri-external-link-line me-1"></i>ดูสถานะตรวจปล่อย ด่านตรวจประมง →
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- ด่านตรวจ -->
+                    <div class="col-md-6">
+                        <label class="form-label">ด่านตรวจปล่อย</label>
+                        <div class="form-control-plaintext fw-semibold">
+                            <i class="ri ri-map-pin-2-line me-1 text-primary"></i>@inspectionPort
+                        </div>
+                    </div>
+                    <!-- วันที่โหลดสินค้า -->
+                    <div class="col-md-3">
+                        <label class="form-label">วันที่โหลดสินค้า</label>
+                        <div class="form-control-plaintext">@loadingDateStr</div>
+                    </div>
+                    <!-- วันที่ส่งออก -->
+                    <div class="col-md-3">
+                        <label class="form-label">วันที่ส่งออก</label>
+                        <div class="form-control-plaintext">@exportDateStr</div>
+                    </div>
+                    <!-- วันที่ตรวจปล่อย -->
+                    <div class="col-md-4">
+                        <label class="form-label">วันที่ตรวจปล่อย (ด่านตรวจ)</label>
+                        <div class="form-control-plaintext">
+                            <span class="badge bg-label-success px-3 py-2">
+                                <i class="ri ri-calendar-check-line me-1"></i>@inspectionDateStr
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Issue Date (คำนวณ = วันที่ตรวจปล่อย, แก้ไขได้) -->
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Issue Date
+                            <span class="badge bg-label-secondary ms-1" style="font-size:0.65rem;">คำนวณอัตโนมัติ</span>
+                        </label>
+                        <input type="text" class="form-control form-control-sm" id="inputIssueDate"
+                               value="@issueDateStr" placeholder="วว/ดด/ปปปป" />
+                        <div class="mt-1">
+                            <div id="alertIssueDateBefore" class="d-none">
+                                <span class="text-danger small">
+                                    <i class="ri ri-error-warning-line me-1"></i>⛔ Issue date ก่อนวันโหลดสินค้า (@loadingDateStr) — ไม่ถูกต้อง
+                                </span>
+                            </div>
+                            <div id="alertIssueDateAfter" class="d-none">
+                                <span class="text-danger small">
+                                    <i class="ri ri-error-warning-line me-1"></i>⛔ Issue date หลังวันส่งออก (@exportDateStr) — ไม่ถูกต้อง
+                                </span>
+                            </div>
+                            <div id="alertIssueDateOk" class="d-none">
+                                <span class="text-success small">
+                                    <i class="ri ri-checkbox-circle-line me-1"></i>Issue date ถูกต้อง ✅
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- สถานะตรวจปล่อย -->
+                    <div class="col-md-4">
+                        <label class="form-label">สถานะตรวจปล่อย</label>
+                        <div class="mt-1">
+                            <span class="badge bg-label-success px-3 py-2">
+                                <i class="ri ri-shield-check-line me-1"></i>ผ่านการตรวจปล่อยแล้ว ✅
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Section 4: ปรับปริมาณน้ำหนักตามตรวจปล่อย ── -->
+        <div class="card mb-4">
+            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f8f9fc;">
+                <i class="ri ri-scales-3-line text-success"></i>
+                <span class="fw-semibold">4. ปรับปริมาณน้ำหนักตามตรวจปล่อย</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">น้ำหนักที่ขอตามใบรับรอง (กก.)</label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control bg-light"
+                                   value="@requestedWeightKg.ToString("N2")" readonly />
+                            <span class="input-group-text">กก.</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            น้ำหนักที่ผ่านตรวจปล่อย (กก.)
+                            <span class="text-muted small fw-normal">(≤ น้ำหนักที่ขอ)</span>
+                        </label>
+                        <div class="input-group input-group-sm">
+                            <input type="number" class="form-control" id="inputInspectedWeight"
+                                   value="@inspectedWeightKg.ToString("F2")"
+                                   min="0.01" max="@requestedWeightKg" step="0.01" />
+                            <span class="input-group-text">กก.</span>
+                            <button class="btn btn-outline-success btn-sm" type="button" id="btnSaveWeight"
+                                    data-bs-toggle="tooltip" title="บันทึกน้ำหนักปรับ">
+                                <i class="ri ri-save-line"></i>
+                            </button>
+                        </div>
+                        <div id="alertWeightExceed" class="d-none mt-1">
+                            <span class="text-danger small">
+                                <i class="ri ri-error-warning-line me-1"></i>⛔ น้ำหนักเกินกว่าที่ขอ (สูงสุด @requestedWeightKg.ToString("N0") กก.)
+                            </span>
+                        </div>
+                        <div id="alertWeightOk" class="d-none mt-1">
+                            <span class="text-success small">
+                                <i class="ri ri-checkbox-circle-line me-1"></i>น้ำหนักถูกต้อง
+                            </span>
+                        </div>
+                        <div id="savedWeightMsg" class="d-none mt-1">
+                            <span class="text-success small fw-semibold">
+                                <i class="ri ri-checkbox-double-line me-1"></i>บันทึกน้ำหนักเรียบร้อยแล้ว
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">% ที่ผ่านตรวจปล่อย</label>
+                        <div class="mt-1">
+                            <div class="weight-bar mb-1">
+                                <div class="weight-bar-fill" id="weightBarFill"
+                                     style="width:@((inspectedWeightKg/requestedWeightKg*100).ToString("F0"))%;"></div>
+                            </div>
+                            <small class="text-muted" id="weightPctLabel">
+                                @inspectedWeightKg.ToString("N2") กก. (@((inspectedWeightKg / requestedWeightKg * 100).ToString("F1"))%)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 p-2 rounded" style="background:#f0fff4;border:1px solid #b7ebb7;font-size:0.78rem;">
+                    <i class="ri ri-information-line text-success me-1"></i>
+                    เมื่อบันทึกน้ำหนักตรวจปล่อย ระบบจะ<strong>ปรับปริมาณในใบรับรองอัตโนมัติ</strong>
+                    และใช้น้ำหนักนี้สำหรับออกใบรับรองฉบับจริง
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /col-left -->
+
+    <!-- ════════════ COL RIGHT ════════════ -->
+    <div class="col-lg-5">
+
+        <!-- ── วันที่สำคัญ ── -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="section-heading">วันที่สำคัญ</div>
+                <table class="table table-sm mb-0" style="font-size:0.82rem;">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted">วันที่ยื่นคำขอ</td>
+                            <td class="fw-semibold">@requestedAtStr</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">วันที่รับคำขอ (ด่าน)</td>
+                            <td class="fw-semibold">@receivedAtStr</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">วันที่โหลดสินค้า</td>
+                            <td class="fw-semibold">@loadingDateStr</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">วันที่ตรวจปล่อย</td>
+                            <td><span class="badge bg-label-success">@inspectionDateStr</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">วันที่ส่งออก</td>
+                            <td class="fw-semibold">@exportDateStr</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Issue Date (ใบรับรอง)</td>
+                            <td class="fw-semibold text-primary">@issueDateStr</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">วันที่ออกใบรับรอง</td>
+                            <td class="fw-semibold">@issuedAtStr</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">วันหมดอายุ</td>
+                            <td class="fw-semibold">@expiredAtStr</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── ออกใบรับรอง quick panel ── -->
+        @if (canEdit)
+        {
+        <div class="card mb-4 border-success" style="border-width:2px!important;">
+            <div class="card-header py-2" style="background:#f0fff4;">
+                <span class="fw-semibold text-success">
+                    <i class="ri ri-award-line me-1"></i>ออกใบรับรอง
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">ประเภทใบรับรอง</label>
+                    <select class="form-select form-select-sm" id="quickCertType">
+                        <option value="PS" selected>PS — Processing Statement</option>
+                        <option value="PST">PST — Processing Statement (Transit)</option>
+                        <option value="NMD">NMD — Non-Manipulation Document</option>
+                        <option value="NMDT">NMDT — Non-Manipulation Document (Transit)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">ชนิดสำเนา</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="radio" name="issueCopyType" id="radioOriginal2" value="original" checked />
+                            <label class="form-check-label small" for="radioOriginal2">Original</label>
+                        </div>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="radio" name="issueCopyType" id="radioCopy2" value="copy" />
+                            <label class="form-check-label small" for="radioCopy2">Copy</label>
+                        </div>
+                        <div id="issueCopyCountWrap" class="d-none d-flex align-items-center gap-1">
+                            <label class="small mb-0">จำนวน:</label>
+                            <input type="number" class="form-control form-control-sm" id="issueCopyCount"
+                                   value="1" min="1" max="10" style="width:55px;" />
+                            <span class="small">ชุด</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalIssueCert">
+                        <i class="ri ri-award-line me-1"></i>
+                        ออกใบรับรองตามน้ำหนักตรวจปล่อย
+                        <span class="badge bg-label-success ms-1" id="issueCopyBadge">ORIGINAL</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-download-cert-pdf">
+                        <i class="ri ri-download-2-line me-1"></i>PDF/A-3
+                    </button>
+                </div>
+                <div class="mt-2 small text-muted">
+                    <i class="ri ri-scales-3-line me-1"></i>
+                    น้ำหนักในใบรับรอง: <strong class="text-success" id="issuedWeightDisplay">@inspectedWeightKg.ToString("N2") กก.</strong>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ── หลักฐานประกอบ (2.9(2): restricted) ── -->
+        @if (canViewEvidence)
+        {
+        <div class="card mb-4">
+            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f8f9fc;">
+                <i class="ri ri-attachment-2 text-secondary"></i>
+                <span class="fw-semibold small">หลักฐานประกอบ</span>
+                <span class="badge bg-label-secondary ms-auto">3 ไฟล์</span>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush" style="font-size:0.80rem;">
+                    <li class="list-group-item d-flex align-items-center gap-2 py-2 px-3">
+                        <i class="ri ri-file-pdf-2-line text-danger"></i>
+                        <span class="flex-grow-1">ใบรายการสินค้า (Packing List)</span>
+                        <a href="#" class="btn btn-link btn-sm p-0" onclick="alert('mockup — ดาวน์โหลดไฟล์ หลักฐาน 1')">
+                            <i class="ri ri-download-2-line"></i>
+                        </a>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2 py-2 px-3">
+                        <i class="ri ri-file-pdf-2-line text-danger"></i>
+                        <span class="flex-grow-1">Invoice</span>
+                        <a href="#" class="btn btn-link btn-sm p-0" onclick="alert('mockup — ดาวน์โหลดไฟล์ หลักฐาน 2')">
+                            <i class="ri ri-download-2-line"></i>
+                        </a>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2 py-2 px-3">
+                        <i class="ri ri-file-text-line text-primary"></i>
+                        <span class="flex-grow-1">ใบรับรองผลการตรวจ</span>
+                        <a href="#" class="btn btn-link btn-sm p-0" onclick="alert('mockup — ดาวน์โหลดไฟล์ หลักฐาน 3')">
+                            <i class="ri ri-download-2-line"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        }
+        else
+        {
+        <div class="card mb-4 border-warning" style="border-width:1px;opacity:0.8;">
+            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#fff8e1;">
+                <i class="ri ri-attachment-2 text-warning"></i>
+                <span class="fw-semibold small text-warning">หลักฐานประกอบ</span>
+                <span class="badge bg-warning text-dark ms-auto" data-bs-toggle="tooltip"
+                      title="🔒 ไม่มีสิทธิ์ดูหลักฐานประกอบ — เฉพาะเจ้าของข้อมูลและผู้มีสิทธิ์เท่านั้น">
+                    <i class="ri ri-lock-line me-1"></i>จำกัดสิทธิ์
+                </span>
+            </div>
+            <div class="card-body text-center py-4">
+                <div class="mb-2"><i class="ri ri-lock-2-line text-warning" style="font-size:2rem;"></i></div>
+                <div class="fw-semibold text-warning mb-1">🔒 ไม่มีสิทธิ์ดูหลักฐานประกอบ</div>
+                <div class="text-muted small">เฉพาะเจ้าของข้อมูลและผู้มีสิทธิ์ที่กรมประมงกำหนดเท่านั้น</div>
+            </div>
+        </div>
+        }
+
+        <!-- ── ประวัติการดำเนินการ ── -->
+        <div class="card mb-4">
+            <div class="card-header py-2" style="background:#f8f9fc;">
+                <span class="fw-semibold small"><i class="ri ri-history-line me-1"></i>ประวัติการดำเนินการ</span>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush" style="font-size:0.78rem;">
+                    <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                        <span class="badge bg-label-success mt-1" style="font-size:0.65rem;min-width:60px;text-align:center;">ตรวจปล่อย</span>
+                        <div>
+                            <div class="fw-semibold">ผ่านการตรวจปล่อย</div>
+                            <div class="text-muted">@inspectionPort — @inspectionDateStr</div>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                        <span class="badge bg-label-primary mt-1" style="font-size:0.65rem;min-width:60px;text-align:center;">ออกใบรับรอง</span>
+                        <div>
+                            <div class="fw-semibold">ออกใบรับรอง @certNo</div>
+                            <div class="text-muted">@issuedByName — @issuedAtStr</div>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                        <span class="badge bg-label-info mt-1" style="font-size:0.65rem;min-width:60px;text-align:center;">รับคำขอ</span>
+                        <div>
+                            <div class="fw-semibold">ลงทะเบียนรับคำขอ @receiptNo</div>
+                            <div class="text-muted">@receivedAtStr</div>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-start gap-2 py-2">
+                        <span class="badge bg-label-secondary mt-1" style="font-size:0.65rem;min-width:60px;text-align:center;">ยื่นคำขอ</span>
+                        <div>
+                            <div class="fw-semibold">ยื่นคำขอ @requestNo</div>
+                            <div class="text-muted">@companyName — @requestedAtStr</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div><!-- /col-right -->
+</div><!-- /row -->
+
+<!-- ==================== Modal: ออกใบรับรอง Original/Copy ==================== -->
+<div class="modal fade" id="modalIssueCert" tabindex="-1" aria-labelledby="modalIssueCertLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalIssueCertLabel">
+                    <i class="ri ri-award-line me-1 text-success"></i>
+                    ออกใบรับรองตามน้ำหนักตรวจปล่อย
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Action bar -->
+                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">
+                        <i class="ri ri-printer-line me-1"></i>พิมพ์
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-download-cert-pdf">
+                        <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด PDF/A-3
+                    </button>
+                    <span class="badge bg-label-success ms-auto">ผ่านตรวจปล่อยแล้ว ✅</span>
+                </div>
+
+                <!-- Options -->
+                <div class="card border mb-3">
+                    <div class="card-body py-2">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small">ประเภทใบรับรอง</label>
+                                <select class="form-select form-select-sm">
+                                    <option value="PS" selected>PS — Processing Statement</option>
+                                    <option value="PST">PST — Processing Statement (Transit)</option>
+                                    <option value="NMD">NMD — Non-Manipulation Document</option>
+                                    <option value="NMDT">NMDT — Non-Manipulation Document (Transit)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small">ชนิดสำเนา</label>
+                                <div class="d-flex gap-3 mt-1">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="modalCopyType" id="modalRadioOrig" value="original" checked />
+                                        <label class="form-check-label small" for="modalRadioOrig">Original</label>
+                                    </div>
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="modalCopyType" id="modalRadioCopy" value="copy" />
+                                        <label class="form-check-label small" for="modalRadioCopy">Copy</label>
+                                    </div>
+                                    <div id="modalCopyCountWrap" class="d-none d-flex align-items-center gap-1 ms-1">
+                                        <input type="number" class="form-control form-control-sm" value="1" min="1" max="10" style="width:55px;" />
+                                        <span class="small">ชุด</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold small">เลขที่ใบรับรอง</label>
+                                <input type="text" class="form-control form-control-sm bg-light" value="@certNo" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div class="card border">
+                    <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background:#f8f9fc;">
+                        <span class="fw-semibold small">@certTypeFull (Original)</span>
+                        <span class="badge bg-label-success">ORIGINAL</span>
+                    </div>
+                    <div class="card-body p-3" style="font-size:0.82rem;font-family:'Times New Roman',serif;">
+                        <div class="text-center mb-3">
+                            <div class="fw-bold" style="font-size:1rem;">PROCESSING STATEMENT</div>
+                            <div class="small text-muted">กรมประมง — Department of Fisheries, Kingdom of Thailand</div>
+                        </div>
+                        <hr class="my-2" />
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <span class="text-muted">Certificate No.:</span>
+                                <span class="fw-semibold ms-1">@certNo</span>
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="text-muted">Issue Date:</span>
+                                <span class="fw-semibold ms-1">@issueDateStr</span>
+                                &nbsp;<span class="badge bg-label-warning">ORIGINAL</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted">คำขอเลขที่:</span>
+                                <span class="ms-1">@requestNo</span>
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="text-muted">วันที่ส่งออก:</span>
+                                <span class="ms-1">@exportDateStr</span>
+                            </div>
+                        </div>
+                        <hr class="my-2" />
+                        <div class="mb-2">
+                            <div class="text-muted small fw-semibold">1. EXPORTER</div>
+                            <div class="ms-2">@companyName</div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="text-muted small fw-semibold">2. CONSIGNEE</div>
+                            <div class="ms-2">Japan Seafood Import Co., Ltd. — Tokyo, Japan</div>
+                        </div>
+                        <hr class="my-2" />
+                        <div class="mb-2">
+                            <div class="text-muted small fw-semibold">3. FISHERY PRODUCTS</div>
+                            <table class="table table-bordered table-sm mb-0 mt-1" style="font-size:0.78rem;">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th>HS Code</th>
+                                        <th>Description</th>
+                                        <th>Country of Origin</th>
+                                        <th>Net Weight (kg)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center">@hsCode</td>
+                                        <td>@productDesc</td>
+                                        <td class="text-center">Thailand</td>
+                                        <td class="text-center fw-semibold text-success">@inspectedWeightKg.ToString("N2")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="mt-1 text-muted small">
+                                <i class="ri ri-information-line me-1"></i>น้ำหนักตามตรวจปล่อย ด่าน@inspectionPort
+                                | ยานพาหนะ: @vesselName
+                            </div>
+                        </div>
+                        <hr class="my-2" />
+                        <div class="mb-3">
+                            <div class="text-muted small fw-semibold">4. DECLARATION</div>
+                            <p class="ms-2 mb-1 small">
+                                I, the undersigned, certify that the above-mentioned products were processed
+                                in accordance with the requirements of EU Regulation (EC) No. 1005/2008 and
+                                Thai fisheries laws. The net weight stated herein reflects the quantity cleared
+                                through fisheries inspection at @inspectionPort on @inspectionDateStr.
+                            </p>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6 text-center">
+                                <div class="border-top pt-2 mt-4" style="width:70%;margin:auto;">
+                                    <div class="small text-muted">ลายเซ็น / Signature</div>
+                                    <div class="small fw-semibold">@issuedByName</div>
+                                    <div class="small text-muted">เจ้าหน้าที่กรมประมง</div>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div class="border-top pt-2 mt-4" style="width:70%;margin:auto;">
+                                    <div class="small text-muted">ประทับตรา / Official Stamp</div>
+                                    <div class="border rounded-circle d-inline-flex align-items-center justify-content-center text-muted"
+                                        style="width:72px;height:72px;border-style:dashed!important;">
+                                        <span class="small">ตรา</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end text-muted mt-3" style="font-size:0.72rem;">
+                            พิมพ์เมื่อ: 28/04/2569 14:30 น. &nbsp;|&nbsp; ระบบออกใบรับรอง กรมประมง v2.0
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-danger btn-sm btn-download-cert-pdf">
+                    <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด PDF/A-3
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal: ออกใบรับรอง -->
+
+<!-- ==================== Modal: แจ้งแก้ไข ==================== -->
+<div class="modal fade" id="modalNotifyFix" tabindex="-1" aria-labelledby="modalNotifyFixLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNotifyFixLabel">
+                    <i class="ri ri-error-warning-line me-1 text-warning"></i>แจ้งแก้ไขข้อมูล
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เหตุผล / รายละเอียดที่ต้องแก้ไข <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="notifyReason" rows="4"
+                              placeholder="ระบุรายละเอียดที่ต้องการให้แก้ไข..."></textarea>
+                </div>
+                <div id="notifySuccessMsg" class="d-none">
+                    <div class="alert alert-success py-2 px-3 mb-0">
+                        <i class="ri ri-checkbox-circle-line me-1"></i>แจ้งแก้ไขเรียบร้อยแล้ว — ระบบจะส่งแจ้งเตือนไปยังผู้ประกอบการ
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-warning btn-sm" id="btnConfirmNotify">
+                    <i class="ri ri-send-plane-line me-1"></i>ส่งแจ้งแก้ไข
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal: แจ้งแก้ไข -->

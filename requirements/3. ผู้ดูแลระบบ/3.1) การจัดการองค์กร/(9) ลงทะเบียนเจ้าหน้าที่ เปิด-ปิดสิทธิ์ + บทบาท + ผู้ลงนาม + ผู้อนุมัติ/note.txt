@@ -1,0 +1,17 @@
+# (9) ลงทะเบียนเจ้าหน้าที่ เปิด-ปิดสิทธิ์ + บทบาท + ผู้ลงนาม + ผู้อนุมัติ
+
+URL 1: http://localhost:5055/Officer/IndexRegisterUser
+URL 2: http://localhost:5055/Officer/IndexUserData
+
+จำนวนรูปที่ต้องแคป: 5 รูป
+
+รายการหน้าที่ต้องแคป
+1. Officer/IndexRegisterUser > หน้าหลัก
+   - summary cards + ตารางคำขอลงทะเบียน + badge 'รอดำเนินการ'
+2. Modal #approveRegModal > 'อนุมัติการลงทะเบียน'
+   - กำหนดบทบาท / สังกัด / พื้นที่รับผิดชอบ + หมายเหตุ
+3. Modal #rejectRegModal > 'ปฏิเสธการลงทะเบียน'
+   - เหตุผลการปฏิเสธ + checkbox แจ้งอีเมล
+4. Officer/IndexUserData > #userDetailModal > card 'การจัดการสิทธิ์'
+   - toggle เปิด/ปิดสิทธิ์ + select บทบาทหลัก + switch ผู้ลงนาม/ผู้อนุมัติ
+5. IndexUserData > ตาราง + badge สถานะ 'ใช้งาน'/'ระงับ' + ปุ่ม เปิด/ปิดสิทธิ์

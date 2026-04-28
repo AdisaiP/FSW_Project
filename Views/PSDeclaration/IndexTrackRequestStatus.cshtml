@@ -367,6 +367,10 @@
     };
     var today = new DateTime(2026, 4, 27);
     var alertThresholdDays = 3;
+    var nearCount = exportDates.Count(kv => {
+        var dl = (int)((kv.Value - today).TotalDays);
+        return dl >= 0 && dl <= alertThresholdDays;
+    });
 }
 
 @section VendorStyles {
@@ -553,6 +557,64 @@
             filterRows();
         });
     });
+
+    // TOR 1.7(22): ตั้งค่าล่วงหน้า — ปรับ threshold แล้ว re-highlight badge ใน table
+    function applyThresholdSetting() {
+        var thresholdInput = document.getElementById('inputThresholdDays');
+        var threshold = parseInt(thresholdInput.value, 10);
+        if (isNaN(threshold) || threshold < 1) { threshold = 3; thresholdInput.value = 3; }
+        var today = new Date(2026, 3, 27); // fixed mockup date 27/04/2026
+        var rows = document.querySelectorAll('#requestTableBody tr[data-export-date]');
+        rows.forEach(function (row) {
+            var expDateStr = row.dataset.exportDate;
+            if (!expDateStr) { return; }
+            var parts = expDateStr.split('-');
+            var expDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            var daysLeft = Math.round((expDate - today) / 86400000);
+            var isNear = daysLeft >= 0 && daysLeft <= threshold;
+            row.dataset.nearExport = isNear ? 'true' : 'false';
+            row.dataset.daysLeft = daysLeft.toString();
+            // update the export date cell (column index 8)
+            var exportCell = row.querySelectorAll('td')[8];
+            if (exportCell) {
+                var dateDiv = exportCell.querySelector('div');
+                var badge = exportCell.querySelector('span.badge');
+                if (dateDiv) {
+                    dateDiv.className = 'text-nowrap fw-semibold' + (isNear ? ' text-danger' : '');
+                }
+                if (badge) {
+                    if (isNear) {
+                        badge.className = 'badge bg-label-danger';
+                        badge.textContent = 'เหลือ ' + daysLeft + ' วัน ⚠️';
+                    } else {
+                        badge.className = 'badge bg-label-secondary';
+                        badge.textContent = daysLeft + ' วัน';
+                    }
+                }
+            }
+        });
+        // update notification panel count
+        var nearCount = document.querySelectorAll('#requestTableBody tr[data-near-export="true"]').length;
+        var panel = document.getElementById('panelNearExport');
+        if (panel) {
+            var strongEl = panel.querySelector('strong');
+            if (strongEl) { strongEl.textContent = nearCount + ' คำขอ'; }
+            var infoSpan = panel.querySelector('span');
+            if (infoSpan) {
+                infoSpan.innerHTML = 'มี <strong>' + nearCount + ' คำขอ</strong> ที่ใกล้ถึงวันที่ส่งออก (ภายใน ' + threshold + ' วัน) — กรุณาตรวจสอบและดำเนินการโดยเร็ว';
+            }
+            panel.style.display = nearCount > 0 ? '' : 'none';
+        }
+        // show saved msg
+        var msg = document.getElementById('thresholdAppliedMsg');
+        if (msg) {
+            msg.style.display = '';
+            setTimeout(function () { msg.style.display = 'none'; }, 2000);
+        }
+        // update nearOnly checkbox label
+        var nearLabel = document.querySelector('label[for="filterExportNearOnly"]');
+        if (nearLabel) { nearLabel.textContent = 'เฉพาะใกล้วันส่งออก (≤ ' + threshold + ' วัน)'; }
+    }
 </script>
 }
 
@@ -568,6 +630,40 @@
         </li>
     </ol>
 </nav>
+
+<!-- ==================== TOR 1.7(22): notification panel ==================== -->
+@if (nearCount > 0)
+{
+    <div id="panelNearExport" class="alert alert-warning d-flex align-items-start gap-3 mb-4" role="alert">
+        <i class="ri ri-notification-3-fill fs-4 flex-shrink-0 mt-1 text-warning"></i>
+        <div class="flex-grow-1">
+            <h6 class="alert-heading mb-1">แจ้งเตือน: คำขอใกล้ถึงวันที่ส่งออก</h6>
+            <span>มี <strong>@nearCount คำขอ</strong> ที่ใกล้ถึงวันที่ส่งออก (ภายใน @alertThresholdDays วัน) — กรุณาตรวจสอบและดำเนินการโดยเร็ว</span>
+            <div class="mt-2 d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-warning"
+                    onclick="document.getElementById('filterExportNearOnly').checked=true; filterRows(); this.closest('.alert').scrollIntoView({behavior:'smooth'});">
+                    <i class="ri ri-filter-line me-1"></i>กรองเฉพาะใกล้วันส่งออก
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="alert">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ==================== TOR 1.7(22): threshold setting ==================== -->
+<div class="d-flex align-items-center gap-2 mb-3">
+    <span class="text-muted small"><i class="ri ri-settings-3-line me-1"></i>ตั้งค่าการแจ้งเตือนล่วงหน้า:</span>
+    <div class="input-group input-group-sm" style="width:auto;">
+        <input type="number" id="inputThresholdDays" class="form-control form-control-sm" value="@alertThresholdDays" min="1" max="30" style="width:5rem;" />
+        <span class="input-group-text">วัน</span>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-primary" onclick="applyThresholdSetting()">
+        <i class="ri ri-refresh-line me-1"></i>ใช้งาน
+    </button>
+    <span id="thresholdAppliedMsg" class="badge bg-label-success" style="display:none;">บันทึกแล้ว ✓</span>
+</div>
 
 <div class="card mb-4">
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
@@ -649,6 +745,13 @@
         <div>
             <h5 class="card-title mb-1">รายการติดตามสถานะคำขอใบรับรอง</h5>
             <p class="text-muted small mb-0">แสดงสถานะการตรวจสอบ อนุมัติ และลายมือชื่ออิเล็กทรอนิกส์ของคำขอทั้งหมด</p>
+        </div>
+        <!-- TOR 1.7(34): Export Excel -->
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-success btn-sm"
+                onclick="alert('Export Excel รายการติดตามสถานะคำขอใบรับรอง (mockup)\n\nรายการที่ export:\n- เลขที่คำขอ\n- เลขที่รับ\n- Health Certificate Number\n- HS Code\n- สถานะการตรวจสอบ\n- สถานะอนุมัติ\n- ลายมือชื่ออิเล็กทรอนิกส์')">
+                <i class="ri ri-file-excel-2-line me-1"></i> Export Excel
+            </button>
         </div>
     </div>
     <div class="table-responsive p-1">

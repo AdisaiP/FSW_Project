@@ -1,0 +1,15 @@
+# (1) ดึงรายงานผ่านหน้าโปรแกรม + Export Excel ตามรูปแบบกรมประมง
+
+URL: http://localhost:5055/Admin/Reports
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. หน้า Admin/Reports + summary cards (รายงานทั้งหมด/Static/Dynamic) + Tab Static/Dynamic
+   - ตาราง Static 4 รายการ + ปุ่มต่อแถว (ดูรายละเอียด/แก้ไข/ดูรายงาน/Export Excel)
+2. Detail modal > Tab 'พารามิเตอร์' > accordion 'เงื่อนไขการค้นหา (TOR)'
+   - ชนิดสัตว์น้ำ/ปริมาณ min-max/แหล่งที่มา/ผู้ประกอบการ/หน่วยงาน/ช่วงวันที่ + ปุ่ม 'ดูรายงาน'
+3. Modal #rptViewerModal (modal-xl)
+   - Preview table + active filter chips + summary text
+   - footer: Export Excel dropdown (3 รูปแบบ) + Export PDF + ปิด
+4. Export Excel dropdown (3 ตัวเลือก: Data sheet/สรุป/Template กรมประมง) + toast 2 ขั้น

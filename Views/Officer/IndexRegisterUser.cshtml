@@ -1,20 +1,110 @@
 @{
     ViewData["Title"] = "ลงทะเบียนผู้ใช้";
 
+    // TODO: ดึงจากฐานข้อมูลจริง — ข้อมูลผู้ประกอบการ (Exporter) 2.14(1)
     var pendingRegistrations = new[]
     {
-        new { RowNo=1, ReqNo="REG-2026-00101", FullName="นายสุรชาติ เกษมสุข", Email="surachat@newcompany.co.th", Organization="บริษัท นิว ซีฟู้ด เทรด จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,22,10,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
-        new { RowNo=2, ReqNo="REG-2026-00102", FullName="นางสาววรรณพร ดีงาม", Email="wannaporn@bluefish.co.th", Organization="บริษัท บลู ฟิช เอ็กซ์พอร์ต จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,22,14,15,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
-        new { RowNo=3, ReqNo="REG-2026-00103", FullName="นายกิตติภัทร พงษ์ไพร", Email="kittipat@andaman2.co.th", Organization="บริษัท อันดามัน 2 โปรเซสซิ่ง จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,23,9,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
-        new { RowNo=4, ReqNo="REG-2026-00104", FullName="นายศุภชัย มือเย็น", Email="supachai@dof.go.th", Organization="กรมประมง — ศตส. เขต 4", RequestedRole="เจ้าหน้าที่", RequestedAgency="ศตส.เขต 4", SubmittedAt=new DateTime(2026,4,23,11,0,0), StatusText="รอตรวจสอบ", StatusClass="bg-label-warning" },
-        new { RowNo=5, ReqNo="REG-2026-00099", FullName="นางสาวมณีรัตน์ สุขใจ", Email="maneerat@siammarine.co.th", Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,21,11,0,0), StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
-        new { RowNo=6, ReqNo="REG-2026-00098", FullName="นายอิทธิพล รักดี", Email="itthiphon@fake.co.th", Organization="ไม่ระบุ", RequestedRole="สมาชิก", RequestedAgency="", SubmittedAt=new DateTime(2026,4,20,8,30,0), StatusText="ปฏิเสธ", StatusClass="bg-label-danger" },
+        new {
+            RowNo=1, ReqNo="REG-2026-00101", FullName="นายสุรชาติ เกษมสุข",
+            Email="surachat@newcompany.co.th",
+            Organization="บริษัท นิว ซีฟู้ด เทรด จำกัด",
+            RequestedRole="สมาชิก", RequestedAgency="",
+            SubmittedAt=new DateTime(2026,4,22,10,0,0),
+            StatusText="รอตรวจสอบ", StatusClass="bg-label-warning",
+            // ข้อมูลผู้ประกอบการ (Exporter) — 2.14(1)
+            CompanyNameTH="บริษัท นิว ซีฟู้ด เทรด จำกัด",
+            CompanyNameEN="New Seafood Trade Co., Ltd.",
+            AddressTH="123/45 ถนนพระราม 2 แขวงบางมด เขตจอมทอง กรุงเทพมหานคร 10150",
+            AddressEN="123/45 Rama II Rd., Bang Mot, Chom Thong, Bangkok 10150, Thailand",
+            TaxId="0105566012345", BranchNo="00000",
+            PhoneCC="+66", Phone="02-123-4567",
+            FaxCC="+66", Fax="02-123-4568",
+            DataComplete=true
+        },
+        new {
+            RowNo=2, ReqNo="REG-2026-00102", FullName="นางสาววรรณพร ดีงาม",
+            Email="wannaporn@bluefish.co.th",
+            Organization="บริษัท บลู ฟิช เอ็กซ์พอร์ต จำกัด",
+            RequestedRole="สมาชิก", RequestedAgency="",
+            SubmittedAt=new DateTime(2026,4,22,14,15,0),
+            StatusText="รอตรวจสอบ", StatusClass="bg-label-warning",
+            CompanyNameTH="บริษัท บลู ฟิช เอ็กซ์พอร์ต จำกัด",
+            CompanyNameEN="Blue Fish Export Co., Ltd.",
+            AddressTH="67 ถนนสุขุมวิท 101 เขตบางนา กรุงเทพมหานคร 10260",
+            AddressEN="",
+            TaxId="0105567023456", BranchNo="00000",
+            PhoneCC="+66", Phone="02-765-4321",
+            FaxCC="+66", Fax="",
+            DataComplete=false   // ขาด AddressEN, Fax
+        },
+        new {
+            RowNo=3, ReqNo="REG-2026-00103", FullName="นายกิตติภัทร พงษ์ไพร",
+            Email="kittipat@andaman2.co.th",
+            Organization="บริษัท อันดามัน 2 โปรเซสซิ่ง จำกัด",
+            RequestedRole="สมาชิก", RequestedAgency="",
+            SubmittedAt=new DateTime(2026,4,23,9,0,0),
+            StatusText="รอตรวจสอบ", StatusClass="bg-label-warning",
+            CompanyNameTH="บริษัท อันดามัน 2 โปรเซสซิ่ง จำกัด",
+            CompanyNameEN="Andaman 2 Processing Co., Ltd.",
+            AddressTH="88 ม.3 ต.รัษฎา อ.เมืองภูเก็ต จ.ภูเก็ต 83000",
+            AddressEN="88 M.3 Ratsada, Mueang Phuket, Phuket 83000, Thailand",
+            TaxId="", BranchNo="",    // ขาด TaxId, BranchNo
+            PhoneCC="+66", Phone="076-234-567",
+            FaxCC="+66", Fax="",
+            DataComplete=false
+        },
+        new {
+            RowNo=4, ReqNo="REG-2026-00104", FullName="นายศุภชัย มือเย็น",
+            Email="supachai@dof.go.th",
+            Organization="กรมประมง — ศตส. เขต 4",
+            RequestedRole="เจ้าหน้าที่", RequestedAgency="ศตส.เขต 4",
+            SubmittedAt=new DateTime(2026,4,23,11,0,0),
+            StatusText="รอตรวจสอบ", StatusClass="bg-label-warning",
+            CompanyNameTH="กรมประมง", CompanyNameEN="Department of Fisheries",
+            AddressTH="50 ถนนพหลโยธิน แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900",
+            AddressEN="50 Phahon Yothin Rd., Lat Yao, Chatuchak, Bangkok 10900",
+            TaxId="", BranchNo="",    // เจ้าหน้าที่รัฐ — ไม่มี TaxId
+            PhoneCC="+66", Phone="02-562-0600",
+            FaxCC="+66", Fax="02-562-0515",
+            DataComplete=false        // เจ้าหน้าที่รัฐ ไม่ต้องมี TaxId แต่ flag=false เพื่อให้ตรวจสอบ
+        },
+        new {
+            RowNo=5, ReqNo="REG-2026-00099", FullName="นางสาวมณีรัตน์ สุขใจ",
+            Email="maneerat@siammarine.co.th",
+            Organization="บริษัท สยาม มารีน ฟู้ดส์ จำกัด",
+            RequestedRole="สมาชิก", RequestedAgency="",
+            SubmittedAt=new DateTime(2026,4,21,11,0,0),
+            StatusText="อนุมัติแล้ว", StatusClass="bg-label-success",
+            CompanyNameTH="บริษัท สยาม มารีน ฟู้ดส์ จำกัด",
+            CompanyNameEN="Siam Marine Foods Co., Ltd.",
+            AddressTH="555 ถนนสุขุมวิท กม.29 เขตพระโขนง กรุงเทพฯ 10260",
+            AddressEN="555 Sukhumvit Rd. km.29, Phra Khanong, Bangkok 10260, Thailand",
+            TaxId="0105555034567", BranchNo="00001",
+            PhoneCC="+66", Phone="02-330-5000",
+            FaxCC="+66", Fax="02-330-5001",
+            DataComplete=true
+        },
+        new {
+            RowNo=6, ReqNo="REG-2026-00098", FullName="นายอิทธิพล รักดี",
+            Email="itthiphon@fake.co.th",
+            Organization="ไม่ระบุ",
+            RequestedRole="สมาชิก", RequestedAgency="",
+            SubmittedAt=new DateTime(2026,4,20,8,30,0),
+            StatusText="ปฏิเสธ", StatusClass="bg-label-danger",
+            CompanyNameTH="", CompanyNameEN="",
+            AddressTH="", AddressEN="",
+            TaxId="", BranchNo="",
+            PhoneCC="+66", Phone="",
+            FaxCC="+66", Fax="",
+            DataComplete=false
+        },
     };
 
-    var pendingCount = pendingRegistrations.Count(x => x.StatusText == "รอตรวจสอบ");
+    var pendingCount  = pendingRegistrations.Count(x => x.StatusText == "รอตรวจสอบ");
     var approvedCount = pendingRegistrations.Count(x => x.StatusText == "อนุมัติแล้ว");
     var rejectedCount = pendingRegistrations.Count(x => x.StatusText == "ปฏิเสธ");
-    var officerCount = pendingRegistrations.Count(x => x.RequestedRole == "เจ้าหน้าที่" && x.StatusText == "รอตรวจสอบ");
+    var officerCount  = pendingRegistrations.Count(x => x.RequestedRole == "เจ้าหน้าที่" && x.StatusText == "รอตรวจสอบ");
+    var dataCompleteCount = pendingRegistrations.Count(x => x.DataComplete);
 }
 
 @section PageStyles {
@@ -32,6 +122,45 @@
 
 @section PageScripts {
 <script>
+    // DOF Check mock data (2.14(4)) — result per reqNo
+    // status: 'pass' | 'mismatch' | 'incomplete' | 'na'
+    var dofCheckMap = {
+        'REG-2026-00101': {
+            status: 'mismatch',
+            rows: [
+                { label: 'ชื่อโรงงาน (EN)', system: 'New Seafood Trade Co., Ltd.', dof: 'New Seafood Trade Company Limited', match: false },
+                { label: 'ที่อยู่ (EN)', system: '123/45 Rama II Rd., Bang Mot, Chom Thong, Bangkok 10150, Thailand', dof: '123/45 Rama II Rd., Bang Mot, Chom Thong, Bangkok 10150, Thailand', match: true },
+                { label: 'หมายเลขรับรองโรงงาน', system: 'TH-EST-1041', dof: 'TH-EST-1041', match: true }
+            ]
+        },
+        'REG-2026-00102': {
+            status: 'incomplete',
+            rows: [
+                { label: 'ชื่อโรงงาน (EN)', system: 'Blue Fish Export Co., Ltd.', dof: 'Blue Fish Export Co., Ltd.', match: true },
+                { label: 'ที่อยู่ (EN)', system: '— ไม่มีข้อมูล (ข้อมูลไม่ครบ) —', dof: '67 Sukhumvit Soi 101, Bangna, Bangkok 10260, Thailand', match: false },
+                { label: 'หมายเลขรับรองโรงงาน', system: 'TH-EST-0921', dof: 'TH-EST-0921', match: true }
+            ]
+        },
+        'REG-2026-00103': {
+            status: 'mismatch',
+            rows: [
+                { label: 'ชื่อโรงงาน (EN)', system: 'Andaman 2 Processing Co., Ltd.', dof: 'Andaman 2 Processing Co., Ltd.', match: true },
+                { label: 'ที่อยู่ (EN)', system: '88 M.3 Ratsada, Mueang Phuket, Phuket 83000, Thailand', dof: '88 Moo 3 Ratsada Sub-district, Muang District, Phuket 83000, Thailand', match: false },
+                { label: 'หมายเลขรับรองโรงงาน', system: 'TH-EST-0644', dof: 'TH-EST-0644', match: true }
+            ]
+        },
+        'REG-2026-00104': { status: 'na', rows: [] },
+        'REG-2026-00099': {
+            status: 'pass',
+            rows: [
+                { label: 'ชื่อโรงงาน (EN)', system: 'Siam Marine Foods Co., Ltd.', dof: 'Siam Marine Foods Co., Ltd.', match: true },
+                { label: 'ที่อยู่ (EN)', system: '555 Sukhumvit Rd. km.29, Phra Khanong, Bangkok 10260, Thailand', dof: '555 Sukhumvit Rd. km.29, Phra Khanong, Bangkok 10260, Thailand', match: true },
+                { label: 'หมายเลขรับรองโรงงาน', system: 'TH-EST-0828', dof: 'TH-EST-0828', match: true }
+            ]
+        },
+        'REG-2026-00098': { status: 'na', rows: [] }
+    };
+
 document.addEventListener('DOMContentLoaded', function () {
     function filterRows() {
         var keyword = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
@@ -59,6 +188,168 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('filterKeyword').addEventListener('keydown', function (e) { if (e.key === 'Enter') filterRows(); });
     document.getElementById('filterStatus').addEventListener('change', filterRows);
     document.getElementById('filterRole').addEventListener('change', filterRows);
+
+    // Detail button (ข้อมูลผู้ประกอบการ — 2.14(1))
+    // POA mock count map (2.14(3))
+    var poaCountMap = {
+        'REG-2026-00101': 2,
+        'REG-2026-00102': 0,
+        'REG-2026-00103': 0,
+        'REG-2026-00104': 1,
+        'REG-2026-00099': 2,
+        'REG-2026-00098': 0
+    };
+    document.querySelectorAll('.btn-view-detail').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var rowId = this.dataset.row;
+            var row = document.querySelector('#regTableBody tr[data-req-no="' + rowId + '"]');
+            if (!row) return;
+
+            var complete   = row.dataset.complete === 'true';
+            var companyTH  = row.dataset.companyTh || '';
+            var companyEN  = row.dataset.companyEn || '';
+            var addressTH  = row.dataset.addressTh || '';
+            var addressEN  = row.dataset.addressEn || '';
+            var taxId      = row.dataset.taxId || '';
+            var branchNo   = row.dataset.branchNo || '';
+            var phoneCC    = row.dataset.phoneCC || '+66';
+            var phone      = row.dataset.phone || '';
+            var faxCC      = row.dataset.faxCC || '+66';
+            var fax        = row.dataset.fax || '';
+
+            // Header
+            document.getElementById('dModalReqNo').textContent = row.dataset.reqNo;
+
+            // Badge completeness
+            var badgeEl = document.getElementById('dBadgeComplete');
+            if (complete) {
+                badgeEl.innerHTML = '<span class="badge bg-success px-3 py-2"><i class="ri ri-checkbox-circle-line me-1"></i>ข้อมูลผู้ประกอบการครบถ้วน ✅ — พร้อมนำส่งสู่ระบบออกใบรับรอง</span>';
+            } else {
+                badgeEl.innerHTML = '<span class="badge bg-label-warning px-3 py-2"><i class="ri ri-error-warning-line me-1"></i>ข้อมูลผู้ประกอบการไม่ครบถ้วน ⚠️ — กรุณาตรวจสอบก่อนอนุมัติ</span>';
+            }
+
+            // Tab badge
+            var tabBadge = document.getElementById('dTabExporterBadge');
+            tabBadge.innerHTML = complete
+                ? '<span class="badge bg-success" style="font-size:0.6rem;">✅</span>'
+                : '<span class="badge bg-warning" style="font-size:0.6rem;">⚠️</span>';
+
+            // Tab 1: user info
+            document.getElementById('dReqNo').textContent     = row.dataset.reqNo;
+            document.getElementById('dFullName').textContent   = row.dataset.fullName;
+            document.getElementById('dEmail').textContent      = row.dataset.email;
+            document.getElementById('dOrg').textContent        = row.dataset.org;
+            document.getElementById('dRole').textContent       = row.dataset.orgRole;
+            document.getElementById('dSubmitted').textContent  = row.dataset.submitted;
+
+            // Tab 2: exporter info
+            document.getElementById('dCompanyTH').textContent  = companyTH  || '— ยังไม่ระบุ —';
+            document.getElementById('dCompanyEN').textContent  = companyEN  || '— Not provided —';
+            document.getElementById('dAddressTH').textContent  = addressTH  || '— ยังไม่ระบุ —';
+            document.getElementById('dAddressEN').textContent  = addressEN  || '— Not provided —';
+            document.getElementById('dTaxId').textContent      = taxId      || '— ยังไม่ระบุ —';
+            document.getElementById('dBranchNo').textContent   = branchNo   || '— ยังไม่ระบุ —';
+            document.getElementById('dPhoneCC').textContent    = phoneCC;
+            document.getElementById('dPhone').textContent      = phone      || '— ยังไม่ระบุ —';
+            document.getElementById('dFaxCC').textContent      = faxCC;
+            document.getElementById('dFax').textContent        = fax        || '— ยังไม่ระบุ —';
+
+            // Missing fields
+            var missing = [];
+            if (!companyEN)  missing.push('ชื่อบริษัท (EN)');
+            if (!addressTH)  missing.push('ที่อยู่ (ไทย)');
+            if (!addressEN)  missing.push('ที่อยู่ (EN)');
+            if (!taxId)      missing.push('เลขผู้เสียภาษี');
+            if (!branchNo)   missing.push('ลำดับสาขา');
+            if (!phone)      missing.push('โทรศัพท์');
+
+            var alertEl = document.getElementById('dMissingAlert');
+            if (missing.length > 0 && !complete) {
+                alertEl.classList.remove('d-none');
+                document.getElementById('dMissingList').textContent = missing.join(', ');
+            } else {
+                alertEl.classList.add('d-none');
+            }
+
+            // Tab badge POA (2.14(3))
+            var poaCount = poaCountMap[row.dataset.reqNo] || 0;
+            var tabPoaBadge = document.getElementById('dTabPoaBadge');
+            tabPoaBadge.innerHTML = poaCount > 0
+                ? '<span class="badge bg-primary" style="font-size:0.6rem;">' + poaCount + '</span>'
+                : '<span class="badge bg-label-secondary" style="font-size:0.6rem;">0</span>';
+            // POA summary badge
+            var poaSummary = document.getElementById('dPoaSummaryBadge');
+            if (poaSummary) {
+                poaSummary.innerHTML = poaCount > 0
+                    ? '<span class="badge bg-label-primary px-3 py-2"><i class="ri ri-user-shared-line me-1"></i>มีผู้รับมอบอำนาจ ' + poaCount + ' คน</span>'
+                    : '<span class="badge bg-label-secondary px-3 py-2"><i class="ri ri-user-shared-line me-1"></i>ยังไม่มีผู้รับมอบอำนาจ</span>';
+            }
+
+            // DOF Check Tab (2.14(4))
+            var dofData  = dofCheckMap[row.dataset.reqNo] || { status: 'na', rows: [] };
+            var dofStatus = dofData.status;
+
+            // Reset visibility
+            ['dDofMismatchAlert','dDofIncompleteAlert','dDofNaAlert','dDofCheckTableWrap'].forEach(function(id){
+                document.getElementById(id).classList.add('d-none');
+            });
+
+            // Tab badge
+            var dofBadge = document.getElementById('dTabDofBadge');
+            var approveBtn = document.getElementById('dBtnApprove');
+            if (dofStatus === 'pass') {
+                dofBadge.innerHTML = '<span class="badge bg-success" style="font-size:0.6rem;">✅</span>';
+                approveBtn.disabled = false;
+            } else if (dofStatus === 'mismatch') {
+                dofBadge.innerHTML = '<span class="badge bg-danger" style="font-size:0.6rem;">❌</span>';
+                approveBtn.disabled = true;
+                approveBtn.title = 'ไม่สามารถอนุมัติได้ — ข้อมูลไม่ตรง DOF List';
+                document.getElementById('dDofMismatchAlert').classList.remove('d-none');
+            } else if (dofStatus === 'incomplete') {
+                dofBadge.innerHTML = '<span class="badge bg-warning" style="font-size:0.6rem;">⚠️</span>';
+                approveBtn.disabled = true;
+                approveBtn.title = 'ไม่สามารถอนุมัติได้ — ข้อมูลไม่ครบสำหรับตรวจสอบ DOF List';
+                document.getElementById('dDofIncompleteAlert').classList.remove('d-none');
+            } else {
+                dofBadge.innerHTML = '<span class="badge bg-label-secondary" style="font-size:0.6rem;">N/A</span>';
+                approveBtn.disabled = false;
+                document.getElementById('dDofNaAlert').classList.remove('d-none');
+            }
+
+            // Comparison table
+            var checkBadge = document.getElementById('dDofCheckBadge');
+            if (dofStatus === 'pass') {
+                checkBadge.innerHTML = '<span class="badge bg-success px-3 py-2 fs-6"><i class="ri ri-checkbox-circle-line me-1"></i>ตรวจสอบ DOF List ✅ — ข้อมูลตรงกันทุกรายการ</span>';
+            } else if (dofStatus === 'na') {
+                checkBadge.innerHTML = '<span class="badge bg-label-secondary px-3 py-2"><i class="ri ri-subtract-line me-1"></i>ไม่ใช้งาน DOF List สำหรับผู้ใช้ประเภทนี้</span>';
+            } else if (dofStatus === 'mismatch') {
+                checkBadge.innerHTML = '<span class="badge bg-danger px-3 py-2 fs-6"><i class="ri ri-error-warning-line me-1"></i>ข้อมูลไม่ตรง DOF List ❌ — ไม่สามารถอนุมัติได้</span>';
+            } else {
+                checkBadge.innerHTML = '<span class="badge bg-warning px-3 py-2"><i class="ri ri-error-warning-line me-1"></i>ข้อมูลไม่ครบ ⚠️ — ตรวจสอบ DOF List ไม่ได้ครบทุกรายการ</span>';
+            }
+
+            if (dofData.rows && dofData.rows.length > 0) {
+                document.getElementById('dDofCheckTableWrap').classList.remove('d-none');
+                var tbody = document.getElementById('dDofCheckTableBody');
+                tbody.innerHTML = '';
+                dofData.rows.forEach(function(r) {
+                    var rowClass = r.match ? '' : 'table-danger';
+                    var resultBadge = r.match
+                        ? '<span class="badge bg-label-success">ตรงกัน ✅</span>'
+                        : '<span class="badge bg-danger">ไม่ตรง ❌</span>';
+                    var systemCellClass = r.match ? '' : 'text-danger fw-semibold';
+                    tbody.innerHTML += '<tr class="' + rowClass + '">'
+                        + '<td class="fw-semibold text-muted">' + r.label + '</td>'
+                        + '<td class="' + systemCellClass + '">' + r.system + '</td>'
+                        + '<td>' + r.dof + '</td>'
+                        + '<td class="text-center">' + resultBadge + '</td>'
+                        + '</tr>';
+                });
+            }
+
+            new bootstrap.Modal(document.getElementById('detailRegModal')).show();
+        });
+    });
 
     // Approve button — open approval modal
     document.querySelectorAll('.btn-approve-reg').forEach(function (btn) {
@@ -179,6 +470,21 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         </div>
     </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-@(dataCompleteCount == pendingRegistrations.Length ? "success" : "warning") border-2">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@dataCompleteCount/@pendingRegistrations.Length</h5>
+                        <small>ข้อมูลผู้ประกอบการครบถ้วน</small>
+                    </div>
+                    <span class="badge bg-label-@(dataCompleteCount == pendingRegistrations.Length ? "success" : "warning") rounded-circle p-2">
+                        <i class="icon-base ri ri-building-2-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Filter Card -->
@@ -250,15 +556,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     <th>องค์กร / หน่วยงาน</th>
                     <th>บทบาทที่ขอ</th>
                     <th>สังกัดที่ขอ</th>
-                    <th>วันที่ยื่น</th>
-                    <th>สถานะ</th>
+                    <th>วันที่ยื่น</th>                    <th>ข้อมูลผู้ประกอบการ</th>                    <th>สถานะ</th>
                     <th style="width:120px"></th>
                 </tr>
             </thead>
             <tbody id="regTableBody">
                 @foreach (var r in pendingRegistrations)
                 {
-                    <tr data-id="@r.ReqNo" data-status="@r.StatusText" data-role="@r.RequestedRole" data-search-text="@r.FullName.ToLower() @r.Email.ToLower() @r.Organization.ToLower()">
+                    <tr data-id="@r.ReqNo" data-status="@r.StatusText" data-role="@r.RequestedRole" data-search-text="@r.FullName.ToLower() @r.Email.ToLower() @r.Organization.ToLower()"
+                        data-req-no="@r.ReqNo" data-full-name="@r.FullName" data-email="@r.Email"
+                        data-org="@r.Organization" data-org-role="@r.RequestedRole" data-agency="@r.RequestedAgency"
+                        data-submitted="@r.SubmittedAt.ToString("dd/MM/yyyy HH:mm")"
+                        data-company-th="@r.CompanyNameTH" data-company-en="@r.CompanyNameEN"
+                        data-address-th="@r.AddressTH" data-address-en="@r.AddressEN"
+                        data-tax-id="@r.TaxId" data-branch-no="@r.BranchNo"
+                        data-phone-cc="@r.PhoneCC" data-phone="@r.Phone"
+                        data-fax-cc="@r.FaxCC" data-fax="@r.Fax"
+                        data-complete="@r.DataComplete.ToString().ToLower()">
                         <td class="text-center text-muted">@r.RowNo</td>
                         <td><span class="fw-semibold text-primary">@r.ReqNo</span></td>
                         <td>@r.FullName</td>
@@ -284,10 +598,26 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         </td>
                         <td>@r.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="text-center">
+                            @if (r.DataComplete)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="ri ri-checkbox-circle-line me-1"></i>ข้อมูลครบถ้วน ✅
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-warning">
+                                    <i class="ri ri-error-warning-line me-1"></i>ข้อมูลไม่ครบ ⚠️
+                                </span>
+                            }
+                        </td>
                         <td class="text-center"><span class="badge rounded-pill @r.StatusClass">@r.StatusText</span></td>
                         <td class="text-center">
                             <div class="d-flex gap-1 justify-content-center">
-                                <button class="btn btn-icon btn-sm btn-outline-info" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                <button class="btn btn-icon btn-sm btn-outline-info btn-view-detail"
+                                        data-row="@r.ReqNo"
+                                        data-bs-toggle="tooltip" title="ดูรายละเอียด (ข้อมูลผู้ประกอบการ)">
                                     <i class="ri ri-eye-line text-info"></i>
                                 </button>
                                 @if (r.StatusText == "รอตรวจสอบ")
@@ -310,10 +640,564 @@ document.addEventListener('DOMContentLoaded', function () {
                     </tr>
                 }
                 <tr id="regTableEmpty" class="d-none">
-                    <td colspan="10" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="11" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- ======================================================
+     Modal: รายละเอียดผู้ลงทะเบียน + ข้อมูลผู้ประกอบการ (TOR 2.14(1))
+     ====================================================== -->
+<div class="modal fade" id="detailRegModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-file-user-line me-2"></i>
+                    รายละเอียดคำขอลงทะเบียน — <span id="dModalReqNo">-</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pb-2">
+                <!-- completeness badge -->
+                <div id="dBadgeComplete" class="mb-3"></div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs mb-4" id="detailTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-user-info" data-bs-toggle="tab" data-bs-target="#pane-user-info" type="button" role="tab">
+                            <i class="ri ri-user-line me-1"></i>ข้อมูลผู้ใช้
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-exporter" data-bs-toggle="tab" data-bs-target="#pane-exporter" type="button" role="tab">
+                            <i class="ri ri-building-2-line me-1"></i>ข้อมูลผู้ประกอบการ (Exporter)
+                            <span id="dTabExporterBadge" class="ms-1"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-poa" data-bs-toggle="tab" data-bs-target="#pane-poa" type="button" role="tab">
+                            <i class="ri ri-user-shared-line me-1"></i>ผู้รับมอบอำนาจ
+                            <span id="dTabPoaBadge" class="ms-1"></span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-dof-check" data-bs-toggle="tab" data-bs-target="#pane-dof-check" type="button" role="tab">
+                            <i class="ri ri-search-eye-line me-1"></i>ตรวจสอบ DOF List
+                            <span id="dTabDofBadge" class="ms-1"></span>
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Tab 1: ข้อมูลผู้ใช้ -->
+                    <div class="tab-pane fade show active" id="pane-user-info" role="tabpanel">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted small">เลขที่คำขอ</label>
+                                <div class="fw-semibold text-primary" id="dReqNo">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted small">ชื่อ-สกุล</label>
+                                <div id="dFullName">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted small">อีเมล</label>
+                                <div id="dEmail">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted small">องค์กร / หน่วยงาน</label>
+                                <div id="dOrg">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted small">บทบาทที่ขอ</label>
+                                <div id="dRole">-</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted small">วันที่ยื่นคำขอ</label>
+                                <div id="dSubmitted">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: ข้อมูลผู้ประกอบการ (Exporter) — TOR 2.14(1) -->
+                    <div class="tab-pane fade" id="pane-exporter" role="tabpanel">
+                        <div class="alert alert-info border-0 py-2 mb-4 small">
+                            <i class="ri ri-information-line me-1"></i>
+                            <strong>2.14(1)</strong> ข้อมูลนี้จะถูกนำส่งสู่ระบบออกใบรับรองสัตว์น้ำโดยอัตโนมัติหลังอนุมัติการลงทะเบียน
+                        </div>
+
+                        <!-- ชื่อบริษัท TH/EN -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    ชื่อบริษัท / ผู้ประกอบการ <span class="text-muted">(ไทย)</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div id="dCompanyTH" class="form-control-plaintext border rounded px-3 py-2 bg-light">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Company Name <span class="text-muted">(English)</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div id="dCompanyEN" class="form-control-plaintext border rounded px-3 py-2 bg-light">-</div>
+                            </div>
+                        </div>
+
+                        <!-- ที่อยู่ TH/EN -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    ที่อยู่ <span class="text-muted">(ไทย)</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div id="dAddressTH" class="form-control-plaintext border rounded px-3 py-2 bg-light" style="min-height:56px;white-space:pre-wrap;">-</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    Address <span class="text-muted">(English)</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div id="dAddressEN" class="form-control-plaintext border rounded px-3 py-2 bg-light" style="min-height:56px;white-space:pre-wrap;">-</div>
+                            </div>
+                        </div>
+
+                        <!-- เลขผู้เสียภาษี + ลำดับสาขา -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    เลขประจำตัวผู้เสียภาษีอากร <span class="text-danger">*</span>
+                                </label>
+                                <div id="dTaxId" class="form-control-plaintext border rounded px-3 py-2 bg-light font-monospace">-</div>
+                                <div class="form-text">13 หลัก (นิติบุคคล)</div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">
+                                    ลำดับสาขา <span class="text-danger">*</span>
+                                </label>
+                                <div id="dBranchNo" class="form-control-plaintext border rounded px-3 py-2 bg-light font-monospace">-</div>
+                                <div class="form-text">5 หลัก (00000 = สำนักงานใหญ่)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert border-0 py-2 bg-label-secondary small mt-4">
+                                    <i class="ri ri-information-line me-1"></i>
+                                    สำนักงานใหญ่ = 00000 &nbsp;|&nbsp; สาขา 1 = 00001 &nbsp;|&nbsp; สาขา 2 = 00002
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- โทรศัพท์ + โทรสาร (พร้อมรหัสประเทศ) -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    โทรศัพท์ (พร้อมรหัสประเทศ) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light fw-semibold" id="dPhoneCC" style="min-width:70px;">+66</span>
+                                    <div id="dPhone" class="form-control bg-light py-2 px-3">-</div>
+                                </div>
+                                <div class="form-text">รหัสประเทศ + เบอร์โทรศัพท์ (เช่น +66 02-123-4567)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    โทรสาร / Fax (พร้อมรหัสประเทศ)
+                                    <span class="text-muted">(ถ้ามี)</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light fw-semibold" id="dFaxCC" style="min-width:70px;">+66</span>
+                                    <div id="dFax" class="form-control bg-light py-2 px-3">-</div>
+                                </div>
+                                <div class="form-text">รหัสประเทศ + หมายเลขโทรสาร</div>
+                            </div>
+                        </div>
+
+                        <!-- Missing fields alert -->
+                        <div id="dMissingAlert" class="d-none">
+                            <div class="alert alert-warning border-0 py-2 small">
+                                <i class="ri ri-error-warning-line me-1"></i>
+                                <strong>ข้อมูลไม่ครบถ้วน</strong> — ฟิลด์ที่ยังขาด:
+                                <span id="dMissingList" class="fw-semibold text-danger"></span>
+                                <br/>เจ้าหน้าที่ควรติดต่อผู้ประกอบการเพื่อขอข้อมูลเพิ่มเติมก่อนอนุมัติ
+                            </div>
+                        </div>
+
+                        <!-- Edit hint -->
+                        <div class="alert alert-secondary border-0 py-2 mt-3 small">
+                            <i class="ri ri-edit-line me-1"></i>
+                            <strong>หมายเหตุ:</strong> เจ้าหน้าที่สามารถแก้ไขข้อมูลผู้ประกอบการได้ใน Admin &gt; จัดการผู้ใช้
+                            หลังอนุมัติการลงทะเบียนแล้ว &nbsp;|&nbsp;
+                            ข้อมูลจะถูกนำส่งสู่ระบบออกใบรับรองโดยอัตโนมัติ
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: ผู้รับมอบอำนาจ — TOR 2.14(3) -->
+                    <div class="tab-pane fade" id="pane-poa" role="tabpanel">
+                        <div class="alert alert-info border-0 py-2 mb-3 small">
+                            <i class="ri ri-information-line me-1"></i>
+                            <strong>2.14(3)</strong> ผู้รับมอบอำนาจ (นิติบุคคลและบุคคลธรรมดา)
+                            สามารถดำเนินการแทนผู้มอบอำนาจได้ทั้งหมดในระบบออกใบรับรองสัตว์น้ำ
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div id="dPoaSummaryBadge"></div>
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                    onclick="document.getElementById('addPoaModal').querySelector('.modal-title').textContent='เพิ่มผู้รับมอบอำนาจ'; new bootstrap.Modal(document.getElementById('addPoaModal')).show();">
+                                <i class="ri ri-user-add-line me-1"></i>เพิ่มผู้รับมอบอำนาจ
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0" style="font-size:0.82rem;">
+                                <thead class="text-center table-light">
+                                    <tr>
+                                        <th style="width:40px;">#</th>
+                                        <th>ประเภท</th>
+                                        <th>ชื่อ-สกุล / ชื่อนิติบุคคล</th>
+                                        <th>เลขบัตร / ทะเบียนนิติบุคคล</th>
+                                        <th>สิทธิ์ที่มอบ</th>
+                                        <th>วันที่มอบ</th>
+                                        <th>วันหมดอายุ</th>
+                                        <th>สถานะ</th>
+                                        <th style="width:80px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dPoaTableBody">
+                                    <tr>
+                                        <td class="text-center text-muted">1</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-label-primary">นิติบุคคล</span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">บริษัท ทริปเปิล ซี ลอจิสติกส์ จำกัด</div>
+                                            <div class="text-muted small fst-italic">Triple C Logistics Co., Ltd.</div>
+                                        </td>
+                                        <td class="font-monospace text-center">0105564012888</td>
+                                        <td>
+                                            <span class="badge bg-label-success me-1" style="font-size:0.65rem;">ยื่นคำขอ</span>
+                                            <span class="badge bg-label-success me-1" style="font-size:0.65rem;">ลงนาม</span>
+                                            <span class="badge bg-label-success me-1" style="font-size:0.65rem;">รับใบรับรอง</span>
+                                        </td>
+                                        <td class="text-center">01/01/2569</td>
+                                        <td class="text-center">31/12/2569</td>
+                                        <td class="text-center"><span class="badge bg-label-success rounded-pill">ใช้งาน</span></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-icon btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="แก้ไข"
+                                                    onclick="new bootstrap.Modal(document.getElementById('addPoaModal')).show();">
+                                                <i class="ri ri-pencil-line text-warning"></i>
+                                            </button>
+                                            <button class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="ถอนมอบอำนาจ"
+                                                    onclick="alert('// TODO: ถอนมอบอำนาจ')">
+                                                <i class="ri ri-user-unfollow-line text-danger"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center text-muted">2</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-label-warning">บุคคลธรรมดา</span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">นายสมชาย รับมอบ</div>
+                                            <div class="text-muted small fst-italic">Mr. Somchai Rabmob</div>
+                                        </td>
+                                        <td class="font-monospace text-center">1-1019-00123-45-6</td>
+                                        <td>
+                                            <span class="badge bg-label-success me-1" style="font-size:0.65rem;">ยื่นคำขอ</span>
+                                            <span class="badge bg-label-secondary me-1" style="font-size:0.65rem;">รับใบรับรอง</span>
+                                        </td>
+                                        <td class="text-center">15/04/2569</td>
+                                        <td class="text-center">14/04/2570</td>
+                                        <td class="text-center"><span class="badge bg-label-success rounded-pill">ใช้งาน</span></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-icon btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="แก้ไข"
+                                                    onclick="new bootstrap.Modal(document.getElementById('addPoaModal')).show();">
+                                                <i class="ri ri-pencil-line text-warning"></i>
+                                            </button>
+                                            <button class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="ถอนมอบอำนาจ"
+                                                    onclick="alert('// TODO: ถอนมอบอำนาจ')">
+                                                <i class="ri ri-user-unfollow-line text-danger"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="alert alert-secondary border-0 py-2 mt-3 small">
+                            <i class="ri ri-shield-user-line me-1"></i>
+                            <strong>หมายเหตุ:</strong> ผู้รับมอบอำนาจสามารถดำเนินการแทนผู้มอบอำนาจได้ตามสิทธิ์ที่กำหนด
+                            ในระบบออกใบรับรองสัตว์น้ำ — ต้องมีหนังสือมอบอำนาจที่ถูกต้องตามกฎหมาย
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: ตรวจสอบ DOF List อัตโนมัติ — TOR 2.14(4) -->
+                    <div class="tab-pane fade" id="pane-dof-check" role="tabpanel">
+                        <div class="alert alert-info border-0 py-2 mb-3 small">
+                            <i class="ri ri-information-line me-1"></i>
+                            <strong>2.14(4)</strong> ระบบตรวจสอบข้อมูลผู้ประกอบการกับ <strong>DOF List</strong> (ทะเบียนสถานประกอบการ) อัตโนมัติ
+                            — หากพบข้อมูลไม่สอดคล้อง <strong>จะไม่สามารถบันทึก/อนุมัติ</strong> ได้จนกว่าจะแก้ไข
+                        </div>
+
+                        <!-- Badge ผลการตรวจสอบ -->
+                        <div id="dDofCheckBadge" class="mb-3"></div>
+
+                        <!-- ตารางเปรียบเทียบ -->
+                        <div id="dDofCheckTableWrap" class="table-responsive mb-3 d-none">
+                            <table class="table table-bordered align-middle mb-0" style="font-size:0.82rem;">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th style="width:180px;">รายการ</th>
+                                        <th>ข้อมูลที่ผู้ประกอบการกรอก</th>
+                                        <th>DOF List (ข้อมูลจริง)</th>
+                                        <th style="width:90px;">ผลตรวจสอบ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dDofCheckTableBody">
+                                    <!-- populate by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- alert block (เมื่อ mismatch) -->
+                        <div id="dDofMismatchAlert" class="d-none">
+                            <div class="alert alert-danger border-0 py-3 mb-3">
+                                <div class="d-flex align-items-start gap-2">
+                                    <i class="ri ri-forbid-line fs-5 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <div class="fw-semibold mb-1">🚫 พบข้อมูลไม่สอดคล้องกับ DOF List</div>
+                                        <div class="small mb-2">ไม่สามารถบันทึก/อนุมัติคำขอลงทะเบียนนี้ได้จนกว่าข้อมูลจะถูกแก้ไขให้ตรงกับ DOF List</div>
+                                        <div class="fw-semibold small">ขั้นตอนการแก้ไข:</div>
+                                        <ol class="small mb-0 ps-3">
+                                            <li>ผู้ประกอบการติดต่อ <strong>หน่วยงานที่ลงทะเบียน</strong> (กตส./ศตส.) เพื่อแก้ไขข้อมูลให้ตรงกับ DOF List</li>
+                                            <li>แก้ไขข้อมูลในระบบลงทะเบียนให้ตรงกับ DOF List</li>
+                                            <li>ระบบจะตรวจสอบอีกครั้งโดยอัตโนมัติ</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-secondary border-0 py-2 small">
+                                <i class="ri ri-phone-line me-1"></i>
+                                <strong>ติดต่อหน่วยงาน:</strong>
+                                กองตรวจสอบสินค้าประมง (กตส.) โทร. 0-2562-0600 ต่อ 3501 &nbsp;|&nbsp;
+                                หรือ ศูนย์ตรวจสอบสินค้าประมง (ศตส.) ในพื้นที่
+                            </div>
+                        </div>
+
+                        <!-- alert warning (ข้อมูลไม่ครบ ตรวจสอบไม่ได้ทั้งหมด) -->
+                        <div id="dDofIncompleteAlert" class="d-none">
+                            <div class="alert alert-warning border-0 py-2 small">
+                                <i class="ri ri-error-warning-line me-1"></i>
+                                <strong>ข้อมูลผู้ประกอบการไม่ครบถ้วน</strong>
+                                — ไม่สามารถตรวจสอบ DOF List ได้ครบทุกรายการ
+                                กรุณาเติมข้อมูลที่ขาดใน <strong>Tab ข้อมูลผู้ประกอบการ</strong> ก่อน
+                            </div>
+                        </div>
+
+                        <!-- N/A: เจ้าหน้าที่ -->
+                        <div id="dDofNaAlert" class="d-none">
+                            <div class="alert alert-secondary border-0 py-2 small">
+                                <i class="ri ri-user-settings-line me-1"></i>
+                                <strong>ไม่ต้องตรวจสอบ DOF List</strong>
+                                — ผู้ลงทะเบียนเป็น <strong>เจ้าหน้าที่รัฐ</strong> ไม่ใช่ผู้ประกอบการส่งออก
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /tab-content -->
+            </div><!-- /modal-body -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-primary btn-from-detail" id="dBtnApprove"
+                        onclick="alert('// TODO: เปิด modal อนุมัติสำหรับคำขอนี้')">
+                    <i class="ri ri-check-line me-1"></i>ดำเนินการอนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================
+     Modal: เพิ่ม/แก้ไขผู้รับมอบอำนาจ (TOR 2.14(3))
+     ====================================================== -->
+<div class="modal fade" id="addPoaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-user-shared-line me-2"></i>
+                    <span>เพิ่มผู้รับมอบอำนาจ</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info border-0 py-2 mb-4 small">
+                    <i class="ri ri-information-line me-1"></i>
+                    <strong>TOR 2.14(3)</strong> ผู้รับมอบอำนาจสามารถดำเนินการแทนผู้มอบอำนาจได้ทั้งหมดในระบบออกใบรับรองสัตว์น้ำ
+                    ตามสิทธิ์ที่กำหนดในหนังสือมอบอำนาจ
+                </div>
+
+                <!-- ประเภทผู้รับมอบอำนาจ -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">ประเภทผู้รับมอบอำนาจ <span class="text-danger">*</span></label>
+                    <div class="d-flex gap-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="poaType" id="poaTypeJuristic" value="juristic" checked
+                                   onchange="document.getElementById('poaJuristicFields').classList.remove('d-none'); document.getElementById('poaNaturalFields').classList.add('d-none');">
+                            <label class="form-check-label fw-semibold" for="poaTypeJuristic">
+                                <i class="ri ri-building-2-line me-1 text-primary"></i>นิติบุคคล
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="poaType" id="poaTypeNatural" value="natural"
+                                   onchange="document.getElementById('poaJuristicFields').classList.add('d-none'); document.getElementById('poaNaturalFields').classList.remove('d-none');">
+                            <label class="form-check-label fw-semibold" for="poaTypeNatural">
+                                <i class="ri ri-user-line me-1 text-warning"></i>บุคคลธรรมดา
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ฟิลด์นิติบุคคล -->
+                <div id="poaJuristicFields">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">ชื่อนิติบุคคล (ไทย) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="ชื่อบริษัท / ห้างหุ้นส่วน (ไทย)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Company Name (EN) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="Company / Partnership Name (English)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">เลขทะเบียนนิติบุคคล <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control font-monospace" placeholder="0105564012345" maxlength="13" />
+                            <div class="form-text">13 หลัก (กรมพัฒนาธุรกิจการค้า)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">ชื่อผู้แทนนิติบุคคล (ผู้ลงนาม)</label>
+                            <input type="text" class="form-control" placeholder="ชื่อ-สกุล กรรมการผู้มีอำนาจ" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ฟิลด์บุคคลธรรมดา -->
+                <div id="poaNaturalFields" class="d-none">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">ชื่อ-สกุล (ไทย) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="ชื่อ-สกุล (ภาษาไทย)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Full Name (EN) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" placeholder="First-Last Name (English)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">เลขบัตรประชาชน <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control font-monospace" placeholder="1-XXXX-XXXXX-XX-X" maxlength="17" />
+                            <div class="form-text">13 หลัก (รูปแบบ: 1-2345-67890-12-3)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">ความสัมพันธ์กับผู้มอบอำนาจ</label>
+                            <input type="text" class="form-control" placeholder="เช่น พนักงานบริษัท / ตัวแทนการค้า" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- สิทธิ์ที่มอบ -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">สิทธิ์ที่มอบ <span class="text-danger">*</span></label>
+                    <div class="row g-2">
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="poaPermSubmit" checked>
+                                <label class="form-check-label" for="poaPermSubmit">
+                                    <i class="ri ri-file-add-line me-1 text-primary"></i>ยื่นคำขอใบรับรอง
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="poaPermSign" checked>
+                                <label class="form-check-label" for="poaPermSign">
+                                    <i class="ri ri-pen-nib-line me-1 text-success"></i>ลงนามคำขอ
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="poaPermReceive" checked>
+                                <label class="form-check-label" for="poaPermReceive">
+                                    <i class="ri ri-inbox-line me-1 text-warning"></i>รับใบรับรอง
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="poaPermEdit">
+                                <label class="form-check-label" for="poaPermEdit">
+                                    <i class="ri ri-edit-line me-1 text-danger"></i>แก้ไขข้อมูล
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text mt-1">
+                        <i class="ri ri-information-line me-1"></i>
+                        สิทธิ์ทั้งหมด = ดำเนินการแทนผู้มอบอำนาจได้ทุกกระบวนการในระบบออกใบรับรอง
+                    </div>
+                </div>
+
+                <!-- ช่วงวันที่มอบอำนาจ -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">วันที่เริ่มมอบอำนาจ <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="28/04/2569" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">วันที่สิ้นสุดมอบอำนาจ <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="DD/MM/YYYY (พ.ศ.)" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">สถานะ</label>
+                        <select class="form-select">
+                            <option value="active" selected>ใช้งาน</option>
+                            <option value="inactive">ระงับ</option>
+                            <option value="expired">หมดอายุ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- อัปโหลดหนังสือมอบอำนาจ -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        แนบหนังสือมอบอำนาจ <span class="text-danger">*</span>
+                        <span class="badge bg-label-secondary ms-1" style="font-size:0.65rem;">PDF / JPG / PNG ≤ 10 MB</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="ri ri-upload-2-line"></i>
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        // TODO: หนังสือมอบอำนาจจะถูกตรวจสอบโดยเจ้าหน้าที่ก่อนอนุมัติสิทธิ์
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        onclick="alert('// TODO: บันทึกผู้รับมอบอำนาจ')">
+                    <i class="ri ri-save-line me-1"></i>บันทึกผู้รับมอบอำนาจ
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 

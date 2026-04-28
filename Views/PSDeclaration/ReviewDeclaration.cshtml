@@ -349,6 +349,226 @@
                         </div>
                     </div>
                     <!-- /accordion ส่วนเนื้อหา -->
+
+                    <!-- ==================== Section: ส่งออกและตรวจปล่อย (2.4(30)/(31)) ==================== -->
+                    <div class="card border mt-4" id="sectionExportInspection">
+                        <div class="card-header py-2 d-flex align-items-center gap-2 flex-wrap" style="background:#f4f6fb;">
+                            <i class="ri ri-ship-2-line text-primary"></i>
+                            <span class="fw-semibold">ส่งออกและตรวจปล่อย</span>
+                            <!-- 2.4(30): ข้อมูลตรวจปล่อยจากด่านฯ รับแล้ว -->
+                            <span class="badge bg-label-info ms-2" id="badgeReceivedFromPort">
+                                <i class="ri ri-download-cloud-2-line me-1"></i>ข้อมูลตรวจปล่อยจากด่านฯ รับแล้ว ✅
+                            </span>
+                            <!-- 2.4(31): ส่งข้อมูลใบรับรองไปด่านตรวจปล่อยแล้ว -->
+                            <span class="badge bg-label-success ms-1" id="badgeSentToInspection">
+                                <i class="ri ri-checkbox-circle-line me-1"></i>ส่งข้อมูลใบรับรองไปด่านตรวจปล่อยแล้ว ✅
+                            </span>
+                        </div>
+                        <div class="card-body" style="font-size:.85rem;">
+                            <div class="row g-3">
+
+                                <!-- เลขที่ใบรับรอง -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">เลขที่ใบรับรอง (ออกอัตโนมัติ)</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control bg-light"
+                                            value="NMD-2569-00847" readonly />
+                                        <span class="input-group-text bg-success text-white">
+                                            <i class="ri ri-award-line"></i>
+                                        </span>
+                                    </div>
+                                    <div class="form-text text-success">
+                                        <i class="ri ri-checkbox-circle-fill me-1"></i>ออกเลขที่อัตโนมัติแล้วเมื่อ 25/04/2569
+                                    </div>
+                                </div>
+
+                                <!-- วันที่ส่งออก -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">วันที่ส่งออก (Export Date)</label>
+                                    <input type="text" class="form-control form-control-sm bg-light"
+                                        value="28/04/2569" readonly />
+                                </div>
+
+                                <!-- ด่านตรวจ -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">ด่านตรวจปล่อย</label>
+                                    <input type="text" class="form-control form-control-sm bg-light"
+                                        value="ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง" readonly />
+                                    <div class="mt-1">
+                                        <a href="#" class="small text-primary fw-semibold">
+                                            <i class="ri ri-external-link-line me-1"></i>ดูสถานะตรวจปล่อย ด่านตรวจประมง →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- สถานะตรวจปล่อย -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">สถานะตรวจปล่อย</label>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="badge bg-label-success px-3 py-2">
+                                            <i class="ri ri-checkbox-circle-fill me-1"></i>ผ่านการตรวจปล่อยแล้ว ✅
+                                        </span>
+                                    </div>
+                                    <div class="small text-muted mt-1">วันที่ตรวจปล่อย: 28/04/2569 เวลา 09:30 น.</div>
+                                </div>
+
+                            </div>
+
+                            <!-- 2.4(30): Panel — ข้อมูลตรวจปล่อยที่ได้รับจากด่านประมง -->
+                            <div class="mt-4 p-3 rounded-3 border border-info-subtle" style="background:linear-gradient(135deg,#e8f7ff 0%,#f0fbff 100%);">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <i class="ri ri-download-cloud-2-line text-info fs-5"></i>
+                                    <span class="fw-semibold text-info-emphasis">ข้อมูลตรวจปล่อยที่ได้รับจากด่านประมง (Pull from Port System)</span>
+                                    <span class="badge bg-info ms-1" style="font-size:.72rem;">
+                                        <i class="ri ri-refresh-line me-1"></i>อัปเดตล่าสุด 28/04/2569 09:30 น.
+                                    </span>
+                                    <button type="button" class="btn btn-outline-info btn-sm ms-auto" id="btnSyncFromPortDecl">
+                                        <i class="ri ri-refresh-line me-1"></i>ดึงข้อมูลใหม่
+                                    </button>
+                                    <button type="button" class="btn btn-info btn-sm text-white"
+                                            data-bs-toggle="modal" data-bs-target="#modalInspectionDetailDecl">
+                                        <i class="ri ri-eye-line me-1"></i>ดูรายละเอียดตรวจปล่อย →
+                                    </button>
+                                </div>
+                                <div class="row g-3" style="font-size:.85rem;">
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">เลขที่ใบรับรอง</div>
+                                        <div class="fw-semibold" style="font-family:monospace;">NMD-2569-00847</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">ด่านตรวจปล่อย</div>
+                                        <div class="fw-semibold">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">เจ้าหน้าที่ด่าน</div>
+                                        <div class="fw-semibold">นางสาวเบญจมาศ ดีงาม</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">วันที่/เวลาตรวจปล่อย</div>
+                                        <div class="fw-semibold text-success">28/04/2569 เวลา 09:30 น.</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">น้ำหนักตรวจปล่อยจริง (กก.)</div>
+                                        <div class="fw-semibold text-primary">22,300.00</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">ผลการตรวจปล่อย</div>
+                                        <div>
+                                            <span class="badge bg-success py-1 px-2">
+                                                <i class="ri ri-checkbox-circle-fill me-1"></i>ผ่านการตรวจปล่อย
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">เลขที่อ้างอิงด่าน</div>
+                                        <div class="fw-semibold" style="font-family:monospace;">PORT-2569-LC-04302</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">หมายเหตุ</div>
+                                        <div class="small">สินค้าตรงตามใบรับรอง ไม่พบสิ่งผิดปกติ</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /Panel ข้อมูลตรวจปล่อย -->
+
+                            <!-- 2.4(31): Panel — ส่งข้อมูลใบรับรองไปยังระบบด่านตรวจปล่อย (Push to Port) -->
+                            <div class="mt-3 p-3 rounded-3 border border-success-subtle" id="panelPushToPortDecl"
+                                 style="background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);">
+                                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                    <i class="ri ri-upload-cloud-2-line text-success fs-5"></i>
+                                    <span class="fw-semibold text-success-emphasis">ส่งข้อมูลใบรับรองไปยังระบบด่านตรวจปล่อย (Push to Port System)</span>
+                                    <span class="badge bg-success ms-1" id="badgePushSentDecl" style="font-size:.75rem;">
+                                        <i class="ri ri-checkbox-circle-fill me-1"></i>ส่งข้อมูลแล้ว ✅ เมื่อ 26/04/2569 10:05 น.
+                                    </span>
+                                    <span class="badge bg-label-warning d-none ms-1" id="badgePushPendingDecl" style="font-size:.75rem;">
+                                        <i class="ri ri-time-line me-1"></i>ยังไม่ได้ส่งข้อมูลไปด่าน
+                                    </span>
+                                    <button type="button" class="btn btn-outline-success btn-sm ms-auto" id="btnResendToPortDecl"
+                                            data-bs-toggle="modal" data-bs-target="#modalSendToPortDecl">
+                                        <i class="ri ri-refresh-line me-1"></i>ส่งข้อมูลอัปเดต
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm d-none ms-auto" id="btnFirstSendToPortDecl"
+                                            data-bs-toggle="modal" data-bs-target="#modalSendToPortDecl">
+                                        <i class="ri ri-send-plane-2-line me-1"></i>ส่งข้อมูลใบรับรองไปด่านตรวจปล่อย
+                                    </button>
+                                    <button type="button" class="btn btn-link btn-sm text-muted p-0 ms-2" id="btnTogglePushDemoDecl"
+                                            title="สลับสถานะ Demo">
+                                        <i class="ri ri-swap-line"></i>Demo
+                                    </button>
+                                </div>
+                                <div class="row g-3" style="font-size:.85rem;">
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">เลขที่ใบรับรอง (ที่ส่ง)</div>
+                                        <div class="fw-semibold" style="font-family:monospace;">NMD-2569-00847</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">ด่านปลายทาง</div>
+                                        <div class="fw-semibold">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">วันที่/เวลาส่งข้อมูล</div>
+                                        <div class="fw-semibold" id="pushSentTimestampDecl">26/04/2569 เวลา 10:05 น.</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">สถานะการรับข้อมูล</div>
+                                        <div>
+                                            <span class="badge bg-label-success py-1 px-2">
+                                                <i class="ri ri-checkbox-circle-fill me-1"></i>ด่านรับข้อมูลแล้ว
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">น้ำหนักตามใบรับรอง (กก.)</div>
+                                        <div class="fw-semibold text-primary">22,300.00</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">วันที่ส่งออก</div>
+                                        <div class="fw-semibold">28/04/2569</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">เลขอ้างอิงการส่ง</div>
+                                        <div class="fw-semibold" style="font-family:monospace;">PUSH-2569-00847-001</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">ส่งโดย</div>
+                                        <div class="fw-semibold">ระบบอัตโนมัติ (เมื่อออกใบรับรอง)</div>
+                                    </div>
+                                </div>
+                                <!-- ประวัติการส่ง -->
+                                <div class="mt-3">
+                                    <div class="small text-muted fw-semibold mb-1">
+                                        <i class="ri ri-history-line me-1"></i>ประวัติการส่งข้อมูล
+                                    </div>
+                                    <table class="table table-bordered table-sm mb-0" style="font-size:.82rem;">
+                                        <thead class="text-center table-light">
+                                            <tr>
+                                                <th style="width:2rem;">#</th>
+                                                <th>วันที่/เวลาส่ง</th>
+                                                <th>เลขอ้างอิง</th>
+                                                <th>ประเภท</th>
+                                                <th>ผลการส่ง</th>
+                                                <th>ส่งโดย</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center text-muted">1</td>
+                                                <td>26/04/2569 10:05 น.</td>
+                                                <td style="font-family:monospace;">PUSH-2569-00847-001</td>
+                                                <td>ส่งอัตโนมัติ (ออกใบรับรอง)</td>
+                                                <td><span class="badge bg-success">ด่านรับแล้ว ✅</span></td>
+                                                <td>ระบบ PS/NMD</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /Panel Push to Port -->
+
+                        </div>
+                    </div>
+                    <!-- /Section ส่งออกและตรวจปล่อย -->
+
                 </div>
                 <!-- /TAB 1 -->
 
@@ -613,9 +833,306 @@
 </div>
 <!-- /Modal ยืนยัน -->
 
+<!-- ==================== Modal: รายละเอียดตรวจปล่อย (2.4(30)) ==================== -->
+<div class="modal fade" id="modalInspectionDetailDecl" tabindex="-1" aria-labelledby="modalInspDetailDeclLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#0dcaf0 0%,#0a94b7 100%);color:#fff;">
+                <h5 class="modal-title" id="modalInspDetailDeclLabel">
+                    <i class="ri ri-shield-check-line me-1"></i>รายละเอียดข้อมูลตรวจปล่อยจากด่านประมง
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:.85rem;">
+                <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-3" role="alert">
+                    <i class="ri ri-download-cloud-2-line fs-5 flex-shrink-0"></i>
+                    <div>
+                        ข้อมูลนี้ได้รับจาก <strong>ระบบตรวจปล่อยด่านประมง (Port Inspection System)</strong>
+                        แบบอัตโนมัติ &nbsp;|&nbsp; อัปเดตล่าสุด: <strong>28/04/2569 09:30 น.</strong>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded bg-light border">
+                    <i class="ri ri-award-line text-primary fs-5"></i>
+                    <div>
+                        <div class="fw-semibold">ใบรับรอง: <span style="font-family:monospace;color:#1a3c6d;">NMD-2569-00847</span></div>
+                        <div class="text-muted small">Non-Manipulation Declaration — บริษัท อินโนเวชั่นส์ โซลูชั่น แอนด์ เซอร์วิส จำกัด</div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-map-pin-line me-1 text-danger"></i>
+                                <span class="fw-semibold small">ข้อมูลด่านตรวจปล่อย</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">ด่านตรวจ</td><td class="fw-semibold">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง</td></tr>
+                                    <tr><td class="text-muted">รหัสด่าน</td><td style="font-family:monospace;">PORT-LC-01</td></tr>
+                                    <tr><td class="text-muted">จังหวัด</td><td>ชลบุรี</td></tr>
+                                    <tr><td class="text-muted">เลขที่อ้างอิงด่าน</td><td style="font-family:monospace;">PORT-2569-LC-04302</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-user-star-line me-1 text-primary"></i>
+                                <span class="fw-semibold small">เจ้าหน้าที่ผู้ตรวจ</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">ชื่อ-นามสกุล</td><td class="fw-semibold">นางสาวเบญจมาศ ดีงาม</td></tr>
+                                    <tr><td class="text-muted">ตำแหน่ง</td><td>เจ้าหน้าที่ด่านตรวจปล่อย</td></tr>
+                                    <tr><td class="text-muted">วันที่ตรวจ</td><td>28/04/2569</td></tr>
+                                    <tr><td class="text-muted">เวลา</td><td class="fw-semibold text-success">09:30 น.</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-scales-3-line me-1 text-warning"></i>
+                                <span class="fw-semibold small">น้ำหนักและปริมาณ</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">น้ำหนักตามใบรับรอง</td><td>22,300.00 กก.</td></tr>
+                                    <tr><td class="text-muted">น้ำหนักตรวจปล่อยจริง</td><td class="fw-semibold text-primary">22,300.00 กก.</td></tr>
+                                    <tr><td class="text-muted">ผลต่าง</td><td class="text-muted">0.00 กก. (ตรงกัน)</td></tr>
+                                    <tr><td class="text-muted">จำนวนหีบห่อ</td><td>2,230 กล่อง</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-truck-line me-1 text-success"></i>
+                                <span class="fw-semibold small">การขนส่งและเรือ</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">ชื่อเรือ / พาหนะ</td><td class="fw-semibold">MV. PACIFIC CARRIER</td></tr>
+                                    <tr><td class="text-muted">เลขที่ตู้สินค้า</td><td style="font-family:monospace;">MSCU7391204</td></tr>
+                                    <tr><td class="text-muted">ท่าเรือต้นทาง</td><td>แหลมฉบัง (THLCH)</td></tr>
+                                    <tr><td class="text-muted">ท่าเรือปลายทาง</td><td>บัวโนสไอเรส (ARBUE)</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded border border-success-subtle" style="background:#f0fdf4;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="ri ri-checkbox-circle-fill text-success fs-4"></i>
+                        <span class="fw-bold text-success fs-6">ผลการตรวจปล่อย: ผ่าน ✅</span>
+                    </div>
+                    <div class="row g-2 small">
+                        <div class="col-md-6">
+                            <span class="text-muted">หมายเหตุจากด่าน:</span>
+                            <span class="ms-1">สินค้าตรงตามใบรับรอง ไม่พบสิ่งผิดปกติ</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted">เลขที่รายงานตรวจปล่อย:</span>
+                            <span class="ms-1 fw-semibold" style="font-family:monospace;">RPT-2569-LC-00432</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-info btn-sm" onclick="window.print()">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์รายละเอียด
+                </button>
+                <button type="button" class="btn btn-info text-white btn-sm">
+                    <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลดรายงาน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal รายละเอียดตรวจปล่อย -->
+
+<!-- ==================== Modal: ส่งข้อมูลใบรับรองไปด่านตรวจปล่อย (2.4(31)) ==================== -->
+<div class="modal fade" id="modalSendToPortDecl" tabindex="-1" aria-labelledby="modalSendToPortDeclLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#198754 0%,#157347 100%);color:#fff;">
+                <h5 class="modal-title" id="modalSendToPortDeclLabel">
+                    <i class="ri ri-upload-cloud-2-line me-1"></i>ส่งข้อมูลใบรับรองไปยังด่านตรวจปล่อย
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:.85rem;">
+                <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-3" role="alert">
+                    <i class="ri ri-information-line fs-5 flex-shrink-0"></i>
+                    <div>
+                        ระบบจะส่งข้อมูลใบรับรอง NMD นี้ไปยัง <strong>ระบบด่านตรวจปล่อยประมง</strong>
+                        เพื่อให้เจ้าหน้าที่ด่านตรวจสอบสินค้าก่อนส่งออก
+                    </div>
+                </div>
+                <div class="card border mb-3">
+                    <div class="card-header py-2" style="background:#f4f6fb;">
+                        <i class="ri ri-award-line me-1 text-success"></i>
+                        <span class="fw-semibold small">ข้อมูลใบรับรองที่จะส่ง</span>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="small text-muted">เลขที่ใบรับรอง</div>
+                                <div class="fw-bold" style="font-family:monospace;font-size:1.05rem;color:#1a3c6d;">NMD-2569-00847</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">ประเภทใบรับรอง</div>
+                                <div class="fw-semibold">Non-Manipulation Declaration (NMD)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">ผู้ประกอบการ / บริษัท</div>
+                                <div class="fw-semibold">บริษัท อินโนเวชั่นส์ โซลูชั่น แอนด์ เซอร์วิส จำกัด</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">สินค้า</div>
+                                <div class="fw-semibold">กุ้งขาวแปรรูปแช่แข็ง (Frozen White Shrimp, Processed)</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">น้ำหนักตามใบรับรอง (กก.)</div>
+                                <div class="fw-semibold text-primary">22,300.00</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">วันที่ส่งออก</div>
+                                <div class="fw-semibold">28/04/2569</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">ประเทศปลายทาง</div>
+                                <div class="fw-semibold">อาร์เจนตินา (AR)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="ri ri-map-pin-line me-1 text-danger"></i>ด่านตรวจปล่อยปลายทาง
+                        <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select form-select-sm" id="selectTargetPortDecl">
+                        <option value="LC" selected>ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง (PORT-LC-01)</option>
+                        <option value="BKK">ด่านตรวจสัตว์น้ำ ท่าอากาศยานสุวรรณภูมิ (PORT-BKK-01)</option>
+                        <option value="PKT">ด่านตรวจสัตว์น้ำ ท่าเรือภูเก็ต (PORT-PKT-01)</option>
+                        <option value="SGK">ด่านตรวจสัตว์น้ำ ท่าเรือสงขลา (PORT-SGK-01)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">หมายเหตุ (ถ้ามี)</label>
+                    <textarea class="form-control form-control-sm" id="sendToPortRemarkDecl" rows="2"
+                        placeholder="ระบุข้อความพิเศษหรือคำแนะนำสำหรับเจ้าหน้าที่ด่าน"></textarea>
+                </div>
+                <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-0" role="alert">
+                    <i class="ri ri-alert-line fs-5 flex-shrink-0 text-warning"></i>
+                    <div class="small">
+                        <strong>หมายเหตุ:</strong> เมื่อยืนยันการส่งแล้ว ระบบด่านจะได้รับข้อมูลทันที
+                    </div>
+                </div>
+                <div id="sendToPortSpinnerDecl" class="d-none text-center py-3">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">กำลังส่ง...</span>
+                    </div>
+                    <div class="mt-2 text-success fw-semibold">กำลังส่งข้อมูลไปยังระบบด่าน...</div>
+                </div>
+                <div id="sendToPortSuccessDecl" class="d-none mt-3 p-3 rounded bg-success bg-opacity-10 border border-success-subtle text-center">
+                    <i class="ri ri-checkbox-circle-fill text-success fs-3"></i>
+                    <div class="fw-bold text-success mt-1">ส่งข้อมูลสำเร็จ!</div>
+                    <div class="small text-muted mt-1" id="sendSuccessDetailDecl">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง รับข้อมูลแล้ว</div>
+                </div>
+            </div>
+            <div class="modal-footer" id="sendToPortFooterDecl">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success" id="btnConfirmSendToPortDecl">
+                    <i class="ri ri-send-plane-2-line me-1"></i>ยืนยันส่งข้อมูลไปด่านตรวจปล่อย
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal ส่งข้อมูลใบรับรองไปด่านตรวจปล่อย (Declaration) -->
+
 @section PageScripts {
 <script>
     $(document).ready(function () {
+
+        // ── 2.4(30): ปุ่มดึงข้อมูลใหม่จากด่าน ──
+        $('#btnSyncFromPortDecl').on('click', function () {
+            var $btn = $(this);
+            var orig = $btn.html();
+            $btn.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>กำลังดึง...').prop('disabled', true);
+            setTimeout(function () {
+                $btn.html(orig).prop('disabled', false);
+                // TODO: call API to sync inspection data from port system
+                alert('ข้อมูลตรวจปล่อยล่าสุดแล้ว (Mockup)');
+            }, 1500);
+        });
+
+        // ── 2.4(31): Demo toggle สถานะ Push to Port (Declaration) ──
+        var _pushSentStateDecl = true;
+        $('#btnTogglePushDemoDecl').on('click', function () {
+            _pushSentStateDecl = !_pushSentStateDecl;
+            if (_pushSentStateDecl) {
+                $('#badgePushSentDecl').removeClass('d-none');
+                $('#badgePushPendingDecl').addClass('d-none');
+                $('#btnResendToPortDecl').removeClass('d-none');
+                $('#btnFirstSendToPortDecl').addClass('d-none');
+            } else {
+                $('#badgePushSentDecl').addClass('d-none');
+                $('#badgePushPendingDecl').removeClass('d-none');
+                $('#btnResendToPortDecl').addClass('d-none');
+                $('#btnFirstSendToPortDecl').removeClass('d-none');
+            }
+        });
+
+        // ── 2.4(31): ยืนยันส่งข้อมูลไปด่าน (Declaration) ──
+        $('#btnConfirmSendToPortDecl').on('click', function () {
+            $('#selectTargetPortDecl, #sendToPortRemarkDecl').prop('disabled', true);
+            $(this).prop('disabled', true);
+            $('#sendToPortFooterDecl button').prop('disabled', true);
+            $('#sendToPortSpinnerDecl').removeClass('d-none');
+            setTimeout(function () {
+                $('#sendToPortSpinnerDecl').addClass('d-none');
+                var portName = $('#selectTargetPortDecl option:selected').text().split(' (')[0];
+                var now = new Date();
+                var thYear = now.getFullYear() + 543;
+                var pad = function(n){ return String(n).padStart(2,'0'); };
+                var ts = pad(now.getDate()) + '/' + pad(now.getMonth()+1) + '/' + thYear
+                       + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' น.';
+                $('#sendSuccessDetailDecl').text(portName + ' รับข้อมูลแล้ว เมื่อ ' + ts);
+                $('#sendToPortSuccessDecl').removeClass('d-none');
+                $('#sendToPortFooterDecl').html(
+                    '<button type="button" class="btn btn-success" data-bs-dismiss="modal">'
+                  + '<i class="ri ri-checkbox-circle-fill me-1"></i>เสร็จสิ้น</button>'
+                );
+                _pushSentStateDecl = true;
+                $('#badgePushSentDecl').html(
+                    '<i class="ri ri-checkbox-circle-fill me-1"></i>ส่งข้อมูลแล้ว ✅ เมื่อ ' + ts
+                ).removeClass('d-none');
+                $('#badgePushPendingDecl').addClass('d-none');
+                $('#badgeSentToInspection').removeClass('d-none');
+                $('#btnFirstSendToPortDecl').addClass('d-none');
+                $('#btnResendToPortDecl').removeClass('d-none');
+                $('#pushSentTimestampDecl').text(ts);
+                // TODO: call API to send cert data to port system
+            }, 2000);
+        });
+
+        // reset modal state on close
+        $('#modalSendToPortDecl').on('hidden.bs.modal', function () {
+            $('#sendToPortSpinnerDecl').addClass('d-none');
+            $('#sendToPortSuccessDecl').addClass('d-none');
+            $('#selectTargetPortDecl, #sendToPortRemarkDecl').prop('disabled', false);
+        });
 
         // ── Toggle sub-row (expand/collapse) ──
         $(document).on('click', '.btn-toggle-sub', function () {

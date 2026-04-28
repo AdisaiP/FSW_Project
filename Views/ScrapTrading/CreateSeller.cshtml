@@ -354,65 +354,239 @@
                 </div>
                 <!-- /TAB 1 -->
 
-                <!-- ==================== TAB 2: รายการเศษเหลือ ==================== -->
+                <!-- ==================== TAB 2: รายการเศษเหลือ (TOR 1.6(19.1)) ==================== -->
                 <div id="tab-scrap" class="tab-pane fade" role="tabpanel">
 
                     <!-- Toolbar -->
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <div>
                             <span class="fw-semibold small">รายการเศษเหลือจากการผลิต</span>
-                            <span class="text-muted small ms-2">— เลือกจากรายการ RMBS2 ที่มีเศษเหลือคงเหลือ</span>
+                            <span class="text-muted small ms-2">— เลือกจากรายการ RMBS2 ที่มีเศษเหลือคงเหลือ (TOR 1.6(19.1))</span>
                         </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="btnAddScrap"
-                            data-bs-toggle="modal" data-bs-target="#modalSelectScrap">
-                            <i class="ri ri-add-line me-1"></i> เพิ่มรายการเศษเหลือ
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-success btn-sm"
+                                onclick="alert('Export Excel รายการเศษเหลือ (mockup)')">
+                                <i class="ri ri-file-excel-2-line me-1"></i> Export Excel
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="btnAddScrap"
+                                data-bs-toggle="modal" data-bs-target="#modalSelectScrap">
+                                <i class="ri ri-add-line me-1"></i> เพิ่มรายการเศษเหลือ
+                            </button>
+                        </div>
                     </div>
 
+                    <!-- P1 Reference Banner -->
+                    <div class="alert alert-secondary d-flex align-items-center gap-2 py-2 mb-3" style="font-size:0.82rem;">
+                        <i class="ri ri-file-paper-2-line fs-5 flex-shrink-0"></i>
+                        <div>
+                            อ้างอิง P1: <strong class="text-primary">P1-2569-00046</strong>
+                            &nbsp;|&nbsp; รุ่นผลิต: LOT-2561-001, LOT-2561-002
+                            &nbsp;|&nbsp; น้ำหนักเศษเหลือทั้งหมดจากการผลิต: <strong>1,240.000 กก.</strong>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 col-md-3">
+                            <div class="card border-secondary h-100">
+                                <div class="card-body py-2 px-3 text-center">
+                                    <div class="text-muted small">น้ำหนักเศษเหลือจากการผลิต</div>
+                                    <div class="fw-bold text-dark fs-6">1,240.000 <span class="fw-normal text-muted" style="font-size:0.75rem;">กก.</span></div>
+                                    <div class="small text-muted" style="font-size:0.7rem;">(เพดานสูงสุด)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card border-warning h-100">
+                                <div class="card-body py-2 px-3 text-center">
+                                    <div class="text-muted small">ขายแล้ว (ก่อนรายการนี้)</div>
+                                    <div class="fw-bold text-warning fs-6" id="summaryAlreadySold">500.000 <span class="fw-normal text-muted" style="font-size:0.75rem;">กก.</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card border-success h-100">
+                                <div class="card-body py-2 px-3 text-center">
+                                    <div class="text-muted small">คงเหลือ (ขายได้อีก)</div>
+                                    <div class="fw-bold text-success fs-6" id="summaryRemaining">740.000 <span class="fw-normal text-muted" style="font-size:0.75rem;">กก.</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card h-100" id="cardThisSell">
+                                <div class="card-body py-2 px-3 text-center">
+                                    <div class="text-muted small">น้ำหนักในรายการนี้</div>
+                                    <div class="fw-bold fs-6" id="summaryThisSell">750.000 <span class="fw-normal text-muted" style="font-size:0.75rem;">กก.</span></div>
+                                    <div class="small" id="summaryValidBadge">
+                                        <span class="badge bg-success" style="font-size:0.65rem;">✅ ไม่เกินเพดาน</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alert น้ำหนักรวมเกิน -->
+                    <div class="alert alert-danger d-flex align-items-center gap-2 py-2 mb-2" id="alertOverWeight" style="display:none;">
+                        <i class="ri ri-error-warning-line fs-5"></i>
+                        <div class="small">
+                            <strong>❌ น้ำหนักรวมที่บันทึกเกินกว่าน้ำหนักเศษเหลือคงเหลือ!</strong><br/>
+                            ระบบควบคุมน้ำหนักรวมไม่เกิน 740.000 กก. (คงเหลือที่ขายได้) — กรุณาแก้ไขน้ำหนักในตาราง
+                        </div>
+                    </div>
+
+                    <!-- Alert น้ำหนักรวมปกติ -->
+                    <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-3" id="alertWeightOk">
+                        <i class="ri ri-checkbox-circle-line fs-5"></i>
+                        <div class="small">
+                            <strong>✅ น้ำหนักรวมในรายการนี้อยู่ในเกณฑ์</strong> — 750.000 กก. ≤ คงเหลือ 740.000 กก.
+                            รายการนี้มี <strong>3 รายการเศษเหลือ</strong> จาก 2 รุ่นการผลิต สามารถบันทึกได้
+                        </div>
+                    </div>
+
+                    <!-- ตารางรายการเศษเหลือ (หลายรายการ) -->
                     <div class="table-responsive">
-                        <table class="table table-bordered align-middle small mb-3" id="scrapItemTable">
-                            <thead class="text-center">
+                        <table class="table table-bordered align-middle small mb-2" id="scrapItemTable" style="font-size:0.81rem;">
+                            <thead class="table-dark text-center">
                                 <tr>
-                                    <th style="width:3rem;">#</th>
-                                    <th>เลขที่ RMBS1</th>
+                                    <th style="width:2.5rem;">#</th>
                                     <th>เลขที่ RMBS2</th>
-                                    <th>ชื่อผลิตภัณฑ์</th>
+                                    <th>ชื่อชนิดสัตว์น้ำ / ผลิตภัณฑ์</th>
                                     <th>ประเภทเศษเหลือ</th>
-                                    <th class="text-end">น้ำหนักเศษเหลือคงเหลือ (กก.)</th>
-                                    <th class="text-end">น้ำหนักที่ขาย (กก.) <span class="text-danger">●</span></th>
-                                    <th></th>
+                                    <th>รหัสรุ่นเศษเหลือ</th>
+                                    <th style="min-width:160px;">ชื่อผู้ซื้อ <span class="text-danger">●</span></th>
+                                    <th class="text-end" style="min-width:110px;">เศษคงเหลือ (กก.)</th>
+                                    <th class="text-end" style="min-width:130px;">น้ำหนักที่ขาย (กก.) <span class="text-danger">●</span></th>
+                                    <th class="text-center" style="min-width:80px;">ควบคุม</th>
+                                    <th style="min-width:70px;"></th>
                                 </tr>
                             </thead>
                             <tbody id="scrapItemTbody">
-                                <!-- dummy row -->
-                                <tr data-item-id="si1" data-rmbs1="10604204211700000093" data-rmbs2="RMBS2-001"
-                                    data-product="Skipjack Tuna Canned" data-scrap-type="เศษทูน่า (หัว หาง ก้าง)"
-                                    data-available="5200.000">
-                                    <td class="text-center text-muted small">1</td>
-                                    <td class="text-primary">10604204211700000093</td>
-                                    <td class="text-primary">RMBS2-001</td>
-                                    <td>Skipjack Tuna Canned</td>
-                                    <td>เศษทูน่า (หัว หาง ก้าง)</td>
-                                    <td class="text-end">5,200.000</td>
+                                <!-- Row 1: ✅ ไม่เกิน -->
+                                <tr data-item-id="si1" data-rmbs2="RMBS2-2569-001" data-available="740">
+                                    <td class="text-center text-muted">1</td>
+                                    <td class="text-primary fw-semibold">RMBS2-2569-001</td>
+                                    <td>ปลาทูน่าครีบเหลือง (Yellowfin Tuna)</td>
+                                    <td>กระดูก / ก้างปลา</td>
+                                    <td class="text-muted">LOT-2561-001</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm input-buyer-name"
+                                            placeholder="ชื่อผู้ซื้อ" value="บริษัท ปลาป่นไทย จำกัด" />
+                                    </td>
+                                    <td class="text-end fw-semibold text-success">740.000</td>
                                     <td class="text-end">
                                         <input type="number" class="form-control form-control-sm text-end input-sell-weight"
-                                            style="min-width:120px;" value="5200" step="0.001" min="0" max="5200" />
+                                            style="min-width:110px;" value="400" step="0.001" min="0" max="740" />
                                     </td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-scrap-item" title="ลบ">
-                                            <i class="ri ri-delete-bin-line text-danger"></i>
-                                        </button>
+                                        <span class="badge bg-success row-ctrl-badge" style="font-size:0.65rem;">✅ ไม่เกิน</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" title="แก้ไข"
+                                                onclick="alert('แก้ไขรายการ (mockup)')">
+                                                <i class="ri ri-pencil-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-scrap-item" title="ลบ">
+                                                <i class="ri ri-delete-bin-line text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Row 2: ✅ ไม่เกิน -->
+                                <tr data-item-id="si2" data-rmbs2="RMBS2-2569-002" data-available="500">
+                                    <td class="text-center text-muted">2</td>
+                                    <td class="text-primary fw-semibold">RMBS2-2569-002</td>
+                                    <td>ปลาทูน่าครีบเหลือง (Yellowfin Tuna)</td>
+                                    <td>เครื่องในสัตว์น้ำ</td>
+                                    <td class="text-muted">LOT-2561-002</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm input-buyer-name"
+                                            placeholder="ชื่อผู้ซื้อ" value="บริษัท ปลาป่นไทย จำกัด" />
+                                    </td>
+                                    <td class="text-end fw-semibold text-success">500.000</td>
+                                    <td class="text-end">
+                                        <input type="number" class="form-control form-control-sm text-end input-sell-weight"
+                                            style="min-width:110px;" value="200" step="0.001" min="0" max="500" />
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success row-ctrl-badge" style="font-size:0.65rem;">✅ ไม่เกิน</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" title="แก้ไข"
+                                                onclick="alert('แก้ไขรายการ (mockup)')">
+                                                <i class="ri ri-pencil-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-scrap-item" title="ลบ">
+                                                <i class="ri ri-delete-bin-line text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Row 3: ❌ เกิน (เพื่อแสดง validation) -->
+                                <tr data-item-id="si3" data-rmbs2="RMBS2-2569-003" data-available="200" class="table-danger">
+                                    <td class="text-center text-muted">3</td>
+                                    <td class="text-primary fw-semibold">RMBS2-2569-003</td>
+                                    <td>ปลาทูน่าท้องแถบ (Skipjack Tuna)</td>
+                                    <td>น้ำที่ได้จากการต้ม/คั้น</td>
+                                    <td class="text-muted">LOT-2561-002</td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm input-buyer-name border-danger"
+                                            placeholder="ชื่อผู้ซื้อ" value="บริษัท อาหารสัตว์ไทย จำกัด" />
+                                    </td>
+                                    <td class="text-end fw-semibold text-warning">200.000</td>
+                                    <td class="text-end">
+                                        <input type="number" class="form-control form-control-sm text-end input-sell-weight border-danger"
+                                            style="min-width:110px;" value="380" step="0.001" min="0" max="200" />
+                                        <div class="small text-danger mt-1" style="font-size:0.65rem;">เกิน 200 กก. ที่มีอยู่!</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger row-ctrl-badge" style="font-size:0.65rem;">❌ เกิน</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-primary" title="แก้ไข"
+                                                onclick="alert('แก้ไขรายการ (mockup)')">
+                                                <i class="ri ri-pencil-line"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-scrap-item" title="ลบ">
+                                                <i class="ri ri-delete-bin-line text-danger"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
                             <tfoot class="table-light">
                                 <tr>
-                                    <td colspan="6" class="text-end fw-semibold small">น้ำหนักรวมที่ขายทั้งหมด (กก.)</td>
-                                    <td class="text-end fw-bold" id="totalSellWeight">5,200.000</td>
+                                    <td colspan="7" class="text-end fw-semibold small">น้ำหนักรวมที่ขายในรายการนี้ (กก.)</td>
+                                    <td class="text-end fw-bold text-danger" id="totalSellWeight">980.000</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger" style="font-size:0.65rem;" id="totalCtrlBadge">❌ เกินเพดาน</span>
+                                    </td>
                                     <td></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td colspan="7" class="text-end small text-muted">เพดานสูงสุด (คงเหลือที่ขายได้)</td>
+                                    <td class="text-end fw-semibold text-success">740.000</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td colspan="7" class="text-end small text-muted">ส่วนต่าง (เกิน/คงเหลือ)</td>
+                                    <td class="text-end fw-bold text-danger" id="totalDiff">-240.000</td>
+                                    <td colspan="2"></td>
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+
+                    <!-- Info: คำอธิบายการควบคุม -->
+                    <div class="alert alert-light border py-2 mt-2" style="font-size:0.8rem;">
+                        <div class="fw-semibold mb-1"><i class="ri ri-information-line me-1 text-info"></i>การควบคุมน้ำหนัก (TOR 1.6(19.1))</div>
+                        <ul class="mb-0 ps-3">
+                            <li><strong>ระดับรายการ:</strong> น้ำหนักที่ขายต้องไม่เกินน้ำหนักเศษเหลือคงเหลือของแต่ละ RMBS2/รุ่น</li>
+                            <li><strong>ระดับรวม:</strong> น้ำหนักรวมทั้งหมดในรายการนี้ต้องไม่เกิน 740.000 กก. (เศษเหลือคงเหลือ P1)</li>
+                            <li>สามารถเพิ่มรายการเศษเหลือได้หลายรายการ (หลายชนิด/หลายรุ่น/หลายผู้ซื้อ) แก้ไขข้อมูลได้ทุกรายการ</li>
+                        </ul>
                     </div>
 
                 </div>
@@ -834,7 +1008,9 @@ $(document).ready(function () {
                 '<td>' + product + '</td>' +
                 '<td>' + scrapType + '</td>' +
                 '<td class="text-end">' + available.toLocaleString('th-TH', {minimumFractionDigits: 3}) + '</td>' +
-                '<td class="text-end"><input type="number" class="form-control form-control-sm text-end input-sell-weight" style="min-width:120px;" value="' + available + '" step="0.001" min="0" max="' + available + '" /></td>' +
+                '<td><input type="text" class="form-control form-control-sm input-buyer-name" placeholder="ชื่อผู้ซื้อ" /></td>' +
+        '<td class="text-end"></td>' +
+        '<td class="text-end"><input type="number" class="form-control form-control-sm text-end input-sell-weight" style="min-width:120px;" value="' + available + '" step="0.001" min="0" max="' + available + '" /></td>' +
                 '<td class="text-center"><button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-scrap-item" title="ลบ"><i class="ri ri-delete-bin-line text-danger"></i></button></td>' +
                 '</tr>');
             $('#scrapItemTbody').append($tr);
@@ -862,12 +1038,47 @@ $(document).ready(function () {
         });
     }
 
+    var PRODUCTION_SCRAP_WEIGHT = 740; // กก. — คงเหลือที่ขายได้ (mockup P1-2569-00046)
+
     function recalcTotal() {
         var total = 0;
-        $('#scrapItemTbody .input-sell-weight').each(function () {
-            total += parseFloat($(this).val()) || 0;
+        var hasRowError = false;
+        // ── ตรวจสอบระดับรายการ (per-row) ──
+        $('#scrapItemTbody tr').each(function () {
+            var $row = $(this);
+            var available = parseFloat($row.data('available')) || 0;
+            var sell = parseFloat($row.find('.input-sell-weight').val()) || 0;
+            var $badge = $row.find('.row-ctrl-badge');
+            if (sell > available) {
+                $badge.removeClass('bg-success').addClass('bg-danger').text('❌ เกิน');
+                $row.find('.input-sell-weight').addClass('border-danger');
+                hasRowError = true;
+            } else {
+                $badge.removeClass('bg-danger').addClass('bg-success').text('✅ ไม่เกิน');
+                $row.find('.input-sell-weight').removeClass('border-danger');
+            }
+            total += sell;
         });
+        // ── ตรวจสอบระดับรวม ──
         $('#totalSellWeight').text(total.toLocaleString('th-TH', {minimumFractionDigits: 3}));
+        var diff = total - PRODUCTION_SCRAP_WEIGHT;
+        $('#totalDiff').text((diff >= 0 ? '-' : '+') + Math.abs(diff).toLocaleString('th-TH', {minimumFractionDigits: 3}));
+        $('#summaryThisSell').html(total.toLocaleString('th-TH', {minimumFractionDigits: 3}) + ' <span class="fw-normal text-muted" style="font-size:0.75rem;">กก.</span>');
+        if (total > PRODUCTION_SCRAP_WEIGHT || hasRowError) {
+            $('#alertOverWeight').show();
+            $('#alertWeightOk').hide();
+            $('#totalSellWeight').addClass('text-danger').removeClass('text-success');
+            $('#totalCtrlBadge').removeClass('bg-success').addClass('bg-danger').text('❌ เกินเพดาน');
+            $('#summaryValidBadge').html('<span class="badge bg-danger" style="font-size:0.65rem;">❌ เกินเพดาน</span>');
+            $('#cardThisSell').addClass('border-danger').removeClass('border-success');
+        } else {
+            $('#alertOverWeight').hide();
+            $('#alertWeightOk').show();
+            $('#totalSellWeight').addClass('text-success').removeClass('text-danger');
+            $('#totalCtrlBadge').removeClass('bg-danger').addClass('bg-success').text('✅ ไม่เกิน');
+            $('#summaryValidBadge').html('<span class="badge bg-success" style="font-size:0.65rem;">✅ ไม่เกินเพดาน</span>');
+            $('#cardThisSell').addClass('border-success').removeClass('border-danger');
+        }
     }
 
     $(document).on('input', '.input-sell-weight', function () { recalcTotal(); });

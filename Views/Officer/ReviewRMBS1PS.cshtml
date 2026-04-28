@@ -54,7 +54,10 @@
 }
 
 @* ===== Content ===== *@
-<h4 class="mb-1">พิจารณา RMBS1:PS</h4>
+<div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+    <h4 class="mb-0">พิจารณา RMBS1:PS</h4>
+    <span class="badge bg-label-success ms-1">ผู้อนุมัติ 🔑</span>
+</div>
 <p class="mb-1 text-muted">ตรวจสอบและพิจารณาอนุมัติเอกสารการควบคุมปริมาณวัตถุดิบสัตว์นํ้านำเข้าเพื่อแปรรูปส่งออก เอกสารที่ 1 (RMBS1) สถานะ PS</p>
 
 <nav aria-label="breadcrumb" class="mb-4">
@@ -65,10 +68,29 @@
 </nav>
 
 <!-- ─── Status Banner ─── -->
-<div class="alert alert-warning d-flex align-items-center gap-2 mb-4" role="alert">
+<div class="alert alert-warning d-flex align-items-center gap-2 mb-2" role="alert">
         <i class="ri ri-time-line fs-5"></i>
         <span><strong>รออนุมัติ</strong> — คำขอนี้รอการพิจารณาจากเจ้าหน้าที่</span>
     </div>
+
+<!-- ─── Auto-Issue Success Banner (hidden, shown after approval) ─── -->
+<div class="alert alert-success d-flex align-items-start gap-3 mb-4 d-none" id="bannerAutoIssue" role="alert">
+    <i class="ri ri-checkbox-circle-line fs-4 flex-shrink-0 mt-1 text-success"></i>
+    <div>
+        <div class="fw-semibold fs-6">✅ ระบบออกเลขที่เอกสาร RMBS1:PS อัตโนมัติแล้ว</div>
+        <div class="small mt-1">
+            เลขที่เอกสาร: <span class="fw-semibold text-success" id="bannerAutoIssueNo">10611280211800000561</span>
+            &nbsp;|&nbsp; วันที่ออก: <span class="fw-semibold" id="bannerAutoIssueDate">—</span>
+            &nbsp;|&nbsp; เวลา: <span class="fw-semibold" id="bannerAutoIssueTime">—</span> น.
+        </div>
+        <div class="mt-2 d-flex gap-2 flex-wrap">
+            <span class="badge bg-success"><i class="ri ri-file-text-line me-1"></i>ออกเลขที่อัตโนมัติ ✅</span>
+            <a href="@Url.Action("IndexAdjustRMBS1PS", "ImportAdjustment")" class="btn btn-sm btn-outline-success py-0">
+                <i class="ri ri-eye-line me-1"></i> ดูเอกสาร RMBS1:PS
+            </a>
+        </div>
+    </div>
+</div>
 
 <div class="row g-4">
     <div class="col-12">
@@ -330,11 +352,526 @@
                         </div>
                     </div>
 
+                    <!-- ===== accordion: ผลการประมวลผลมาตรการสุขอนามัย ===== -->
+                    <div class="accordion accordion-custom-button mb-4" id="accordionSanitary">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingSanitary">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseSanitary" aria-expanded="true"
+                                    aria-controls="collapseSanitary">
+                                    <i class="icon-base ri ri-shield-check-line me-2"></i>
+                                    ผลการประมวลผลมาตรการสุขอนามัย
+                                </button>
+                            </h2>
+                            <div id="collapseSanitary" class="accordion-collapse collapse show"
+                                aria-labelledby="headingSanitary">
+                                <div class="accordion-body p-0">
+
+                                    <!-- ── ความประสงค์ขอใบรับรอง ── -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-success rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-award-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ความประสงค์ขอใบรับรอง</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small">ความประสงค์ขอใบรับรองการแปรรูปสัตว์น้ำ</label>
+                                                <div class="field-display">
+                                                    <span class="badge bg-label-primary me-2">PS</span>
+                                                    ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">ความประสงค์ส่งออกไปยังประเทศปลายทาง</label>
+                                                <div class="field-display">
+                                                    <span class="badge bg-label-info me-2">EU</span>
+                                                    สหภาพยุโรป (European Union)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ── มาตรการสุขอนามัยสัตว์น้ำนำเข้า ── -->
+                                    <div class="p-4 border-bottom">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-danger rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-virus-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ผลมาตรการสุขอนามัยสัตว์น้ำนำเข้าตามมาตรการสุขอนามัย</h6>
+                                        </div>
+                                        <!-- IUU Lock Alert -->
+                                        <div class="alert alert-danger d-flex align-items-start gap-2 mb-3" role="alert">
+                                            <i class="ri ri-error-warning-line fs-5 flex-shrink-0 mt-1"></i>
+                                            <div>
+                                                <div class="fw-semibold">⛔ IUU (EU) — ไม่สามารถเปลี่ยนแปลงผลจากด่านตรวจได้</div>
+                                                <div class="small mt-1">เอกสาร RMBS1 นี้ติดมาตรการ IUU จากสหภาพยุโรป (EU) ผลการประมวลผลถูกล็อกจากด่านตรวจประมง เจ้าหน้าที่ไม่สามารถแก้ไขผลนี้ได้</div>
+                                            </div>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small">เลขที่ใบรับรองสุขอนามัย (CC Number)</label>
+                                                <div class="field-display">KP-001022017-091</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">วันที่ตรวจสอบ (Validation Date)</label>
+                                                <div class="field-display">16/02/2026</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">ผลมาตรการสุขอนามัย</label>
+                                                <div class="field-display">
+                                                    <span class="badge bg-danger me-2"><i class="ri ri-close-circle-line me-1"></i>ติดมาตรการ ❌</span>
+                                                    IUU (EU) — ล็อกจากด่านตรวจประมง
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">ผลการประมวลผลของระบบ</label>
+                                                <div class="field-display">
+                                                    <span class="badge bg-label-danger me-2">ติดมาตรการ ❌</span>
+                                                    แจ้งผลให้เจ้าหน้าที่ทราบแล้ว
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ── ผลมาตรการประเทศคู่ค้า/เงื่อนไขด่านตรวจ ── -->
+                                    <div class="p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge bg-label-warning rounded-circle me-2 d-inline-flex align-items-center justify-content-center" style="width:2.2rem;height:2.2rem;">
+                                                <i class="ri ri-government-line fs-5"></i>
+                                            </span>
+                                            <h6 class="mb-0 fw-semibold">ผลมาตรการประเทศคู่ค้า / เงื่อนไขด่านตรวจประมง</h6>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label small">ผลมาตรการประเทศคู่ค้า</label>
+                                                <div class="field-display">
+                                                    <span class="badge bg-label-danger me-2">ติดมาตรการ IUU (EU)</span>
+                                                    ห้ามส่งออกสินค้าประมงไปยังสหภาพยุโรปจนกว่าจะได้รับการยกเว้น
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small">เงื่อนไขด่านตรวจประมง (Remarks)</label>
+                                                <div class="field-display" style="min-height:4rem; align-items:flex-start; padding-top:0.6rem;">
+                                                    ด่านตรวจสัตว์น้ำอำจังหวัดตราด: ตรวจพบการติดมาตรการ IUU จาก EU — ล็อกผลอัตโนมัติ ไม่อนุญาตให้เปลี่ยนแปลง
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /accordionSanitary -->
+
+                    <!-- ===== decision-card: ผลการพิจารณา (เจ้าหน้าที่ระดับพิจารณา) ===== -->
+                    <div class="card decision-card mb-4" id="cardDecisionOfficer">
+                        <div class="card-header d-flex align-items-center gap-2">
+                            <i class="ri ri-user-star-line fs-5 text-primary"></i>
+                            <h6 class="mb-0 fw-semibold">ผลการพิจารณา (เจ้าหน้าที่ระดับพิจารณา)</h6>
+                            <span class="badge bg-label-primary ms-auto">ก่อนส่งผู้อนุมัติ</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- IUU Lock Alert -->
+                            <div class="alert alert-danger d-flex align-items-start gap-2 mb-4" role="alert" id="iuuLockAlert">
+                                <i class="ri ri-error-warning-line fs-5 flex-shrink-0 mt-1"></i>
+                                <div>
+                                    <div class="fw-semibold">⛔ RMBS1 นี้ติดมาตรการ IUU (EU) จากด่านตรวจประมง</div>
+                                    <div class="small mt-1">เจ้าหน้าที่ไม่สามารถเปลี่ยนผลการพิจารณาได้ ต้องใช้ผลจากด่านตรวจประมงเท่านั้น</div>
+                                </div>
+                            </div>
+                            <!-- radio ผลพิจารณา -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">ผลการพิจารณา <span class="text-danger">*</span></label>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="decisionResult" id="decisionApprove" value="approve" disabled />
+                                        <label class="form-check-label" for="decisionApprove">
+                                            <span class="badge bg-label-success me-1">✔</span> สนับสนุนอนุมัติ
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="decisionResult" id="decisionReject" value="reject" />
+                                        <label class="form-check-label" for="decisionReject">
+                                            <span class="badge bg-label-danger me-1">✖</span> ไม่อนุมัติ
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="decisionResult" id="decisionCondition" value="condition" />
+                                        <label class="form-check-label" for="decisionCondition">
+                                            <span class="badge bg-label-warning me-1">⚠</span> มีเงื่อนไข
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="small text-danger mt-1 d-none" id="decisionResultError">กรุณาระบุผลการพิจารณา</div>
+                            </div>
+                            <!-- textarea รายละเอียด -->
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold" for="decisionRemark">รายละเอียดการพิจารณา</label>
+                                <textarea id="decisionRemark" class="form-control" rows="3"
+                                    placeholder="ระบุรายละเอียดเพิ่มเติม เงื่อนไขที่พบ หรือโน้แย้งให้ผู้อนุมัติทราบ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /cardDecisionOfficer -->
+
+                    <!-- ===== card: ผลการพิจารณา (ยืนยัน/override โดยผู้อนุมัติ) ===== -->
+                    <div class="card mb-4" style="border:2px solid #28a745;" id="cardApproverOverride">
+                        <div class="card-header d-flex align-items-center gap-2" style="background:rgba(40,167,69,.08);">
+                            <i class="ri ri-shield-star-line fs-5 text-success"></i>
+                            <h6 class="mb-0 fw-semibold">ผลการพิจารณาของเจ้าหน้าที่ (ยืนยันโดยผู้อนุมัติ)</h6>
+                            <span class="badge bg-label-success ms-auto">ผู้อนุมัติ 🔑</span>
+                            <button type="button" class="btn btn-sm btn-outline-success" id="btnEnableOverride">
+                                <i class="ri ri-edit-line me-1"></i> แก้ไขผล
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- readonly view -->
+                            <div id="overrideReadonly">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">ผลการพิจารณาของเจ้าหน้าที่ระดับพิจารณา</label>
+                                        <div class="field-display">
+                                            <span class="badge bg-label-danger me-2">✖ ไม่อนุมัติ (ติด IUU)</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">เจ้าหน้าที่ผู้พิจารณา</label>
+                                        <div class="field-display">นายสมชาย จันทร์</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small">รายละเอียดการพิจารณา</label>
+                                        <div class="field-display" style="min-height:3rem;align-items:flex-start;padding-top:0.6rem;">ติดมาตรการ IUU (EU) จากด่านตรวจประมง — ไม่สามารถส่งออกไปยัง EU ได้</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- editable override (hidden by default) -->
+                            <div id="overrideEdit" class="d-none">
+                                <div class="alert alert-warning d-flex gap-2 py-2 mb-3">
+                                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                                    <span class="small">ผู้อนุมัติสามารถ override ผลการพิจารณาของเจ้าหน้าที่ผู้พิจารณาได้ก่อนอนุมัติ การเปลี่ยนแปลงจะถูกบันทึกในประวัติ</span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">ผลการพิจารณา (Override) <span class="text-danger">*</span></label>
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="overrideResult" id="overrideApprove" value="approve" />
+                                            <label class="form-check-label" for="overrideApprove"><span class="badge bg-label-success me-1">✔</span> อนุมัติ</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="overrideResult" id="overrideReject" value="reject" checked />
+                                            <label class="form-check-label" for="overrideReject"><span class="badge bg-label-danger me-1">✖</span> ไม่อนุมัติ</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="overrideResult" id="overrideCondition" value="condition" />
+                                            <label class="form-check-label" for="overrideCondition"><span class="badge bg-label-warning me-1">⚠</span> มีเงื่อนไข</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="overrideRemark">เหตุผลการแก้ไขผล <span class="text-danger">*</span></label>
+                                    <textarea id="overrideRemark" class="form-control" rows="3" placeholder="ระบุเหตุผลที่ต้องการแก้ไขผลการพิจารณา..."></textarea>
+                                    <div class="invalid-feedback" id="overrideRemarkError">กรุณาระบุเหตุผล</div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-success btn-sm" id="btnSaveOverride">
+                                        <i class="ri ri-save-line me-1"></i> บันทึกผลที่แก้ไข
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCancelOverride">ยกเลิก</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /cardApproverOverride -->
+
+                    <!-- ===== card: ล็อกมาตรการสุขอนามัย (ผู้อนุมัติ) ===== -->
+                    <div class="card mb-4" style="border:2px solid #0dcaf0;" id="cardSanitaryLock">
+                        <div class="card-header d-flex align-items-center gap-2" style="background:rgba(13,202,240,.08);">
+                            <i class="ri ri-lock-line fs-5 text-info"></i>
+                            <h6 class="mb-0 fw-semibold">ล็อกมาตรการสุขอนามัย</h6>
+                            <span class="badge bg-label-info ms-auto">ผู้อนุมัติ 🔑</span>
+                            <span class="badge bg-info d-none" id="badgeSanitaryLocked"><i class="ri ri-lock-2-line me-1"></i>ล็อกมาตรการสุขอนามัย 🔒</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">เลือกประเทศ/กลุ่มประเทศที่ต้องการล็อกมาตรการสุขอนามัยสำหรับเอกสาร RMBS1:PS นี้ (สามารถเลือกได้มากกว่า 1 รายการ)</p>
+
+                            <!-- แสดงผลล็อกปัจจุบัน (readonly, hidden ก่อนบันทึก) -->
+                            <div id="sanitaryLockSaved" class="d-none mb-3">
+                                <div class="alert alert-info d-flex align-items-start gap-2 py-2 mb-2">
+                                    <i class="ri ri-information-line fs-5 flex-shrink-0 mt-1 text-info"></i>
+                                    <div>
+                                        <div class="fw-semibold small">📋 ระบบแจ้งผลมาตรการสุขอนามัยให้ผู้ประกอบการแล้ว</div>
+                                        <div class="small mt-1">ล็อกสำหรับประเทศ/กลุ่มประเทศ: <span class="fw-semibold" id="sanitaryLockSummary">—</span></div>
+                                    </div>
+                                </div>
+                                <!-- (ข) ส่งมาตรการสุขอนามัย → ระบบหนังสือรับรองตนเอง -->
+                                <div class="alert alert-success d-flex align-items-start gap-2 py-2 mb-2">
+                                    <i class="ri ri-links-line fs-5 flex-shrink-0 mt-1 text-success"></i>
+                                    <div>
+                                        <div class="fw-semibold small">✅ ส่งมาตรการสุขอนามัยไประบบหนังสือรับรองตนเองแล้ว</div>
+                                        <div class="small mt-1 text-muted">ข้อมูลมาตรการประเทศคู่ค้า / เงื่อนไขด่านตรวจ และมาตรการสุขอนามัย กตส.<br/>ถูกส่งไปยัง <strong>ระบบหนังสือรับรองตนเอง</strong> เรียบร้อยแล้ว</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-info mt-2" id="btnEditSanitaryLock">
+                                    <i class="ri ri-edit-line me-1"></i> แก้ไข
+                                </button>
+                            </div>
+
+                            <!-- ฟอร์มเลือก (แสดงเมื่อยังไม่บันทึก หรือกดแก้ไข) -->
+                            <div id="sanitaryLockForm">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="form-check border rounded p-2">
+                                            <input class="form-check-input sanitary-country" type="checkbox" id="lockEU" value="สหภาพยุโรป (EU)" />
+                                            <label class="form-check-label fw-semibold" for="lockEU">
+                                                <span class="badge bg-label-primary me-1">EU</span> สหภาพยุโรป
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="form-check border rounded p-2">
+                                            <input class="form-check-input sanitary-country" type="checkbox" id="lockUS" value="สหรัฐอเมริกา (US)" />
+                                            <label class="form-check-label fw-semibold" for="lockUS">
+                                                <span class="badge bg-label-info me-1">US</span> สหรัฐอเมริกา
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="form-check border rounded p-2">
+                                            <input class="form-check-input sanitary-country" type="checkbox" id="lockJP" value="ญี่ปุ่น (JP)" />
+                                            <label class="form-check-label fw-semibold" for="lockJP">
+                                                <span class="badge bg-label-warning me-1">JP</span> ญี่ปุ่น
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="form-check border rounded p-2">
+                                            <input class="form-check-input sanitary-country" type="checkbox" id="lockAll" value="ทุกประเทศ" />
+                                            <label class="form-check-label fw-semibold" for="lockAll">
+                                                <span class="badge bg-label-danger me-1">ALL</span> ทุกประเทศ
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-none" id="sanitaryLockError">กรุณาเลือกอย่างน้อย 1 ประเทศ/กลุ่มประเทศ</div>
+                                <button type="button" class="btn btn-info btn-sm text-white" id="btnSaveSanitaryLock">
+                                    <i class="ri ri-lock-line me-1"></i> บันทึกการล็อกมาตรการสุขอนามัย
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /cardSanitaryLock -->
+
+                    <!-- ===== (ค) เชื่อมโยงรายละเอียดการนำเข้า ===== -->
+                    <div class="accordion accordion-custom-button mb-4" id="accordionImportDetails">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingImportDetails">
+                                <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseImportDetails" aria-expanded="true"
+                                    aria-controls="collapseImportDetails">
+                                    <i class="icon-base ri ri-ship-line me-2"></i>
+                                    รายละเอียดการนำเข้า (เป็นข้อมูลตั้งต้นใบรับรอง)
+                                    <span class="badge bg-label-success ms-2 small">เชื่อมโยงอัตโนมัติ ✅</span>
+                                </button>
+                            </h2>
+                            <div id="collapseImportDetails" class="accordion-collapse collapse show"
+                                aria-labelledby="headingImportDetails">
+                                <div class="accordion-body">
+                                    <div class="alert alert-info d-flex gap-2 py-2 mb-3 small">
+                                        <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                                        <span>ข้อมูลด้านล่างถูกดึงจากระบบ IMD/CC โดยอัตโนมัติ สามารถแก้ไขได้ และนำไปเป็นข้อมูลตั้งต้นสำหรับใบรับรองแต่ละประเภท</span>
+                                    </div>
+
+                                    <!-- Readonly view -->
+                                    <div id="importDetailsReadonly">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Place of departure</label>
+                                                <div class="field-display">Songkhla, Thailand</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Date of departure</label>
+                                                <div class="field-display">05/08/2561</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Last port / airport</label>
+                                                <div class="field-display">Laem Chabang Port (TH)</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">Transport details (Vessel name &amp; flag)</label>
+                                                <div class="field-display">MV PACIFIC STAR / Thailand (TH)</div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small">Flight No. / Voyage No.</label>
+                                                <div class="field-display">V.25/2561</div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small">Container number</label>
+                                                <div class="field-display">TEMU1234567 / TCKU8765432</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Date of arrival to place of storage</label>
+                                                <div class="field-display">17/08/2561</div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <label class="form-label small">Place of storage</label>
+                                                <div class="field-display">คลังสินค้าห้องเย็น Alpha Office Automation — 123/1 ถ.สุขสวัสดิ์ สมุทรปราการ 10280</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <label class="form-label small">หมายเหตุ</label>
+                                            <div class="field-display" style="min-height:3rem;align-items:flex-start;padding-top:.5rem;">—</div>
+                                        </div>
+                                        <div class="d-flex gap-2 mt-3">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnEditImportDetails">
+                                                <i class="ri ri-edit-line me-1"></i> แก้ไขรายละเอียด
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAttachImportEvidence">
+                                                <i class="ri ri-attachment-line me-1"></i> แนบหลักฐาน
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Edit form -->
+                                    <div id="importDetailsForm" class="d-none">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Place of departure <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-sm" value="Songkhla, Thailand" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Date of departure <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-sm" value="05/08/2561" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Last port / airport</label>
+                                                <input type="text" class="form-control form-control-sm" value="Laem Chabang Port (TH)" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small">Transport details (Vessel name &amp; flag)</label>
+                                                <input type="text" class="form-control form-control-sm" value="MV PACIFIC STAR / Thailand (TH)" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small">Flight No. / Voyage No.</label>
+                                                <input type="text" class="form-control form-control-sm" value="V.25/2561" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small">Container number</label>
+                                                <input type="text" class="form-control form-control-sm" value="TEMU1234567 / TCKU8765432" />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small">Date of arrival to place of storage <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-sm" value="17/08/2561" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <label class="form-label small">Place of storage <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-sm" value="คลังสินค้าห้องเย็น Alpha Office Automation — 123/1 ถ.สุขสวัสดิ์ สมุทรปราการ 10280" />
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small">หมายเหตุ</label>
+                                                <textarea id="importDetailsRemark" class="form-control" rows="2" placeholder="ระบุหมายเหตุ (ถ้ามี)"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-2 mt-3">
+                                            <button type="button" class="btn btn-sm btn-primary" id="btnSaveImportDetails">
+                                                <i class="ri ri-save-line me-1"></i> บันทึก
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnCancelImportEdit">
+                                                ยกเลิก
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /accordionImportDetails -->
+
+                    <!-- ===== (ง) เชื่อมโยง RMBS1:PS และ P1 → ใบรับรองแต่ละประเภท ===== -->
+                    <div class="card shadow-sm mb-4" id="cardCertLinkage">
+                        <div class="card-header py-2 d-flex align-items-center gap-2">
+                            <i class="ri ri-git-branch-line text-success fs-5"></i>
+                            <h6 class="mb-0 fw-semibold">เชื่อมโยง RMBS1:PS และ P1 ไปยังใบรับรองแต่ละประเภท</h6>
+                            <span class="badge bg-label-success ms-auto">เชื่อมโยงอัตโนมัติ ✅</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">ข้อมูล RMBS1:PS ฉบับนี้จะถูกนำไปแสดงและเชื่อมโยงในใบรับรองประเภทต่างๆ ดังนี้</p>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>ประเภทใบรับรอง</th>
+                                            <th>ชื่อใบรับรอง</th>
+                                            <th class="text-center">ข้อมูลที่เชื่อมโยง</th>
+                                            <th class="text-center">สถานะ</th>
+                                            <th class="text-center">จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td><span class="badge bg-label-primary">PS</span></td>
+                                            <td>Processing Statement (PS)<br/><span class="text-muted small">PS-2561-00123</span></td>
+                                            <td class="text-center"><span class="badge bg-label-success">RMBS1:PS ✅</span></td>
+                                            <td class="text-center"><span class="badge bg-label-success">ออกแล้ว</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-xs btn-outline-primary" data-bs-toggle="tooltip" title="ดูใบรับรอง"><i class="ri ri-eye-line"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td><span class="badge bg-label-info">P1</span></td>
+                                            <td>Health Certificate P1 (EU)<br/><span class="text-muted small">P1-EU-2561-00056</span></td>
+                                            <td class="text-center">
+                                                <span class="badge bg-label-success me-1">RMBS1:PS ✅</span>
+                                                <span class="badge bg-label-primary">Place/Date ✅</span>
+                                            </td>
+                                            <td class="text-center"><span class="badge bg-label-warning">รอออก</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-xs btn-outline-primary" data-bs-toggle="tooltip" title="ดูใบรับรอง"><i class="ri ri-eye-line"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td><span class="badge bg-label-warning">P1</span></td>
+                                            <td>Health Certificate P1 (US)<br/><span class="text-muted small">P1-US-2561-00089</span></td>
+                                            <td class="text-center">
+                                                <span class="badge bg-label-success me-1">RMBS1:PS ✅</span>
+                                                <span class="badge bg-label-primary">Place/Date ✅</span>
+                                            </td>
+                                            <td class="text-center"><span class="badge bg-label-warning">รอออก</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-xs btn-outline-primary" data-bs-toggle="tooltip" title="ดูใบรับรอง"><i class="ri ri-eye-line"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /cardCertLinkage -->
+
                 </div>
                 <!-- /TAB 1 -->
 
                 <!-- ==================== TAB 2: ข้อมูลการผลิต ==================== -->
                 <div id="tab-production" class="tab-pane fade" role="tabpanel">
+
+                    <!-- (ก) ส่งข้อมูลตัดโควตา RMBS1/RMBS2 อัตโนมัติ -->
+                    <div class="alert alert-success d-flex align-items-start gap-2 py-2 mb-3 small" id="alertQuotaDeduct">
+                        <i class="ri ri-database-line fs-5 flex-shrink-0 mt-1 text-success"></i>
+                        <div>
+                            <div class="fw-semibold">✅ ส่งข้อมูลตัดโควตา RMBS1/RMBS2 ไปยังระบบอัตโนมัติแล้ว</div>
+                            <div class="text-muted mt-1">
+                                ปริมาณที่อนุมัติ <strong>240,000.00 กก.</strong> ถูกส่งตัดโควตาไปยังระบบ RMBS1 และ RMBS2 เรียบร้อยแล้ว
+                                &nbsp;|&nbsp; เลขที่ RMBS1: <span class="fw-semibold text-primary">10611280211800000561</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Summary bar -->
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 p-1">
@@ -518,6 +1055,15 @@
             <a href="@Url.Action("IndexReturnWeight", "Officer")" class="btn btn-outline-secondary">
                 <i class="ri ri-arrow-left-line me-1"></i> ยกเลิก
             </a>
+            <button type="button" class="btn btn-outline-primary" id="btnSaveDraft">
+                <i class="ri ri-save-line me-1"></i> บันทึกร่าง
+            </button>
+            <button type="button" class="btn btn-outline-warning" id="btnNotifyCorrect">
+                <i class="ri ri-arrow-go-back-line me-1"></i> แจ้งแก้ไข
+            </button>
+            <button type="button" class="btn btn-primary" id="btnSendToApprover">
+                <i class="ri ri-send-plane-line me-1"></i> ส่งให้ผู้อนุมัติ
+            </button>
             <button type="button" class="btn btn-outline-danger" id="btnRejectRequest">
                 <i class="ri ri-close-circle-line me-1"></i> ไม่อนุมัติ
             </button>
@@ -528,6 +1074,70 @@
 
     </div><!-- /col -->
 </div><!-- /row -->
+
+<!-- ==================== Modal: ยืนยันส่งให้ผู้อนุมัติ ==================== -->
+<div class="modal fade" id="modalSendToApprover" tabindex="-1" aria-labelledby="modalSendToApproverLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalSendToApproverLabel">
+                    <i class="ri ri-send-plane-line me-1 text-primary"></i> ยืนยันส่งให้ผู้อนุมัติ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <p class="mb-1">คำขอ RMBS1 หมายเลข <span class="fw-semibold text-primary">10611280211800000561</span></p>
+                <div class="alert alert-primary d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span class="small">ระบบจะส่งผลการพิจารณาของเจ้าหน้าที่ไปยังผู้อนุมัติ และบันทึกประวัติในระบบทันที</span>
+                </div>
+                <div class="row g-2 mb-0">
+                    <div class="col-md-6">
+                        <label class="form-label small">ผลการพิจารณาที่เลือก</label>
+                        <div class="fw-semibold text-primary" id="sendApproverDecisionText">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmSendToApprover" class="btn btn-primary">
+                    <i class="ri ri-send-plane-line me-1"></i> ยืนยันส่งให้ผู้อนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: แจ้งแก้ไข (ส่งกลับผู้ประกอบการ) ====================  -->
+<div class="modal fade" id="modalNotifyCorrect" tabindex="-1" aria-labelledby="modalNotifyCorrectLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalNotifyCorrectLabel">
+                    <i class="ri ri-arrow-go-back-line me-1 text-warning"></i> แจ้งแก้ไข — ส่งกลับผู้ประกอบการ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <p class="mb-1">คำขอ RMBS1 หมายเลข <span class="fw-semibold text-primary">10611280211800000561</span></p>
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span class="small">ระบบจะเปลี่ยนสถานะเป็น <strong>"ส่งกลับแก้ไข ⚠️"</strong> และส่งการแจ้งเตือนไปยังผู้ประกอบการทันที</span>
+                </div>
+                <label class="form-label small fw-semibold">รายละเอียดที่ต้องแก้ไข <span class="text-danger">*</span></label>
+                <textarea id="notifyCorrectRemark" class="form-control" rows="4"
+                    placeholder="ระบุรายละเอียดข้อมูลที่ผู้ประกอบการต้องแก้ไข เช่น ข้อมูลน้ำหนักไม่ตรง, เอกสารแนบไม่ครบ..."></textarea>
+                <div class="invalid-feedback" id="notifyCorrectRemarkError">กรุณาระบุรายละเอียดที่ต้องแก้ไข</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmNotifyCorrect" class="btn btn-warning">
+                    <i class="ri ri-send-plane-line me-1"></i> ส่งแจ้งเตือนกลับผู้ประกอบการ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- ==================== Modal: ยืนยันการอนุมัติ ==================== -->
 <div class="modal fade" id="modalConfirmApprove" tabindex="-1" aria-labelledby="modalConfirmApproveLabel" aria-hidden="true">
@@ -542,15 +1152,57 @@
             <div class="modal-body pt-2">
                 <p class="mb-1">คุณต้องการ <strong class="text-success">อนุมัติ</strong> เอกสาร RMBS1 หมายเลข</p>
                 <p class="fw-semibold text-primary mb-3">10611280211800000561</p>
-                <div class="alert alert-success d-flex gap-2 py-2 mb-0">
+                <div class="alert alert-success d-flex gap-2 py-2 mb-3">
                     <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
                     <span class="small">การอนุมัติจะเปลี่ยนสถานะเอกสารเป็น "อนุมัติแล้ว" และแจ้งผลให้ผู้ประกอบการทราบทันที</span>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label small fw-semibold">หมายเหตุการอนุมัติ (ผู้อนุมัติ)</label>
+                    <textarea id="approveRemark" class="form-control" rows="2" placeholder="ระบุหมายเหตุเพิ่มเติม (ไม่บังคับ)"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
                 <button type="button" id="btnConfirmApprove" class="btn btn-success">
                     <i class="ri ri-checkbox-circle-line me-1"></i> ยืนยันอนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ออกเอกสาร RMBS1:PS อัตโนมัติ ==================== -->
+<div class="modal fade" id="modalAutoIssuePs" tabindex="-1" aria-labelledby="modalAutoIssuePsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalAutoIssuePsLabel">
+                    <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติและออกเอกสารอัตโนมัติสำเร็จ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success mb-3 d-flex gap-2">
+                    <i class="ri ri-file-check-line fs-5 mt-1 flex-shrink-0"></i>
+                    <div>
+                        <div class="fw-semibold">✅ ระบบออกเลขที่เอกสาร RMBS1:PS อัตโนมัติแล้ว</div>
+                        <div class="small text-muted mt-1">เลขที่เอกสาร: <span class="fw-semibold text-success">10611280211800000561</span></div>
+                        <div class="small text-muted">วันที่ออก: <span class="fw-semibold" id="modalAutoIssueDateText">—</span> &nbsp;|&nbsp; เวลา: <span class="fw-semibold" id="modalAutoIssueTimeText">—</span> น.</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap mb-3">
+                    <span class="badge bg-success fs-6 px-3 py-2"><i class="ri ri-checkbox-circle-line me-1"></i>ออกเลขที่อัตโนมัติ ✅</span>
+                </div>
+                <div class="small text-muted mb-0">
+                    ผลการอนุมัติถูกบันทึกเรียบร้อย และระบบพร้อมแสดงเอกสารสำหรับการตรวจสอบ/พิมพ์
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="@Url.Action("IndexAdjustRMBS1PS", "ImportAdjustment")" class="btn btn-outline-primary">
+                    <i class="ri ri-eye-line me-1"></i> ดูเอกสาร
+                </a>
+                <button type="button" id="btnPrintAutoIssuedDoc" class="btn btn-success">
+                    <i class="ri ri-printer-line me-1"></i> พิมพ์
                 </button>
             </div>
         </div>
@@ -588,8 +1240,80 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        var btnApprove = document.getElementById('btnApprove');
-        var btnReject  = document.getElementById('btnReject');
+        var btnApprove = document.getElementById('btnApproveRequest');
+        var btnReject  = document.getElementById('btnRejectRequest');
+        var btnSaveDraft = document.getElementById('btnSaveDraft');
+        var btnNotifyCorrect = document.getElementById('btnNotifyCorrect');
+        var btnSendToApprover = document.getElementById('btnSendToApprover');
+
+        // ── ส่งให้ผู้อนุมัติ ──
+        btnSendToApprover.addEventListener('click', function () {
+            var selected = document.querySelector('input[name="decisionResult"]:checked');
+            if (!selected) {
+                document.getElementById('decisionResultError').classList.remove('d-none');
+                document.getElementById('cardDecisionOfficer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            document.getElementById('decisionResultError').classList.add('d-none');
+            var labelMap = { approve: 'สนับสนุนอนุมัติ ✔', reject: 'ไม่อนุมัติ ✖', condition: 'มีเงื่อนไข ⚠' };
+            document.getElementById('sendApproverDecisionText').textContent = labelMap[selected.value] || selected.value;
+            new bootstrap.Modal(document.getElementById('modalSendToApprover')).show();
+        });
+
+        document.getElementById('btnConfirmSendToApprover').addEventListener('click', function () {
+            bootstrap.Modal.getInstance(document.getElementById('modalSendToApprover')).hide();
+            var banner = document.querySelector('.alert[role="alert"] span');
+            if (banner) {
+                banner.innerHTML = '<strong>ส่งให้ผู้อนุมัติแล้ว 📨</strong> — รอผู้อนุมัติพิจารณาคำขอนี้';
+                var alertEl = document.querySelector('.alert[role="alert"]');
+                alertEl.className = 'alert alert-primary d-flex align-items-center gap-2 mb-4';
+                alertEl.querySelector('i').className = 'ri ri-send-plane-line fs-5';
+            }
+            showToast('ส่งผลการพิจารณาให้ผู้อนุมัติเรียบร้อยแล้ว', 'info');
+        });
+
+        // ── IUU lock: ล็อก radio "สนับสนุนอนุมัติ" ──
+        document.querySelectorAll('input[name="decisionResult"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                document.getElementById('decisionResultError').classList.add('d-none');
+            });
+        });
+
+        // ── บันทึกร่าง ──
+        btnSaveDraft.addEventListener('click', function () {
+            showToast('บันทึกร่างเรียบร้อยแล้ว', 'info');
+        });
+
+        // ── แจ้งแก้ไข ──
+        btnNotifyCorrect.addEventListener('click', function () {
+            var el = document.getElementById('notifyCorrectRemark');
+            el.classList.remove('is-invalid');
+            el.value = '';
+            new bootstrap.Modal(document.getElementById('modalNotifyCorrect')).show();
+        });
+
+        document.getElementById('btnConfirmNotifyCorrect').addEventListener('click', function () {
+            var el = document.getElementById('notifyCorrectRemark');
+            if (!el.value.trim()) {
+                el.classList.add('is-invalid');
+                el.focus();
+                return;
+            }
+            bootstrap.Modal.getInstance(document.getElementById('modalNotifyCorrect')).hide();
+            // อัปเดต status banner เป็น "ส่งกลับแก้ไข"
+            var banner = document.querySelector('.alert[role="alert"] span');
+            if (banner) {
+                banner.innerHTML = '<strong>ส่งกลับแก้ไข ⚠️</strong> — แจ้งเตือนไปยังผู้ประกอบการแล้ว รอการแก้ไขจากผู้ประกอบการ';
+                var alertEl = document.querySelector('.alert[role="alert"]');
+                alertEl.className = 'alert alert-warning d-flex align-items-center gap-2 mb-4';
+                alertEl.querySelector('i').className = 'ri ri-reply-line fs-5';
+            }
+            showToast('ส่งแจ้งแก้ไขกลับผู้ประกอบการเรียบร้อยแล้ว', 'warning');
+        });
+
+        document.getElementById('notifyCorrectRemark').addEventListener('input', function () {
+            if (this.value.trim()) this.classList.remove('is-invalid');
+        });
 
         // ── อนุมัติ ──
         btnApprove.addEventListener('click', function () {
@@ -598,8 +1322,33 @@
 
         document.getElementById('btnConfirmApprove').addEventListener('click', function () {
             // TODO: submit form or call API
+            // Set issued date/time (mockup: current date/time)
+            var now = new Date();
+            var dd = String(now.getDate()).padStart(2,'0');
+            var mm = String(now.getMonth()+1).padStart(2,'0');
+            var yyyy = now.getFullYear() + 543; // Buddhist era
+            var hh = String(now.getHours()).padStart(2,'0');
+            var min = String(now.getMinutes()).padStart(2,'0');
+            var dateStr = dd + '/' + mm + '/' + yyyy;
+            var timeStr = hh + ':' + min;
+            // Update modal date/time spans
+            document.getElementById('modalAutoIssueDateText').textContent = dateStr;
+            document.getElementById('modalAutoIssueTimeText').textContent = timeStr;
             bootstrap.Modal.getInstance(document.getElementById('modalConfirmApprove')).hide();
             showToast('อนุมัติเอกสารเรียบร้อยแล้ว', 'success');
+            new bootstrap.Modal(document.getElementById('modalAutoIssuePs')).show();
+            // Show persistent auto-issue banner on page
+            document.getElementById('bannerAutoIssueDate').textContent = dateStr;
+            document.getElementById('bannerAutoIssueTime').textContent = timeStr;
+            var banner = document.getElementById('bannerAutoIssue');
+            banner.classList.remove('d-none');
+            // Update status banner
+            var statusBanner = document.querySelector('.alert[role="alert"]:not(#bannerAutoIssue)');
+            if (statusBanner) {
+                statusBanner.className = 'alert alert-success d-flex align-items-center gap-2 mb-2';
+                statusBanner.querySelector('i').className = 'ri ri-checkbox-circle-line fs-5';
+                statusBanner.querySelector('span').innerHTML = '<strong>อนุมัติแล้ว ✅</strong> — เอกสาร RMBS1:PS ออกเลขที่อัตโนมัติแล้ว';
+            }
         });
 
         // ── ไม่อนุมัติ ──
@@ -624,6 +1373,98 @@
 
         document.getElementById('rejectRemark').addEventListener('input', function () {
             if (this.value.trim()) this.classList.remove('is-invalid');
+        });
+
+        document.getElementById('btnPrintAutoIssuedDoc').addEventListener('click', function () {
+            alert('สั่งพิมพ์เอกสาร RMBS1:PS เรียบร้อย (mockup)');
+        });
+
+        // ── Override card (ผู้อนุมัติ) ──
+        document.getElementById('btnEnableOverride').addEventListener('click', function () {
+            document.getElementById('overrideReadonly').classList.add('d-none');
+            document.getElementById('overrideEdit').classList.remove('d-none');
+            this.classList.add('d-none');
+        });
+
+        document.getElementById('btnCancelOverride').addEventListener('click', function () {
+            document.getElementById('overrideEdit').classList.add('d-none');
+            document.getElementById('overrideReadonly').classList.remove('d-none');
+            document.getElementById('btnEnableOverride').classList.remove('d-none');
+        });
+
+        document.getElementById('btnSaveOverride').addEventListener('click', function () {
+            var remark = document.getElementById('overrideRemark');
+            if (!remark.value.trim()) {
+                remark.classList.add('is-invalid');
+                remark.focus();
+                return;
+            }
+            remark.classList.remove('is-invalid');
+            // Update readonly display with new value
+            var selected = document.querySelector('input[name="overrideResult"]:checked');
+            var labelMap = { approve: '<span class="badge bg-label-success me-2">✔ อนุมัติ</span>', reject: '<span class="badge bg-label-danger me-2">✖ ไม่อนุมัติ</span>', condition: '<span class="badge bg-label-warning me-2">⚠ มีเงื่อนไข</span>' };
+            var readonlyFields = document.querySelectorAll('#overrideReadonly .field-display');
+            if (readonlyFields[0] && selected) readonlyFields[0].innerHTML = labelMap[selected.value] || selected.value;
+            if (readonlyFields[2]) readonlyFields[2].textContent = remark.value;
+            document.getElementById('overrideEdit').classList.add('d-none');
+            document.getElementById('overrideReadonly').classList.remove('d-none');
+            document.getElementById('btnEnableOverride').classList.remove('d-none');
+            showToast('บันทึกผลการพิจารณา (override) เรียบร้อยแล้ว', 'success');
+        });
+
+        document.getElementById('overrideRemark').addEventListener('input', function () {
+            if (this.value.trim()) this.classList.remove('is-invalid');
+        });
+
+        // ── Sanitary Lock ──
+        // "ทุกประเทศ" ToggleAll
+        document.getElementById('lockAll').addEventListener('change', function () {
+            document.querySelectorAll('.sanitary-country').forEach(function (cb) {
+                if (cb.id !== 'lockAll') cb.checked = false;
+            });
+        });
+        document.querySelectorAll('.sanitary-country:not(#lockAll)').forEach(function (cb) {
+            cb.addEventListener('change', function () {
+                if (this.checked) document.getElementById('lockAll').checked = false;
+            });
+        });
+
+        document.getElementById('btnSaveSanitaryLock').addEventListener('click', function () {
+            var checked = Array.from(document.querySelectorAll('.sanitary-country:checked'));
+            if (checked.length === 0) {
+                document.getElementById('sanitaryLockError').classList.remove('d-none');
+                return;
+            }
+            document.getElementById('sanitaryLockError').classList.add('d-none');
+            var names = checked.map(function (cb) { return cb.value; }).join(', ');
+            document.getElementById('sanitaryLockSummary').textContent = names;
+            document.getElementById('sanitaryLockForm').classList.add('d-none');
+            document.getElementById('sanitaryLockSaved').classList.remove('d-none');
+            document.getElementById('badgeSanitaryLocked').classList.remove('d-none');
+            showToast('ล็อกมาตรการสุขอนามัยเรียบร้อยแล้ว — แจ้งผู้ประกอบการแล้ว', 'info');
+        });
+
+        document.getElementById('btnEditSanitaryLock').addEventListener('click', function () {
+            document.getElementById('sanitaryLockSaved').classList.add('d-none');
+            document.getElementById('sanitaryLockForm').classList.remove('d-none');
+        });
+
+        // ── (ค) Import Details Edit Toggle ──
+        document.getElementById('btnEditImportDetails').addEventListener('click', function () {
+            document.getElementById('importDetailsReadonly').classList.add('d-none');
+            document.getElementById('importDetailsForm').classList.remove('d-none');
+        });
+        document.getElementById('btnCancelImportEdit').addEventListener('click', function () {
+            document.getElementById('importDetailsForm').classList.add('d-none');
+            document.getElementById('importDetailsReadonly').classList.remove('d-none');
+        });
+        document.getElementById('btnSaveImportDetails').addEventListener('click', function () {
+            document.getElementById('importDetailsForm').classList.add('d-none');
+            document.getElementById('importDetailsReadonly').classList.remove('d-none');
+            showToast('บันทึกรายละเอียดการนำเข้าเรียบร้อยแล้ว', 'success');
+        });
+        document.getElementById('btnAttachImportEvidence').addEventListener('click', function () {
+            showToast('ฟังก์ชันแนบหลักฐาน — TODO: implement file upload', 'info');
         });
 
         // ── Toast helper ──

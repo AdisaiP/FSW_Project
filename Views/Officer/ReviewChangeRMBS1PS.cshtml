@@ -1,0 +1,685 @@
+@{
+    ViewData["Title"] = "พิจารณาคำขอเปลี่ยนแปลง RMBS1:PS";
+
+    string changeRequestNo = "CHG-PS-2561-0001";
+    string rmbs1OldNo      = "10611280211800000560";
+    string changeType      = "เปลี่ยนผลการพิจารณา";
+    string operatorName    = "Alpha Office Automation Co., Ltd. (สาขา 00001)";
+    string submittedDate   = "5 ตุลาคม 2561  เวลา 09:30 น.";
+    string statusText      = "รออนุมัติ";
+    string statusClass     = "bg-label-warning";
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/select2/select2.js"></script>
+}
+
+@section PageStyles {
+<style>
+    .field-display {
+        font-size: 0.875rem;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.375rem;
+        padding: 0.4375rem 0.875rem;
+        min-height: 2.375rem;
+        display: flex;
+        align-items: center;
+        word-break: break-word;
+    }
+    .field-display.text-end   { justify-content: flex-end; }
+    .field-display.text-center { justify-content: center; }
+    .form-label.small { font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem; }
+
+    .review-banner {
+        border-left: 4px solid;
+        padding: 1rem 1.25rem;
+        border-radius: 0.5rem;
+    }
+    .review-banner.pending  { border-color: #fd7e14; background: rgba(253,126,20,.06); }
+    .review-banner.approved { border-color: #28a745; background: rgba(40,167,69,.06); }
+    .review-banner.rejected { border-color: #dc3545; background: rgba(220,53,69,.06); }
+
+    .decision-card { border: 2px solid var(--bs-primary); }
+    .decision-card .card-header { background: rgba(var(--bs-primary-rgb), .08); }
+
+    .history-timeline { list-style: none; padding-left: 0; position: relative; }
+    .history-timeline::before { content: ''; position: absolute; left: 1rem; top: 0; bottom: 0; width: 2px; background: var(--bs-border-color); }
+    .history-timeline li { position: relative; padding-left: 2.5rem; margin-bottom: 1.2rem; }
+    .history-timeline li::before { content: ''; position: absolute; left: 0.55rem; top: 0.3rem; width: 0.9rem; height: 0.9rem; border-radius: 50%; background: var(--bs-primary); border: 2px solid #fff; box-shadow: 0 0 0 2px var(--bs-primary); }
+    .history-timeline li.success::before { background: #28a745; box-shadow: 0 0 0 2px #28a745; }
+    .history-timeline li.warning::before { background: #ffc107; box-shadow: 0 0 0 2px #ffc107; }
+    .history-timeline li.danger::before  { background: #dc3545; box-shadow: 0 0 0 2px #dc3545; }
+</style>
+}
+
+@* ===== Content ===== *@
+<div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+    <h4 class="mb-0">พิจารณาคำขอเปลี่ยนแปลง RMBS1:PS</h4>
+    <span class="badge bg-label-success ms-1">ผู้อนุมัติ 🔑</span>
+</div>
+<p class="mb-1 text-muted">ตรวจสอบและพิจารณาคำขอเปลี่ยนแปลงผลการพิจารณา / ยกเลิกการออกเอกสาร RMBS1:PS กรณีที่ออกใบรับรองไปแล้ว</p>
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="@Url.Action("IndexRMBS1PS", "Officer")" class="text-primary fw-semibold">พิจารณา RMBS1 สถานะ PS / NoPS</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("IndexChangeRMBS1PS", "Officer")" class="text-primary fw-semibold">คำขอเปลี่ยนแปลง / ยกเลิก</a></li>
+        <li class="breadcrumb-item active text-secondary">@changeRequestNo</li>
+    </ol>
+</nav>
+
+<!-- ─── Status Banner ─── -->
+<div class="review-banner pending mb-4 d-flex align-items-center gap-3" id="statusBanner">
+    <i class="ri ri-time-line fs-4 text-warning"></i>
+    <div>
+        <div class="fw-semibold">รออนุมัติ</div>
+        <div class="small text-muted">คำขอนี้รอการพิจารณาจากผู้อนุมัติ — <span class="badge bg-label-primary">@changeType</span></div>
+    </div>
+</div>
+
+<!-- ─── Header Meta ─── -->
+<div class="row g-2 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">เลขที่คำขอเปลี่ยนแปลง</div>
+        <div class="fw-semibold">@changeRequestNo</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">เลขที่ RMBS1:PS เดิม</div>
+        <div class="fw-semibold text-primary">@rmbs1OldNo</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">วันที่ยื่นคำขอ</div>
+        <div class="fw-semibold">@submittedDate</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">ผู้ประกอบการ</div>
+        <div class="fw-semibold">@operatorName</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">ประเภทการเปลี่ยนแปลง</div>
+        <div><span class="badge bg-label-primary">@changeType</span></div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">สถานะ</div>
+        <div><span class="badge @statusClass">@statusText</span></div>
+    </div>
+</div>
+
+<!-- ─── Action Buttons (Draft/Pending state) ─── -->
+<div class="d-flex flex-wrap gap-2 mb-4" id="actionBar">
+    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnSaveDraft">
+        <i class="ri ri-save-line me-1"></i> บันทึกร่าง
+    </button>
+    <button type="button" class="btn btn-primary btn-sm" id="btnSendToApprover" data-bs-toggle="modal" data-bs-target="#modalSendToApprover">
+        <i class="ri ri-send-plane-line me-1"></i> ส่งให้ผู้อนุมัติ
+    </button>
+    <button type="button" class="btn btn-success btn-sm" id="btnApprove" data-bs-toggle="modal" data-bs-target="#modalConfirmApprove">
+        <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติคำขอ
+    </button>
+    <button type="button" class="btn btn-danger btn-sm" id="btnReject" data-bs-toggle="modal" data-bs-target="#modalConfirmReject">
+        <i class="ri ri-close-circle-line me-1"></i> ไม่อนุมัติ
+    </button>
+    <button type="button" class="btn btn-outline-warning btn-sm" id="btnNotifyCorrect" data-bs-toggle="modal" data-bs-target="#modalNotifyCorrect">
+        <i class="ri ri-edit-line me-1"></i> แจ้งให้แก้ไข
+    </button>
+</div>
+
+<!-- ─── Tabs ─── -->
+<ul class="nav nav-tabs mb-4" id="changeTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">
+            <i class="ri ri-file-list-3-line me-1"></i> รายละเอียดคำขอ
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">
+            <i class="ri ri-attachment-line me-1"></i> หลักฐานประกอบ
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">
+            <i class="ri ri-scales-line me-1"></i> ผลการพิจารณา
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab">
+            <i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="changeTabsContent">
+
+    <!-- ============================================================ -->
+    <!-- TAB 1: รายละเอียดคำขอ -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+
+        <!-- ── ข้อมูล RMBS1:PS เดิม (readonly) ── -->
+        <div class="accordion mb-3" id="accordionOldRmbs1">
+            <div class="accordion-item border shadow-sm">
+                <h2 class="accordion-header">
+                    <button class="accordion-button fw-semibold py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOldRmbs1">
+                        <i class="ri ri-file-list-line me-2 text-primary"></i> ข้อมูล RMBS1:PS เดิม (ฉบับที่ออกแล้ว) — @rmbs1OldNo
+                    </button>
+                </h2>
+                <div id="collapseOldRmbs1" class="accordion-collapse collapse show" data-bs-parent="#accordionOldRmbs1">
+                    <div class="accordion-body">
+                        <div class="alert alert-info d-flex gap-2 py-2 mb-3 small">
+                            <i class="ri ri-lock-line mt-1 flex-shrink-0"></i>
+                            <span>ข้อมูลด้านล่างเป็นข้อมูลต้นฉบับที่ได้รับการอนุมัติแล้ว (อ่านอย่างเดียว)</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small">เลขที่ RMBS1:PS</label>
+                                <div class="field-display">@rmbs1OldNo</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">เลขที่ใบรับรองสุขภาพสัตว์ (CC)</label>
+                                <div class="field-display">ACC817FR1056</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">เลขที่ IMD</label>
+                                <div class="field-display">235012013161000086</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">ชื่อเรือ</label>
+                                <div class="field-display">AS PER CC No.MARTINEZ472</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">วันออกเอกสาร</label>
+                                <div class="field-display">17/08/2561</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">ประเภทสัตว์น้ำ</label>
+                                <div class="field-display">ปลาทูน่าอัลบาคอร์ ทั้งตัว แช่แข็ง</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">ปริมาณที่อนุมัติ (กก.)</label>
+                                <div class="field-display text-end">240,000.00</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">ผลการพิจารณาเดิม</label>
+                                <div class="field-display"><span class="badge bg-label-success">อนุมัติ PS</span></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">ประเทศปลายทางเดิม</label>
+                                <div class="field-display">ญี่ปุ่น (JP)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── รายละเอียดการเปลี่ยนแปลงที่ขอ ── -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-loop-left-line me-1 text-warning"></i> รายละเอียดการเปลี่ยนแปลงที่ขอ
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small">ประเภทการเปลี่ยนแปลง <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-sm" id="changeTypeSelect">
+                            <option selected>เปลี่ยนผลการพิจารณา</option>
+                            <option>ยกเลิกการออกเอกสาร</option>
+                            <option>เปลี่ยนความประสงค์</option>
+                            <option>เปลี่ยนประเทศปลายทาง</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">ผลการพิจารณาใหม่ที่ขอ <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-sm">
+                            <option selected>NoPS (ไม่ให้สิทธิ์ PS)</option>
+                            <option>PS (ให้สิทธิ์ PS)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">ประเทศปลายทางใหม่ (ถ้ามี)</label>
+                        <input type="text" class="form-control form-control-sm" value="สหรัฐอเมริกา (US)" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small">ความประสงค์ใหม่ (ถ้ามี)</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="ระบุความประสงค์ใหม่" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small">เหตุผลการขอเปลี่ยนแปลง <span class="text-danger">*</span></label>
+                        <textarea class="form-control" rows="3" placeholder="ระบุเหตุผลการขอเปลี่ยนแปลง...">พบว่าปลายทางจริงเปลี่ยนเป็นสหรัฐอเมริกา จึงต้องเปลี่ยนผลการพิจารณาให้สอดคล้อง</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ใบรับรองที่ได้รับผลกระทบ ── -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-file-warning-line me-1 text-danger"></i> ใบรับรองที่ได้รับผลกระทบ
+                <span class="badge bg-danger ms-2">ต้องยกเลิก / ออกใหม่</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>เลขที่ใบรับรอง</th>
+                                <th>ประเภทใบรับรอง</th>
+                                <th class="text-center">สถานะ</th>
+                                <th class="text-center">ผลกระทบ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>PS-2561-00123</td>
+                                <td>Processing Statement (PS)</td>
+                                <td class="text-center"><span class="badge bg-label-success">ออกแล้ว</span></td>
+                                <td class="text-center"><span class="badge bg-label-danger">ต้องยกเลิก</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>PS-2561-00124</td>
+                                <td>Processing Statement (PS)</td>
+                                <td class="text-center"><span class="badge bg-label-success">ออกแล้ว</span></td>
+                                <td class="text-center"><span class="badge bg-label-warning">ต้องตรวจสอบ</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB 2: หลักฐานประกอบ -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade" id="tab2" role="tabpanel">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                <span class="fw-semibold small"><i class="ri ri-attachment-line me-1 text-primary"></i> หลักฐานประกอบคำขอเปลี่ยนแปลง</span>
+                <button type="button" class="btn btn-sm btn-primary" id="btnAddAttachment">
+                    <i class="ri ri-upload-line me-1"></i> แนบไฟล์
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>ชื่อไฟล์</th>
+                                <th>ประเภทหลักฐาน</th>
+                                <th class="text-center">ขนาด</th>
+                                <th class="text-center">วันที่แนบ</th>
+                                <th class="text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><i class="ri ri-file-pdf-line text-danger me-1"></i> invoice_change_request.pdf</td>
+                                <td>Invoice สนับสนุนการเปลี่ยนแปลง</td>
+                                <td class="text-center">245 KB</td>
+                                <td class="text-center">05/10/2561</td>
+                                <td class="text-center">
+                                    <button class="btn btn-xs btn-outline-primary me-1" data-bs-toggle="tooltip" title="ดาวน์โหลด"><i class="ri ri-download-line"></i></button>
+                                    <button class="btn btn-xs btn-outline-danger" data-bs-toggle="tooltip" title="ลบ"><i class="ri ri-delete-bin-line"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td><i class="ri ri-file-word-line text-primary me-1"></i> explanation_letter.docx</td>
+                                <td>หนังสือชี้แจงเหตุผล</td>
+                                <td class="text-center">128 KB</td>
+                                <td class="text-center">05/10/2561</td>
+                                <td class="text-center">
+                                    <button class="btn btn-xs btn-outline-primary me-1" data-bs-toggle="tooltip" title="ดาวน์โหลด"><i class="ri ri-download-line"></i></button>
+                                    <button class="btn btn-xs btn-outline-danger" data-bs-toggle="tooltip" title="ลบ"><i class="ri ri-delete-bin-line"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Upload area mockup -->
+                <div class="border-2 border-dashed rounded p-4 text-center mt-3" id="uploadArea" style="border-style:dashed!important; cursor:pointer;">
+                    <i class="ri ri-cloud-upload-line fs-3 text-muted"></i>
+                    <div class="text-muted small mt-1">คลิกหรือลากไฟล์มาวางที่นี่ (PDF, DOC, JPG, PNG — ไม่เกิน 10 MB)</div>
+                    <div class="text-danger small d-none mt-1" id="uploadError">ไฟล์ที่เลือกไม่ถูกต้อง</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB 3: ผลการพิจารณา (Workflow 2 ขั้น) -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade" id="tab3" role="tabpanel">
+
+        <!-- ขั้นที่ 1: เจ้าหน้าที่ระดับพิจารณา -->
+        <div class="card shadow-sm mb-3" id="cardDecisionOfficer">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-user-line me-1 text-primary"></i> ขั้นที่ 1 — ผลการพิจารณาเจ้าหน้าที่
+                <span class="badge bg-label-success ms-2" id="badgeOfficerDecision">ส่งให้ผู้อนุมัติแล้ว ✅</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small">ผลการพิจารณา</label>
+                        <div class="field-display"><span class="badge bg-label-success">เห็นด้วย — อนุมัติการเปลี่ยนแปลง</span></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">ชื่อเจ้าหน้าที่</label>
+                        <div class="field-display">นางสาวกมลพร วงศ์ทอง</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">วันที่พิจารณา</label>
+                        <div class="field-display">06/10/2561</div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small">หมายเหตุเจ้าหน้าที่</label>
+                        <div class="field-display" style="min-height:4rem;align-items:flex-start;padding-top:0.6rem;">ตรวจสอบ invoice แล้ว ยืนยันว่าปลายทางเปลี่ยนเป็น US จริง เห็นควรอนุมัติการเปลี่ยนแปลง</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ขั้นที่ 2: ผู้อนุมัติ -->
+        <div class="card shadow-sm decision-card mb-3" id="cardApproverDecision">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-key-line me-1 text-success"></i> ขั้นที่ 2 — ผลการพิจารณาผู้อนุมัติ
+                <span class="badge bg-label-warning ms-2">รอผู้อนุมัติพิจารณา</span>
+            </div>
+            <div class="card-body" id="approverDecisionBody">
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-time-line mt-1 flex-shrink-0"></i>
+                    <span>คำขอนี้อยู่ระหว่างรอผู้อนุมัติพิจารณา กรุณากดปุ่ม "อนุมัติคำขอ" หรือ "ไม่อนุมัติ" ด้านบน</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small">ผลการพิจารณา</label>
+                        <select class="form-select form-select-sm" id="approverResultSelect">
+                            <option value="">— เลือกผลการพิจารณา —</option>
+                            <option value="approved">อนุมัติ</option>
+                            <option value="rejected">ไม่อนุมัติ</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small" for="approverRemark">หมายเหตุผู้อนุมัติ</label>
+                        <textarea id="approverRemark" class="form-control" rows="3" placeholder="ระบุหมายเหตุ (ไม่บังคับ)"></textarea>
+                    </div>
+                </div>
+                <!-- Approved result banner (hidden) -->
+                <div class="alert alert-success d-flex gap-2 py-2 mt-3 d-none" id="approvedResultBanner">
+                    <i class="ri ri-checkbox-circle-line mt-1 flex-shrink-0 text-success"></i>
+                    <span class="small">ผู้อนุมัติได้อนุมัติคำขอเปลี่ยนแปลงนี้แล้ว — ระบบจะดำเนินการเปลี่ยนแปลงข้อมูล RMBS1:PS และใบรับรองที่เกี่ยวข้องโดยอัตโนมัติ</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB 4: ประวัติการดำเนินการ -->
+    <!-- ============================================================ -->
+    <div class="tab-pane fade" id="tab4" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-header py-2 fw-semibold small">
+                <i class="ri ri-history-line me-1 text-primary"></i> ประวัติการดำเนินการ
+            </div>
+            <div class="card-body">
+                <ul class="history-timeline mt-2">
+                    <li class="success">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">ส่งคำขอให้ผู้อนุมัติ</div>
+                                <div class="text-muted small">เจ้าหน้าที่ระดับพิจารณาได้ส่งคำขอเปลี่ยนแปลงให้ผู้อนุมัติพิจารณาแล้ว</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: นางสาวกมลพร วงศ์ทอง</div>
+                            </div>
+                            <span class="badge bg-label-success text-nowrap ms-3">06/10/2561 14:22</span>
+                        </div>
+                    </li>
+                    <li class="warning">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">ผลการพิจารณาเจ้าหน้าที่</div>
+                                <div class="text-muted small">เห็นด้วย — อนุมัติการเปลี่ยนแปลง</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: นางสาวกมลพร วงศ์ทอง</div>
+                            </div>
+                            <span class="badge bg-label-warning text-nowrap ms-3">06/10/2561 14:20</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">แนบหลักฐานประกอบ</div>
+                                <div class="text-muted small">แนบ invoice_change_request.pdf และ explanation_letter.docx</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: บริษัท Alpha Office Automation Co., Ltd.</div>
+                            </div>
+                            <span class="badge bg-label-primary text-nowrap ms-3">05/10/2561 11:05</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold small">สร้างคำขอเปลี่ยนแปลง</div>
+                                <div class="text-muted small">สร้างคำขอ @changeRequestNo สำหรับ RMBS1:PS @rmbs1OldNo</div>
+                                <div class="text-muted small">ผู้ดำเนินการ: บริษัท Alpha Office Automation Co., Ltd.</div>
+                            </div>
+                            <span class="badge bg-label-secondary text-nowrap ms-3">05/10/2561 09:30</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== Modal: ส่งให้ผู้อนุมัติ ==================== -->
+<div class="modal fade" id="modalSendToApprover" tabindex="-1" aria-labelledby="modalSendToApproverLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalSendToApproverLabel">
+                    <i class="ri ri-send-plane-line me-1 text-primary"></i> ยืนยันส่งให้ผู้อนุมัติ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>ยืนยันส่งคำขอเปลี่ยนแปลง <strong>@changeRequestNo</strong> ให้ผู้อนุมัติพิจารณา ใช่หรือไม่?</p>
+                <label class="form-label small" for="sendApproverRemark">หมายเหตุเจ้าหน้าที่ (ไม่บังคับ)</label>
+                <textarea id="sendApproverRemark" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmSendToApprover" class="btn btn-primary">
+                    <i class="ri ri-send-plane-line me-1"></i> ยืนยันส่ง
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: อนุมัติคำขอ ==================== -->
+<div class="modal fade" id="modalConfirmApprove" tabindex="-1" aria-labelledby="modalConfirmApproveLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalConfirmApproveLabel">
+                    <i class="ri ri-checkbox-circle-line me-1 text-success"></i> ยืนยันอนุมัติคำขอเปลี่ยนแปลง
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success d-flex gap-2 py-2 mb-3 small">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span>เมื่ออนุมัติ ระบบจะอัปเดตข้อมูล RMBS1:PS และดำเนินการกับใบรับรองที่เกี่ยวข้องโดยอัตโนมัติ</span>
+                </div>
+                <label class="form-label small" for="approveRemark">หมายเหตุผู้อนุมัติ (ไม่บังคับ)</label>
+                <textarea id="approveRemark" class="form-control" rows="2" placeholder="ระบุหมายเหตุ"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmApprove" class="btn btn-success">
+                    <i class="ri ri-checkbox-circle-line me-1"></i> ยืนยันอนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ไม่อนุมัติ ==================== -->
+<div class="modal fade" id="modalConfirmReject" tabindex="-1" aria-labelledby="modalConfirmRejectLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalConfirmRejectLabel">
+                    <i class="ri ri-close-circle-line me-1 text-danger"></i> ยืนยันไม่อนุมัติ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label small" for="rejectReason">เหตุผลการไม่อนุมัติ <span class="text-danger">*</span></label>
+                <textarea id="rejectReason" class="form-control" rows="3" placeholder="ระบุเหตุผล..."></textarea>
+                <div id="rejectReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผล</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmReject" class="btn btn-danger">
+                    <i class="ri ri-close-circle-line me-1"></i> ยืนยันไม่อนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: แจ้งให้แก้ไข ==================== -->
+<div class="modal fade" id="modalNotifyCorrect" tabindex="-1" aria-labelledby="modalNotifyCorrectLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalNotifyCorrectLabel">
+                    <i class="ri ri-edit-line me-1 text-warning"></i> แจ้งให้แก้ไขคำขอ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label small" for="correctDetail">รายละเอียดที่ต้องแก้ไข <span class="text-danger">*</span></label>
+                <textarea id="correctDetail" class="form-control" rows="3" placeholder="ระบุรายละเอียดที่ต้องแก้ไข..."></textarea>
+                <div id="correctDetailError" class="text-danger small d-none mt-1">กรุณาระบุรายละเอียด</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmNotifyCorrect" class="btn btn-warning">
+                    <i class="ri ri-send-plane-line me-1"></i> ส่งแจ้งให้แก้ไข
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Tooltips
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+        new bootstrap.Tooltip(el, { trigger: 'hover' });
+    });
+
+    function showReviewToast(msg, type) {
+        var bg   = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+        var icon = type === 'success' ? 'ri-checkbox-circle-line' : type === 'danger' ? 'ri-close-circle-line' : 'ri-error-warning-line';
+        var toastEl = document.createElement('div');
+        toastEl.className = 'position-fixed bottom-0 end-0 p-3';
+        toastEl.style.zIndex = 9999;
+        toastEl.innerHTML =
+            '<div class="toast show align-items-center text-white ' + bg + ' border-0" role="alert">' +
+            '  <div class="d-flex">' +
+            '    <div class="toast-body d-flex align-items-center gap-2">' +
+            '      <i class="ri ' + icon + ' fs-5"></i> ' + msg +
+            '    </div>' +
+            '    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+            '  </div>' +
+            '</div>';
+        document.body.appendChild(toastEl);
+        setTimeout(function () { toastEl.remove(); }, 4000);
+    }
+
+    // Save draft
+    document.getElementById('btnSaveDraft').addEventListener('click', function () {
+        showReviewToast('บันทึกร่างคำขอเปลี่ยนแปลงเรียบร้อยแล้ว', 'info');
+    });
+
+    // Send to approver
+    document.getElementById('btnConfirmSendToApprover').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalSendToApprover')).hide();
+        showReviewToast('ส่งคำขอให้ผู้อนุมัติเรียบร้อยแล้ว', 'success');
+        // Update status banner
+        var banner = document.getElementById('statusBanner');
+        banner.className = 'review-banner pending mb-4 d-flex align-items-center gap-3';
+        banner.innerHTML =
+            '<i class="ri ri-send-plane-fill fs-4 text-primary"></i>' +
+            '<div><div class="fw-semibold">ส่งให้ผู้อนุมัติแล้ว</div>' +
+            '<div class="small text-muted">รอผู้อนุมัติพิจารณา</div></div>';
+    });
+
+    // Approve
+    document.getElementById('btnConfirmApprove').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalConfirmApprove')).hide();
+        showReviewToast('อนุมัติคำขอเปลี่ยนแปลงเรียบร้อยแล้ว — ระบบดำเนินการเปลี่ยนแปลงข้อมูลแล้ว', 'success');
+        document.getElementById('approvedResultBanner').classList.remove('d-none');
+        // Update status banner
+        var banner = document.getElementById('statusBanner');
+        banner.className = 'review-banner approved mb-4 d-flex align-items-center gap-3';
+        banner.innerHTML =
+            '<i class="ri ri-checkbox-circle-fill fs-4 text-success"></i>' +
+            '<div><div class="fw-semibold">อนุมัติแล้ว</div>' +
+            '<div class="small text-muted">ผู้อนุมัติได้อนุมัติคำขอเปลี่ยนแปลงนี้แล้ว</div></div>';
+    });
+
+    // Reject
+    document.getElementById('btnConfirmReject').addEventListener('click', function () {
+        var reason = document.getElementById('rejectReason').value.trim();
+        if (!reason) {
+            document.getElementById('rejectReasonError').classList.remove('d-none');
+            return;
+        }
+        document.getElementById('rejectReasonError').classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('modalConfirmReject')).hide();
+        showReviewToast('ไม่อนุมัติคำขอเปลี่ยนแปลงเรียบร้อยแล้ว', 'danger');
+        var banner = document.getElementById('statusBanner');
+        banner.className = 'review-banner rejected mb-4 d-flex align-items-center gap-3';
+        banner.innerHTML =
+            '<i class="ri ri-close-circle-fill fs-4 text-danger"></i>' +
+            '<div><div class="fw-semibold">ไม่อนุมัติ</div>' +
+            '<div class="small text-muted">ผู้อนุมัติไม่อนุมัติคำขอเปลี่ยนแปลงนี้</div></div>';
+    });
+
+    // Notify correct
+    document.getElementById('btnConfirmNotifyCorrect').addEventListener('click', function () {
+        var detail = document.getElementById('correctDetail').value.trim();
+        if (!detail) {
+            document.getElementById('correctDetailError').classList.remove('d-none');
+            return;
+        }
+        document.getElementById('correctDetailError').classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('modalNotifyCorrect')).hide();
+        showReviewToast('แจ้งให้แก้ไขเรียบร้อยแล้ว', 'warning');
+    });
+
+    // Upload area mock
+    document.getElementById('uploadArea').addEventListener('click', function () {
+        showReviewToast('ฟังก์ชันแนบไฟล์ — TODO: implement file upload', 'info');
+    });
+    document.getElementById('btnAddAttachment').addEventListener('click', function () {
+        showReviewToast('ฟังก์ชันแนบไฟล์ — TODO: implement file upload', 'info');
+    });
+});
+</script>
+}

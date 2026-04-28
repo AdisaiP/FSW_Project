@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "ขอเปลี่ยนแปลงใบรับรองฯ";
 
+    // TOR 1.7(26): expanded mockup data with all required search fields
     var requests = new[]
     {
         new
@@ -15,7 +16,17 @@
             StatusIcon = "ri-file-3-line",
             RequestedByText = "ผู้เข้าใช้ระบบ",
             RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
+            RequestedByIcon = "ri-user-3-line",
+            CertNo = "AC821B2171001",
+            Establishment = "Alpha Office Automation Co., Ltd.",
+            ApprovalNo = "AP-74110-001",
+            Product = "ปลาทูน่า / 0304.87.00",
+            Country = "AR",
+            RequestDate = new DateTime(2026, 4, 18),
+            ReceiveNo = "RCV-NMD-2569-00049",
+            ReceiveDate = new DateTime(2026, 4, 19),
+            ExportDate = new DateTime(2026, 5, 2),
+            InspectionDate = new DateTime(2026, 4, 30)
         },
         new
         {
@@ -29,7 +40,17 @@
             StatusIcon = "ri-mail-send-line",
             RequestedByText = "เจ้าหน้าที่",
             RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
+            RequestedByIcon = "ri-user-star-line",
+            CertNo = "AC821B2171101",
+            Establishment = "Beta Seafood Export Co., Ltd.",
+            ApprovalNo = "AP-74110-002",
+            Product = "ปลาทูน่าตาโต / 0303.44.00",
+            Country = "EU",
+            RequestDate = new DateTime(2026, 4, 19),
+            ReceiveNo = "RCV-PS-2569-00118",
+            ReceiveDate = new DateTime(2026, 4, 20),
+            ExportDate = new DateTime(2026, 5, 3),
+            InspectionDate = new DateTime(2026, 5, 1)
         },
         new
         {
@@ -43,7 +64,17 @@
             StatusIcon = "ri-checkbox-circle-line",
             RequestedByText = "ผู้เข้าใช้ระบบ",
             RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
+            RequestedByIcon = "ri-user-3-line",
+            CertNo = "AC821B2171201",
+            Establishment = "Gamma Fish Processing Ltd.",
+            ApprovalNo = "AP-74110-003",
+            Product = "กุ้งขาว / 0306.17.00",
+            Country = "JP",
+            RequestDate = new DateTime(2026, 4, 20),
+            ReceiveNo = "RCV-NMD-2569-00201",
+            ReceiveDate = new DateTime(2026, 4, 21),
+            ExportDate = new DateTime(2026, 5, 5),
+            InspectionDate = new DateTime(2026, 5, 3)
         },
         new
         {
@@ -57,7 +88,17 @@
             StatusIcon = "ri-file-3-line",
             RequestedByText = "เจ้าหน้าที่",
             RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
+            RequestedByIcon = "ri-user-star-line",
+            CertNo = "AC821B2171202",
+            Establishment = "Delta Marine Products Co., Ltd.",
+            ApprovalNo = "AP-74110-004",
+            Product = "ปลาแมคเคอเรล / 0302.54.00",
+            Country = "US",
+            RequestDate = new DateTime(2026, 4, 21),
+            ReceiveNo = "RCV-PS-2569-00202",
+            ReceiveDate = new DateTime(2026, 4, 21),
+            ExportDate = new DateTime(2026, 5, 8),
+            InspectionDate = new DateTime(2026, 5, 6)
         },
         new
         {
@@ -71,7 +112,17 @@
             StatusIcon = "ri-close-circle-line",
             RequestedByText = "ผู้เข้าใช้ระบบ",
             RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
+            RequestedByIcon = "ri-user-3-line",
+            CertNo = "AC821B2171305",
+            Establishment = "Epsilon Seafood Export Co., Ltd.",
+            ApprovalNo = "AP-74110-005",
+            Product = "ปลาซาร์ดีน / 0302.61.00",
+            Country = "CN",
+            RequestDate = new DateTime(2026, 4, 21),
+            ReceiveNo = "RCV-NMD-2569-00305",
+            ReceiveDate = new DateTime(2026, 4, 22),
+            ExportDate = new DateTime(2026, 5, 10),
+            InspectionDate = new DateTime(2026, 5, 8)
         },
         new
         {
@@ -85,7 +136,17 @@
             StatusIcon = "ri-mail-send-line",
             RequestedByText = "เจ้าหน้าที่",
             RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
+            RequestedByIcon = "ri-user-star-line",
+            CertNo = "AC821B2171410",
+            Establishment = "Zeta Fish Industry Co., Ltd.",
+            ApprovalNo = "AP-74110-006",
+            Product = "กุ้งกุลาดำ / 0306.16.00",
+            Country = "KR",
+            RequestDate = new DateTime(2026, 4, 22),
+            ReceiveNo = "RCV-PS-2569-00410",
+            ReceiveDate = new DateTime(2026, 4, 22),
+            ExportDate = new DateTime(2026, 5, 12),
+            InspectionDate = new DateTime(2026, 5, 10)
         },
         new
         {
@@ -99,7 +160,17 @@
             StatusIcon = "ri-checkbox-circle-line",
             RequestedByText = "ผู้เข้าใช้ระบบ",
             RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
+            RequestedByIcon = "ri-user-3-line",
+            CertNo = "AC821B2171501",
+            Establishment = "Eta Marine Export Co., Ltd.",
+            ApprovalNo = "AP-74110-007",
+            Product = "ปลาหมึกกล้วย / 0307.43.00",
+            Country = "AU",
+            RequestDate = new DateTime(2026, 4, 22),
+            ReceiveNo = "RCV-NMD-2569-00501",
+            ReceiveDate = new DateTime(2026, 4, 23),
+            ExportDate = new DateTime(2026, 5, 15),
+            InspectionDate = new DateTime(2026, 5, 13)
         },
         new
         {
@@ -113,7 +184,17 @@
             StatusIcon = "ri-forbid-line",
             RequestedByText = "เจ้าหน้าที่",
             RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
+            RequestedByIcon = "ri-user-star-line",
+            CertNo = "AC821B2171612",
+            Establishment = "Theta Seafood Processing Co., Ltd.",
+            ApprovalNo = "AP-74110-008",
+            Product = "ปลาทูน่า / 0304.87.00",
+            Country = "US",
+            RequestDate = new DateTime(2026, 4, 22),
+            ReceiveNo = "RCV-PS-2569-00612",
+            ReceiveDate = new DateTime(2026, 4, 23),
+            ExportDate = new DateTime(2026, 5, 18),
+            InspectionDate = new DateTime(2026, 5, 16)
         },
         new
         {
@@ -127,7 +208,17 @@
             StatusIcon = "ri-file-3-line",
             RequestedByText = "ผู้เข้าใช้ระบบ",
             RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
+            RequestedByIcon = "ri-user-3-line",
+            CertNo = "AC821B2171700",
+            Establishment = "Iota Fish Products Co., Ltd.",
+            ApprovalNo = "AP-74110-009",
+            Product = "กุ้งขาว / 0306.17.00",
+            Country = "JP",
+            RequestDate = new DateTime(2026, 4, 23),
+            ReceiveNo = "RCV-NMD-2569-00700",
+            ReceiveDate = new DateTime(2026, 4, 23),
+            ExportDate = new DateTime(2026, 5, 20),
+            InspectionDate = new DateTime(2026, 5, 18)
         },
         new
         {
@@ -141,7 +232,17 @@
             StatusIcon = "ri-mail-send-line",
             RequestedByText = "เจ้าหน้าที่",
             RequestedByClass = "bg-label-primary",
-            RequestedByIcon = "ri-user-star-line"
+            RequestedByIcon = "ri-user-star-line",
+            CertNo = "AC821B2171811",
+            Establishment = "Kappa Marine Industry Ltd.",
+            ApprovalNo = "AP-74110-010",
+            Product = "ปลาแมคเคอเรล / 0302.54.00",
+            Country = "EU",
+            RequestDate = new DateTime(2026, 4, 23),
+            ReceiveNo = "RCV-PS-2569-00811",
+            ReceiveDate = new DateTime(2026, 4, 24),
+            ExportDate = new DateTime(2026, 5, 22),
+            InspectionDate = new DateTime(2026, 5, 20)
         }
     };
 
@@ -228,22 +329,10 @@
 @section PageScripts {
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var fromInput = document.getElementById('filterDraftDateFrom');
-        var toInput = document.getElementById('filterDraftDateTo');
-
-        if (fromInput) {
-            flatpickr(fromInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
-
-        if (toInput) {
-            flatpickr(toInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
+        // Initialize flatpickr for all date filter inputs
+        document.querySelectorAll('.flatpickr-date').forEach(function(el) {
+            flatpickr(el, { dateFormat: 'd/m/Y', allowInput: true });
+        });
 
         if (window.bootstrap && bootstrap.Tooltip) {
             document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
@@ -273,55 +362,78 @@
         }
 
         function filterRows() {
-            var status = (document.getElementById('filterStatus').value || '').trim();
-            var fromDate = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
-            var toDate = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
-            var excludeRange = document.getElementById('filterDateExclude').checked;
+            var certType   = (document.getElementById('filterCertType').value || '').trim();
+            var certNo     = (document.getElementById('filterCertNo').value || '').trim().toLowerCase();
+            var requestNo  = (document.getElementById('filterRequestNo').value || '').trim().toLowerCase();
+            var estab      = (document.getElementById('filterEstablishment').value || '').trim().toLowerCase();
+            var approvalNo = (document.getElementById('filterApprovalNo').value || '').trim().toLowerCase();
+            var product    = (document.getElementById('filterProduct').value || '').trim().toLowerCase();
+            var country    = (document.getElementById('filterCountry').value || '').trim();
+            var submitFrom = parseDateInput(document.getElementById('filterSubmitDateFrom').value, false);
+            var submitTo   = parseDateInput(document.getElementById('filterSubmitDateTo').value, true);
+            var receiveNo  = (document.getElementById('filterReceiveNo').value || '').trim().toLowerCase();
+            var receiveDate = parseDateInput(document.getElementById('filterReceiveDate').value, false);
+            var status     = (document.getElementById('filterStatus').value || '').trim();
+            var exportFrom = parseDateInput(document.getElementById('filterExportDateFrom').value, false);
+            var exportTo   = parseDateInput(document.getElementById('filterExportDateTo').value, true);
+            var inspFrom   = parseDateInput(document.getElementById('filterInspDateFrom').value, false);
+            var inspTo     = parseDateInput(document.getElementById('filterInspDateTo').value, true);
             var rows = document.querySelectorAll('#requestTableBody tr[data-certificate]');
             var visibleCount = 0;
 
             rows.forEach(function (row) {
-                var rowStatus = row.dataset.status || '';
-                var rowDraftDate = new Date(row.dataset.draftDate || '');
-                var statusMatch = !status || rowStatus === status;
-                var dateMatch;
-                if (!fromDate && !toDate) {
-                    dateMatch = true;
-                } else if (excludeRange) {
-                    var inRange = (!fromDate || rowDraftDate >= fromDate) && (!toDate || rowDraftDate <= toDate);
-                    dateMatch = !inRange;
-                } else {
-                    dateMatch = (!fromDate || rowDraftDate >= fromDate) && (!toDate || rowDraftDate <= toDate);
-                }
-                var isVisible = statusMatch && dateMatch;
+                var certTypeMatch   = !certType   || row.dataset.certificate === certType;
+                var certNoMatch     = !certNo     || (row.dataset.certNo || '').toLowerCase().includes(certNo);
+                var requestNoMatch  = !requestNo  || (row.dataset.requestNo || '').toLowerCase().includes(requestNo);
+                var estabMatch      = !estab      || (row.dataset.establishment || '').toLowerCase().includes(estab);
+                var approvalMatch   = !approvalNo || (row.dataset.approvalNo || '').toLowerCase().includes(approvalNo);
+                var productMatch    = !product    || (row.dataset.product || '').toLowerCase().includes(product);
+                var countryMatch    = !country    || (row.dataset.country || '') === country;
+                var statusMatch     = !status     || (row.dataset.status || '') === status;
+                var receiveNoMatch  = !receiveNo  || (row.dataset.receiveNo || '').toLowerCase().includes(receiveNo);
+
+                var rowSubmitDate   = new Date(row.dataset.submitDate || '');
+                var rowReceiveDate  = new Date(row.dataset.receiveDate || '');
+                var rowExportDate   = new Date(row.dataset.exportDate || '');
+                var rowInspDate     = new Date(row.dataset.inspDate || '');
+
+                var submitDateMatch  = (!submitFrom && !submitTo)  || ((!submitFrom || rowSubmitDate >= submitFrom) && (!submitTo  || rowSubmitDate <= submitTo));
+                var receiveDateMatch = !receiveDate || (rowReceiveDate >= receiveDate && rowReceiveDate <= parseDateInput(document.getElementById('filterReceiveDate').value, true));
+                var exportDateMatch  = (!exportFrom && !exportTo)  || ((!exportFrom || rowExportDate >= exportFrom) && (!exportTo  || rowExportDate <= exportTo));
+                var inspDateMatch    = (!inspFrom   && !inspTo)    || ((!inspFrom   || rowInspDate >= inspFrom)   && (!inspTo    || rowInspDate <= inspTo));
+
+                var isVisible = certTypeMatch && certNoMatch && requestNoMatch && estabMatch && approvalMatch && productMatch && countryMatch && statusMatch && receiveNoMatch && submitDateMatch && receiveDateMatch && exportDateMatch && inspDateMatch;
 
                 row.classList.toggle('d-none', !isVisible);
-                if (isVisible) {
-                    visibleCount += 1;
-                }
+                if (isVisible) { visibleCount += 1; }
             });
 
             document.getElementById('requestTableEmpty').classList.toggle('d-none', visibleCount !== 0);
         }
 
         document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
-        document.getElementById('filterStatus').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateFrom').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateTo').addEventListener('change', filterRows);
-        document.getElementById('filterDateExclude').addEventListener('change', filterRows);
-        document.querySelectorAll('#filterStatus, #filterDraftDateFrom, #filterDraftDateTo').forEach(function (element) {
-            element.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    filterRows();
-                }
+        ['filterCertType','filterCertNo','filterRequestNo','filterEstablishment','filterApprovalNo',
+         'filterProduct','filterCountry','filterStatus','filterReceiveNo',
+         'filterSubmitDateFrom','filterSubmitDateTo','filterReceiveDate',
+         'filterExportDateFrom','filterExportDateTo','filterInspDateFrom','filterInspDateTo'
+        ].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('change', filterRows);
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
         document.getElementById('btnResetRequests').addEventListener('click', function () {
+            ['filterCertNo','filterRequestNo','filterEstablishment','filterApprovalNo','filterProduct',
+             'filterReceiveNo','filterSubmitDateFrom','filterSubmitDateTo','filterReceiveDate',
+             'filterExportDateFrom','filterExportDateTo','filterInspDateFrom','filterInspDateTo'
+            ].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.getElementById('filterCertType').value = '';
             document.getElementById('filterStatus').value = '';
-            document.getElementById('filterDraftDateFrom').value = '';
-            document.getElementById('filterDraftDateTo').value = '';
-            document.getElementById('filterDateExclude').checked = false;
             filterRows();
         });
     });
@@ -345,11 +457,54 @@
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h5 class="card-title mb-1">ตัวกรองการค้นหา</h5>
-            <p class="text-muted small mb-0">ค้นหารายการคำขอตามประเภทใบรับรองและช่วงวันที่ร่างคำขอ</p>
+            <p class="text-muted small mb-0">ค้นหารายการคำขอตามเงื่อนไข (TOR 1.7(26))</p>
         </div>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end">
+            @* Row 1 *@
+            <div class="col-md-4 col-lg-3">
+                <label for="filterCertType" class="form-label">ประเภทใบรับรอง</label>
+                <select id="filterCertType" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="processing">ใบรับรองการแปรรูปสัตว์น้ำ (PS)</option>
+                    <option value="declaration">ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</option>
+                </select>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterCertNo" class="form-label">เลขที่ใบรับรอง</label>
+                <input type="text" id="filterCertNo" class="form-control" placeholder="เช่น AC821B2171101" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterRequestNo" class="form-label">เลขที่คำขอ</label>
+                <input type="text" id="filterRequestNo" class="form-control" placeholder="เช่น 10611180131800118" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterEstablishment" class="form-label">ชื่อสถานประกอบการ</label>
+                <input type="text" id="filterEstablishment" class="form-control" placeholder="ชื่อสถานประกอบการ" />
+            </div>
+            @* Row 2 *@
+            <div class="col-md-4 col-lg-3">
+                <label for="filterApprovalNo" class="form-label">หมายเลขรับรองโรงงาน</label>
+                <input type="text" id="filterApprovalNo" class="form-control" placeholder="เช่น AP-74110-001" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterProduct" class="form-label">ชื่อสินค้า</label>
+                <input type="text" id="filterProduct" class="form-control" placeholder="ชื่อสินค้า / HS Code" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterCountry" class="form-label">ประเทศปลายทาง</label>
+                <select id="filterCountry" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="AR">AR — อาร์เจนตินา</option>
+                    <option value="AU">AU — ออสเตรเลีย</option>
+                    <option value="CN">CN — จีน</option>
+                    <option value="EU">EU — สหภาพยุโรป</option>
+                    <option value="JP">JP — ญี่ปุ่น</option>
+                    <option value="KR">KR — เกาหลีใต้</option>
+                    <option value="US">US — สหรัฐอเมริกา</option>
+                </select>
+            </div>
             <div class="col-md-4 col-lg-3">
                 <label for="filterStatus" class="form-label">สถานะ</label>
                 <select id="filterStatus" class="form-select">
@@ -361,32 +516,48 @@
                     <option value="ยกเลิก">ยกเลิก</option>
                 </select>
             </div>
-            <div class="col-md-12 col-lg-9">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-4">
-                        <label for="filterDraftDateFrom" class="form-label">วันที่ทำรายการ</label>
-                        <input type="text" id="filterDraftDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
-                    </div>
-                    <div class="col-md-4">
-                        <label for="filterDraftDateTo" class="form-label">ถึงวันที่</label>
-                        <input type="text" id="filterDraftDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
-                    </div>
-                    <div class="col-auto">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="filterDateExclude" />
-                            <label class="form-check-label small" for="filterDateExclude">ไม่อยู่ในช่วง</label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <div class="d-flex gap-2 filter-action-buttons">
-                            <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
-                                <i class="ri ri-search-line"></i>
-                            </button>
-                            <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square">
-                                <i class="ri ri-refresh-line"></i>
-                            </button>
-                        </div>
-                    </div>
+            @* Row 3 *@
+            <div class="col-md-4 col-lg-3">
+                <label for="filterSubmitDateFrom" class="form-label">วันที่ยื่น (ตั้งแต่)</label>
+                <input type="text" id="filterSubmitDateFrom" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterSubmitDateTo" class="form-label">วันที่ยื่น (ถึง)</label>
+                <input type="text" id="filterSubmitDateTo" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterReceiveNo" class="form-label">เลขที่รับ</label>
+                <input type="text" id="filterReceiveNo" class="form-control" placeholder="เช่น RCV-PS-2569-00118" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterReceiveDate" class="form-label">วันที่รับ</label>
+                <input type="text" id="filterReceiveDate" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            @* Row 4 *@
+            <div class="col-md-4 col-lg-3">
+                <label for="filterExportDateFrom" class="form-label">วันที่ส่งออก (ตั้งแต่)</label>
+                <input type="text" id="filterExportDateFrom" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterExportDateTo" class="form-label">วันที่ส่งออก (ถึง)</label>
+                <input type="text" id="filterExportDateTo" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterInspDateFrom" class="form-label">วันที่ตรวจปล่อย (ตั้งแต่)</label>
+                <input type="text" id="filterInspDateFrom" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <label for="filterInspDateTo" class="form-label">วันที่ตรวจปล่อย (ถึง)</label>
+                <input type="text" id="filterInspDateTo" class="form-control flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-auto">
+                <div class="d-flex gap-2 filter-action-buttons">
+                    <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
+                        <i class="ri ri-search-line"></i>
+                    </button>
+                    <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square" title="ล้างการค้นหา">
+                        <i class="ri ri-refresh-line"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -409,28 +580,44 @@
         <table class="table table-bordered align-middle mb-0 request-table-compact">
             <thead class="text-center">
                 <tr>
-                    <th style="min-width:180px;">เลขที่ใบรับรอง</th>
-                    <th style="min-width:200px;">ใบรับรอง</th>
-                    <th>เรื่อง</th>
-                    <th style="min-width:150px;">วันที่ทำรายการ</th>
+                    <th style="min-width:200px;">เลขที่คำขอ / ใบรับรอง</th>
+                    <th style="min-width:160px;">สถานประกอบการ / รับรองโรงงาน</th>
+                    <th style="min-width:160px;">สินค้า / ประเทศ</th>
+                    <th style="min-width:130px;">วันส่งออก / ตรวจปล่อย</th>
+                    <th style="min-width:140px;">เลขที่รับ / วันที่รับ</th>
+                    <th style="min-width:130px;">วันที่ทำรายการ</th>
                     <th style="width:6rem;"></th>
                 </tr>
             </thead>
             <tbody id="requestTableBody">
                 @foreach (var request in requests)
                 {
-                    <tr data-certificate="@request.CertificateKey" data-status="@request.StatusText" data-draft-date="@request.TransactionAt.ToString("yyyy-MM-ddTHH:mm:ss")">
+                    <tr data-certificate="@request.CertificateKey"
+                        data-status="@request.StatusText"
+                        data-draft-date="@request.TransactionAt.ToString("yyyy-MM-ddTHH:mm:ss")"
+                        data-cert-no="@request.CertNo"
+                        data-request-no="@request.RequestNumber"
+                        data-establishment="@request.Establishment"
+                        data-approval-no="@request.ApprovalNo"
+                        data-product="@request.Product"
+                        data-country="@request.Country"
+                        data-submit-date="@request.RequestDate.ToString("yyyy-MM-dd")"
+                        data-receive-no="@request.ReceiveNo"
+                        data-receive-date="@request.ReceiveDate.ToString("yyyy-MM-dd")"
+                        data-export-date="@request.ExportDate.ToString("yyyy-MM-dd")"
+                        data-insp-date="@request.InspectionDate.ToString("yyyy-MM-dd")">
                         <td>
-                                <a href="@(request.CertificateKey == "processing" ? Url.Action("CreateUpdateCertificate", "PSDeclaration") : Url.Action("CreateUpdateCertificate", "PSDeclaration"))"
-                                       class="fw-semibold text-primary text-decoration-none d-block mb-1">
+                            <a href="@(request.CertificateKey == "processing" ? Url.Action("CreateUpdateCertificate", "PSDeclaration") : Url.Action("CreateUpdateCertificate", "PSDeclaration"))"
+                                   class="fw-semibold text-primary text-decoration-none d-block mb-1">
                                 @request.RequestNumber
                             </a>
+                            <div class="small text-muted mb-1">@request.CertNo</div>
                             <div class="d-flex flex-column gap-1">
                                 <div class="d-flex align-items-center gap-1 small text-muted">
                                     <span class="badge @request.StatusClass rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:1.15rem;height:1.15rem;padding:0;">
                                         <i class="ri @request.StatusIcon" style="font-size:0.6rem;"></i>
                                     </span>
-                                    <span>สถานะ: @request.StatusText</span>
+                                    <span>@request.StatusText</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-1 small text-muted">
                                     <span class="badge @request.RequestedByClass rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:1.15rem;height:1.15rem;padding:0;">
@@ -440,8 +627,22 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="small">@request.CertificateName</td>
-                        <td class="small">@request.Subject</td>
+                        <td class="small">
+                            <div class="fw-semibold text-dark mb-1">@request.Establishment</div>
+                            <div class="text-muted">@request.ApprovalNo</div>
+                        </td>
+                        <td class="small">
+                            <div class="mb-1">@request.Product</div>
+                            <span class="badge bg-label-info">@request.Country</span>
+                        </td>
+                        <td class="text-center small text-nowrap">
+                            <div><i class="ri ri-ship-line me-1 text-muted"></i>@request.ExportDate.ToString("dd/MM/yyyy")</div>
+                            <div class="text-muted"><i class="ri ri-checkbox-circle-line me-1"></i>@request.InspectionDate.ToString("dd/MM/yyyy")</div>
+                        </td>
+                        <td class="small text-nowrap">
+                            <div class="fw-semibold">@request.ReceiveNo</div>
+                            <div class="text-muted">@request.ReceiveDate.ToString("dd/MM/yyyy")</div>
+                        </td>
                         <td class="text-center small text-nowrap">
                             @request.TransactionAt.ToString("dd/MM/yyyy")<br />
                             <span class="text-muted">(@request.TransactionAt.ToString("HH:mm:ss"))</span>
@@ -453,8 +654,7 @@
                                     <a href="@(request.CertificateKey == "processing" ? Url.Action("CreateManageCertificatePS", "PSDeclaration") : Url.Action("CreateManageCertificateNoPS", "PSDeclaration"))" class="btn btn-sm btn-icon btn-outline-warning" data-bs-toggle="tooltip" title="แก้ไข">
                                         <i class="ri ri-pencil-line text-warning"></i>
                                     </a>
-                                        <button type="button" class="btn btn-sm btn-icon btn-outline-primary"
-                                                data-bs-toggle="tooltip" title="ยืนยันส่งคำขอ">
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="ยืนยันส่งคำขอ">
                                         <i class="ri ri-send-plane-line text-primary"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="ลบ">
@@ -474,7 +674,7 @@
                     </tr>
                 }
                 <tr id="requestTableEmpty" class="d-none">
-                    <td colspan="5" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="7" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>

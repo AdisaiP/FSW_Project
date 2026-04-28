@@ -1,0 +1,16 @@
+# (6) กำหนดต้นแบบการลงทะเบียนรับเรื่อง + กำหนดผู้ทำหน้าที่แทน (proxy/delegate)
+
+URL: http://localhost:5055/Admin/ReceptionTemplate
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. หน้า Admin/ReceptionTemplate + summary cards (ต้นแบบทั้งหมด/ใช้งาน/รอทบทวน/มีผู้แทนแอคทีฟ)
+   + ตาราง 5 ต้นแบบ (RTP-001-RTP-005): รหัส/ชื่อ/ประเภทใบรับรอง/ขั้นตอน/ผู้รับผิดชอบ/ผู้แทน/สถานะ
+2. Modal #modalAddTemplate > ส่วนที่ 1 'ข้อมูลต้นแบบ'
+   - ชื่อต้นแบบ + checkbox ประเภทใบ (PS/NMD/Declaration) + ขั้นตอน 4 ขั้น (drag-drop)
+   - select ผู้รับผิดชอบหลัก
+3. Modal > section 'ผู้ทำหน้าที่แทน (Proxy/Delegate)'
+   - Proxy ลำดับ 1-3 + radio เงื่อนไข (ไม่ login N วัน/ตั้งค่าลา/Admin กำหนด) + ช่วงวันที่
+   - badge preview 'ผู้แทน: [ชื่อ] (ถึง [วันที่])' สีเขียวอ่อน
+4. Modal #modalProxy > กำหนดผู้แทน standalone + badge preview + checkbox email alert

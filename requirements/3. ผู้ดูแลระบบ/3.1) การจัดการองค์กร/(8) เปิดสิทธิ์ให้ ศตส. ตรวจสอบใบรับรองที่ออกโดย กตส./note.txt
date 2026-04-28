@@ -1,0 +1,13 @@
+# (8) เปิดสิทธิ์ให้ ศตส. ตรวจสอบใบรับรองที่ออกโดย กตส.
+
+URL: http://localhost:5055/Officer/IndexUserData
+
+จำนวนรูปที่ต้องแคป: 3 รูป
+
+รายการหน้าที่ต้องแคป
+1. IndexUserData > คอลัมน์ 'สิทธิ์ข้อมูล' > badge 'ตรวจ กตส.' (สีม่วง)
+   - เปรียบเทียบก่อน/หลังเปิดสิทธิ์
+2. Modal #dataAccessModal > section 'สิทธิ์ตรวจสอบใบรับรองที่ออกโดย กตส.'
+   - toggle certCrossAgencyToggle + checkbox ประเภทใบรับรอง (PS/NMD)
+3. Modal > section 'เงื่อนไขการตรวจสอบ'
+   - select กตส. ที่ให้ตรวจ + ช่วงวันที่มีผล + เหตุผล

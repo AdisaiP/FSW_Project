@@ -1,6 +1,15 @@
 @{
   TempData.Keep();
   string? currentPage = ViewContext.HttpContext.Request.Path;
+
+  string operatorType =
+    ViewContext.HttpContext.User.FindFirst("OperatorType")?.Value
+    ?? ViewContext.HttpContext.User.FindFirst("operator_type")?.Value
+    ?? ViewContext.HttpContext.Request.Query["operatorType"].ToString();
+
+  bool isFactoryOperator = string.IsNullOrWhiteSpace(operatorType)
+    || operatorType.Trim().Equals("โรงงาน", StringComparison.OrdinalIgnoreCase)
+    || operatorType.Trim().Equals("factory", StringComparison.OrdinalIgnoreCase);
 }
 
 <!-- Menu -->
@@ -73,11 +82,14 @@
               <div data-i18n="บันทึก RMBS1:PS">บันทึก RMBS1:PS</div>
           </a>
         </li>
-        <li class='menu-item@(currentPage == "/ImportAdjustment/IndexAdjustRMBS1NoPS" ? " active" : "")'>
-          <a asp-controller="ImportAdjustment" asp-action="IndexAdjustRMBS1NoPS" class="menu-link">
-            <div data-i18n="บันทึก RMBS1:NoPS">บันทึก RMBS1:NoPS</div>
-          </a>
-        </li>
+        @if (isFactoryOperator)
+        {
+          <li class='menu-item@(currentPage == "/ImportAdjustment/IndexAdjustRMBS1NoPS" ? " active" : "")'>
+            <a asp-controller="ImportAdjustment" asp-action="IndexAdjustRMBS1NoPS" class="menu-link">
+              <div data-i18n="บันทึก RMBS1:NoPS">บันทึก RMBS1:NoPS</div>
+            </a>
+          </li>
+        }
       </ul>
     </li>
 

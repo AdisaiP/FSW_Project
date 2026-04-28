@@ -10,6 +10,12 @@
             ImportPermitNumber = "23501100116100110",
             SeizureNumber = "23501200816100019",
             OperatorName = "Ocean Prime Export Co., Ltd.",
+            FactoryRegNo = "OPE-2569-001",
+            CertType = "NMD",
+            CertNo = "NMD-2569-OC-00551",
+            ProductName = "กุ้งแช่แข็ง",
+            Destination = "ญี่ปุ่น",
+            ReceiptNo = "รบ-คน.2569-00105",
             ReturnWeightStatusText = "อยู่ระหว่างดำเนินการ",
             StatusClass = "bg-label-info",
             StatusIcon = "ri-flag-2-line"
@@ -21,6 +27,12 @@
             ImportPermitNumber = "23501100116100114",
             SeizureNumber = "23501200816100022",
             OperatorName = "Andaman Seafood Processing Co., Ltd.",
+            FactoryRegNo = "ASP-2569-002",
+            CertType = "HC",
+            CertNo = "HC-2569-OC-00821",
+            ProductName = "ปลาทูน่าแช่แข็ง",
+            Destination = "สหรัฐอเมริกา",
+            ReceiptNo = "รบ-คน.2569-00106",
             ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนัก",
             StatusClass = "bg-label-success",
             StatusIcon = "ri-check-line"
@@ -32,6 +44,12 @@
             ImportPermitNumber = "23501100116100118",
             SeizureNumber = "23501200816100025",
             OperatorName = "Siam Frozen Tuna Co., Ltd.",
+            FactoryRegNo = "SFT-2569-003",
+            CertType = "NMD",
+            CertNo = "NMD-2569-OC-00561",
+            ProductName = "ปลาแซลมอนแช่แข็ง",
+            Destination = "สหภาพยุโรป",
+            ReceiptNo = "รบ-คน.2569-00107",
             ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข",
             StatusClass = "bg-label-primary",
             StatusIcon = "ri-check-double-line"
@@ -43,6 +61,12 @@
             ImportPermitNumber = "23501100116100121",
             SeizureNumber = "23501200816100030",
             OperatorName = "Gulf Catch Exporters Co., Ltd.",
+            FactoryRegNo = "GCE-2569-004",
+            CertType = "HC",
+            CertNo = "HC-2569-OC-00842",
+            ProductName = "หมึกกล้วยแช่แข็ง",
+            Destination = "จีน",
+            ReceiptNo = "รบ-คน.2569-00108",
             ReturnWeightStatusText = "ไม่อนุมัติให้คืนน้ำหนัก",
             StatusClass = "bg-label-danger",
             StatusIcon = "ri-close-line"
@@ -54,6 +78,12 @@
             ImportPermitNumber = "23501100116100124",
             SeizureNumber = "23501200816100034",
             OperatorName = "Pacific Fishery Group Co., Ltd.",
+            FactoryRegNo = "PFG-2569-005",
+            CertType = "NMD",
+            CertNo = "NMD-2569-OC-00575",
+            ProductName = "ปลาหมึกแช่แข็ง",
+            Destination = "เกาหลีใต้",
+            ReceiptNo = "รบ-คน.2569-00109",
             ReturnWeightStatusText = "ยกเลิก",
             StatusClass = "bg-label-secondary",
             StatusIcon = "ri-forbid-line"
@@ -65,6 +95,12 @@
             ImportPermitNumber = "23501100116100128",
             SeizureNumber = "23501200816100039",
             OperatorName = "Eastern Aqua Trade Co., Ltd.",
+            FactoryRegNo = "EAT-2569-006",
+            CertType = "HC",
+            CertNo = "HC-2569-OC-00855",
+            ProductName = "กุ้งต้มแช่แข็ง",
+            Destination = "ออสเตรเลีย",
+            ReceiptNo = "รบ-คน.2569-00110",
             ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนัก",
             StatusClass = "bg-label-success",
             StatusIcon = "ri-check-line"
@@ -76,6 +112,12 @@
             ImportPermitNumber = "23501100116100136",
             SeizureNumber = "23501200816100047",
             OperatorName = "Southern Pelagic Co., Ltd.",
+            FactoryRegNo = "SPL-2569-007",
+            CertType = "NMD",
+            CertNo = "NMD-2569-OC-00591",
+            ProductName = "ปลาทูน่าตาโต",
+            Destination = "แคนาดา",
+            ReceiptNo = "รบ-คน.2569-00112",
             ReturnWeightStatusText = "อยู่ระหว่างดำเนินการ",
             StatusClass = "bg-label-info",
             StatusIcon = "ri-flag-2-line"
@@ -250,6 +292,15 @@
                 var fromDate = parseDateInput(document.getElementById('filterDocumentDateFrom').value, false);
                 var toDate = parseDateInput(document.getElementById('filterDocumentDateTo').value, true);
                 var excludeRange = document.getElementById('filterDateExclude').checked;
+                // 2.8(11): ค้นหาขั้นสูง
+                var certType = (document.getElementById('filterCertType').value || '').trim();
+                var certNo = (document.getElementById('filterCertNo').value || '').trim().toLowerCase();
+                var operatorName = (document.getElementById('filterOperatorName').value || '').trim().toLowerCase();
+                var factoryReg = (document.getElementById('filterFactoryReg').value || '').trim().toLowerCase();
+                var product = (document.getElementById('filterProduct').value || '').trim().toLowerCase();
+                var destination = (document.getElementById('filterDestination').value || '').trim();
+                var receiptNo = (document.getElementById('filterReceiptNo').value || '').trim().toLowerCase();
+
                 var rows = document.querySelectorAll('#requestTableBody tr[data-doc-number]');
                 var visibleCount = 0;
 
@@ -259,11 +310,25 @@
                     var rowSeizureNumber = (row.dataset.seizureNumber || '').toLowerCase();
                     var rowStatus = row.dataset.returnWeightStatus || '';
                     var rowDocumentDate = new Date(row.dataset.docDate || '');
+                    var rowCertType = row.dataset.certType || '';
+                    var rowCertNo = (row.dataset.certNo || '').toLowerCase();
+                    var rowOperatorName = (row.dataset.operatorName || '').toLowerCase();
+                    var rowFactoryReg = (row.dataset.factoryReg || '').toLowerCase();
+                    var rowProduct = (row.dataset.product || '').toLowerCase();
+                    var rowDestination = row.dataset.destination || '';
+                    var rowReceiptNo = (row.dataset.receiptNo || '').toLowerCase();
 
-                    var documentMatch = !documentNumber || rowDocumentNumber.indexOf(documentNumber) >= 0;
+                    var documentMatch = !documentNumber || rowDocumentNumber.indexOf(documentNumber) >= 0 || rowReceiptNo.indexOf(documentNumber) >= 0;
                     var importPermitMatch = !importPermitNumber || rowImportPermit.indexOf(importPermitNumber) >= 0;
                     var seizureMatch = !seizureNumber || rowSeizureNumber.indexOf(seizureNumber) >= 0;
                     var statusMatch = !status || rowStatus === status;
+                    var certTypeMatch = !certType || rowCertType === certType;
+                    var certNoMatch = !certNo || rowCertNo.indexOf(certNo) >= 0;
+                    var operatorMatch = !operatorName || rowOperatorName.indexOf(operatorName) >= 0;
+                    var factoryMatch = !factoryReg || rowFactoryReg.indexOf(factoryReg) >= 0;
+                    var productMatch = !product || rowProduct.indexOf(product) >= 0;
+                    var destinationMatch = !destination || rowDestination === destination;
+                    var receiptMatch = !receiptNo || rowReceiptNo.indexOf(receiptNo) >= 0;
                     var dateMatch;
                     if (!fromDate && !toDate) {
                         dateMatch = true;
@@ -273,7 +338,8 @@
                     } else {
                         dateMatch = (!fromDate || rowDocumentDate >= fromDate) && (!toDate || rowDocumentDate <= toDate);
                     }
-                    var isVisible = documentMatch && importPermitMatch && seizureMatch && statusMatch && dateMatch;
+                    var isVisible = documentMatch && importPermitMatch && seizureMatch && statusMatch && dateMatch
+                                 && certTypeMatch && certNoMatch && operatorMatch && factoryMatch && productMatch && destinationMatch && receiptMatch;
 
                     row.classList.toggle('d-none', !isVisible);
                     if (isVisible) {
@@ -289,7 +355,9 @@
             document.getElementById('filterDocumentDateFrom').addEventListener('change', filterRows);
             document.getElementById('filterDocumentDateTo').addEventListener('change', filterRows);
             document.getElementById('filterDateExclude').addEventListener('change', filterRows);
-            document.querySelectorAll('#filterDocumentNumber, #filterImportPermit, #filterSeizure, #filterReturnWeightStatus, #filterDocumentDateFrom, #filterDocumentDateTo').forEach(function (element) {
+            document.getElementById('filterCertType').addEventListener('change', filterRows);
+            document.getElementById('filterDestination').addEventListener('change', filterRows);
+            document.querySelectorAll('#filterDocumentNumber, #filterImportPermit, #filterSeizure, #filterCertNo, #filterOperatorName, #filterFactoryReg, #filterProduct, #filterReceiptNo, #filterDocumentDateFrom, #filterDocumentDateTo').forEach(function (element) {
                 element.addEventListener('keydown', function (event) {
                     if (event.key === 'Enter') {
                         event.preventDefault();
@@ -305,9 +373,45 @@
                 document.getElementById('filterDocumentDateFrom').value = '';
                 document.getElementById('filterDocumentDateTo').value = '';
                 document.getElementById('filterDateExclude').checked = false;
+                document.getElementById('filterCertType').value = '';
+                document.getElementById('filterCertNo').value = '';
+                document.getElementById('filterOperatorName').value = '';
+                document.getElementById('filterFactoryReg').value = '';
+                document.getElementById('filterProduct').value = '';
+                document.getElementById('filterDestination').value = '';
+                document.getElementById('filterReceiptNo').value = '';
                 filterRows();
             });
 
+            // 2.8(13): Export Excel mockup
+            function exportToExcel() {
+                var rows = document.querySelectorAll('#requestTableBody tr:not(.d-none)');
+                if (rows.length === 0) {
+                    alert('ไม่มีข้อมูลที่จะ Export');
+                    return;
+                }
+                var headers = ['เลขที่เอกสาร', 'ผู้ประกอบการ', 'น้ำหนักที่คืน (กก.)', 'วัตถุประสงค์', 'สถานะ', 'วันที่ออกเอกสาร'];
+                var lines = [headers.join('\t')];
+                rows.forEach(function (row) {
+                    var docNo = row.dataset.docNo || '';
+                    var operator = row.dataset.operatorName || '';
+                    var returnWt = row.dataset.returnWeight || '-';
+                    var purpose = row.dataset.purpose || '-';
+                    var status = (row.querySelector('.badge') || {}).textContent || '';
+                    var docDate = row.dataset.docDate || '';
+                    lines.push([docNo, operator, returnWt, purpose, status.trim(), docDate].join('\t'));
+                });
+                var content = '\uFEFF' + lines.join('\n');
+                var blob = new Blob([content], { type: 'application/vnd.ms-excel;charset=utf-8' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'คำขอคืนน้ำหนัก_' + new Date().toLocaleDateString('th-TH') + '.xls';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
 
         });
     </script>
@@ -396,13 +500,17 @@
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h5 class="card-title mb-1">ตัวกรองการค้นหา</h5>
-            <p class="text-muted small mb-0">ค้นหาจากเลขที่เอกสาร เลขที่ใบอนุญาตนำเข้า เลขที่ใบอายัดสินค้า สถานะการคืนน้ำหนัก และวันที่ออกเอกสาร</p>
+            <p class="text-muted small mb-0">ค้นหาจากเลขที่เอกสาร เลขที่ใบอนุญาตนำเข้า สถานะ วันที่ และอื่นๆ</p>
         </div>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                data-bs-target="#advancedSearchCollapse" aria-expanded="false">
+            <i class="ri ri-filter-3-line me-1"></i>ค้นหาขั้นสูง
+        </button>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end">
             <div class="col-md-6 col-lg-3">
-                <label for="filterDocumentNumber" class="form-label">เลขที่เอกสาร</label>
+                <label for="filterDocumentNumber" class="form-label">เลขที่เอกสาร / รับคำขอ</label>
                 <input type="text" id="filterDocumentNumber" class="form-control" placeholder="ระบุเลขที่เอกสาร" />
             </div>
             <div class="col-md-6 col-lg-3">
@@ -425,7 +533,7 @@
                 </select>
             </div>
             <div class="col-md-6 col-lg-3">
-                <label for="filterDocumentDateFrom" class="form-label">วันที่ออกเอกสาร</label>
+                <label for="filterDocumentDateFrom" class="form-label">วันที่ยื่นคำขอ (จาก)</label>
                 <input type="text" id="filterDocumentDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
             </div>
             <div class="col-md-6 col-lg-3">
@@ -449,6 +557,55 @@
                 </div>
             </div>
         </div>
+
+        @* ค้นหาขั้นสูง (2.8(11)) *@
+        <div class="collapse mt-3 pt-3 border-top" id="advancedSearchCollapse">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6 col-lg-3">
+                    <label for="filterCertType" class="form-label">ประเภทใบรับรอง</label>
+                    <select id="filterCertType" class="form-select">
+                        <option value="">-- ทุกประเภท --</option>
+                        <option value="NMD">NMD — ใบรับรองสัตว์น้ำไม่แปรรูป</option>
+                        <option value="HC">HC — ใบรับรองสุขอนามัย</option>
+                        <option value="CC">CC — ใบรับรองการจับสัตว์น้ำ</option>
+                        <option value="SCC">SCC — ใบรับรองการจับเสริม</option>
+                    </select>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="filterCertNo" class="form-label">เลขที่ใบรับรอง</label>
+                    <input type="text" id="filterCertNo" class="form-control" placeholder="เช่น NMD-2569-OC-00551" />
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="filterOperatorName" class="form-label">ชื่อสถานประกอบการ</label>
+                    <input type="text" id="filterOperatorName" class="form-control" placeholder="ระบุชื่อสถานประกอบการ" />
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="filterFactoryReg" class="form-label">เลขทะเบียนโรงงาน</label>
+                    <input type="text" id="filterFactoryReg" class="form-control" placeholder="เช่น OPE-2569-001" />
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="filterProduct" class="form-label">ชื่อสินค้า</label>
+                    <input type="text" id="filterProduct" class="form-control" placeholder="ระบุชื่อสินค้า" />
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="filterDestination" class="form-label">ประเทศปลายทาง</label>
+                    <select id="filterDestination" class="form-select">
+                        <option value="">-- ทุกประเทศ --</option>
+                        <option value="ญี่ปุ่น">ญี่ปุ่น</option>
+                        <option value="สหรัฐอเมริกา">สหรัฐอเมริกา</option>
+                        <option value="สหภาพยุโรป">สหภาพยุโรป</option>
+                        <option value="จีน">จีน</option>
+                        <option value="เกาหลีใต้">เกาหลีใต้</option>
+                        <option value="ออสเตรเลีย">ออสเตรเลีย</option>
+                        <option value="แคนาดา">แคนาดา</option>
+                    </select>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <label for="filterReceiptNo" class="form-label">เลขที่รับคำขอ</label>
+                    <input type="text" id="filterReceiptNo" class="form-control" placeholder="เช่น รบ-คน.2569-00105" />
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -458,6 +615,18 @@
         <div>
             <h5 class="card-title mb-1">รายการคำขอพิจารณาคืนนํ้าหนักสินค้าส่งคืน</h5>
             <p class="text-muted small mb-0">แสดงรายการที่รอเจ้าหน้าที่พิจารณาอนุมัติการคืนนํ้าหนักสินค้าส่งคืน</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            @* 2.8(13): ปุ่ม Export Excel *@
+            <button type="button" class="btn btn-outline-success" id="btnExportExcel"
+                    onclick="exportToExcel(); return false;">
+                <i class="ri ri-file-excel-line me-1"></i>Export Excel
+            </button>
+            @* 2.8(2): ปุ่มสร้างคำขอคืนน้ำหนัก (เจ้าหน้าที่) *@
+            <button type="button" class="btn btn-success"
+                    onclick="alert('TODO: เปิดฟอร์มสร้างคำขอคืนน้ำหนักโดยเจ้าหน้าที่'); return false;">
+                <i class="ri ri-add-line me-1"></i>สร้างคำขอคืนน้ำหนัก (เจ้าหน้าที่)
+            </button>
         </div>
     </div>
     <div class="table-responsive p-1">
@@ -484,7 +653,14 @@
                     <tr data-doc-number="@request.DocumentNumber" data-import-permit="@request.ImportPermitNumber"
                         data-seizure-number="@request.SeizureNumber"
                         data-return-weight-status="@request.ReturnWeightStatusText"
-                        data-doc-date="@request.DocumentDate.ToString("yyyy-MM-ddTHH:mm:ss")">
+                        data-doc-date="@request.DocumentDate.ToString("yyyy-MM-ddTHH:mm:ss")"
+                        data-cert-type="@request.CertType"
+                        data-cert-no="@request.CertNo"
+                        data-operator-name="@request.OperatorName"
+                        data-factory-reg="@request.FactoryRegNo"
+                        data-product="@request.ProductName"
+                        data-destination="@request.Destination"
+                        data-receipt-no="@request.ReceiptNo">
                         <td>
                             <a href="@Url.Action("ReviewReturnWeight", "Officer")"
                                    class="fw-semibold text-primary text-decoration-none d-block mb-1">
@@ -520,6 +696,12 @@
                                 </a>
                                 @if (canApprove)
                                 {
+                                    @* 2.8(2): ปุ่มแก้ไข *@
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                            data-bs-toggle="tooltip" title="แก้ไขคำขอ"
+                                            onclick="alert('TODO: แก้ไขคำขอ @request.DocumentNumber')">
+                                        <i class="ri ri-edit-line text-warning"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-success"
                                             data-bs-toggle="tooltip" title="อนุมัติให้คืนน้ำหนัก">
                                         <i class="ri ri-check-line text-success"></i>
@@ -531,6 +713,12 @@
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
                                             data-bs-toggle="tooltip" title="ไม่อนุมัติให้คืนน้ำหนัก">
                                         <i class="ri ri-close-line text-danger"></i>
+                                    </button>
+                                    @* 2.8(2): ปุ่มลบ *@
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                            data-bs-toggle="tooltip" title="ลบคำขอ"
+                                            onclick="if(confirm('ยืนยันการลบคำขอ @request.DocumentNumber ?')) alert('TODO: ลบคำขอ @request.DocumentNumber')">
+                                        <i class="ri ri-delete-bin-line text-danger"></i>
                                     </button>
                                 }
                                 @if (canCancel)

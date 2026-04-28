@@ -18,7 +18,13 @@
             QtyEnteringFactory = 240000m,
             DocumentType = "cc",
             StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning"
+            StatusClass = "bg-label-warning",
+            CertStatus = "ในการรับรอง",
+            DestCountryOk = true,
+            P1Number = "—",
+            QuotaStatus = "เพียงพอ",
+            QuotaRemaining = 240000m,
+            QuotaRequired = 240000m
         },
         new
         {
@@ -35,7 +41,13 @@
             QtyEnteringFactory = 60000m,
             DocumentType = "cc",
             StatusText = "อนุมัติแล้ว",
-            StatusClass = "bg-label-success"
+            StatusClass = "bg-label-success",
+            CertStatus = "ในการรับรอง",
+            DestCountryOk = true,
+            P1Number = "P1-2569-00121",
+            QuotaStatus = "เพียงพอ",
+            QuotaRemaining = 60000m,
+            QuotaRequired = 60000m
         },
         new
         {
@@ -52,7 +64,13 @@
             QtyEnteringFactory = 120000m,
             DocumentType = "scc",
             StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning"
+            StatusClass = "bg-label-warning",
+            CertStatus = "ในการรับรอง",
+            DestCountryOk = true,
+            P1Number = "—",
+            QuotaStatus = "ใกล้หมด",
+            QuotaRemaining = 9000m,
+            QuotaRequired = 120000m
         },
         new
         {
@@ -69,7 +87,13 @@
             QtyEnteringFactory = 45000m,
             DocumentType = "cc",
             StatusText = "อนุมัติแล้ว",
-            StatusClass = "bg-label-success"
+            StatusClass = "bg-label-success",
+            CertStatus = "ในการรับรอง",
+            DestCountryOk = true,
+            P1Number = "P1-2569-00099",
+            QuotaStatus = "เพียงพอ",
+            QuotaRemaining = 45000m,
+            QuotaRequired = 45000m
         },
         new
         {
@@ -86,7 +110,13 @@
             QtyEnteringFactory = 180000m,
             DocumentType = "cc",
             StatusText = "ไม่อนุมัติ",
-            StatusClass = "bg-label-danger"
+            StatusClass = "bg-label-danger",
+            CertStatus = "นอกการรับรอง",
+            DestCountryOk = false,
+            P1Number = "—",
+            QuotaStatus = "ไม่เพียงพอ",
+            QuotaRemaining = 500m,
+            QuotaRequired = 180000m
         }
     };
 }
@@ -156,6 +186,13 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+    }
+
+    /* TOR 1.6(4): Print CSS for P1 form */
+    @@media print {
+        body * { visibility: hidden; }
+        #p1FormA4Post, #p1FormA4Post * { visibility: visible; }
+        #p1FormA4Post { position: fixed; top: 0; left: 0; width: 100%; box-shadow: none; border: none; }
     }
 </style>
 }
@@ -250,7 +287,102 @@
                 if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
+
+        // แสดง modal P1 auto-issued เมื่อกดสร้างใหม่ (simulate หลังบันทึก)
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('p1issued') === '1') {
+            setTimeout(function () {
+                new bootstrap.Modal(document.getElementById('modalP1AutoIssuedPost')).show();
+            }, 500);
+        }
     });
+
+    // TOR 1.6(3): ยืนยันยกเลิกการซื้อขาย
+    function showCancelModal(imdNo) {
+        document.getElementById('cancelImdNumber').textContent = imdNo;
+        document.getElementById('cancelReason').value = '';
+        new bootstrap.Modal(document.getElementById('modalCancelSale')).show();
+    }
+
+    function confirmCancel() {
+        var reason = document.getElementById('cancelReason').value.trim();
+        if (!reason) {
+            document.getElementById('cancelReason').classList.add('is-invalid');
+            return;
+        }
+        document.getElementById('cancelReason').classList.remove('is-invalid');
+        bootstrap.Modal.getInstance(document.getElementById('modalCancelSale')).hide();
+        alert('ยกเลิกการซื้อขาย IMD: ' + document.getElementById('cancelImdNumber').textContent +
+            '\nระบบได้ยกเลิกเลขที่ P1 และคืน Balance Stock อัตโนมัติแล้ว (mockup)');
+    }
+
+    // TOR 1.6(4): แสดง Modal พิมพ์ P1
+    function showP1PrintModal(p1No, imdNo, product, qty) {
+        // Update modal fields
+        var p1Num = document.getElementById('printP1NumberPost');
+        var p1Prod = document.getElementById('printP1ProductPost');
+        var p1Qty1 = document.getElementById('printP1Qty1Post');
+        var p1Qty2 = document.getElementById('printP1Qty2Post');
+        var p1Date = document.getElementById('printP1DatePost');
+        if (p1Num) p1Num.textContent = p1No;
+        if (p1Prod) p1Prod.textContent = product || 'ผลิตภัณฑ์แปรรูปสัตว์น้ำ';
+        if (p1Qty1) p1Qty1.textContent = qty || '0.000';
+        if (p1Qty2) p1Qty2.textContent = qty || '0.000';
+        if (p1Date) p1Date.textContent = 'วันที่ออก: ' + new Date().toLocaleDateString('th-TH');
+        new bootstrap.Modal(document.getElementById('modalP1PrintPost')).show();
+    }
+
+    // TOR 1.6(4): พิมพ์ P1 Form
+    function printP1FormPost() {
+        var content = document.getElementById('p1FormA4Post').outerHTML;
+        var win = window.open('', '_blank', 'width=900,height=700');
+        win.document.write('<html><head><title>เอกสาร P1 — Product Balance Stock No.1</title>');
+        win.document.write('<style>body{font-family:Sarabun,sans-serif;margin:0;}#p1FormA4Post{margin:0 auto;padding:30px 40px;max-width:794px;}</style>');
+        win.document.write('</head><body>');
+        win.document.write(content);
+        win.document.write('<div style="text-align:center;margin-top:16px;"><button onclick="window.print()" style="padding:8px 24px;background:#154360;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;">พิมพ์</button></div>');
+        win.document.write('</body></html>');
+        win.document.close();
+    }
+
+    // TOR 1.6(12): ดูรายละเอียด P1 + P2
+    function showP1P2Detail(p1No, imdNo, product, qty) {
+        // Populate P1 fields
+        var p1Num = document.getElementById('detailP1Number');
+        var imdEl = document.getElementById('detailImdNo');
+        var prodEl = document.getElementById('detailProduct');
+        var sellerEl = document.getElementById('detailSeller');
+        if (p1Num) p1Num.textContent = p1No || 'P1-2569-00121';
+        if (imdEl)  imdEl.textContent = imdNo || 'IMD-2569-00089';
+        if (prodEl) prodEl.innerHTML  = (product || 'ปลาทูน่าอัลบาคอร์ แช่แข็ง') + '<br/><small class="text-primary">LOT-2561-001</small>';
+        // Show modal
+        new bootstrap.Modal(document.getElementById('modalP1P2Detail')).show();
+    }
+
+    function exportDetailP1Excel() {
+        var p1No = document.getElementById('detailP1Number') ? document.getElementById('detailP1Number').textContent : 'P1';
+        alert('Export Excel P1: ' + p1No + '.xlsx (mockup)\nระบบจะดาวน์โหลดรายละเอียด Balance Stock P1');
+    }
+
+    function exportDetailP2Excel() {
+        var p1No = document.getElementById('detailP1Number') ? document.getElementById('detailP1Number').textContent : 'P1';
+        alert('Export Excel P2 ที่เชื่อมกับ ' + p1No + ' (mockup)\nระบบจะดาวน์โหลดรายละเอียด P2 ทั้งหมด 2 รุ่น');
+    }
+
+    // TOR 1.6(4): Export Excel
+    function exportExcelPost() {
+        alert('Export Excel รายการทั้งหมดเป็นไฟล์ .xlsx (mockup)\nระบบจะดาวน์โหลดไฟล์ IMD_List_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    }
+
+    function exportP1ExcelPost() {
+        var p1No = document.getElementById('printP1NumberPost') ? document.getElementById('printP1NumberPost').textContent : 'P1';
+        alert('Export Excel เอกสาร P1: ' + p1No + ' เป็นไฟล์ .xlsx (mockup)\nระบบจะดาวน์โหลด ' + p1No + '.xlsx');
+    }
+
+    function downloadP1PDFPost() {
+        var p1No = document.getElementById('printP1NumberPost') ? document.getElementById('printP1NumberPost').textContent : 'P1';
+        alert('ดาวน์โหลด PDF: ' + p1No + '.pdf (mockup)\nระบบจะเรนเดอร์ PDF และดาวน์โหลดอัตโนมัติ');
+    }
 </script>
 }
 
@@ -362,9 +494,14 @@
             <h5 class="card-title mb-1">รายการขออนุมัติปริมาณ (จับคู่ภายหลัง)</h5>
             <p class="text-muted small mb-0">แสดงรายการขออนุมัติปริมาณตั้งต้นวัตถุดิบสัตว์น้ำนำเข้าภายหลัง</p>
         </div>
-        <a href="@Url.Action("CreatePost", "ImportAdjustment")" class="btn btn-primary btn-sm">
-            <i class="ri ri-add-line me-1"></i> สร้างคำขอ
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-outline-success btn-sm" onclick="exportExcelPost()" title="Export รายการทั้งหมดเป็น Excel">
+                <i class="ri ri-file-excel-2-line me-1"></i>เพิ่มเติม Excel
+            </button>
+            <a href="@Url.Action("CreatePost", "ImportAdjustment")" class="btn btn-primary btn-sm">
+                <i class="ri ri-add-line me-1"></i> สร้างคำขอ
+            </a>
+        </div>
     </div>
     <div class="table-responsive p-1">
         <table class="table table-bordered table-hover align-middle mb-0 imd-table">
@@ -380,6 +517,8 @@
                     <th>สินค้าประมง</th>
                     <th>ปริมาณสัตว์น้ำใน CC</th>
                     <th>ปริมาณสัตว์น้ำเข้าโรงงาน</th>
+                    <th>เลขที่ P1</th>
+                    <th>สถานะโควตา</th>
                     <th></th>
                 </tr>
             </thead>
@@ -430,6 +569,23 @@
                                     </span>
                                     <span class="fw-semibold">สถานะ :</span> <span class="ms-1">@rec.StatusText</span>
                                 </div>
+                                @if (rec.CertStatus == "นอกการรับรอง" || !rec.DestCountryOk)
+                                {
+                                    <div class="mt-1 d-flex flex-wrap gap-1">
+                                        @if (rec.CertStatus == "นอกการรับรอง")
+                                        {
+                                            <span class="badge bg-danger" style="font-size:10px;">
+                                                <i class="ri ri-lock-2-line me-1"></i>นอกการรับรอง 🔒
+                                            </span>
+                                        }
+                                        @if (!rec.DestCountryOk)
+                                        {
+                                            <span class="badge bg-label-danger" style="font-size:10px;">
+                                                <i class="ri ri-earth-line me-1"></i>ประเทศปลายทางไม่อยู่ในรายชื่อ 🔒
+                                            </span>
+                                        }
+                                    </div>
+                                }
                             </div>
                         </td>
                         <td>@rec.CcNumber</td>
@@ -440,28 +596,611 @@
                         <td style="max-width:220px;">@rec.FisheryProducts</td>
                         <td class="text-end">@rec.QtyInCC.ToString("N2")</td>
                         <td class="text-end">@rec.QtyEnteringFactory.ToString("N2")</td>
+                        <!-- เลขที่ P1 (TOR 1.6(3)) -->
+                        <td class="text-nowrap">
+                            @if (rec.P1Number != "—")
+                            {
+                                <a href="@Url.Action("IndexP1", "ImportAdjustment")" class="text-primary fw-semibold">
+                                    @rec.P1Number
+                                </a>
+                                <br />
+                                <span class="badge bg-label-primary" style="font-size:10px;">
+                                    <i class="ri ri-robot-line me-1"></i>ออกอัตโนมัติ
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">— รอออกเลขที่</span>
+                            }
+                        </td>
+                        <!-- สถานะโควตา (TOR 1.6(17)) -->
+                        <td class="text-center">
+                            @{
+                                var quotaBadgeClass = rec.QuotaStatus == "เพียงพอ" ? "bg-success" :
+                                                      rec.QuotaStatus == "ใกล้หมด" ? "bg-warning" : "bg-danger";
+                                var quotaIcon = rec.QuotaStatus == "เพียงพอ" ? "ri-checkbox-circle-line" :
+                                                rec.QuotaStatus == "ใกล้หมด" ? "ri-error-warning-line" : "ri-close-circle-line";
+                            }
+                            <span class="badge @quotaBadgeClass" style="font-size:10px;" title="คงเหลือ @rec.QuotaRemaining.ToString("N0") / ต้องการ @rec.QuotaRequired.ToString("N0") KGM">
+                                <i class="ri @quotaIcon me-1"></i>@rec.QuotaStatus
+                            </span>
+                            @if (rec.QuotaStatus == "ไม่เพียงพอ")
+                            {
+                                <br/>
+                                <small class="text-danger" style="font-size:9px;">
+                                    คงเหลือ @rec.QuotaRemaining.ToString("N0") /<br/>ต้องการ @rec.QuotaRequired.ToString("N0") KGM
+                                </small>
+                            }
+                            @if (rec.QuotaStatus == "ใกล้หมด")
+                            {
+                                <br/>
+                                <small class="text-warning" style="font-size:9px;">
+                                    คงเหลือ @rec.QuotaRemaining.ToString("N0") KGM
+                                </small>
+                            }
+                        </td>
                         <td>
                             <div class="d-flex gap-1 justify-content-center">
                                 <a href="@Url.Action("CreateIMD", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-info" title="รายละเอียด" data-bs-toggle="tooltip" data-bs-placement="top">
                                     <i class="ri ri-eye-line text-info"></i>
                                 </a>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top">
-                                    <i class="ri ri-pencil-line text-warning"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="คัดลอก" data-bs-toggle="tooltip" data-bs-placement="top">
-                                    <i class="ri ri-file-copy-line text-secondary"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="ลบ" data-bs-toggle="tooltip" data-bs-placement="top">
-                                    <i class="ri ri-delete-bin-line text-danger"></i>
-                                </button>
+                                @if (rec.StatusText is "รออนุมัติ" or "ไม่อนุมัติ")
+                                {
+                                    <!-- แก้ไขได้เฉพาะรออนุมัติ/ไม่อนุมัติ -->
+                                    <a href="@Url.Action("CreatePost", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-pencil-line text-warning"></i>
+                                    </a>
+                                    <!-- ยกเลิกการซื้อขาย -->
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                        title="ยกเลิกการซื้อขาย" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="showCancelModal('@rec.ImdNumber')">
+                                        <i class="ri ri-close-circle-line text-danger"></i>
+                                    </button>
+                                }
+                                else if (rec.StatusText == "อนุมัติแล้ว")
+                                {
+                                    <!-- อนุมัติแล้ว: ดู P1+P2 + พิมพ์ P1 + คัดลอก -->
+                                    <!-- TOR 1.6(12): ดูรายละเอียด P1+P2 -->
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-info"
+                                        title="ดูรายละเอียด P1 + P2" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="showP1P2Detail('@rec.P1Number', '@rec.ImdNumber', '@rec.FisheryProducts', '@rec.QtyEnteringFactory.ToString("N2")')">
+                                        <i class="ri ri-eye-line text-info"></i>
+                                    </button>
+                                    <a href="@Url.Action("IndexP1", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-success" title="ดูเอกสาร P1" data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <i class="ri ri-file-list-3-line text-success"></i>
+                                    </a>
+                                    <!-- ปุ่มพิมพ์ P1 (TOR 1.6(4)) -->
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-primary"
+                                        title="พิมพ์เอกสาร P1 (PDF)" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="showP1PrintModal('@rec.P1Number', '@rec.ImdNumber', '@rec.FisheryProducts', '@rec.QtyEnteringFactory.ToString("N2")')">
+                                        <i class="ri ri-printer-line text-primary"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary"
+                                        title="คัดลอก" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="alert('คัดลอกรายการ (mockup)')">
+                                        <i class="ri ri-file-copy-line text-secondary"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                        title="แก้ไข" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="alert('แก้ไขรายการ (mockup)')">
+                                        <i class="ri ri-pencil-line text-warning"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary"
+                                        title="คัดลอก" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        onclick="alert('คัดลอกรายการ (mockup)')">
+                                        <i class="ri ri-file-copy-line text-secondary"></i>
+                                    </button>
+                                }
                             </div>
                         </td>
                     </tr>
                 }
                 <tr id="imdTableEmpty" class="d-none">
-                    <td colspan="12" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="13" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- ==================== Modal: ยืนยันยกเลิกการซื้อขาย (TOR 1.6(3)) ==================== -->
+<div class="modal fade" id="modalCancelSale" tabindex="-1" aria-labelledby="modalCancelSaleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalCancelSaleLabel">
+                    <i class="ri ri-close-circle-line me-2"></i>ยืนยันยกเลิกการซื้อขาย
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-alert-line fs-5 flex-shrink-0 mt-1"></i>
+                    <div class="small">การยกเลิกจะคืนน้ำหนักกลับไปยัง Balance Stock ของ IMD เดิม และเลขที่ P1 (ถ้ามี) จะถูกยกเลิกอัตโนมัติ</div>
+                </div>
+                <table class="table table-sm table-borderless mb-0" style="font-size:0.9rem;">
+                    <tr>
+                        <td class="text-muted" style="width:40%;">เลขที่ IMD:</td>
+                        <td class="fw-semibold" id="cancelImdNumber">—</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">เหตุผลการยกเลิก:</td>
+                        <td></td>
+                    </tr>
+                </table>
+                <textarea class="form-control mt-2" id="cancelReason" rows="3"
+                    placeholder="ระบุเหตุผลการยกเลิก (จำเป็น)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancel()">
+                    <i class="ri ri-close-circle-line me-1"></i>ยืนยันยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: P1 ออกอัตโนมัติ (แสดงหลังบันทึกใหม่) (TOR 1.6(3)) ==================== -->
+<div class="modal fade" id="modalP1AutoIssuedPost" tabindex="-1" aria-labelledby="modalP1AutoIssuedPostLabel" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-primary">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalP1AutoIssuedPostLabel">
+                    <i class="ri ri-robot-line me-2"></i>ระบบออกเอกสาร P1 อัตโนมัติแล้ว
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="ri ri-file-list-3-line text-primary" style="font-size:3.5rem;"></i>
+                </div>
+                <p class="fw-semibold fs-6 mb-1">ระบบออกเอกสาร P1 อัตโนมัติเรียบร้อยแล้ว</p>
+                <p class="text-muted small mb-3">หลังบันทึกการซื้อขาย ระบบดึงข้อมูล RMBS1 + RMBS2 ออกเลขที่ P1 ทันที</p>
+                <div class="card border-0 bg-label-primary d-inline-block px-4 py-2 mb-3">
+                    <div class="text-muted small">เลขที่เอกสาร P1 (ออกอัตโนมัติ)</div>
+                    <div class="fs-4 fw-bold text-primary">P1-2569-00129</div>
+                </div>
+                <div class="row text-start g-2 px-2">
+                    <div class="col-6 small">
+                        <span class="text-muted">วันที่ออกเอกสาร:</span>
+                        <div class="fw-semibold">28/04/2569</div>
+                    </div>
+                    <div class="col-6 small">
+                        <span class="text-muted">ผลิตภัณฑ์:</span>
+                        <div class="fw-semibold">ปลาทูน่าอัลบาคอร์ แช่แข็ง</div>
+                    </div>
+                    <div class="col-6 small">
+                        <span class="text-muted">น้ำหนักจาก RMBS1:</span>
+                        <div class="fw-semibold text-primary">240,000.000 KGM</div>
+                    </div>
+                    <div class="col-6 small">
+                        <span class="text-muted">Balance คงเหลือ:</span>
+                        <div class="fw-semibold text-success">0.000 KGM</div>
+                    </div>
+                </div>
+                <div class="alert alert-primary small py-2 px-3 mt-3 mb-0 text-start">
+                    <i class="ri ri-information-line me-1"></i>
+                    ผู้ขายสามารถแก้ไขหรือยกเลิกรายการนี้ได้ หากสถานะยังเป็น "รออนุมัติ"
+                    เมื่อยกเลิก ระบบจะคืน Balance Stock และยกเลิกเลขที่ P1 อัตโนมัติ
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <a href="@Url.Action("IndexP1", "ImportAdjustment")" class="btn btn-outline-primary btn-sm">
+                    <i class="ri ri-eye-line me-1"></i>ดูเอกสาร P1
+                </a>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-check-line me-1"></i>รับทราบ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modals TOR 1.6(3) -->
+
+<!-- ==================== Modal: พิมพ์ฟอร์ม P1 (PDF Preview) (TOR 1.6(4)) ==================== -->
+<div class="modal fade" id="modalP1PrintPost" tabindex="-1" aria-labelledby="modalP1PrintPostLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalP1PrintPostLabel">
+                    <i class="ri ri-printer-line me-2"></i>พิมพ์ฟอร์ม P1 — Product Balance Stock No.1
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3 bg-light">
+                <!-- A4 Preview -->
+                <div id="p1FormA4Post" style="background:#fff;max-width:794px;min-height:1123px;margin:0 auto;padding:40px 50px;font-family:'Sarabun',sans-serif;font-size:14px;border:1px solid #ddd;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+                    <!-- หัวกรมประมง -->
+                    <div class="text-center mb-3">
+                        <div style="font-size:16px;font-weight:700;color:#1a5276;">กรมประมง — Department of Fisheries</div>
+                        <div style="font-size:13px;color:#555;">ระบบการจัดการวัตถุดิบสัตว์น้ำ (RMBS)</div>
+                        <div style="font-size:18px;font-weight:800;margin-top:8px;color:#154360;letter-spacing:1px;">
+                            เอกสาร P1 — Product Balance Stock No.1<br />
+                            <span style="font-size:13px;font-weight:400;color:#888;">ฟอร์มอิเล็กทรอนิกส์ / Electronic Form (PDF)</span>
+                        </div>
+                        <div style="border-top:2px solid #154360;margin-top:8px;padding-top:6px;">
+                            <span style="font-weight:700;color:#154360;font-size:15px;" id="printP1NumberPost">P1-2569-00121</span>
+                            <span class="ms-3" style="font-size:12px;color:#777;" id="printP1DatePost">วันที่ออก: 10/07/2561</span>
+                            <span class="ms-3 badge" style="background:#e8f4fd;color:#1565c0;font-size:11px;border:1px solid #90caf9;">
+                                <i class="ri ri-robot-line me-1"></i>ออกอัตโนมัติโดยระบบ
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนที่ 1: ข้อมูลผู้ขาย-ผู้ซื้อ -->
+                    <div style="border:1px solid #aaa;border-radius:4px;margin-bottom:12px;">
+                        <div style="background:#154360;color:#fff;padding:5px 12px;font-weight:700;font-size:13px;">
+                            ส่วนที่ 1 — ข้อมูลผู้ขายและผู้ซื้อ
+                        </div>
+                        <div style="padding:10px 14px;">
+                            <table style="width:100%;font-size:13px;border-collapse:collapse;">
+                                <tr>
+                                    <td style="width:50%;vertical-align:top;padding-right:12px;">
+                                        <div style="font-weight:700;margin-bottom:4px;color:#154360;">ผู้ขาย (Seller)</div>
+                                        <div>บริษัท ยูนิไทย ชิปยาร์ด แอนด์ เอนจิเนียริ่ง จำกัด</div>
+                                        <div style="color:#666;">ทะเบียน: TH-12345 | โรงงานแปรรูป</div>
+                                        <div style="color:#666;">ที่อยู่: 72/1 ถ.พระราม 3 เขตบางคอแหลม กรุงเทพ 10120</div>
+                                    </td>
+                                    <td style="width:50%;vertical-align:top;padding-left:12px;border-left:1px solid #ddd;">
+                                        <div style="font-weight:700;margin-bottom:4px;color:#154360;">ผู้ซื้อ (Buyer)</div>
+                                        <div>บริษัท ไทยยูเนี่ยน กรุ๊ป จำกัด (มหาชน)</div>
+                                        <div style="color:#666;">ทะเบียน: TH-67890 | โรงงานแปรรูป</div>
+                                        <div style="color:#666;">ที่อยู่: 72/1 ถ.พระราม 3 เขตบางคอแหลม กรุงเทพ 10120</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนที่ 2: ข้อมูลสินค้า / RMBS Balance -->
+                    <div style="border:1px solid #aaa;border-radius:4px;margin-bottom:12px;">
+                        <div style="background:#154360;color:#fff;padding:5px 12px;font-weight:700;font-size:13px;">
+                            ส่วนที่ 2 — รายละเอียดสินค้าและปริมาณ Balance Stock
+                        </div>
+                        <div style="padding:10px 14px;">
+                            <table style="width:100%;font-size:12px;border-collapse:collapse;border:1px solid #ccc;">
+                                <thead>
+                                    <tr style="background:#eaf2fb;">
+                                        <th style="border:1px solid #ccc;padding:5px 8px;text-align:center;">รายการ</th>
+                                        <th style="border:1px solid #ccc;padding:5px 8px;text-align:center;">รหัสสินค้า</th>
+                                        <th style="border:1px solid #ccc;padding:5px 8px;text-align:center;">ชื่อสินค้า</th>
+                                        <th style="border:1px solid #ccc;padding:5px 8px;text-align:center;">รุ่นการผลิต (Lot)</th>
+                                        <th style="border:1px solid #ccc;padding:5px 8px;text-align:right;">น้ำหนัก RMBS1 (KGM)</th>
+                                        <th style="border:1px solid #ccc;padding:5px 8px;text-align:right;">น้ำหนักขาย RMBS2 (KGM)</th>
+                                        <th style="border:1px solid #ccc;padding:5px 8px;text-align:right;font-weight:700;color:#1a5276;">Balance คงเหลือ (KGM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:center;">1</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:center;">0303.41.00</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;" id="printP1ProductPost">ปลาทูน่าอัลบาคอร์ แช่แข็ง</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:center;">LOT-2561-001</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:right;" id="printP1Qty1Post">240,000.000</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:right;" id="printP1Qty2Post">240,000.000</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:right;font-weight:700;color:#1a7a1a;">0.000</td>
+                                    </tr>
+                                    <tr style="background:#f9f9f9;">
+                                        <td colspan="4" style="border:1px solid #ccc;padding:5px 8px;text-align:right;font-weight:700;">รวมทั้งสิ้น</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:right;font-weight:700;">240,000.000</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:right;font-weight:700;">240,000.000</td>
+                                        <td style="border:1px solid #ccc;padding:5px 8px;text-align:right;font-weight:700;color:#1a7a1a;">0.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนที่ 3: เงื่อนไข/หมายเหตุ -->
+                    <div style="border:1px solid #aaa;border-radius:4px;margin-bottom:14px;">
+                        <div style="background:#154360;color:#fff;padding:5px 12px;font-weight:700;font-size:13px;">
+                            ส่วนที่ 3 — เงื่อนไขและหมายเหตุ
+                        </div>
+                        <div style="padding:10px 14px;font-size:12px;color:#333;">
+                            <ol style="margin:0;padding-left:18px;line-height:2;">
+                                <li>เอกสาร P1 นี้ออกโดยระบบอัตโนมัติ (Auto-Generated) หลังบันทึกการซื้อขาย RMBS2 เรียบร้อยแล้ว</li>
+                                <li>Balance Stock คำนวณจาก น้ำหนักวัตถุดิบใน RMBS1 หักด้วยน้ำหนักที่ขาย (RMBS2)</li>
+                                <li>หากมีการยกเลิกรายการ ระบบจะคืน Balance Stock และยกเลิกเลขที่ P1 นี้โดยอัตโนมัติ</li>
+                                <li>เอกสารนี้สามารถ Export เป็น PDF และ Excel ได้ผ่านระบบ RMBS</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- ลายเซ็น -->
+                    <div style="margin-top:24px;">
+                        <table style="width:100%;font-size:12px;">
+                            <tr>
+                                <td style="width:33%;text-align:center;padding:8px;">
+                                    <div style="border-top:1px solid #333;padding-top:6px;margin-top:32px;">
+                                        <div style="font-weight:700;">ผู้ขาย / Seller</div>
+                                        <div style="color:#666;">(ลงนามอิเล็กทรอนิกส์)</div>
+                                    </div>
+                                </td>
+                                <td style="width:34%;text-align:center;padding:8px;">
+                                    <div style="border:2px solid #154360;border-radius:50%;width:80px;height:80px;margin:0 auto;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+                                        <div style="font-size:9px;font-weight:700;color:#154360;line-height:1.2;">ระบบ<br/>RMBS<br/>กรมประมง</div>
+                                    </div>
+                                    <div style="font-size:10px;color:#888;margin-top:4px;">ออกโดยระบบอัตโนมัติ</div>
+                                </td>
+                                <td style="width:33%;text-align:center;padding:8px;">
+                                    <div style="border-top:1px solid #333;padding-top:6px;margin-top:32px;">
+                                        <div style="font-weight:700;">ผู้ซื้อ / Buyer</div>
+                                        <div style="color:#666;">(ลงนามอิเล็กทรอนิกส์)</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="border-top:1px solid #ccc;margin-top:16px;padding-top:8px;font-size:10px;color:#999;text-align:center;">
+                        พิมพ์จากระบบ RMBS — กรมประมง | วันที่พิมพ์: @DateTime.Now.ToString("dd/MM/yyyy HH:mm") | เอกสารฉบับอิเล็กทรอนิกส์นี้มีผลทางกฎหมายเทียบเท่าเอกสารต้นฉบับ
+                    </div>
+                </div>
+                <!-- /A4 Preview -->
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="exportP1ExcelPost()">
+                        <i class="ri ri-file-excel-2-line me-1"></i>Export Excel
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="downloadP1PDFPost()">
+                        <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด PDF
+                    </button>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="printP1FormPost()">
+                        <i class="ri ri-printer-line me-1"></i>พิมพ์
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal P1 Print TOR 1.6(4) -->
+
+<!-- ==================== Modal: ดูรายละเอียดเอกสาร P1 + P2 (TOR 1.6(12)) ==================== -->
+<div class="modal fade" id="modalP1P2Detail" tabindex="-1" aria-labelledby="modalP1P2DetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalP1P2DetailLabel">
+                    <i class="ri ri-eye-line me-2 text-info"></i>รายละเอียดเอกสาร P1 และ P2 — Product Balance Stock
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+
+                <!-- สรุปสถานะ + ปุ่ม Export ด้านบน -->
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <div>
+                        <span class="fw-semibold me-2">เลขที่ P1:</span>
+                        <span class="badge bg-primary fs-6 px-3 py-2" id="detailP1Number">P1-2569-00121</span>
+                        <span class="badge bg-label-success ms-2" id="detailP1Status">อนุมัติแล้ว</span>
+                        <span class="badge bg-label-warning ms-1" id="detailP1AutoBadge">
+                            <i class="ri ri-robot-line me-1"></i>ออกอัตโนมัติ
+                        </span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="exportDetailP1Excel()">
+                            <i class="ri ri-file-excel-2-line me-1"></i>Export P1 Excel
+                        </button>
+                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="exportDetailP2Excel()">
+                            <i class="ri ri-file-excel-2-line me-1"></i>Export P2 Excel
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="alert('ดาวน์โหลด PDF รวม P1+P2 (mockup)')">
+                            <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลด PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ======================== ส่วนที่ 1: รายละเอียด P1 ======================== -->
+                <div class="card border mb-3">
+                    <div class="card-header py-2" style="background:#154360;color:#fff;">
+                        <span class="fw-semibold"><i class="ri ri-file-list-3-line me-1"></i>เอกสาร P1 — Product Balance Stock No.1</span>
+                    </div>
+                    <div class="card-body py-3">
+                        <!-- ข้อมูลคู่ค้า -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="border rounded p-2 h-100">
+                                    <div class="small text-muted fw-semibold mb-1"><i class="ri ri-store-2-line me-1"></i>ผู้ขาย (Seller)</div>
+                                    <div class="fw-semibold" id="detailSeller">บริษัท ยูนิไทย ชิปยาร์ด แอนด์ เอนจิเนียริ่ง จำกัด</div>
+                                    <div class="small text-muted">ทะเบียน: TH-12345 | สถานประกอบการแปรรูป</div>
+                                    <span class="badge bg-success mt-1"><i class="ri ri-check-line me-1"></i>อยู่ในการรับรองกรมประมง</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-2 h-100">
+                                    <div class="small text-muted fw-semibold mb-1"><i class="ri ri-shopping-cart-line me-1"></i>ผู้ซื้อ (Buyer)</div>
+                                    <div class="fw-semibold" id="detailBuyer">บริษัท ไทยยูเนี่ยน กรุ๊ป จำกัด (มหาชน)</div>
+                                    <div class="small text-muted">ทะเบียน: TH-67890 | โรงงานแปรรูป</div>
+                                    <span class="badge bg-success mt-1"><i class="ri ri-check-line me-1"></i>อยู่ในการรับรองกรมประมง</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ตาราง Balance P1 -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle mb-0" style="font-size:0.82rem;">
+                                <thead class="table-primary text-center">
+                                    <tr>
+                                        <th>เลขที่ IMD</th>
+                                        <th>รหัสสินค้า</th>
+                                        <th>ชื่อสินค้า / รุ่น</th>
+                                        <th>วันที่ผลิต</th>
+                                        <th class="text-end">น้ำหนัก RMBS1 (KGM)</th>
+                                        <th class="text-end">น้ำหนักขาย RMBS2 (KGM)</th>
+                                        <th class="text-end">Balance คงเหลือ (KGM)</th>
+                                        <th>สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-primary fw-semibold" id="detailImdNo">IMD-2569-00089</td>
+                                        <td>0303.41.00</td>
+                                        <td id="detailProduct">ปลาทูน่าอัลบาคอร์ แช่แข็ง<br/><small class="text-primary">LOT-2561-001</small></td>
+                                        <td id="detailProdDate">10/07/2561</td>
+                                        <td class="text-end fw-semibold" id="detailQtyRmbs1">240,000.000</td>
+                                        <td class="text-end" id="detailQtyRmbs2">240,000.000</td>
+                                        <td class="text-end fw-bold text-success" id="detailBalance">0.000</td>
+                                        <td><span class="badge bg-label-success" id="detailP1StatusBadge">ใช้งานแล้ว</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- info row -->
+                        <div class="row g-2 mt-2">
+                            <div class="col-auto"><span class="badge bg-label-secondary small">วันที่ออก P1: <span id="detailP1IssueDate">10/07/2561</span></span></div>
+                            <div class="col-auto"><span class="badge bg-label-info small">วันที่อนุมัติ: <span id="detailP1ApproveDate">11/07/2561</span></span></div>
+                            <div class="col-auto"><span class="badge bg-label-primary small">เจ้าหน้าที่: นายสมชาย ใจดี</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================== ส่วนที่ 2: รายละเอียด P2 ที่เชื่อมกับ P1 ======================== -->
+                <div class="card border">
+                    <div class="card-header py-2 d-flex align-items-center justify-content-between" style="background:#7b3f00;color:#fff;">
+                        <span class="fw-semibold"><i class="ri ri-ship-line me-1"></i>เอกสาร P2 ที่เชื่อมกับ P1 — Product Balance Stock No.2 (ส่งออก)</span>
+                        <button type="button" class="btn btn-sm btn-light py-0 px-2" onclick="exportDetailP2Excel()">
+                            <i class="ri ri-file-excel-2-line me-1 text-success"></i><small>Export P2</small>
+                        </button>
+                    </div>
+                    <div class="card-body py-2">
+                        <!-- Summary P2 -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 bg-label-warning text-center py-2 px-2">
+                                    <div class="small text-muted">รุ่นส่งออก (P2)</div>
+                                    <div class="fw-bold text-warning">2 รุ่น</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 bg-label-primary text-center py-2 px-2">
+                                    <div class="small text-muted">น้ำหนักส่งออกรวม</div>
+                                    <div class="fw-bold text-primary">168,000 KGM</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 bg-label-success text-center py-2 px-2">
+                                    <div class="small text-muted">วัตถุดิบที่ใช้ (%Yield)</div>
+                                    <div class="fw-bold text-success">287,272 KGM</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="card border-0 bg-label-info text-center py-2 px-2">
+                                    <div class="small text-muted">Balance P1 คงเหลือ</div>
+                                    <div class="fw-bold text-info">9,000 KGM</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ตาราง P2 -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm align-middle mb-0" style="font-size:0.82rem;">
+                                <thead class="table-warning text-center">
+                                    <tr>
+                                        <th>เลขที่ P2</th>
+                                        <th>วันที่ส่งออก</th>
+                                        <th>ชื่อสินค้า / รุ่น</th>
+                                        <th>ประเทศปลายทาง</th>
+                                        <th class="text-end">น้ำหนักส่งออก (KGM)</th>
+                                        <th class="text-end">วัตถุดิบ (%Yield)</th>
+                                        <th class="text-end">Balance P1 ก่อนส่ง</th>
+                                        <th class="text-end">Balance P1 หลังส่ง</th>
+                                        <th>สถานะ</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-semibold text-warning">
+                                            <a href="#" class="text-warning" onclick="alert('ดูรายละเอียด P2-2569-00045 (mockup)')">P2-2569-00045</a>
+                                        </td>
+                                        <td class="text-nowrap">10/07/2561</td>
+                                        <td>ปลาทูน่าอล๊าคอร์ แช่แข็ง<br/><small class="text-primary">LOT-2561-001</small></td>
+                                        <td><span class="badge bg-label-info">ญี่ปุ่น 🇯🇵</span></td>
+                                        <td class="text-end fw-semibold">120,000.000</td>
+                                        <td class="text-end text-muted small">200,000.000</td>
+                                        <td class="text-end">240,000.000</td>
+                                        <td class="text-end fw-semibold text-warning">120,000.000</td>
+                                        <td><span class="badge bg-label-success">ส่งออกแล้ว</span></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-icon btn-outline-warning" title="Export P2 นี้"
+                                                onclick="alert('Export Excel P2-2569-00045 (mockup)')">
+                                                <i class="ri ri-file-excel-2-line text-success"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-semibold text-warning">
+                                            <a href="#" class="text-warning" onclick="alert('ดูรายละเอียด P2-2569-00046 (mockup)')">P2-2569-00046</a>
+                                        </td>
+                                        <td class="text-nowrap">15/07/2561</td>
+                                        <td>ปลาโอสา แช่แข็ง<br/><small class="text-primary">LOT-2561-002</small></td>
+                                        <td><span class="badge bg-label-primary">USA 🇺🇸</span></td>
+                                        <td class="text-end fw-semibold">48,000.000</td>
+                                        <td class="text-end text-muted small">87,272.727</td>
+                                        <td class="text-end">120,000.000</td>
+                                        <td class="text-end fw-semibold text-success">72,000.000</td>
+                                        <td><span class="badge bg-label-success">ส่งออกแล้ว</span></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-icon btn-outline-warning" title="Export P2 นี้"
+                                                onclick="alert('Export Excel P2-2569-00046 (mockup)')">
+                                                <i class="ri ri-file-excel-2-line text-success"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-light fw-semibold">
+                                        <td colspan="4" class="text-end">รวม</td>
+                                        <td class="text-end">168,000.000</td>
+                                        <td class="text-end text-muted">287,272.727</td>
+                                        <td class="text-end">—</td>
+                                        <td class="text-end text-success">72,000.000</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Balance bar -->
+                        <div class="mt-3 px-1">
+                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                <span>Balance P1 ที่ใช้ตัด P2 (168,000 / 240,000 KGM = 70%)</span>
+                                <span class="fw-semibold text-success">คงเหลือ: 72,000 KGM (30%)</span>
+                            </div>
+                            <div class="progress" style="height:12px;border-radius:6px;">
+                                <div class="progress-bar bg-warning" style="width:70%;" title="ส่งออกแล้ว 168,000 KGM"></div>
+                                <div class="progress-bar bg-success" style="width:30%;" title="คงเหลือ 72,000 KGM"></div>
+                            </div>
+                            <div class="d-flex gap-3 mt-1 small">
+                                <span><span class="badge bg-warning me-1"> </span>ตัด P2 แล้ว 70%</span>
+                                <span><span class="badge bg-success me-1"> </span>Balance คงเหลือ 30%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="exportDetailP1Excel()">
+                        <i class="ri ri-file-excel-2-line me-1"></i>Export P1 Excel
+                    </button>
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="exportDetailP2Excel()">
+                        <i class="ri ri-file-excel-2-line me-1"></i>Export P2 Excel
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm"
+                        onclick="new bootstrap.Modal(document.getElementById('modalP1PrintPost')).show()">
+                        <i class="ri ri-printer-line me-1"></i>พิมพ์ P1
+                    </button>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal P1+P2 Detail TOR 1.6(12) -->

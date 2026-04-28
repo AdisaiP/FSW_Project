@@ -31,7 +31,8 @@
             CertificationStatusClass = "bg-label-danger",
             CertificationStatusIcon = "ri-file-warning-line",
             StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning"
+            StatusClass = "bg-label-warning",
+            HasPendingChange = false
         },
         new
         {
@@ -59,7 +60,8 @@
             CertificationStatusClass = "bg-label-success",
             CertificationStatusIcon = "ri-file-check-line",
             StatusText = "อนุมัติแล้ว",
-            StatusClass = "bg-label-success"
+            StatusClass = "bg-label-success",
+            HasPendingChange = false
         },
         new
         {
@@ -87,7 +89,8 @@
             CertificationStatusClass = "bg-label-success",
             CertificationStatusIcon = "ri-file-check-line",
             StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning"
+            StatusClass = "bg-label-warning",
+            HasPendingChange = false
         },
         new
         {
@@ -115,7 +118,37 @@
             CertificationStatusClass = "bg-label-success",
             CertificationStatusIcon = "ri-file-check-line",
             StatusText = "อนุมัติแล้ว",
-            StatusClass = "bg-label-success"
+            StatusClass = "bg-label-success",
+            HasPendingChange = false
+        },
+        new
+        {
+            RowNo = 5,
+            CertificateType = "PS",
+            TransactionDate = new DateTime(2018, 9, 18, 10, 0, 0),
+            Rmbs1Number = "10611280211800000912",
+            ImdNumber = "235012013161000133",
+            CcNumber = "ACC918TH4401",
+            ValidationDate = new DateTime(2018, 9, 5),
+            VesselName = "PACIFIC BREEZE 5",
+            RegistrationNo = "TH-REG-441",
+            FishingStartDate = new DateTime(2018, 8, 1),
+            FishingEndDate = new DateTime(2018, 8, 31),
+            GearType = "อวนล้อมจับ (Purse seine)",
+            CatchDescription = "ACC918TH4401",
+            FisheryProducts = "0303.41.00 000/KGM [F020071S10030001/KGM]=ปลาทูน่าอัลบาคอร์ ทั้งตัว แช่แข็ง",
+            QtyInCC = 0m,
+            QtyEnteringFactory = 35000m,
+            DocumentType = "cc",
+            SourceText = "ภายนอกระบบ [FSW]",
+            ResponsibleAgencyCode = "GOV-STS-02",
+            ResponsibleAgencyName = "ศตส.เขต 2",
+            CertificationStatusText = "CCSCC มาแล้ว",
+            CertificationStatusClass = "bg-label-success",
+            CertificationStatusIcon = "ri-file-check-line",
+            StatusText = "อนุมัติแล้ว",
+            StatusClass = "bg-label-success",
+            HasPendingChange = true
         }
     };
 
@@ -325,6 +358,208 @@
                 if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
+
+        // ── ยกเลิกคำขอ ──
+        document.querySelectorAll('.btn-cancel-record').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var rmbs1 = this.dataset.rmbs1;
+                document.getElementById('cancelRecordRmbs1Number').textContent = rmbs1;
+                document.getElementById('cancelRecordReason').value = '';
+                document.getElementById('cancelRecordReason').classList.remove('is-invalid');
+                new bootstrap.Modal(document.getElementById('modalCancelRecord')).show();
+            });
+        });
+
+        document.getElementById('btnConfirmCancel').addEventListener('click', function () {
+            var reasonEl = document.getElementById('cancelRecordReason');
+            if (!reasonEl.value.trim()) {
+                reasonEl.classList.add('is-invalid');
+                reasonEl.focus();
+                return;
+            }
+            bootstrap.Modal.getInstance(document.getElementById('modalCancelRecord')).hide();
+            showIndexToast('ยกเลิกคำขอ RMBS1 เรียบร้อยแล้ว', 'warning');
+        });
+
+        document.getElementById('cancelRecordReason').addEventListener('input', function () {
+            if (this.value.trim()) this.classList.remove('is-invalid');
+        });
+
+        // ── ลบ ──
+        document.querySelectorAll('.btn-delete-record').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var rmbs1 = this.dataset.rmbs1;
+                document.getElementById('deleteRecordRmbs1Number').textContent = rmbs1;
+                new bootstrap.Modal(document.getElementById('modalDeleteRecord')).show();
+            });
+        });
+
+        document.getElementById('btnConfirmDelete').addEventListener('click', function () {
+            bootstrap.Modal.getInstance(document.getElementById('modalDeleteRecord')).hide();
+            showIndexToast('ลบข้อมูล RMBS1 เรียบร้อยแล้ว', 'danger');
+        });
+
+        // ── Multi-Select (Multi-signature) ──
+        function updateMultiBar() {
+            var checked = document.querySelectorAll('.chk-row-select:checked');
+            var bar = document.getElementById('multiApproveBar');
+            document.getElementById('selectedCountText').textContent = checked.length;
+            if (checked.length > 0) {
+                bar.classList.remove('d-none');
+                bar.style.display = 'flex';
+            } else {
+                bar.classList.add('d-none');
+                bar.style.display = '';
+            }
+        }
+
+        document.getElementById('chkSelectAll').addEventListener('change', function () {
+            document.querySelectorAll('.chk-row-select').forEach(function (cb) {
+                cb.checked = this.checked;
+            }, this);
+            updateMultiBar();
+        });
+
+        document.addEventListener('change', function (e) {
+            if (e.target && e.target.classList.contains('chk-row-select')) {
+                updateMultiBar();
+                // Uncheck "select all" if any individual is unchecked
+                var all = document.querySelectorAll('.chk-row-select');
+                var checked = document.querySelectorAll('.chk-row-select:checked');
+                document.getElementById('chkSelectAll').checked = (all.length === checked.length && all.length > 0);
+                document.getElementById('chkSelectAll').indeterminate = (checked.length > 0 && checked.length < all.length);
+            }
+        });
+
+        document.getElementById('btnClearSelection').addEventListener('click', function () {
+            document.querySelectorAll('.chk-row-select').forEach(function (cb) { cb.checked = false; });
+            document.getElementById('chkSelectAll').checked = false;
+            document.getElementById('chkSelectAll').indeterminate = false;
+            updateMultiBar();
+        });
+
+        document.getElementById('btnMultiApprove').addEventListener('click', function () {
+            var checked = Array.from(document.querySelectorAll('.chk-row-select:checked'));
+            var count = checked.length;
+            document.getElementById('multiApproveCountText').textContent = count;
+            document.getElementById('modalConfirmMultiCount').textContent = count;
+            var listHtml = checked.map(function (cb) {
+                return '<div class="py-1 border-bottom"><i class="ri ri-file-list-line me-1 text-primary"></i>' + cb.dataset.rmbs1 + '</div>';
+            }).join('');
+            document.getElementById('multiApproveList').innerHTML = listHtml || '<span class="text-muted">ไม่มีรายการ</span>';
+            document.getElementById('multiApproveRemark').value = '';
+            new bootstrap.Modal(document.getElementById('modalMultiApprove')).show();
+        });
+
+        document.getElementById('btnConfirmMultiApprove').addEventListener('click', function () {
+            // TODO: submit bulk approval API call
+            var count = document.querySelectorAll('.chk-row-select:checked').length;
+            bootstrap.Modal.getInstance(document.getElementById('modalMultiApprove')).hide();
+            document.querySelectorAll('.chk-row-select').forEach(function (cb) { cb.checked = false; });
+            document.getElementById('chkSelectAll').checked = false;
+            document.getElementById('chkSelectAll').indeterminate = false;
+            updateMultiBar();
+            showIndexToast('อนุมัติ ' + count + ' คำขอ RMBS1:PS เรียบร้อยแล้ว', 'success');
+        });
+
+        // ── Revert Status (Item 9) ──
+        var _revertRmbs1 = '';
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn-revert-status');
+            if (!btn) return;
+            _revertRmbs1 = btn.dataset.rmbs1;
+            document.getElementById('revertRmbs1Text').textContent = _revertRmbs1;
+            document.getElementById('revertReason').value = '';
+            document.getElementById('revertReasonError').classList.add('d-none');
+            document.getElementById('revertTypeDecision').checked = true;
+            new bootstrap.Modal(document.getElementById('modalRevertStatus')).show();
+        });
+
+        document.getElementById('btnConfirmRevert').addEventListener('click', function () {
+            var reason = document.getElementById('revertReason').value.trim();
+            if (!reason) {
+                document.getElementById('revertReasonError').classList.remove('d-none');
+                return;
+            }
+            document.getElementById('revertReasonError').classList.add('d-none');
+            // TODO: call API to revert status
+            bootstrap.Modal.getInstance(document.getElementById('modalRevertStatus')).hide();
+            showIndexToast('ดึงสถานะกลับ ' + _revertRmbs1 + ' เรียบร้อยแล้ว — พร้อมดำเนินการเปลี่ยนแปลง', 'warning');
+        });
+
+        // ── Cancel Doc (Item 10) ──
+        var _cancelDocRmbs1 = '';
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn-cancel-doc');
+            if (!btn) return;
+            _cancelDocRmbs1 = btn.dataset.rmbs1;
+            document.getElementById('cancelDocRmbs1Text').textContent = _cancelDocRmbs1;
+            document.getElementById('cancelDocReason').value = '';
+            document.getElementById('cancelDocReasonError').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('modalCancelDoc')).show();
+        });
+
+        document.getElementById('btnConfirmCancelDoc').addEventListener('click', function () {
+            var reason = document.getElementById('cancelDocReason').value.trim();
+            if (!reason) {
+                document.getElementById('cancelDocReasonError').classList.remove('d-none');
+                return;
+            }
+            document.getElementById('cancelDocReasonError').classList.add('d-none');
+            // TODO: call API to cancel doc
+            bootstrap.Modal.getInstance(document.getElementById('modalCancelDoc')).hide();
+            // Update row badge to show ยกเลิกแล้ว
+            document.querySelectorAll('[data-rmbs1-number="' + _cancelDocRmbs1 + '"] .badge').forEach(function (b) {
+                if (b.textContent.trim() === 'อนุมัติแล้ว') {
+                    b.className = 'badge bg-label-danger';
+                    b.textContent = 'ยกเลิกแล้ว 🚫';
+                }
+            });
+            showIndexToast('ยกเลิกการออกเอกสาร ' + _cancelDocRmbs1 + ' เรียบร้อยแล้ว', 'danger');
+        });
+
+        // ── Cancel Change Request (Item 10) ──
+        var _cancelChangeRmbs1 = '';
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn-cancel-change');
+            if (!btn) return;
+            _cancelChangeRmbs1 = btn.dataset.rmbs1;
+            document.getElementById('cancelChangeRmbs1Text').textContent = _cancelChangeRmbs1;
+            document.getElementById('cancelChangeReason').value = '';
+            document.getElementById('cancelChangeReasonError').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('modalCancelChange')).show();
+        });
+
+        document.getElementById('btnConfirmCancelChange').addEventListener('click', function () {
+            var reason = document.getElementById('cancelChangeReason').value.trim();
+            if (!reason) {
+                document.getElementById('cancelChangeReasonError').classList.remove('d-none');
+                return;
+            }
+            document.getElementById('cancelChangeReasonError').classList.add('d-none');
+            // TODO: call API to cancel change request
+            bootstrap.Modal.getInstance(document.getElementById('modalCancelChange')).hide();
+            showIndexToast('ยกเลิกคำขอเปลี่ยนแปลงของ ' + _cancelChangeRmbs1 + ' เรียบร้อยแล้ว', 'info');
+        });
+
+        function showIndexToast(msg, type) {
+            var bg = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+            var icon = type === 'success' ? 'ri-checkbox-circle-line' : type === 'danger' ? 'ri-delete-bin-line' : 'ri-close-circle-line';
+            var toastEl = document.createElement('div');
+            toastEl.className = 'position-fixed bottom-0 end-0 p-3';
+            toastEl.style.zIndex = 9999;
+            toastEl.innerHTML =
+                '<div class="toast show align-items-center text-white ' + bg + ' border-0" role="alert">' +
+                '  <div class="d-flex">' +
+                '    <div class="toast-body d-flex align-items-center gap-2">' +
+                '      <i class="ri ' + icon + ' fs-5"></i> ' + msg +
+                '    </div>' +
+                '    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+                '  </div>' +
+                '</div>';
+            document.body.appendChild(toastEl);
+            setTimeout(function () { toastEl.remove(); }, 3500);
+        }
     });
 </script>
 }
@@ -505,6 +740,9 @@
         <table class="table table-bordered table-hover align-middle mb-0 imd-table">
             <thead class="text-center">
                 <tr>
+                    <th style="width:2.2rem;">
+                        <input type="checkbox" class="form-check-input" id="chkSelectAll" title="เลือกทั้งหมด (เฉพาะรออนุมัติ)" />
+                    </th>
                     <th style="min-width:280px;">เลขที่ RMBS1</th>
                     <th style="min-width:90px;">ประเภท</th>
                     <th>วันที่บันทึก</th>
@@ -517,7 +755,7 @@
                     <th>ปริมาณสัตว์น้ำเข้าโรงงาน</th>
                     <th style="min-width:120px;">หน่วยงานรับผิดชอบ</th>
                     <th style="min-width:110px;">สถานะ</th>
-                    <th style="width:7rem;">การดำเนินการ</th>
+                    <th style="width:10rem;">การดำเนินการ</th>
                 </tr>
             </thead>
             <tbody id="imdTableBody">
@@ -542,6 +780,13 @@
                         data-allocation="all"
                         data-change-type=""
                         data-tx-date="@rec.TransactionDate.ToString("yyyy-MM-ddTHH:mm:ss")">
+                        <td class="text-center">
+                            @if (rec.StatusText == "รออนุมัติ")
+                            {
+                                <input type="checkbox" class="form-check-input chk-row-select"
+                                    data-rmbs1="@rec.Rmbs1Number" />
+                            }
+                        </td>
                         <td>
                             <a href="@Url.Action("ReviewRMBS1PS", "Officer")" class="fw-semibold text-primary text-decoration-none">@rec.Rmbs1Number</a>
                             <div class="mt-1">
@@ -575,30 +820,121 @@
                         </td>
                         <td class="text-center">
                             <span class="badge @rec.StatusClass">@rec.StatusText</span>
+                            @if (rec.StatusText == "อนุมัติแล้ว")
+                            {
+                                <div class="mt-1">
+                                    <span class="badge bg-success" style="font-size:0.65rem;"><i class="ri ri-file-check-line me-1"></i>ออกเลขที่อัตโนมัติ ✅</span>
+                                </div>
+                                <div class="mt-1">
+                                    <span class="badge bg-label-warning" style="font-size:0.6rem;">ยังไม่ถูกนำไปใช้ — ดึงกลับได้ ✅</span>
+                                </div>
+                                @if (rec.HasPendingChange)
+                                {
+                                    <div class="mt-1">
+                                        <span class="badge bg-label-info" style="font-size:0.6rem;"><i class="ri ri-loop-left-line me-1"></i>มีคำขอเปลี่ยนแปลงค้างอยู่ 🔄</span>
+                                    </div>
+                                }
+                            }
                         </td>
                         <td class="text-center">
-                            <div class="d-flex gap-1 justify-content-center">
+                            <div class="d-flex gap-1 justify-content-center flex-wrap">
                                 <a href="@Url.Action("ReviewRMBS1PS", "Officer")" class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                     <i class="ri ri-eye-line"></i>
                                 </a>
                                 @if (rec.StatusText == "รออนุมัติ")
                                 {
+                                    <a href="@Url.Action("ReviewRMBS1PS", "Officer")" class="btn btn-sm btn-icon btn-outline-primary btn-edit-draft" data-rmbs1="@rec.Rmbs1Number" data-bs-toggle="tooltip" title="แก้ไข (ร่าง)">
+                                        <i class="ri ri-edit-line"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning btn-cancel-record" data-rmbs1="@rec.Rmbs1Number" data-bs-toggle="tooltip" title="ยกเลิกคำขอ">
+                                        <i class="ri ri-close-circle-line text-warning"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-delete-record" data-rmbs1="@rec.Rmbs1Number" data-bs-toggle="tooltip" title="ลบ">
+                                        <i class="ri ri-delete-bin-line text-danger"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ">
                                         <i class="ri ri-checkbox-circle-line text-success"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning" data-bs-toggle="tooltip" title="ส่งคืนแก้ไข">
-                                        <i class="ri ri-reply-line text-warning"></i>
+                                }
+                                @if (rec.StatusText == "อนุมัติแล้ว")
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning btn-revert-status" data-rmbs1="@rec.Rmbs1Number" data-bs-toggle="tooltip" title="ดึงสถานะกลับ (เปลี่ยนแปลงผล)">
+                                        <i class="ri ri-arrow-go-back-line" style="color:#fd7e14;"></i>
                                     </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-cancel-doc" data-rmbs1="@rec.Rmbs1Number" data-bs-toggle="tooltip" title="ยกเลิกการออกเอกสาร">
+                                        <i class="ri ri-close-circle-line text-danger"></i>
+                                    </button>
+                                    @if (rec.HasPendingChange)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-cancel-change" data-rmbs1="@rec.Rmbs1Number" data-bs-toggle="tooltip" title="ยกเลิกผลการขอเปลี่ยนแปลง">
+                                            <i class="ri ri-loop-left-line" style="color:#6c757d;"></i>
+                                        </button>
+                                    }
                                 }
                             </div>
                         </td>
                     </tr>
                 }
                 <tr id="imdTableEmpty" class="d-none">
-                    <td colspan="13" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="14" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Modal: ยืนยันการยกเลิกคำขอ -->
+<div class="modal fade" id="modalCancelRecord" tabindex="-1" aria-labelledby="modalCancelRecordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalCancelRecordLabel">ยืนยันการยกเลิกคำขอ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <p class="mb-1">คุณต้องการ <strong class="text-warning">ยกเลิก</strong> คำขอ RMBS1 หมายเลข</p>
+                <p class="fw-semibold text-primary mb-3" id="cancelRecordRmbs1Number">-</p>
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-2">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span class="small">การยกเลิกคำขอจะเปลี่ยนสถานะเป็น "ยกเลิก" และไม่สามารถส่งอนุมัติได้จนกว่าจะยกเลิกและสร้างใหม่</span>
+                </div>
+                <label class="form-label small fw-semibold">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                <textarea id="cancelRecordReason" class="form-control" rows="3" placeholder="ระบุเหตุผลการยกเลิก..."></textarea>
+                <div class="invalid-feedback" id="cancelRecordReasonError">กรุณาระบุเหตุผลการยกเลิก</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" id="btnConfirmCancel" class="btn btn-warning">
+                    <i class="ri ri-close-circle-line me-1"></i> ยืนยันยกเลิกคำขอ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: ยืนยันการลบ -->
+<div class="modal fade" id="modalDeleteRecord" tabindex="-1" aria-labelledby="modalDeleteRecordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalDeleteRecordLabel">ยืนยันการลบ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <p class="mb-1">คุณต้องการ <strong class="text-danger">ลบ</strong> คำขอ RMBS1 หมายเลข</p>
+                <p class="fw-semibold text-primary mb-3" id="deleteRecordRmbs1Number">-</p>
+                <div class="alert alert-danger d-flex gap-2 py-2 mb-0">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <span class="small">การลบข้อมูลจะ<strong>ไม่สามารถกู้คืนได้</strong> กรุณาตรวจสอบให้แน่ใจก่อนดำเนินการ</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmDelete" class="btn btn-danger">
+                    <i class="ri ri-delete-bin-line me-1"></i> ยืนยันลบ
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -652,6 +988,168 @@
                 </button>
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
                     <i class="ri ri-save-line me-1"></i> ยืนยันเปลี่ยนหน่วยงาน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Sticky Multi-Approve Action Bar ==================== -->
+<div id="multiApproveBar" class="d-none position-fixed bottom-0 start-0 end-0 text-white px-4 py-3 d-flex align-items-center justify-content-between gap-3 flex-wrap" style="z-index:1040; background:#1a1a2e; box-shadow:0 -4px 16px rgba(0,0,0,.3);">
+    <div class="d-flex align-items-center gap-2">
+        <i class="ri ri-checkbox-multiple-line fs-4 text-success"></i>
+        <span class="fw-semibold">เลือก <span id="selectedCountText">0</span> รายการ</span>
+        <button type="button" class="btn btn-sm btn-outline-light ms-2" id="btnClearSelection">
+            <i class="ri ri-close-line me-1"></i> ยกเลิกการเลือก
+        </button>
+    </div>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-success" id="btnMultiApprove">
+            <i class="ri ri-checkbox-circle-line me-1"></i> อนุมัติทั้งหมดที่เลือก
+        </button>
+    </div>
+</div>
+
+<!-- ==================== Modal: ยืนยันอนุมัติหลายรายการ ==================== -->
+<div class="modal fade" id="modalMultiApprove" tabindex="-1" aria-labelledby="modalMultiApproveLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalMultiApproveLabel">
+                    <i class="ri ri-checkbox-circle-line me-1 text-success"></i> ยืนยันอนุมัติหลายรายการ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <p class="mb-1">ยืนยันอนุมัติ <strong class="text-success" id="multiApproveCountText">0</strong> คำขอ RMBS1:PS พร้อมกัน ใช่หรือไม่?</p>
+                <div class="alert alert-success d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span class="small">ระบบจะอนุมัติและออกเลขที่เอกสาร RMBS1:PS อัตโนมัติสำหรับทุกคำขอที่เลือกในครั้งเดียว</span>
+                </div>
+                <div id="multiApproveList" class="mb-3 small border rounded p-2 bg-light" style="max-height:140px;overflow-y:auto;"></div>
+                <label class="form-label small fw-semibold">หมายเหตุ (ใช้ร่วมกันทุกคำขอ)</label>
+                <textarea id="multiApproveRemark" class="form-control" rows="2" placeholder="ระบุหมายเหตุ (ไม่บังคับ)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmMultiApprove" class="btn btn-success">
+                    <i class="ri ri-checkbox-circle-line me-1"></i> ยืนยันอนุมัติ <span id="modalConfirmMultiCount">0</span> รายการ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ดึงสถานะกลับ (เปลี่ยนผลการพิจารณา) ==================== -->
+<div class="modal fade" id="modalRevertStatus" tabindex="-1" aria-labelledby="modalRevertStatusLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalRevertStatusLabel">
+                    <i class="ri ri-arrow-go-back-line me-1" style="color:#fd7e14;"></i> ดึงสถานะกลับ — RMBS1:PS
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div class="alert alert-warning d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <span class="small">คำขอ <strong id="revertRmbs1Text"></strong> ยังไม่ถูกนำไปตัดเพื่อขอใบรับรอง สามารถดึงสถานะกลับได้</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">ประเภทการเปลี่ยนแปลง <span class="text-danger">*</span></label>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="revertChangeType" id="revertTypeDecision" value="decision" checked>
+                            <label class="form-check-label" for="revertTypeDecision">
+                                <i class="ri ri-scales-line me-1 text-primary"></i> เปลี่ยนผลการพิจารณา
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="revertChangeType" id="revertTypeIntent" value="intent">
+                            <label class="form-check-label" for="revertTypeIntent">
+                                <i class="ri ri-edit-box-line me-1 text-info"></i> เปลี่ยนความประสงค์
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="revertChangeType" id="revertTypeDestination" value="destination">
+                            <label class="form-check-label" for="revertTypeDestination">
+                                <i class="ri ri-global-line me-1 text-success"></i> เปลี่ยนประเทศปลายทาง
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small" for="revertReason">เหตุผลการดึงสถานะกลับ <span class="text-danger">*</span></label>
+                    <textarea id="revertReason" class="form-control" rows="3" placeholder="ระบุเหตุผลที่ต้องการดึงสถานะกลับ..."></textarea>
+                    <div id="revertReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผล</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btnConfirmRevert" class="btn btn-warning">
+                    <i class="ri ri-arrow-go-back-line me-1"></i> ยืนยันดึงสถานะกลับ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ยกเลิกการออกเอกสาร RMBS1:PS ==================== -->
+<div class="modal fade" id="modalCancelDoc" tabindex="-1" aria-labelledby="modalCancelDocLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalCancelDocLabel">
+                    <i class="ri ri-close-circle-line me-1 text-danger"></i> ยกเลิกการออกเอกสาร RMBS1:PS
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div class="alert alert-danger d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <span class="small">คำขอ <strong id="cancelDocRmbs1Text"></strong> จะถูกยกเลิกการออกเอกสาร สถานะจะเปลี่ยนเป็น "ยกเลิกแล้ว 🚫" ไม่สามารถกู้คืนได้</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small" for="cancelDocReason">เหตุผลการยกเลิก <span class="text-danger">*</span></label>
+                    <textarea id="cancelDocReason" class="form-control" rows="3" placeholder="ระบุเหตุผลการยกเลิกการออกเอกสาร..."></textarea>
+                    <div id="cancelDocReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผล</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" id="btnConfirmCancelDoc" class="btn btn-danger">
+                    <i class="ri ri-close-circle-line me-1"></i> ยืนยันยกเลิกการออกเอกสาร
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ยกเลิกผลการขอเปลี่ยนแปลง ==================== -->
+<div class="modal fade" id="modalCancelChange" tabindex="-1" aria-labelledby="modalCancelChangeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalCancelChangeLabel">
+                    <i class="ri ri-loop-left-line me-1 text-secondary"></i> ยกเลิกผลการขอเปลี่ยนแปลง
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div class="alert alert-info d-flex gap-2 py-2 mb-3">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <span class="small">คำขอ <strong id="cancelChangeRmbs1Text"></strong> มีคำขอเปลี่ยนแปลงค้างอยู่ การยกเลิกจะทำให้คำขอเปลี่ยนแปลงนั้นถูกยกเลิก เอกสาร RMBS1:PS จะกลับสู่สถานะ "อนุมัติแล้ว" เดิม</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small" for="cancelChangeReason">เหตุผลการยกเลิกคำขอเปลี่ยนแปลง <span class="text-danger">*</span></label>
+                    <textarea id="cancelChangeReason" class="form-control" rows="3" placeholder="ระบุเหตุผล..."></textarea>
+                    <div id="cancelChangeReasonError" class="text-danger small d-none mt-1">กรุณาระบุเหตุผล</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" id="btnConfirmCancelChange" class="btn btn-secondary">
+                    <i class="ri ri-loop-left-line me-1"></i> ยืนยันยกเลิกคำขอเปลี่ยนแปลง
                 </button>
             </div>
         </div>

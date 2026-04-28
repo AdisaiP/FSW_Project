@@ -1,0 +1,16 @@
+# (3) รายงานการพิจารณาอนุมัติ %Yield ของสถานประกอบการ
+
+URL: http://localhost:5055/Admin/Reports
+
+รหัสรายงาน: ST-007
+
+จำนวนรูปที่ต้องแคป: 3 รูป
+
+รายการหน้าที่ต้องแคป
+1. หน้า Reports > แถว ST-007 'รายงานการพิจารณาอนุมัติ %Yield รายสถานประกอบการ'
+2. Modal #rptViewerModal > ST-007: ตาราง โรงงาน/ชนิด/%Yield ที่ขอ/%Yield ที่อนุมัติ/วันที่/ผู้อนุมัติ/ผลต่าง
+   summary: %Yield เฉลี่ยที่ขอ 70% / อนุมัติ 68%
+3. #viewerChartSection > bar chart Bootstrap progress bars
+   legend: สีม่วง (ที่ขอ) vs สีเขียว (อนุมัติ) | 5 โรงงาน
+
+หมายเหตุ: รายงานนี้มี bar chart แสดงใน #viewerChartSection (ใต้ตารางใน viewer modal)

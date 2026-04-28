@@ -12,7 +12,8 @@
             OperatorName = "Alpha Office Automation Co., Ltd. (สำนักงานใหญ่)",
             ReturnWeightStatusText = "ไม่ระบุ (default)",
             StatusClass = "bg-label-secondary",
-            StatusIcon = "ri-flag-line"
+            StatusIcon = "ri-flag-line",
+            CancellationLinked = ""
         },
         new
         {
@@ -23,7 +24,8 @@
             OperatorName = "Thai Marine Foods Co., Ltd. (สำนักงานใหญ่)",
             ReturnWeightStatusText = "ร่าง",
             StatusClass = "bg-label-warning",
-            StatusIcon = "ri-flag-2-line"
+            StatusIcon = "ri-flag-2-line",
+            CancellationLinked = ""
         },
         new
         {
@@ -34,7 +36,8 @@
             OperatorName = "Ocean Prime Export Co., Ltd.",
             ReturnWeightStatusText = "อยู่ระหว่างดำเนินการ",
             StatusClass = "bg-label-info",
-            StatusIcon = "ri-flag-2-line"
+            StatusIcon = "ri-flag-2-line",
+            CancellationLinked = "CAN821B211301"
         },
         new
         {
@@ -45,7 +48,8 @@
             OperatorName = "Andaman Seafood Processing Co., Ltd.",
             ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนัก",
             StatusClass = "bg-label-success",
-            StatusIcon = "ri-check-line"
+            StatusIcon = "ri-check-line",
+            CancellationLinked = ""
         },
         new
         {
@@ -56,7 +60,8 @@
             OperatorName = "Siam Frozen Tuna Co., Ltd.",
             ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนักแบบมีเงื่อนไข",
             StatusClass = "bg-label-primary",
-            StatusIcon = "ri-check-double-line"
+            StatusIcon = "ri-check-double-line",
+            CancellationLinked = "CAN821B211303"
         },
         new
         {
@@ -67,7 +72,8 @@
             OperatorName = "Gulf Catch Exporters Co., Ltd.",
             ReturnWeightStatusText = "ไม่อนุมัติให้คืนน้ำหนัก",
             StatusClass = "bg-label-danger",
-            StatusIcon = "ri-close-line"
+            StatusIcon = "ri-close-line",
+            CancellationLinked = ""
         },
         new
         {
@@ -78,7 +84,8 @@
             OperatorName = "Pacific Fishery Group Co., Ltd.",
             ReturnWeightStatusText = "ยกเลิก",
             StatusClass = "bg-label-secondary",
-            StatusIcon = "ri-forbid-line"
+            StatusIcon = "ri-forbid-line",
+            CancellationLinked = ""
         },
         new
         {
@@ -89,7 +96,8 @@
             OperatorName = "Eastern Aqua Trade Co., Ltd.",
             ReturnWeightStatusText = "อนุมัติให้คืนน้ำหนัก",
             StatusClass = "bg-label-success",
-            StatusIcon = "ri-check-line"
+            StatusIcon = "ri-check-line",
+            CancellationLinked = ""
         },
         new
         {
@@ -100,7 +108,8 @@
             OperatorName = "Blue Harbor Seafood Co., Ltd.",
             ReturnWeightStatusText = "ร่าง",
             StatusClass = "bg-label-warning",
-            StatusIcon = "ri-flag-2-line"
+            StatusIcon = "ri-flag-2-line",
+            CancellationLinked = ""
         },
         new
         {
@@ -111,7 +120,8 @@
             OperatorName = "Southern Pelagic Co., Ltd.",
             ReturnWeightStatusText = "อยู่ระหว่างดำเนินการ",
             StatusClass = "bg-label-info",
-            StatusIcon = "ri-flag-2-line"
+            StatusIcon = "ri-flag-2-line",
+            CancellationLinked = ""
         }
     };
 
@@ -333,6 +343,16 @@
             document.getElementById('filterDocumentDateFrom').value = '';
             document.getElementById('filterDocumentDateTo').value = '';
             document.getElementById('filterDateExclude').checked = false;
+            // TOR 1.11(11): clear new fields
+            document.getElementById('filterCertType').value = '';
+            document.getElementById('filterCertNumber').value = '';
+            document.getElementById('filterEstablishment').value = '';
+            document.getElementById('filterEstRegNo').value = '';
+            document.getElementById('filterProductName').value = '';
+            document.getElementById('filterDestCountry').value = '';
+            document.getElementById('filterSubmitDateFrom').value = '';
+            document.getElementById('filterSubmitDateTo').value = '';
+            document.getElementById('filterReceiveNumber').value = '';
             filterRows();
         });
     });
@@ -415,7 +435,16 @@
             <p class="text-muted small mb-0">แสดงรายการอนุมัติการคืนนํ้าหนักสินค้าส่งคืน</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-                <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-primary btn-sm">
+            <!-- TOR 1.7(34): Export Excel + Export ข้อมูลตัดน้ำหนักรับรองตนเอง -->
+            <button type="button" class="btn btn-outline-success btn-sm"
+                onclick="alert('Export Excel รายการอนุมัติการคืนน้ำหนักสินค้าส่งคืน (mockup)\n\nรายการที่ export:\n- เลขที่เอกสาร\n- วันที่ออกเอกสาร\n- เลขที่ใบอนุญาตนำเข้า\n- เลขที่ใบอายัดสินค้า\n- สถานะการคืนน้ำหนัก')">
+                <i class="ri ri-file-excel-2-line me-1"></i> Export Excel
+            </button>
+            <button type="button" class="btn btn-outline-info btn-sm"
+                onclick="alert('Export ข้อมูลตัดน้ำหนักหนังสือรับรองตนเอง (mockup)\n\nจะ export ข้อมูล:\n- รายการน้ำหนักที่ตัดจากหนังสือรับรองตนเอง (Self-Certification)\n- RMBS1/P1 ที่เกี่ยวข้อง\n- RMBS2/P2 ที่เกี่ยวข้อง\n- วันที่ / เลขที่เอกสารอ้างอิง')">
+                <i class="ri ri-file-excel-2-line me-1"></i> Export ข้อมูลตัดน้ำหนักรับรองตนเอง
+            </button>
+            <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-primary btn-sm">
                 <i class="ri ri-add-line me-1"></i> สร้างคำขอ
             </a>
         </div>
@@ -430,7 +459,9 @@
                     <th style="min-width:180px;">เลขที่ใบอนุญาตนำเข้า</th>
                     <th style="min-width:180px;">เลขที่ใบอายัดสินค้า</th>
                     <th style="min-width:220px;">ผู้ประกอบการ</th>
-                    <th style="width:7rem;"></th>
+                    @* TOR 1.10(11): เชื่อมโยง Cancellation *@
+                    <th style="min-width:160px;">เชื่อมโยงคำขอยกเลิก</th>
+                    <th style="width:8rem;"></th>
                 </tr>
             </thead>
             <tbody id="requestTableBody">
@@ -473,25 +504,229 @@
                         <td class="text-nowrap">@request.ImportPermitNumber</td>
                         <td class="text-nowrap">@request.SeizureNumber</td>
                         <td>@request.OperatorName</td>
+                        @* TOR 1.10(11): เชื่อมโยงคำขอยกเลิก *@
                         <td class="text-center">
-                            <div class="d-flex gap-1 justify-content-center">
-                                <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-sm btn-icon btn-outline-warning" data-bs-toggle="tooltip" title="รายละเอียดการขอคืนน้ำหนัก">
-                                    <i class="ri ri-pencil-line text-warning"></i>
+                            @if (!string.IsNullOrEmpty(request.CancellationLinked))
+                            {
+                                <a href="@Url.Action("IndexCancelCertificate", "PSDeclaration")"
+                                   class="badge bg-label-danger text-decoration-none"
+                                   data-bs-toggle="tooltip"
+                                   title="เชื่อมโยงกับคำขอยกเลิก @request.CancellationLinked">
+                                    <i class="ri ri-link me-1"></i>@request.CancellationLinked
                                 </a>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="รายละเอียดใบอนุญาตนำเข้า">
-                                    <i class="ri ri-mail-line text-primary"></i>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @* TOR 1.11(2): action buttons ตาม status *@
+                            <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                @if (request.ReturnWeightStatusText == "ร่าง" || request.ReturnWeightStatusText == "ไม่ระบุ (default)")
+                                {
+                                    @* draft: แก้ไข + ยกเลิกคำขอ + ลบ *@
+                                    <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-sm btn-icon btn-outline-warning" data-bs-toggle="tooltip" title="แก้ไขคำขอ">
+                                        <i class="ri ri-pencil-line text-warning"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary"
+                                            data-bs-toggle="tooltip" title="ยกเลิกคำขอ"
+                                            onclick="confirmCancelRequest('@request.DocumentNumber')">
+                                        <i class="ri ri-close-circle-line text-secondary"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                            data-bs-toggle="tooltip" title="ลบคำขอ"
+                                            onclick="confirmDeleteRequest('@request.DocumentNumber')">
+                                        <i class="ri ri-delete-bin-line text-danger"></i>
+                                    </button>
+                                }
+                                else if (request.ReturnWeightStatusText == "อยู่ระหว่างดำเนินการ")
+                                {
+                                    @* pending: ดูรายละเอียด + ยกเลิกคำขอ *@
+                                    <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="ดูรายละเอียดคำขอ">
+                                        <i class="ri ri-eye-line text-primary"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary"
+                                            data-bs-toggle="tooltip" title="ยกเลิกคำขอ"
+                                            onclick="confirmCancelRequest('@request.DocumentNumber')">
+                                        <i class="ri ri-close-circle-line text-secondary"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    @* อนุมัติ/ไม่อนุมัติ/ยกเลิก: ดูรายละเอียดอย่างเดียว *@
+                                    <a href="@Url.Action("CreateApproveReturnWeight", "PSDeclaration")" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="ดูรายละเอียดคำขอ">
+                                        <i class="ri ri-eye-line text-primary"></i>
+                                    </a>
+                                }
+                                @* ปุ่มดูใบอนุญาตนำเข้า + ใบอายัด (แสดงทุก status) *@
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-info" data-bs-toggle="tooltip" title="รายละเอียดใบอนุญาตนำเข้า"
+                                        onclick="alert('[mockup] รายละเอียดใบอนุญาตนำเข้า: @request.ImportPermitNumber')">
+                                    <i class="ri ri-mail-line text-info"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-icon btn-outline-info" data-bs-toggle="tooltip" title="รายละเอียดใบอายัดสินค้า">
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-info" data-bs-toggle="tooltip" title="รายละเอียดใบอายัดสินค้า"
+                                        onclick="alert('[mockup] รายละเอียดใบอายัดสินค้า: @request.SeizureNumber')">
                                     <i class="ri ri-file-list-2-line text-info"></i>
                                 </button>
+                                @if (!string.IsNullOrEmpty(request.CancellationLinked))
+                                {
+                                    @* TOR 1.10(11): ปุ่มลบการตรวจปล่อย *@
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                            data-bs-toggle="tooltip" title="ลบการตรวจปล่อย"
+                                            onclick="confirmDeleteInspection('@request.DocumentNumber', '@request.CancellationLinked')">
+                                        <i class="ri ri-delete-bin-line text-danger"></i>
+                                    </button>
+                                }
                             </div>
                         </td>
                     </tr>
                 }
                 <tr id="requestTableEmpty" class="d-none">
-                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="8" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
     </div>
+</div>
+
+@* ==================== TOR 1.10(11): Modal ยืนยันลบการตรวจปล่อย ==================== *@
+<div class="modal fade" id="modalDeleteInspection" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger-subtle">
+                <h5 class="modal-title fw-semibold">
+                    <i class="ri ri-delete-bin-line me-2 text-danger"></i>ยืนยันการลบการตรวจปล่อย
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger small mb-3">
+                    <i class="ri ri-alert-line me-1"></i>
+                    การลบการตรวจปล่อยไม่สามารถย้อนกลับได้ กรุณาตรวจสอบข้อมูลก่อนยืนยัน
+                </div>
+                <table class="table table-sm table-bordered mb-0 small">
+                    <tr>
+                        <td class="fw-semibold text-nowrap" style="width:45%">เลขที่เอกสาร</td>
+                        <td id="deleteInspectionDocNo">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">เชื่อมโยงคำขอยกเลิก</td>
+                        <td id="deleteInspectionCancelNo">—</td>
+                    </tr>
+                </table>
+                <div class="alert alert-success small mt-3 mb-0">
+                    <i class="ri ri-arrow-go-back-line me-1"></i>
+                    หลังลบการตรวจปล่อย — น้ำหนัก/โควตาจะถูก<strong>คืนกลับ</strong>อัตโนมัติ
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-danger"
+                        onclick="alert('[mockup] ลบการตรวจปล่อยเรียบร้อย — น้ำหนัก/โควตาถูกคืนแล้ว'); bootstrap.Modal.getInstance(document.getElementById(\'modalDeleteInspection\')).hide();">
+                    <i class="ri ri-delete-bin-line me-1"></i>ยืนยันลบการตรวจปล่อย
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDeleteInspection(docNo, cancelNo) {
+        document.getElementById('deleteInspectionDocNo').textContent = docNo;
+        document.getElementById('deleteInspectionCancelNo').textContent = cancelNo;
+        new bootstrap.Modal(document.getElementById('modalDeleteInspection')).show();
+    }
+
+    @* TOR 1.11(2): ยกเลิกคำขอ *@
+    function confirmCancelRequest(docNo) {
+        document.getElementById('cancelRequestDocNo').textContent = docNo;
+        new bootstrap.Modal(document.getElementById('modalCancelRequest')).show();
+    }
+
+    @* TOR 1.11(2): ลบคำขอ *@
+    function confirmDeleteRequest(docNo) {
+        document.getElementById('deleteRequestDocNo').textContent = docNo;
+        new bootstrap.Modal(document.getElementById('modalDeleteRequest')).show();
+    }
+</script>
+
+@* ==================== TOR 1.11(2): Modal ยืนยันยกเลิกคำขอ ==================== *@
+<div class="modal fade" id="modalCancelRequest" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning-subtle">
+                <h5 class="modal-title fw-semibold">
+                    <i class="ri ri-close-circle-line me-2 text-warning"></i>ยืนยันการยกเลิกคำขอ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning small mb-3">
+                    <i class="ri ri-information-line me-1"></i>
+                    คำขอจะเปลี่ยนสถานะเป็น <strong>"ยกเลิก"</strong> และไม่สามารถแก้ไขได้อีก
+                </div>
+                <table class="table table-sm table-bordered mb-0 small">
+                    <tr>
+                        <td class="fw-semibold text-nowrap" style="width:45%">เลขที่เอกสาร</td>
+                        <td id="cancelRequestDocNo">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">การดำเนินการ</td>
+                        <td><span class="badge bg-label-warning">ยกเลิกคำขอ</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-warning"
+                        onclick="alert('[mockup] ยกเลิกคำขอเรียบร้อย — สถานะเปลี่ยนเป็น ยกเลิก'); bootstrap.Modal.getInstance(document.getElementById('modalCancelRequest')).hide();">
+                    <i class="ri ri-close-circle-line me-1"></i>ยืนยันยกเลิกคำขอ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ==================== TOR 1.11(2): Modal ยืนยันลบคำขอ ==================== *@
+<div class="modal fade" id="modalDeleteRequest" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger-subtle">
+                <h5 class="modal-title fw-semibold">
+                    <i class="ri ri-delete-bin-line me-2 text-danger"></i>ยืนยันการลบคำขอ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger small mb-3">
+                    <i class="ri ri-alert-line me-1"></i>
+                    การลบคำขอไม่สามารถย้อนกลับได้ กรุณาตรวจสอบข้อมูลก่อนยืนยัน
+                </div>
+                <table class="table table-sm table-bordered mb-0 small">
+                    <tr>
+                        <td class="fw-semibold text-nowrap" style="width:45%">เลขที่เอกสาร</td>
+                        <td id="deleteRequestDocNo">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">การดำเนินการ</td>
+                        <td><span class="badge bg-label-danger">ลบคำขอถาวร</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-danger"
+                        onclick="alert('[mockup] ลบคำขอเรียบร้อย'); bootstrap.Modal.getInstance(document.getElementById('modalDeleteRequest')).hide();">
+                    <i class="ri ri-delete-bin-line me-1"></i>ยืนยันลบคำขอ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </div>

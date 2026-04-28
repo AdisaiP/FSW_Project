@@ -13,6 +13,19 @@
         new { RowNo=8, UserId="USR-0008", FullName="นางสาวพิมพ์ใจ ชูศรี", Email="pimjai@dof.go.th", Organization="ศตส. เขต 5 (สมุทรสาคร)", Role="เจ้าหน้าที่", Agency="ศตส.เขต 5", SpecificRoles="ผู้อนุมัติ RMBS1,เจ้าหน้าที่พิจารณา", ResponsibleArea="สมุทรสาคร,สมุทรสงคราม,เพชรบุรี", IsSigner=false, IsApprover=true, HasDataScope=true, DataScopeLabel="พื้นที่ ศตส.เขต 5 ✅", HasCrossAgencyCertAccess=true, CrossAgencyCertLabel="ตรวจ กตส. ✅", CanManageDofList=true, DofScopeLabel="DOF: จัดการได้ ✅ (ศตส.เขต 5)", CanManageTraceList=true, TraceScopeLabel="Trace: ศตส.เขต 5 ✅", LastLoginAt=new DateTime(2026,4,21,15,0,0), StatusText="ใช้งาน", StatusClass="bg-label-success" },
     };
 
+    // 2.12(1): วันที่ลงทะเบียน (mockup)
+    var registeredDates = new Dictionary<string, DateTime>
+    {
+        { "USR-0001", new DateTime(2025, 1, 15) },
+        { "USR-0002", new DateTime(2025, 2, 10) },
+        { "USR-0003", new DateTime(2025, 3, 5) },
+        { "USR-0004", new DateTime(2025, 1, 1) },
+        { "USR-0005", new DateTime(2025, 4, 20) },
+        { "USR-0006", new DateTime(2025, 5, 8) },
+        { "USR-0007", new DateTime(2025, 3, 18) },
+        { "USR-0008", new DateTime(2025, 6, 1) },
+    };
+
     var totalCount = users.Length;
     var activeCount = users.Count(x => x.StatusText == "ใช้งาน");
     var suspendedCount = users.Count(x => x.StatusText == "ระงับ");
@@ -35,14 +48,14 @@
 @section PageScripts {
 <script>
 var userData = {
-    "USR-0001": { userId:"USR-0001", fullName:"นางสาวปรียา ศรีสุข", email:"priya@siammarine.co.th", organization:"บริษัท สยาม มารีน ฟู้ดส์ จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, status:"ใช้งาน" },
-    "USR-0002": { userId:"USR-0002", fullName:"นายภาณุพงศ์ รัตน์ชัย", email:"phanu@oceanprime.co.th", organization:"บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, status:"ใช้งาน" },
-    "USR-0003": { userId:"USR-0003", fullName:"นางสาวสมหญิง ใจดี", email:"officer1@dof.go.th", organization:"กรมประมง — กตส.", role:"เจ้าหน้าที่", agency:"กตส.", specificRoles:["เจ้าหน้าที่รับเรื่อง","เจ้าหน้าที่พิจารณา"], responsibleArea:["กรุงเทพมหานคร","สมุทรปราการ"], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:true, dofManageScope:"กตส.", canManageTraceList:false, traceManageScope:"", status:"ใช้งาน" },
-    "USR-0004": { userId:"USR-0004", fullName:"นายประสิทธิ์ วงค์ดี", email:"admin@dof.go.th", organization:"กรมประมง — กตส.", role:"ผู้ดูแลระบบ", agency:"กตส.", specificRoles:["ผู้อนุมัติ RMBS1","ผู้ลงนามใบรับรอง"], responsibleArea:["กรุงเทพมหานคร","นนทบุรี","ปทุมธานี"], isSigner:true, isApprover:true, crossAgencyCertAccess:false, canManageDofList:true, dofManageScope:"ทุกพื้นที่", canManageTraceList:true, traceManageScope:"ทุกพื้นที่", status:"ใช้งาน" },
-    "USR-0005": { userId:"USR-0005", fullName:"นายธนกฤต วงศ์ดี", email:"thanakrit@siammarine.co.th", organization:"บริษัท สยาม มารีน ฟู้ดส์ จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:false, dofManageScope:"", canManageTraceList:false, traceManageScope:"", status:"ระงับ" },
-    "USR-0006": { userId:"USR-0006", fullName:"นางสาวกนกพร สายชล", email:"kanokporn@oceanprime.co.th", organization:"บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:false, dofManageScope:"", canManageTraceList:false, traceManageScope:"", status:"ใช้งาน" },
-    "USR-0007": { userId:"USR-0007", fullName:"นายวิทยา ทองดี", email:"wittaya@dof.go.th", organization:"ศตส. เขต 3 (สงขลา)", role:"เจ้าหน้าที่", agency:"ศตส.เขต 3", specificRoles:["เจ้าหน้าที่รับเรื่อง","ผู้ตรวจสอบ Traceability","ผู้ลงนามใบรับรอง"], responsibleArea:["สงขลา","สตูล","พัทลุง"], isSigner:true, isApprover:false, crossAgencyCertAccess:true, certTypes:["PS","NMD","RMBS1"], canManageDofList:false, dofManageScope:"", canManageTraceList:true, traceManageScope:"ศตส.เขต 3", status:"ใช้งาน" },
-    "USR-0008": { userId:"USR-0008", fullName:"นางสาวพิมพ์ใจ ชูศรี", email:"pimjai@dof.go.th", organization:"ศตส. เขต 5 (สมุทรสาคร)", role:"เจ้าหน้าที่", agency:"ศตส.เขต 5", specificRoles:["ผู้อนุมัติ RMBS1","เจ้าหน้าที่พิจารณา"], responsibleArea:["สมุทรสาคร","สมุทรสงคราม","เพชรบุรี"], isSigner:false, isApprover:true, crossAgencyCertAccess:true, certTypes:["PS","NMD","RMBS2"], canManageDofList:true, dofManageScope:"ศตส.เขต 5", canManageTraceList:true, traceManageScope:"ศตส.เขต 5", status:"ใช้งาน" }
+    "USR-0001": { userId:"USR-0001", fullName:"นางสาวปรียา ศรีสุข", email:"priya@siammarine.co.th", organization:"บริษัท สยาม มารีน ฟู้ดส์ จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, status:"ใช้งาน", registeredAt:"2025-01-15" },
+    "USR-0002": { userId:"USR-0002", fullName:"นายภาณุพงศ์ รัตน์ชัย", email:"phanu@oceanprime.co.th", organization:"บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, status:"ใช้งาน", registeredAt:"2025-02-10" },
+    "USR-0003": { userId:"USR-0003", fullName:"นางสาวสมหญิง ใจดี", email:"officer1@dof.go.th", organization:"กรมประมง — กตส.", role:"เจ้าหน้าที่", agency:"กตส.", specificRoles:["เจ้าหน้าที่รับเรื่อง","เจ้าหน้าที่พิจารณา"], responsibleArea:["กรุงเทพมหานคร","สมุทรปราการ"], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:true, dofManageScope:"กตส.", canManageTraceList:false, traceManageScope:"", status:"ใช้งาน", registeredAt:"2025-03-05" },
+    "USR-0004": { userId:"USR-0004", fullName:"นายประสิทธิ์ วงค์ดี", email:"admin@dof.go.th", organization:"กรมประมง — กตส.", role:"ผู้ดูแลระบบ", agency:"กตส.", specificRoles:["ผู้อนุมัติ RMBS1","ผู้ลงนามใบรับรอง"], responsibleArea:["กรุงเทพมหานคร","นนทบุรี","ปทุมธานี"], isSigner:true, isApprover:true, crossAgencyCertAccess:false, canManageDofList:true, dofManageScope:"ทุกพื้นที่", canManageTraceList:true, traceManageScope:"ทุกพื้นที่", status:"ใช้งาน", registeredAt:"2025-01-01" },
+    "USR-0005": { userId:"USR-0005", fullName:"นายธนกฤต วงศ์ดี", email:"thanakrit@siammarine.co.th", organization:"บริษัท สยาม มารีน ฟู้ดส์ จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:false, dofManageScope:"", canManageTraceList:false, traceManageScope:"", status:"ระงับ", registeredAt:"2025-04-20" },
+    "USR-0006": { userId:"USR-0006", fullName:"นางสาวกนกพร สายชล", email:"kanokporn@oceanprime.co.th", organization:"บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด", role:"สมาชิก", agency:"", specificRoles:[], responsibleArea:[], isSigner:false, isApprover:false, crossAgencyCertAccess:false, canManageDofList:false, dofManageScope:"", canManageTraceList:false, traceManageScope:"", status:"ใช้งาน", registeredAt:"2025-05-08" },
+    "USR-0007": { userId:"USR-0007", fullName:"นายวิทยา ทองดี", email:"wittaya@dof.go.th", organization:"ศตส. เขต 3 (สงขลา)", role:"เจ้าหน้าที่", agency:"ศตส.เขต 3", specificRoles:["เจ้าหน้าที่รับเรื่อง","ผู้ตรวจสอบ Traceability","ผู้ลงนามใบรับรอง"], responsibleArea:["สงขลา","สตูล","พัทลุง"], isSigner:true, isApprover:false, crossAgencyCertAccess:true, certTypes:["PS","NMD","RMBS1"], canManageDofList:false, dofManageScope:"", canManageTraceList:true, traceManageScope:"ศตส.เขต 3", status:"ใช้งาน", registeredAt:"2025-03-18" },
+    "USR-0008": { userId:"USR-0008", fullName:"นางสาวพิมพ์ใจ ชูศรี", email:"pimjai@dof.go.th", organization:"ศตส. เขต 5 (สมุทรสาคร)", role:"เจ้าหน้าที่", agency:"ศตส.เขต 5", specificRoles:["ผู้อนุมัติ RMBS1","เจ้าหน้าที่พิจารณา"], responsibleArea:["สมุทรสาคร","สมุทรสงคราม","เพชรบุรี"], isSigner:false, isApprover:true, crossAgencyCertAccess:true, certTypes:["PS","NMD","RMBS2"], canManageDofList:true, dofManageScope:"ศตส.เขต 5", canManageTraceList:true, traceManageScope:"ศตส.เขต 5", status:"ใช้งาน", registeredAt:"2025-06-01" }
 };
 document.addEventListener('DOMContentLoaded', function () {
     function filterRows() {
@@ -50,6 +63,12 @@ document.addEventListener('DOMContentLoaded', function () {
         var role = (document.getElementById('filterRole').value || '').trim();
         var agency = (document.getElementById('filterAgency').value || '').trim();
         var status = (document.getElementById('filterStatus').value || '').trim();
+        // 2.12(1): date filters
+        var filterOrg = (document.getElementById('filterOrg').value || '').trim().toLowerCase();
+        var filterRegFrom = document.getElementById('filterRegFrom').value || '';
+        var filterRegTo   = document.getElementById('filterRegTo').value   || '';
+        var filterLoginFrom = document.getElementById('filterLoginFrom').value || '';
+        var filterLoginTo   = document.getElementById('filterLoginTo').value   || '';
         var rows = document.querySelectorAll('#userTableBody tr[data-id]');
         var count = 0;
         rows.forEach(function (row) {
@@ -57,8 +76,16 @@ document.addEventListener('DOMContentLoaded', function () {
             var rowRole = row.dataset.role || '';
             var rowAgency = row.dataset.agency || '';
             var rowStatus = row.dataset.status || '';
+            var rowReg = row.dataset.registered || '';
+            var rowLogin = row.dataset.lastlogin || '';
             var agencyMatch = !agency || (agency === 'ศตส.' ? rowAgency.startsWith('ศตส.') : rowAgency === agency);
-            var show = (!keyword || text.includes(keyword)) && (!role || rowRole === role) && agencyMatch && (!status || rowStatus === status);
+            var orgMatch = !filterOrg || text.includes(filterOrg);
+            var regFromMatch = !filterRegFrom || rowReg >= filterRegFrom;
+            var regToMatch   = !filterRegTo   || rowReg <= filterRegTo;
+            var loginFromMatch = !filterLoginFrom || rowLogin >= filterLoginFrom;
+            var loginToMatch   = !filterLoginTo   || rowLogin <= filterLoginTo;
+            var show = (!keyword || text.includes(keyword)) && (!role || rowRole === role) && agencyMatch && (!status || rowStatus === status)
+                       && orgMatch && regFromMatch && regToMatch && loginFromMatch && loginToMatch;
             row.classList.toggle('d-none', !show);
             if (show) count++;
         });
@@ -70,14 +97,88 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('filterRole').value = '';
         document.getElementById('filterAgency').value = '';
         document.getElementById('filterStatus').value = '';
+        // 2.12(1)
+        document.getElementById('filterOrg').value = '';
+        document.getElementById('filterRegFrom').value = '';
+        document.getElementById('filterRegTo').value = '';
+        document.getElementById('filterLoginFrom').value = '';
+        document.getElementById('filterLoginTo').value = '';
         filterRows();
     });
-    ['filterKeyword', 'filterRole', 'filterAgency', 'filterStatus'].forEach(function (id) {
+    ['filterKeyword', 'filterRole', 'filterAgency', 'filterStatus', 'filterOrg', 'filterRegFrom', 'filterRegTo', 'filterLoginFrom', 'filterLoginTo'].forEach(function (id) {
         var el = document.getElementById(id);
         el.addEventListener('change', filterRows);
         if (el.tagName === 'INPUT') el.addEventListener('keydown', function (e) { if (e.key === 'Enter') filterRows(); });
     });
-    // ---- กำหนดสิทธิ์ข้อมูล ----
+
+    // 2.12(1): ปุ่มดูประวัติการเข้าใช้งาน
+    var loginHistoryMock = {
+        "USR-0001": [
+            { dt:"28/04/2569 09:15", ip:"182.53.10.21", action:"เข้าสู่ระบบ (login)", result:"สำเร็จ" },
+            { dt:"27/04/2569 16:42", ip:"182.53.10.21", action:"ดูรายการใบรับรอง", result:"สำเร็จ" },
+            { dt:"27/04/2569 09:02", ip:"182.53.10.21", action:"เข้าสู่ระบบ (login)", result:"สำเร็จ" },
+            { dt:"26/04/2569 11:30", ip:"182.53.10.21", action:"ส่งคำขอ RMBS2", result:"สำเร็จ" },
+            { dt:"25/04/2569 08:55", ip:"182.53.10.21", action:"ออกจากระบบ (logout)", result:"สำเร็จ" }
+        ],
+        "USR-0002": [
+            { dt:"27/04/2569 14:30", ip:"203.150.88.12", action:"เข้าสู่ระบบ (login)", result:"สำเร็จ" },
+            { dt:"27/04/2569 14:55", ip:"203.150.88.12", action:"ดาวน์โหลดเอกสาร RMBS1", result:"สำเร็จ" },
+            { dt:"26/04/2569 10:15", ip:"203.150.88.12", action:"ส่งคำขอ P1", result:"สำเร็จ" }
+        ],
+        "USR-0003": [
+            { dt:"28/04/2569 08:00", ip:"10.10.1.3", action:"เข้าสู่ระบบ (login) — DOF Internal", result:"สำเร็จ" },
+            { dt:"28/04/2569 08:45", ip:"10.10.1.3", action:"อนุมัติคำขอ RMBS2 #2025-001210", result:"สำเร็จ" },
+            { dt:"28/04/2569 09:30", ip:"10.10.1.3", action:"ตรวจสอบ DOF List", result:"สำเร็จ" },
+            { dt:"27/04/2569 08:05", ip:"10.10.1.3", action:"เข้าสู่ระบบ (login) — DOF Internal", result:"สำเร็จ" },
+            { dt:"27/04/2569 16:00", ip:"10.10.1.3", action:"ออกจากระบบ (logout)", result:"สำเร็จ" }
+        ],
+        "USR-0004": [
+            { dt:"28/04/2569 07:45", ip:"10.10.1.4", action:"เข้าสู่ระบบ (login) — Admin", result:"สำเร็จ" },
+            { dt:"28/04/2569 08:10", ip:"10.10.1.4", action:"ลงนามใบรับรอง PS-TH-2026-00921", result:"สำเร็จ" },
+            { dt:"28/04/2569 08:35", ip:"10.10.1.4", action:"กำหนดสิทธิ์ผู้ใช้ USR-0007", result:"สำเร็จ" },
+            { dt:"27/04/2569 07:50", ip:"10.10.1.4", action:"เข้าสู่ระบบ (login) — Admin", result:"สำเร็จ" }
+        ],
+        "USR-0007": [
+            { dt:"27/04/2569 10:30", ip:"172.16.4.7", action:"เข้าสู่ระบบ (login) — ศตส.เขต 3", result:"สำเร็จ" },
+            { dt:"27/04/2569 11:00", ip:"172.16.4.7", action:"ลงนามใบรับรอง NMD-TH-2026-00415", result:"สำเร็จ" },
+            { dt:"26/04/2569 09:15", ip:"172.16.4.7", action:"ตรวจสอบ Traceability เขต 3", result:"สำเร็จ" }
+        ],
+        "USR-0008": [
+            { dt:"26/04/2569 15:00", ip:"172.16.5.8", action:"เข้าสู่ระบบ (login) — ศตส.เขต 5", result:"สำเร็จ" },
+            { dt:"26/04/2569 15:20", ip:"172.16.5.8", action:"อนุมัติ RMBS1 #2026-00891", result:"สำเร็จ" },
+            { dt:"25/04/2569 14:30", ip:"172.16.5.8", action:"เข้าสู่ระบบ (login) — ศตส.เขต 5", result:"สำเร็จ" }
+        ]
+    };
+
+    document.querySelectorAll('.btn-view-login-history').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var userId = this.dataset.userId;
+            var userName = this.dataset.userName;
+            document.getElementById('loginHistoryModalTitle').textContent = 'ประวัติการเข้าใช้งาน — ' + userName;
+            document.getElementById('loginHistoryUserId').textContent = userId;
+            var logs = loginHistoryMock[userId] || [];
+            var tbody = document.getElementById('loginHistoryBody');
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">ไม่มีประวัติการใช้งาน</td></tr>';
+            } else {
+                tbody.innerHTML = logs.map(function(l, i) {
+                    var badge = l.result === 'สำเร็จ'
+                        ? '<span class="badge bg-label-success">สำเร็จ</span>'
+                        : '<span class="badge bg-label-danger">ล้มเหลว</span>';
+                    var icon = l.action.includes('login') ? '<i class="ri ri-login-box-line text-success me-1"></i>'
+                        : l.action.includes('logout') ? '<i class="ri ri-logout-box-line text-secondary me-1"></i>'
+                        : l.action.includes('ลงนาม') ? '<i class="ri ri-pen-nib-line text-primary me-1"></i>'
+                        : l.action.includes('อนุมัติ') ? '<i class="ri ri-checkbox-circle-line text-info me-1"></i>'
+                        : '<i class="ri ri-computer-line text-muted me-1"></i>';
+                    return '<tr><td class="text-nowrap text-muted small">' + l.dt + '</td>'
+                        + '<td class="font-monospace small">' + l.ip + '</td>'
+                        + '<td>' + icon + l.action + '</td>'
+                        + '<td class="text-center">' + badge + '</td></tr>';
+                }).join('');
+            }
+            new bootstrap.Modal(document.getElementById('loginHistoryModal')).show();
+        });
+    });
     document.querySelectorAll('.btn-assign-scope').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var userId = this.dataset.userId;
@@ -297,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h5 class="card-title mb-1">ค้นหาผู้ใช้งาน</h5>
-            <p class="text-muted small mb-0">ค้นหาตามชื่อ อีเมล องค์กร บทบาท สังกัด หรือสถานะ</p>
+            <p class="text-muted small mb-0">ค้นหาตามชื่อ อีเมล องค์กร บทบาท สังกัด ช่วงวันที่ หรือสถานะ</p>
         </div>
     </div>
     <div class="card-body">
@@ -342,6 +443,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>
         </div>
+        @* 2.12(1): เพิ่ม filter ช่วงวันที่ *@
+        <div class="row g-3 align-items-end mt-2">
+            <div class="col-md-3">
+                <label for="filterOrg" class="form-label">หน่วยงาน / องค์กร</label>
+                <input id="filterOrg" type="text" class="form-control" placeholder="ชื่อองค์กร หรือ สังกัด" />
+            </div>
+            <div class="col-md-2">
+                <label for="filterRegFrom" class="form-label">วันที่ลงทะเบียน (จาก)</label>
+                <input id="filterRegFrom" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label for="filterRegTo" class="form-label">วันที่ลงทะเบียน (ถึง)</label>
+                <input id="filterRegTo" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label for="filterLoginFrom" class="form-label">ล็อกอินล่าสุด (จาก)</label>
+                <input id="filterLoginFrom" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label for="filterLoginTo" class="form-label">ล็อกอินล่าสุด (ถึง)</label>
+                <input id="filterLoginTo" type="date" class="form-control" />
+            </div>
+        </div>
     </div>
 </div>
 
@@ -351,6 +475,15 @@ document.addEventListener('DOMContentLoaded', function () {
         <div>
             <h5 class="card-title mb-1">รายชื่อผู้ใช้งาน</h5>
             <p class="text-muted small mb-0">แสดงข้อมูลผู้ใช้งานทั้งหมดในระบบ</p>
+        </div>
+        @* 2.12(1): Export Excel + DOF DB status note *@
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge bg-label-info small">
+                <i class="ri ri-database-2-line me-1"></i>เชื่อมโยงฐานข้อมูล DOF: <span class="fw-bold">@users.Count(x => x.Email.EndsWith("@dof.go.th")) รายการ</span>
+            </span>
+            <button type="button" class="btn btn-success btn-sm" id="btnExportUsers" onclick="alert('// TODO: ส่งออก Excel รายชื่อผู้ใช้งาน @totalCount รายการ\nคอลัมน์: รหัสผู้ใช้ / ชื่อ-สกุล / อีเมล / องค์กร / Role / วันลงทะเบียน / วันล็อกอินล่าสุด / สถานะ')">
+                <i class="ri ri-file-excel-line me-1"></i>Export Excel
+            </button>
         </div>
     </div>
     <div class="table-responsive p-1">
@@ -373,11 +506,31 @@ document.addEventListener('DOMContentLoaded', function () {
             <tbody id="userTableBody">
                 @foreach (var u in users)
                 {
-                    <tr data-id="@u.UserId" data-role="@u.Role" data-status="@u.StatusText" data-agency="@u.Agency" data-search-text="@u.FullName.ToLower() @u.Email.ToLower() @u.Organization.ToLower()">
+                    var regDate = registeredDates.ContainsKey(u.UserId) ? registeredDates[u.UserId] : new DateTime(2025,1,1);
+                    var isDofUser = u.Email.EndsWith("@dof.go.th");
+                    <tr data-id="@u.UserId" data-role="@u.Role" data-status="@u.StatusText" data-agency="@u.Agency"
+                        data-search-text="@u.FullName.ToLower() @u.Email.ToLower() @u.Organization.ToLower()"
+                        data-registered="@regDate.ToString("yyyy-MM-dd")"
+                        data-lastlogin="@u.LastLoginAt.ToString("yyyy-MM-dd")">
                         <td class="text-center text-muted">@u.RowNo</td>
                         <td><span class="fw-semibold text-primary">@u.UserId</span></td>
                         <td>@u.FullName</td>
-                        <td>@u.Email</td>
+                        <td>
+                            @u.Email
+                            @* 2.12(1): DOF DB connection badge *@
+                            @if (isDofUser)
+                            {
+                                <br/><span class="badge bg-label-success mt-1" style="font-size:0.65rem;">
+                                    <i class="ri ri-database-2-line me-1"></i>เชื่อมโยงฐานข้อมูล DOF ✅
+                                </span>
+                            }
+                            else
+                            {
+                                <br/><span class="badge bg-label-danger mt-1" style="font-size:0.65rem;">
+                                    <i class="ri ri-database-2-line me-1"></i>ไม่พบในฐานข้อมูล DOF ❌
+                                </span>
+                            }
+                        </td>
                         <td>
                             @u.Organization
                             @if (!string.IsNullOrEmpty(u.Agency)) {
@@ -437,8 +590,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <i class="ri ri-shield-keyhole-line text-primary"></i>
                                 </button>
                             }
-                            <button class="btn btn-icon btn-sm btn-outline-info btn-view-user" data-user-id="@u.UserId" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                            <button class="btn btn-icon btn-sm btn-outline-info me-1 btn-view-user" data-user-id="@u.UserId" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                 <i class="ri ri-eye-line text-info"></i>
+                            </button>
+                            @* 2.12(1): ปุ่มดูประวัติการใช้งาน *@
+                            <button class="btn btn-icon btn-sm btn-outline-secondary btn-view-login-history" data-user-id="@u.UserId" data-user-name="@u.FullName" data-bs-toggle="tooltip" title="ดูประวัติการเข้าใช้งาน">
+                                <i class="ri ri-history-line text-secondary"></i>
                             </button>
                         </td>
                     </tr>
@@ -1078,6 +1235,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
                     <i class="ri ri-save-line me-1"></i>บันทึกสิทธิ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 2.12(1): Modal ประวัติการเข้าใช้งาน *@
+<div class="modal fade" id="loginHistoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginHistoryModalTitle">ประวัติการเข้าใช้งาน</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center gap-2 mb-3 p-2 bg-light rounded">
+                    <i class="ri ri-user-3-line text-primary"></i>
+                    <span class="text-muted small">รหัสผู้ใช้:</span>
+                    <span class="fw-semibold text-primary" id="loginHistoryUserId">-</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0" style="font-size:0.78rem;">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th style="min-width:130px;">วันที่ / เวลา</th>
+                                <th>IP Address</th>
+                                <th>การกระทำ</th>
+                                <th style="width:80px;">ผลลัพธ์</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loginHistoryBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-success" onclick="alert('// TODO: Export ประวัติการเข้าใช้งาน Excel')">
+                    <i class="ri ri-file-excel-line me-1"></i>Export ประวัติ Excel
                 </button>
             </div>
         </div>

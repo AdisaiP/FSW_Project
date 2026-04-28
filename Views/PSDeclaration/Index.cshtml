@@ -378,44 +378,68 @@
 
         function filterRows() {
             var certificate = (document.getElementById('filterCertificate').value || '').trim();
-            var fromDate = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
-            var toDate = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
+            var requestNo   = (document.getElementById('filterRequestNo').value || '').trim().toLowerCase();
+            var receiveNo   = (document.getElementById('filterReceiveNo').value || '').trim().toLowerCase();
+            var establishment = (document.getElementById('filterEstablishment').value || '').trim().toLowerCase();
+            var approvalNo  = (document.getElementById('filterApprovalNo').value || '').trim().toLowerCase();
+            var product     = (document.getElementById('filterProduct').value || '').trim().toLowerCase();
+            var destCountry = (document.getElementById('filterDestCountry').value || '').trim();
+            var status      = (document.getElementById('filterStatus').value || '').trim();
+            var fromDate    = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
+            var toDate      = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
             var rows = document.querySelectorAll('#requestTableBody tr[data-certificate]');
             var visibleCount = 0;
 
             rows.forEach(function (row) {
-                var rowCertificate = row.dataset.certificate || '';
-                var rowDraftDate = new Date(row.dataset.draftDate || '');
-                var certificateMatch = !certificate || rowCertificate === certificate;
-                var fromMatch = !fromDate || rowDraftDate >= fromDate;
-                var toMatch = !toDate || rowDraftDate <= toDate;
-                var isVisible = certificateMatch && fromMatch && toMatch;
+                var rowCertificate  = row.dataset.certificate || '';
+                var rowDraftDate    = new Date(row.dataset.draftDate || '');
+                var rowRequestNo    = (row.dataset.requestNo || '').toLowerCase();
+                var rowReceiveNo    = (row.dataset.receiveNo || '').toLowerCase();
+                var rowEstablishment = (row.dataset.establishment || '').toLowerCase();
+                var rowApprovalNo   = (row.dataset.approvalNo || '').toLowerCase();
+                var rowProduct      = (row.dataset.product || '').toLowerCase();
+                var rowCountry      = row.dataset.country || '';
+                var rowStatus       = row.dataset.status || '';
+
+                var isVisible =
+                    (!certificate   || rowCertificate === certificate) &&
+                    (!requestNo     || rowRequestNo.includes(requestNo)) &&
+                    (!receiveNo     || rowReceiveNo.includes(receiveNo)) &&
+                    (!establishment || rowEstablishment.includes(establishment)) &&
+                    (!approvalNo    || rowApprovalNo.includes(approvalNo)) &&
+                    (!product       || rowProduct.includes(product)) &&
+                    (!destCountry   || rowCountry === destCountry) &&
+                    (!status        || rowStatus === status) &&
+                    (!fromDate      || rowDraftDate >= fromDate) &&
+                    (!toDate        || rowDraftDate <= toDate);
 
                 row.classList.toggle('d-none', !isVisible);
-                if (isVisible) {
-                    visibleCount += 1;
-                }
+                if (isVisible) visibleCount += 1;
             });
 
             document.getElementById('requestTableEmpty').classList.toggle('d-none', visibleCount !== 0);
         }
 
         document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
-        document.getElementById('filterCertificate').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateFrom').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateTo').addEventListener('change', filterRows);
-        document.querySelectorAll('#filterCertificate, #filterDraftDateFrom, #filterDraftDateTo').forEach(function (element) {
-            element.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    filterRows();
-                }
+        ['filterCertificate','filterRequestNo','filterReceiveNo','filterEstablishment',
+         'filterApprovalNo','filterProduct','filterDestCountry','filterStatus',
+         'filterDraftDateFrom','filterDraftDateTo','filterSubmitDateFrom','filterSubmitDateTo','filterReceiveDateFrom']
+        .forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('change', filterRows);
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
         document.getElementById('btnResetRequests').addEventListener('click', function () {
-            document.getElementById('filterCertificate').value = '';
-            document.getElementById('filterDraftDateFrom').value = '';
-            document.getElementById('filterDraftDateTo').value = '';
+            ['filterCertificate','filterRequestNo','filterReceiveNo','filterEstablishment',
+             'filterApprovalNo','filterProduct','filterDestCountry','filterStatus',
+             'filterDraftDateFrom','filterDraftDateTo','filterSubmitDateFrom','filterSubmitDateTo','filterReceiveDateFrom']
+            .forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.value = '';
+            });
             filterRows();
         });
     });
@@ -502,34 +526,104 @@
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
             <h5 class="card-title mb-1">ค้นหารายการคำขอใบรับรอง</h5>
-            <p class="text-muted small mb-0">ค้นหาตามใบรับรองและช่วงวันที่ร่างคำขอ</p>
+            <p class="text-muted small mb-0">ค้นหาตามประเภทคำขอ / เลขที่คำขอ / วันที่ยื่น / ชื่อสถานประกอบการ / ประเทศปลายทาง / สถานะ และอื่นๆ (TOR 1.7(20))</p>
         </div>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end">
+            <!-- ประเภทคำขอ (PS/NMD) -->
             <div class="col-md-4 col-lg-3">
-                <label for="filterCertificate" class="form-label">ใบรับรอง</label>
+                <label for="filterCertificate" class="form-label">ประเภทคำขอ</label>
                 <select id="filterCertificate" class="form-select">
                     <option value="">ทั้งหมด</option>
                     <option value="declaration">ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)</option>
                     <option value="processing">ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)</option>
                 </select>
             </div>
-            <div class="col-md-3 col-lg-3">
+            <!-- เลขที่คำขอ -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterRequestNo" class="form-label">เลขที่คำขอ</label>
+                <input type="text" id="filterRequestNo" class="form-control" placeholder="เช่น PS-2569-00001" />
+            </div>
+            <!-- วันที่ยื่น -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterSubmitDateFrom" class="form-label">วันที่ยื่น</label>
+                <input type="text" id="filterSubmitDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <!-- ถึงวันที่ยื่น -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterSubmitDateTo" class="form-label">ถึงวันที่ยื่น</label>
+                <input type="text" id="filterSubmitDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <!-- เลขที่รับคำขอ -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterReceiveNo" class="form-label">เลขที่รับคำขอ</label>
+                <input type="text" id="filterReceiveNo" class="form-control" placeholder="เช่น RCV-2569-00001" />
+            </div>
+            <!-- วันที่รับคำขอ (range) -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterReceiveDateFrom" class="form-label">วันที่รับ</label>
+                <input type="text" id="filterReceiveDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <!-- ชื่อสถานประกอบการ -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterEstablishment" class="form-label">ชื่อสถานประกอบการ</label>
+                <input type="text" id="filterEstablishment" class="form-control" placeholder="ชื่อสถานประกอบการ" />
+            </div>
+            <!-- หมายเลขรับรองโรงงาน -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterApprovalNo" class="form-label">หมายเลขรับรองโรงงาน</label>
+                <input type="text" id="filterApprovalNo" class="form-control" placeholder="เช่น TH-SMK-2025-0312" />
+            </div>
+            <!-- ชื่อสินค้า -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterProduct" class="form-label">ชื่อสินค้า</label>
+                <input type="text" id="filterProduct" class="form-control" placeholder="ชื่อสินค้า / HS Code" />
+            </div>
+            <!-- ประเทศปลายทาง -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterDestCountry" class="form-label">ประเทศปลายทาง</label>
+                <select id="filterDestCountry" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="AR">อาร์เจนตินา</option>
+                    <option value="US">สหรัฐอเมริกา</option>
+                    <option value="JP">ญี่ปุ่น</option>
+                    <option value="CN">จีน</option>
+                    <option value="EU">สหภาพยุโรป</option>
+                    <option value="KR">เกาหลีใต้</option>
+                    <option value="AU">ออสเตรเลีย</option>
+                </select>
+            </div>
+            <!-- สถานะ -->
+            <div class="col-md-4 col-lg-3">
+                <label for="filterStatus" class="form-label">สถานะ</label>
+                <select id="filterStatus" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="draft">ร่างคำขอ</option>
+                    <option value="submitted">ส่งคำขอแล้ว</option>
+                    <option value="reviewing">อยู่ระหว่างตรวจสอบ</option>
+                    <option value="approved">อนุมัติแล้ว</option>
+                    <option value="rejected">ไม่อนุมัติ</option>
+                    <option value="cancelled">ยกเลิก</option>
+                </select>
+            </div>
+            <!-- วันที่ร่างคำขอ (เดิม) -->
+            <div class="col-md-4 col-lg-3">
                 <label for="filterDraftDateFrom" class="form-label">วันที่ร่างคำขอ</label>
                 <input type="text" id="filterDraftDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
             </div>
-            <div class="col-md-3 col-lg-3">
-                <label for="filterDraftDateTo" class="form-label">ถึงวันที่</label>
+            <div class="col-md-4 col-lg-3">
+                <label for="filterDraftDateTo" class="form-label">ถึงวันที่ร่าง</label>
                 <input type="text" id="filterDraftDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
             </div>
-            <div class="col-md-2 col-lg-3">
+            <!-- ปุ่มค้นหา / reset -->
+            <div class="col-12">
                 <div class="d-flex gap-2 filter-action-buttons">
-                    <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
-                        <i class="ri ri-search-line"></i>
+                    <button type="button" id="btnSearchRequests" class="btn btn-primary btn-sm">
+                        <i class="ri ri-search-line me-1"></i> ค้นหา
                     </button>
-                    <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square">
-                        <i class="ri ri-refresh-line"></i>
+                    <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-sm">
+                        <i class="ri ri-refresh-line me-1"></i> ล้างตัวกรอง
                     </button>
                 </div>
             </div>

@@ -1,0 +1,15 @@
+# (2) ตั้งค่าการแจ้งเตือนล่วงหน้าก่อนวันส่งออก + ค้นหาวันที่ส่งออกในติดตามสถานะ
+
+URL 1: http://localhost:5055/Admin/IssueReason
+URL 2: http://localhost:5055/PSDeclaration/IndexTrackRequestStatus
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. Admin/IssueReason > card 'ตั้งค่าการแจ้งเตือนใบรับรอง' (#alertSettingsCard)
+   - accordion 'แจ้งเตือนล่วงหน้าก่อนวันส่งออก' + input แจ้งก่อน N วัน/ชั่วโมง
+2. checkbox ช่องทาง (ระบบ/อีเมล/SMS) + checkbox กลุ่มผู้รับ + ตัวอย่าง toast warning
+   - ปุ่ม 'ดูตัวอย่าง' / 'รีเซ็ต' / 'บันทึกการตั้งค่า'
+3. PSDeclaration/IndexTrackRequestStatus > คอลัมน์ 'วันส่งออก'
+   - badge 'เหลือ N วัน' (bg-label-danger ถ้า <= 3 วัน)
+4. filter 'วันที่ส่งออก' (date range) + checkbox 'เฉพาะใกล้วันส่งออก (<= 3 วัน)'

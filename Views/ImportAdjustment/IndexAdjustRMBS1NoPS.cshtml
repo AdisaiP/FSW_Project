@@ -1,5 +1,7 @@
 @{
     ViewData["Title"] = "การควบคุมปริมาณวัตถุดิบสัตว์นํ้านำเข้า (RMBS1:NoPS)";
+    var operatorType = Convert.ToString(ViewData["NoPsOperatorType"]) ?? "โรงงาน";
+    var operatorName = Convert.ToString(ViewData["NoPsOperatorName"]) ?? "Alpha Office Automation Co., Ltd.";
 
     string ToThaiDate(DateTime date) => date.AddYears(543).ToString("dd/MM/yyyy");
 
@@ -231,6 +233,19 @@
                 if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
+
+        document.querySelectorAll('.btn-preview-pdf').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var rmbs1 = this.dataset.rmbs1 || '';
+                var date  = this.dataset.date  || '';
+                document.getElementById('pdfPreviewRmbs1No').textContent = rmbs1;
+                document.getElementById('pdfPreviewDate').textContent    = date;
+                document.getElementById('pdfDocNo').textContent          = rmbs1;
+                document.getElementById('pdfApproveDate').textContent    = date;
+                document.getElementById('pdfStampDate').textContent      = date;
+                document.getElementById('pdfFooterDate').textContent     = date;
+            });
+        });
     });
 </script>
 }
@@ -238,7 +253,6 @@
 @* ===== Content ===== *@
 <h4 class="mb-1">การควบคุมปริมาณวัตถุดิบสัตว์นํ้านำเข้า (RMBS1:NoPS)</h4>
 <p class="mb-1">แสดงรายการการควบคุมปริมาณวัตถุดิบสัตว์นํ้านำเข้า (RMBS1:NoPS)</p>
-
 <nav aria-label="breadcrumb" class="mb-6">
     <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
         <li class="breadcrumb-item">
@@ -246,6 +260,11 @@
         </li>
     </ol>
 </nav>
+
+<div class="alert alert-primary d-flex align-items-start gap-2 mt-3" role="alert">
+    <i class="ri ri-information-line mt-1"></i>
+    <div>หน้านี้สำหรับผู้ประกอบการที่มีสถานะ <strong>โรงงาน</strong> เท่านั้น</div>
+</div>
 
 <!-- Filter card -->
 <div class="card mb-4">
@@ -327,6 +346,11 @@
 
 </p>
         </div>
+        <div>
+            <a href="@Url.Action("CreateAdjustRMBS1NoPS", "ImportAdjustment", new { mode = "create" })" class="btn btn-primary btn-sm">
+                <i class="ri ri-add-line me-1"></i> สร้างคำขอใหม่
+            </a>
+        </div>
     </div>
     <div class="table-responsive p-1">
         <table class="table table-bordered table-hover align-middle mb-0 imd-table">
@@ -341,6 +365,8 @@
                     <th>เครื่องมือทำการประมง</th>
                     <th style="min-width:280px;">ชนิดสัตว์น้ำ</th>
                     <th>ปริมาณสัตว์น้ำเข้าโรงงาน</th>
+                    <th style="min-width:130px;">สถานะอนุมัติ</th>
+                    <th style="min-width:130px;">จัดการ</th>
                 </tr>
             </thead>
             <tbody id="imdTableBody">
@@ -363,7 +389,7 @@
                         data-change-type=""
                         data-tx-date="@rec.TransactionDate.ToString("yyyy-MM-ddTHH:mm:ss")">
                         <td>
-                            <a href="@Url.Action("CreateAdjustRMBS1NoPS", "ImportAdjustment")" class="fw-semibold text-primary text-decoration-none">@rec.Rmbs1Number</a>
+                            <a href="@Url.Action("CreateAdjustRMBS1NoPS", "ImportAdjustment", new { mode = "view", rmbs1No = rec.Rmbs1Number })" class="fw-semibold text-primary text-decoration-none">@rec.Rmbs1Number</a>
                             <div class="mt-1">
                                 <div class="small text-muted d-flex align-items-center gap-1">
                                     <span class="badge @rec.CertificationStatusClass rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:1.4rem;height:1.4rem;">
@@ -384,12 +410,164 @@
                         <td>@rec.GearType</td>
                         <td style="max-width:280px;">@rec.FisheryProducts</td>
                         <td class="text-end">@rec.QtyEnteringFactory.ToString("N2")</td>
+                        <td class="text-center">
+                            @if (rec.StatusText == "อนุมัติแล้ว")
+                            {
+                                <span class="badge bg-success"><i class="ri ri-checkbox-circle-line me-1"></i>อนุมัติโดยระบบ</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark"><i class="ri ri-time-line me-1"></i>@rec.StatusText</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-1">
+                                <a href="@Url.Action("CreateAdjustRMBS1NoPS", "ImportAdjustment", new { mode = "view", rmbs1No = rec.Rmbs1Number })" class="btn btn-sm btn-icon btn-outline-primary" title="ดู">
+                                    <i class="ri ri-eye-line"></i>
+                                </a>
+                                <a href="@Url.Action("CreateAdjustRMBS1NoPS", "ImportAdjustment", new { mode = "edit", rmbs1No = rec.Rmbs1Number })" class="btn btn-sm btn-icon btn-outline-warning" title="แก้ไข">
+                                    <i class="ri ri-pencil-line"></i>
+                                </a>
+                                @if (rec.StatusText == "อนุมัติแล้ว")
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-preview-pdf"
+                                            title="พรีวิว PDF"
+                                            data-rmbs1="@rec.Rmbs1Number"
+                                            data-date="@rec.TransactionDate.ToString("dd/MM/yyyy")"
+                                            data-bs-toggle="modal" data-bs-target="#modalPdfPreview">
+                                        <i class="ri ri-file-pdf-line"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary" title="พรีวิว PDF (ยังไม่ได้รับการอนุมัติ)" disabled>
+                                        <i class="ri ri-file-pdf-line"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
                     </tr>
                 }
                 <tr id="imdTableEmpty" class="d-none">
-                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="11" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- Modal: PDF Preview -->
+<div class="modal fade" id="modalPdfPreview" tabindex="-1" aria-labelledby="modalPdfPreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header text-white">
+                <h5 class="modal-title" id="modalPdfPreviewLabel">
+                    <i class="ri ri-file-pdf-line me-2"></i>พรีวิว RMBS1 สถานะ NoPS — <span id="pdfPreviewRmbs1No"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Mock PDF Preview Area -->
+                <div class="bg-light border-bottom px-3 py-2 d-flex align-items-center gap-2 text-muted small">
+                    <i class="ri ri-information-line"></i>
+                    <span>ตัวอย่างเอกสาร RMBS1 (NoPS) — อนุมัติโดยระบบอัตโนมัติ | วันที่: <strong id="pdfPreviewDate"></strong></span>
+                </div>
+                <div style="height:600px; overflow:auto; background:#525659; display:flex; align-items:flex-start; justify-content:center; padding:24px;">
+                    <!-- Mock PDF Page -->
+                    <div style="width:794px; min-height:1123px; background:#fff; box-shadow:0 2px 16px rgba(0,0,0,0.5); padding:60px 70px; font-family:serif; position:relative;">
+                        <!-- Watermark -->
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:72px;color:rgba(0,128,0,0.08);font-weight:bold;white-space:nowrap;pointer-events:none;z-index:0;">อนุมัติโดยระบบ</div>
+                        <!-- Header -->
+                        <div style="text-align:center;border-bottom:2px solid #1565c0;padding-bottom:16px;margin-bottom:20px;">
+                            <div style="font-size:13px;color:#555;">กรมประมง | กองตรวจสอบและรับรองสัตว์น้ำและผลิตภัณฑ์สัตว์น้ำ</div>
+                            <div style="font-size:20px;font-weight:bold;color:#1565c0;margin:8px 0;">เอกสาร RMBS1 สถานะ NoPS</div>
+                            <div style="font-size:13px;color:#555;">Raw Material Balance Sheet — No Prior Season</div>
+                            <div class="mt-2">
+                                <span style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:bold;">
+                                    <i class="ri ri-checkbox-circle-fill"></i> อนุมัติโดยระบบอัตโนมัติ
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Doc Info -->
+                        <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
+                            <tr>
+                                <td style="width:30%;padding:6px 4px;color:#555;">เลขที่เอกสาร:</td>
+                                <td style="padding:6px 4px;font-weight:bold;" id="pdfDocNo"></td>
+                                <td style="width:25%;padding:6px 4px;color:#555;">วันที่อนุมัติ:</td>
+                                <td style="padding:6px 4px;font-weight:bold;" id="pdfApproveDate"></td>
+                            </tr>
+                            <tr style="background:#f5f5f5;">
+                                <td style="padding:6px 4px;color:#555;">ผู้ยื่นคำขอ:</td>
+                                <td style="padding:6px 4px;">บริษัท ทะเลทอง ฟิชเชอรี่ จำกัด</td>
+                                <td style="padding:6px 4px;color:#555;">เลขนิติบุคคล:</td>
+                                <td style="padding:6px 4px;">0105567012345</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:6px 4px;color:#555;">ประเภทกิจการ:</td>
+                                <td style="padding:6px 4px;">โรงงานแปรรูปสัตว์น้ำ</td>
+                                <td style="padding:6px 4px;color:#555;">เลขที่ IMD:</td>
+                                <td style="padding:6px 4px;">IMD-2568-00142</td>
+                            </tr>
+                        </table>
+                        <!-- Species Section -->
+                        <div style="font-size:14px;font-weight:bold;border-left:4px solid #1565c0;padding-left:10px;margin-bottom:10px;">รายละเอียดวัตถุดิบ</div>
+                        <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px;">
+                            <thead>
+                                <tr style="background:#1565c0;color:#fff;">
+                                    <th style="padding:8px;text-align:left;">ชนิดสัตว์น้ำ</th>
+                                    <th style="padding:8px;text-align:right;">น้ำหนักรวม (กก.)</th>
+                                    <th style="padding:8px;text-align:right;">โควตาที่ได้รับ (กก.)</th>
+                                    <th style="padding:8px;text-align:center;">สถานะ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom:1px solid #e0e0e0;">
+                                    <td style="padding:8px;">ปลาทูน่าครีบเหลือง (Thunnus albacares)</td>
+                                    <td style="padding:8px;text-align:right;">52,400.000</td>
+                                    <td style="padding:8px;text-align:right;">52,400.000</td>
+                                    <td style="padding:8px;text-align:center;"><span style="color:#2e7d32;font-weight:bold;">✓ อนุมัติ</span></td>
+                                </tr>
+                                <tr style="background:#f9f9f9;border-bottom:1px solid #e0e0e0;">
+                                    <td style="padding:8px;">ปลาโอท้องแถบ (Katsuwonus pelamis)</td>
+                                    <td style="padding:8px;text-align:right;">18,200.000</td>
+                                    <td style="padding:8px;text-align:right;">18,200.000</td>
+                                    <td style="padding:8px;text-align:center;"><span style="color:#2e7d32;font-weight:bold;">✓ อนุมัติ</span></td>
+                                </tr>
+                                <tr style="font-weight:bold;background:#e3f2fd;">
+                                    <td style="padding:8px;">รวม</td>
+                                    <td style="padding:8px;text-align:right;">70,600.000</td>
+                                    <td style="padding:8px;text-align:right;">70,600.000</td>
+                                    <td style="padding:8px;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- Approval Stamp -->
+                        <div style="text-align:right;margin-top:40px;">
+                            <div style="display:inline-block;border:3px solid #2e7d32;border-radius:8px;padding:12px 24px;color:#2e7d32;">
+                                <div style="font-size:13px;font-weight:bold;">อนุมัติโดยระบบอัตโนมัติ</div>
+                                <div style="font-size:12px;">ระบบ RMBS กรมประมง</div>
+                                <div style="font-size:11px;color:#555;" id="pdfStampDate"></div>
+                            </div>
+                        </div>
+                        <!-- Footer -->
+                        <div style="position:absolute;bottom:30px;left:70px;right:70px;text-align:center;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;">
+                            เอกสารนี้ออกโดยระบบอัตโนมัติ — กรมประมง กระทรวงเกษตรและสหกรณ์ | พิมพ์จากระบบ RMBS วันที่ <span id="pdfFooterDate"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์
+                </button>
+                <button type="button" class="btn btn-danger" onclick="alert('กำลังดาวน์โหลด PDF...')">
+                    <i class="ri ri-download-line me-1"></i>ดาวน์โหลด PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

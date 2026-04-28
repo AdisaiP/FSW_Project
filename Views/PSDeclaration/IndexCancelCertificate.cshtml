@@ -1,0 +1,554 @@
+@{
+    ViewData["Title"] = "ขอยกเลิกใบรับรอง";
+
+    // TOR 1.10(1)(3): mockup data สำหรับรายการคำขอยกเลิกใบรับรอง
+    var requests = new[]
+    {
+        new
+        {
+            RequestNumber = "CAN821B211301",
+            CertificateKey = "processing",
+            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
+            OriginalCertNumber = "AC821B2171001",
+            CancellationReason = "ข้อมูลผิดพลาด",
+            Establishment = "Alpha Office Automation Co., Ltd. (สาขา 00001)",
+            ApprovalNo = "AP-74110-001",
+            Product = "CANNED TUNA IN BRINE",
+            Country = "สหภาพยุโรป",
+            ReceiveNo = "RCV-2569-0401",
+            TransactionAt = new DateTime(2026, 4, 22, 10, 20, 11),
+            StatusText = "ฉบับร่าง",
+            StatusClass = "bg-label-secondary",
+            StatusIcon = "ri-file-3-line",
+            RequestedByText = "ผู้เข้าใช้ระบบ",
+            RequestedByClass = "bg-label-danger",
+            RequestedByIcon = "ri-user-3-line",
+            HasInspection = true,
+            AllowCancel = true,
+            AllowDelete = true
+        },
+        new
+        {
+            RequestNumber = "CAN821B211302",
+            CertificateKey = "declaration",
+            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
+            OriginalCertNumber = "HC821B211301",
+            CancellationReason = "สินค้าไม่ได้ส่งออก",
+            Establishment = "Beta Seafood Export Co., Ltd. (สาขา 00001)",
+            ApprovalNo = "AP-74110-002",
+            Product = "FROZEN TUNA LOIN",
+            Country = "ญี่ปุ่น",
+            ReceiveNo = "RCV-2569-0402",
+            TransactionAt = new DateTime(2026, 4, 23, 14, 33, 52),
+            StatusText = "รออนุมัติ",
+            StatusClass = "bg-label-warning",
+            StatusIcon = "ri-mail-send-line",
+            RequestedByText = "ผู้เข้าใช้ระบบ",
+            RequestedByClass = "bg-label-danger",
+            RequestedByIcon = "ri-user-3-line",
+            HasInspection = false,
+            AllowCancel = false,
+            AllowDelete = false
+        },
+        new
+        {
+            RequestNumber = "CAN821B211303",
+            CertificateKey = "processing",
+            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
+            OriginalCertNumber = "AC821B2171002",
+            CancellationReason = "ขอถอนคำขอ",
+            Establishment = "Gamma Fish Export Co., Ltd. (สาขา 00001)",
+            ApprovalNo = "AP-74110-003",
+            Product = "SMOKED TUNA",
+            Country = "สหรัฐอเมริกา",
+            ReceiveNo = "RCV-2569-0403",
+            TransactionAt = new DateTime(2026, 4, 24, 9, 5, 44),
+            StatusText = "อนุมัติ (ยกเลิกแล้ว)",
+            StatusClass = "bg-label-danger",
+            StatusIcon = "ri-close-circle-line",
+            RequestedByText = "เจ้าหน้าที่",
+            RequestedByClass = "bg-label-primary",
+            RequestedByIcon = "ri-user-star-line",
+            HasInspection = false,
+            AllowCancel = false,
+            AllowDelete = false
+        },
+        new
+        {
+            RequestNumber = "CAN821B211304",
+            CertificateKey = "declaration",
+            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
+            OriginalCertNumber = "HC821B211302",
+            CancellationReason = "ใช้ใบรับรองผิดประเภท",
+            Establishment = "Delta Marine Products Co., Ltd. (สาขา 00001)",
+            ApprovalNo = "AP-74110-004",
+            Product = "TUNA FILLET",
+            Country = "เกาหลีใต้",
+            ReceiveNo = "",
+            TransactionAt = new DateTime(2026, 4, 25, 16, 47, 30),
+            StatusText = "ไม่อนุมัติ",
+            StatusClass = "bg-label-secondary",
+            StatusIcon = "ri-forbid-2-line",
+            RequestedByText = "ผู้เข้าใช้ระบบ",
+            RequestedByClass = "bg-label-danger",
+            RequestedByIcon = "ri-user-3-line",
+            HasInspection = false,
+            AllowCancel = true,
+            AllowDelete = true
+        },
+        new
+        {
+            RequestNumber = "CAN821B211305",
+            CertificateKey = "processing",
+            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
+            OriginalCertNumber = "AC821B2171003",
+            CancellationReason = "อื่นๆ",
+            Establishment = "Epsilon Seafood Co., Ltd. (สาขา 00002)",
+            ApprovalNo = "AP-74110-005",
+            Product = "CANNED MACKEREL",
+            Country = "ออสเตรเลีย",
+            ReceiveNo = "",
+            TransactionAt = new DateTime(2026, 4, 26, 11, 15, 20),
+            StatusText = "ฉบับร่าง",
+            StatusClass = "bg-label-secondary",
+            StatusIcon = "ri-file-3-line",
+            RequestedByText = "ผู้เข้าใช้ระบบ",
+            RequestedByClass = "bg-label-danger",
+            RequestedByIcon = "ri-user-3-line",
+            HasInspection = false,
+            AllowCancel = true,
+            AllowDelete = true
+        }
+    };
+
+    int totalCount       = requests.Length;
+    int draftCount       = requests.Count(r => r.StatusText == "ฉบับร่าง");
+    int pendingCount     = requests.Count(r => r.StatusText == "รออนุมัติ");
+    int cancelledCount   = requests.Count(r => r.StatusText == "อนุมัติ (ยกเลิกแล้ว)");
+}
+
+<h4 class="mb-1">ขอยกเลิกใบรับรอง</h4>
+<p class="mb-1">รายการคำขอยกเลิกใบรับรองการแปรรูปสัตว์น้ำและใบรับรองที่เกี่ยวข้อง</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "PSDeclaration")" class="text-primary fw-semibold">ขอใบรับรอง PS/Declaration</a>
+        </li>
+        <li class="breadcrumb-item active text-secondary">ขอยกเลิกใบรับรอง</li>
+    </ol>
+</nav>
+
+<div class="row mb-6 g-6">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@totalCount</h5>
+                        <small>คำขอยกเลิกทั้งหมด</small>
+                    </div>
+                    <span class="badge bg-label-primary rounded-circle p-2">
+                        <i class="icon-base ri ri-file-forbid-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@draftCount</h5>
+                        <small>ฉบับร่าง</small>
+                    </div>
+                    <span class="badge bg-label-secondary rounded-circle p-2">
+                        <i class="icon-base ri ri-file-3-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@pendingCount</h5>
+                        <small>รออนุมัติ</small>
+                    </div>
+                    <span class="badge bg-label-warning rounded-circle p-2">
+                        <i class="icon-base ri ri-mail-send-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="content-left">
+                        <h5 class="mb-1">@cancelledCount</h5>
+                        <small>อนุมัติ (ยกเลิกแล้ว)</small>
+                    </div>
+                    <span class="badge bg-label-danger rounded-circle p-2">
+                        <i class="icon-base ri ri-close-circle-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Card -->
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <h5 class="card-title mb-1">ค้นหารายการคำขอยกเลิกใบรับรอง</h5>
+            <p class="text-muted small mb-0">ค้นหาตามประเภทใบรับรอง / เลขที่คำขอ / ชื่อสถานประกอบการ / ประเทศปลายทาง / สถานะ และอื่นๆ (TOR 1.10(3)(8))</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">ประเภทใบรับรอง</label>
+                <select class="form-select" id="filterCertType">
+                    <option value="">ทั้งหมด</option>
+                    <option value="processing">Processing Statement (PS)</option>
+                    <option value="declaration">Declaration (NMD)</option>
+                </select>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">เลขที่คำขอ</label>
+                <input type="text" class="form-control" id="filterRequestNo" placeholder="CAN..." />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">เลขที่ใบรับรอง</label>
+                <input type="text" class="form-control" id="filterCertNo" placeholder="AC821B..." />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">ชื่อสถานประกอบการ</label>
+                <input type="text" class="form-control" id="filterEstab" placeholder="ชื่อบริษัท..." />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">หมายเลขรับรองโรงงาน</label>
+                <input type="text" class="form-control" id="filterApprovalNo" placeholder="AP-74110-..." />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">ชื่อสินค้า</label>
+                <input type="text" class="form-control" id="filterProduct" placeholder="CANNED TUNA..." />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">ประเทศปลายทาง</label>
+                <input type="text" class="form-control" id="filterCountry" placeholder="ญี่ปุ่น..." />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">วันที่ยื่นคำขอ (จาก)</label>
+                <input type="text" class="form-control flatpickr-date" id="filterDateFrom" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">วันที่ยื่นคำขอ (ถึง)</label>
+                <input type="text" class="form-control flatpickr-date" id="filterDateTo" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">เลขที่รับคำขอ</label>
+                <input type="text" class="form-control" id="filterReceiveNo" placeholder="RCV-2569-..." />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label class="form-label">สถานะ</label>
+                <select class="form-select" id="filterStatus">
+                    <option value="">ทั้งหมด</option>
+                    <option value="ฉบับร่าง">ฉบับร่าง</option>
+                    <option value="รออนุมัติ">รออนุมัติ</option>
+                    <option value="อนุมัติ (ยกเลิกแล้ว)">อนุมัติ (ยกเลิกแล้ว)</option>
+                    <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    <button type="button" id="btnSearchRequests" class="btn btn-primary btn-sm">
+                        <i class="ri ri-search-line me-1"></i> ค้นหา
+                    </button>
+                    <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-sm">
+                        <i class="ri ri-refresh-line me-1"></i> ล้างตัวกรอง
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- List Card -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h5 class="card-title mb-1">รายการคำขอยกเลิกใบรับรอง</h5>
+            <p class="text-muted mb-0 small">Certificate Cancellation — รายการคำขอยกเลิกใบรับรองของท่าน</p>
+        </div>
+        @* TOR 1.10(2): เปลี่ยนลิงก์ไป SelectTypeCancellation แทน *@
+        <a href="@Url.Action("SelectTypeCancellation", "PSDeclaration")" class="btn btn-danger btn-sm">
+            <i class="ri ri-add-line me-1"></i>สร้างคำขอยกเลิกใหม่
+        </a>
+    </div>
+
+    <div class="table-responsive p-1">
+                    <table class="table table-bordered align-middle mb-0 request-table-compact">
+                        <thead class="text-center">
+                            <tr>
+                                <th style="min-width:180px;">เลขที่คำขอ</th>
+                                <th style="min-width:200px;">ใบรับรองที่ขอยกเลิก</th>
+                                <th style="min-width:160px;">เลขที่ใบรับรอง</th>
+                                <th>เหตุผลการยกเลิก</th>
+                                <th style="min-width:150px;">วันที่ทำรายการ</th>
+                                <th style="min-width:120px;">สถานะตรวจปล่อย</th>
+                                <th style="width:7rem;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestTableBody">
+                            @foreach (var request in requests)
+                            {
+                                <tr data-certificate="@request.CertificateKey"
+                                    data-status="@request.StatusText"
+                                    data-request-no="@request.RequestNumber.ToLower()"
+                                    data-cert-no="@request.OriginalCertNumber.ToLower()"
+                                    data-estab="@request.Establishment.ToLower()"
+                                    data-approval-no="@request.ApprovalNo.ToLower()"
+                                    data-product="@request.Product.ToLower()"
+                                    data-country="@request.Country.ToLower()"
+                                    data-receive-no="@request.ReceiveNo.ToLower()"
+                                    data-date="@request.TransactionAt.ToString("yyyy-MM-dd")">
+                                    <td>
+                                        <a href="@Url.Action("CreateCancelCertificate", "PSDeclaration")"
+                                           class="fw-semibold text-primary text-decoration-none d-block mb-1">
+                                            @request.RequestNumber
+                                        </a>
+                                        <div class="d-flex flex-column gap-1">
+                                            <div class="d-flex align-items-center gap-1 small text-muted">
+                                                <span class="badge @request.StatusClass rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:1.15rem;height:1.15rem;padding:0;">
+                                                    <i class="ri @request.StatusIcon" style="font-size:0.6rem;"></i>
+                                                </span>
+                                                <span>สถานะ: @request.StatusText</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-1 small text-muted">
+                                                <span class="badge @request.RequestedByClass rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width:1.15rem;height:1.15rem;padding:0;">
+                                                    <i class="ri @request.RequestedByIcon" style="font-size:0.6rem;"></i>
+                                                </span>
+                                                <span>ขอโดย: @request.RequestedByText</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-1 small text-muted">
+                                                <i class="ri ri-building-2-line" style="font-size:0.7rem;"></i>
+                                                <span>@request.Establishment</span>
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(request.ReceiveNo))
+                                            {
+                                                <div class="d-flex align-items-center gap-1 small text-muted">
+                                                    <i class="ri ri-file-list-3-line" style="font-size:0.7rem;"></i>
+                                                    <span>เลขรับ: @request.ReceiveNo</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="small">
+                                        @request.CertificateName
+                                        <div class="mt-1">
+                                            <span class="badge bg-label-secondary small me-1">@request.Product</span>
+                                            <span class="badge bg-label-info small">ปลายทาง: @request.Country</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="fw-semibold text-secondary">@request.OriginalCertNumber</span>
+                                    </td>
+                                    <td class="small">@request.CancellationReason</td>
+                                    <td class="text-center small text-nowrap">
+                                        @request.TransactionAt.ToString("dd/MM/yyyy")<br />
+                                        <span class="text-muted">(@request.TransactionAt.ToString("HH:mm:ss"))</span>
+                                    </td>
+                                    @* TOR 1.10(1): สถานะตรวจปล่อย *@
+                                    <td class="text-center">
+                                        @if (request.HasInspection)
+                                        {
+                                            <span class="badge bg-warning text-dark small">
+                                                <i class="ri ri-error-warning-line me-1"></i>มีการตรวจปล่อย
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-label-success small">
+                                                <i class="ri ri-checkbox-circle-line me-1"></i>ไม่มีการตรวจปล่อย
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            @if (request.StatusText == "ฉบับร่าง" || request.StatusText == "ไม่อนุมัติ")
+                                            {
+                                                <a href="@Url.Action("CreateCancelCertificate", "PSDeclaration")"
+                                                   class="btn btn-sm btn-icon btn-outline-primary"
+                                                   data-bs-toggle="tooltip" title="แก้ไข">
+                                                    <i class="ri ri-pencil-line"></i>
+                                                </a>
+                                                if (request.AllowCancel)
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                                            data-bs-toggle="tooltip" title="ยกเลิกคำขอ"
+                                                            onclick="alert('[mockup] ยกเลิกคำขอ @request.RequestNumber')">
+                                                        <i class="ri ri-close-line"></i>
+                                                    </button>
+                                                }
+                                                if (request.AllowDelete)
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                                            data-bs-toggle="tooltip" title="ลบ"
+                                                            onclick="alert('[mockup] ลบคำขอ @request.RequestNumber')">
+                                                        <i class="ri ri-delete-bin-line"></i>
+                                                    </button>
+                                                }
+                                            }
+                                            else if (request.StatusText == "รออนุมัติ")
+                                            {
+                                                @* TOR 1.10(9): ดูรายละเอียด + ติดตามสถานะ *@
+                                                <a href="@Url.Action("CreateCancelCertificate", "PSDeclaration")"
+                                                   class="btn btn-sm btn-icon btn-outline-secondary"
+                                                   data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                                    <i class="ri ri-eye-line"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                                        data-bs-toggle="tooltip" title="ยกเลิกคำขอ"
+                                                        onclick="alert('[mockup] ยกเลิกคำขอ @request.RequestNumber')">
+                                                    <i class="ri ri-close-line"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("CreateCancelCertificate", "PSDeclaration")"
+                                                   class="btn btn-sm btn-icon btn-outline-secondary"
+                                                   data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                                    <i class="ri ri-eye-line"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr id="noResultRow" class="d-none">
+                                <td colspan="7" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+</div>
+
+@section PageScripts {
+<script>
+    function parseDateStr(val) {
+        if (!val) return null;
+        var parts = val.split('/');
+        if (parts.length !== 3) return null;
+        var d = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10) - 1;
+        var y = parseInt(parts[2], 10);
+        var parsed = new Date(y, m, d);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function filterRows() {
+        const status = document.getElementById('filterStatus').value.toLowerCase();
+        const certType = document.getElementById('filterCertType').value.toLowerCase();
+        const requestNo = document.getElementById('filterRequestNo').value.toLowerCase();
+        const certNo = document.getElementById('filterCertNo').value.toLowerCase();
+        const estab = document.getElementById('filterEstab').value.toLowerCase();
+        const approvalNo = document.getElementById('filterApprovalNo').value.toLowerCase();
+        const product = document.getElementById('filterProduct').value.toLowerCase();
+        const country = document.getElementById('filterCountry').value.toLowerCase();
+        const receiveNo = document.getElementById('filterReceiveNo').value.toLowerCase();
+        const dateFrom = parseDateStr(document.getElementById('filterDateFrom').value);
+        const dateTo = parseDateStr(document.getElementById('filterDateTo').value);
+
+        const rows = document.querySelectorAll('#requestTableBody tr');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const rowStatus = (row.dataset.status || '').toLowerCase();
+            const rowCertType = (row.dataset.certificate || '').toLowerCase();
+            const rowRequestNo = (row.dataset.requestNo || '').toLowerCase();
+            const rowCertNo = (row.dataset.certNo || '').toLowerCase();
+            const rowEstab = (row.dataset.estab || '').toLowerCase();
+            const rowApprovalNo = (row.dataset.approvalNo || '').toLowerCase();
+            const rowProduct = (row.dataset.product || '').toLowerCase();
+            const rowCountry = (row.dataset.country || '').toLowerCase();
+            const rowReceiveNo = (row.dataset.receiveNo || '').toLowerCase();
+            const rowDate = row.dataset.date ? new Date(row.dataset.date) : null;
+
+            const dateMatch = (!dateFrom && !dateTo) ||
+                ((!dateFrom || (rowDate && rowDate >= dateFrom)) &&
+                 (!dateTo   || (rowDate && rowDate <= dateTo)));
+
+            const match =
+                (!status || rowStatus.includes(status)) &&
+                (!certType || rowCertType === certType) &&
+                (!requestNo || rowRequestNo.includes(requestNo)) &&
+                (!certNo || rowCertNo.includes(certNo)) &&
+                (!estab || rowEstab.includes(estab)) &&
+                (!approvalNo || rowApprovalNo.includes(approvalNo)) &&
+                (!product || rowProduct.includes(product)) &&
+                (!country || rowCountry.includes(country)) &&
+                (!receiveNo || rowReceiveNo.includes(receiveNo)) &&
+                dateMatch;
+
+            row.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+
+        const noResultRow = document.getElementById('noResultRow');
+        noResultRow.classList.toggle('d-none', visibleCount > 0);
+    }
+
+    function clearFilters() {
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterCertType').value = '';
+        document.getElementById('filterRequestNo').value = '';
+        document.getElementById('filterCertNo').value = '';
+        document.getElementById('filterEstab').value = '';
+        document.getElementById('filterApprovalNo').value = '';
+        document.getElementById('filterProduct').value = '';
+        document.getElementById('filterCountry').value = '';
+        document.getElementById('filterReceiveNo').value = '';
+        document.getElementById('filterDateFrom').value = '';
+        document.getElementById('filterDateTo').value = '';
+        filterRows();
+    }
+
+    // Init tooltips
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        new bootstrap.Tooltip(el);
+    });
+    // Init flatpickr date pickers
+    if (typeof flatpickr !== 'undefined') {
+        flatpickr('.flatpickr-date', { dateFormat: 'd/m/Y', locale: 'th' });
+    }
+
+    document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
+    document.getElementById('btnResetRequests').addEventListener('click', function () {
+        clearFilters();
+    });
+    ['filterCertType','filterRequestNo','filterCertNo','filterEstab','filterApprovalNo',
+     'filterProduct','filterCountry','filterDateFrom','filterDateTo','filterReceiveNo','filterStatus']
+    .forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('change', filterRows);
+        el.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
+        });
+    });
+</script>
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}

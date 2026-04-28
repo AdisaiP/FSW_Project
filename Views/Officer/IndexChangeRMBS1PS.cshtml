@@ -1,0 +1,386 @@
+@{
+    ViewData["Title"] = "คำขอเปลี่ยนแปลง / ยกเลิก RMBS1:PS (หลังออกใบรับรอง)";
+
+    string ToThaiDate(DateTime date) => date.AddYears(543).ToString("dd/MM/yyyy");
+
+    var changeRecords = new[]
+    {
+        new
+        {
+            RowNo = 1,
+            ChangeRequestNo = "CHG-PS-2561-0001",
+            Rmbs1Number     = "10611280211800000560",
+            ChangeType      = "เปลี่ยนผลการพิจารณา",
+            ChangeTypeClass = "bg-label-primary",
+            OperatorName    = "Alpha Office Automation Co., Ltd.",
+            SubmittedDate   = new DateTime(2018, 10, 5),
+            StatusText      = "รออนุมัติ",
+            StatusClass     = "bg-label-warning",
+            CertificateBound = true
+        },
+        new
+        {
+            RowNo = 2,
+            ChangeRequestNo = "CHG-PS-2561-0002",
+            Rmbs1Number     = "10611280211800000835",
+            ChangeType      = "ยกเลิกการออกเอกสาร",
+            ChangeTypeClass = "bg-label-danger",
+            OperatorName    = "Beta Seafood Processing Co., Ltd.",
+            SubmittedDate   = new DateTime(2018, 10, 8),
+            StatusText      = "ฉบับร่าง",
+            StatusClass     = "bg-label-secondary",
+            CertificateBound = true
+        },
+        new
+        {
+            RowNo = 3,
+            ChangeRequestNo = "CHG-PS-2561-0003",
+            Rmbs1Number     = "10611280211800000912",
+            ChangeType      = "เปลี่ยนประเทศปลายทาง",
+            ChangeTypeClass = "bg-label-info",
+            OperatorName    = "Gamma Marine Products Co., Ltd.",
+            SubmittedDate   = new DateTime(2018, 10, 12),
+            StatusText      = "อนุมัติ",
+            StatusClass     = "bg-label-success",
+            CertificateBound = true
+        },
+        new
+        {
+            RowNo = 4,
+            ChangeRequestNo = "CHG-PS-2561-0004",
+            Rmbs1Number     = "10611280211800000560",
+            ChangeType      = "เปลี่ยนความประสงค์",
+            ChangeTypeClass = "bg-label-info",
+            OperatorName    = "Alpha Office Automation Co., Ltd.",
+            SubmittedDate   = new DateTime(2018, 10, 15),
+            StatusText      = "ไม่อนุมัติ",
+            StatusClass     = "bg-label-danger",
+            CertificateBound = true
+        }
+    };
+
+    var totalCount   = changeRecords.Length;
+    var draftCount   = changeRecords.Count(r => r.StatusText == "ฉบับร่าง");
+    var pendingCount = changeRecords.Count(r => r.StatusText == "รออนุมัติ");
+    var approvedCount= changeRecords.Count(r => r.StatusText == "อนุมัติ");
+    var rejectedCount= changeRecords.Count(r => r.StatusText == "ไม่อนุมัติ");
+}
+
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/flatpickr/flatpickr.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/flatpickr/flatpickr.js"></script>
+}
+
+@section PageStyles {
+<style>
+    .chg-table { font-size: 0.78rem; }
+    .chg-table th, .chg-table td { padding: 0.45rem 0.5rem; vertical-align: middle; white-space: normal; line-height: 1.3; }
+</style>
+}
+
+@* ===== Content ===== *@
+<h4 class="mb-1">คำขอเปลี่ยนแปลง / ยกเลิก RMBS1:PS</h4>
+<p class="mb-1 text-muted">จัดการคำขอเปลี่ยนแปลงผลการพิจารณาหรือยกเลิกการออกเอกสาร RMBS1:PS กรณีที่ออกใบรับรองไปแล้ว</p>
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="@Url.Action("IndexRMBS1PS", "Officer")" class="text-primary fw-semibold">พิจารณา RMBS1 สถานะ PS / NoPS</a></li>
+        <li class="breadcrumb-item active text-secondary">คำขอเปลี่ยนแปลง / ยกเลิก</li>
+    </ol>
+</nav>
+
+<!-- ─── Summary Cards ─── -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-body">@totalCount</div>
+            <div class="small text-muted">ทั้งหมด</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-warning">@pendingCount</div>
+            <div class="small text-muted">รออนุมัติ</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-success">@approvedCount</div>
+            <div class="small text-muted">อนุมัติแล้ว</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm text-center py-3">
+            <div class="fs-2 fw-bold text-danger">@rejectedCount</div>
+            <div class="small text-muted">ไม่อนุมัติ</div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Filter Card ─── -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body py-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label small mb-1">ค้นหา</label>
+                <input type="text" id="filterSearch" class="form-control form-control-sm" placeholder="เลขที่คำขอเปลี่ยน / เลขที่ RMBS1:PS / ชื่อบริษัท" />
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">ประเภทการเปลี่ยน</label>
+                <select id="filterChangeType" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    <option>เปลี่ยนผลการพิจารณา</option>
+                    <option>ยกเลิกการออกเอกสาร</option>
+                    <option>เปลี่ยนความประสงค์</option>
+                    <option>เปลี่ยนประเทศปลายทาง</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">สถานะ</label>
+                <select id="filterStatus" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    <option>ฉบับร่าง</option>
+                    <option>รออนุมัติ</option>
+                    <option>อนุมัติ</option>
+                    <option>ไม่อนุมัติ</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">วันที่ยื่น (จาก)</label>
+                <input type="text" id="filterDateFrom" class="form-control form-control-sm flatpickr-date" placeholder="วว/ดด/ปปปป" />
+            </div>
+            <div class="col-6 col-md-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm w-100" id="btnFilterReset">
+                    <i class="ri ri-refresh-line me-1"></i> ล้างตัวกรอง
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Table ─── -->
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center py-2 flex-wrap gap-2">
+        <span class="fw-semibold small"><i class="ri ri-list-check me-1 text-primary"></i>รายการคำขอเปลี่ยนแปลง / ยกเลิก RMBS1:PS</span>
+        <div class="d-flex gap-2">
+            <span class="badge bg-label-primary" id="tableCountBadge">แสดง @totalCount รายการ</span>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover chg-table mb-0" id="changeTable">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center" style="width:2.5rem;">#</th>
+                    <th>เลขที่คำขอเปลี่ยน</th>
+                    <th>เลขที่ RMBS1:PS เดิม</th>
+                    <th>ประเภทการเปลี่ยนแปลง</th>
+                    <th>ชื่อผู้ประกอบการ</th>
+                    <th class="text-center">วันที่ยื่น</th>
+                    <th class="text-center">สถานะ</th>
+                    <th class="text-center">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="changeTableBody">
+                @foreach (var rec in changeRecords)
+                {
+                    <tr data-change-no="@rec.ChangeRequestNo"
+                        data-rmbs1="@rec.Rmbs1Number"
+                        data-change-type="@rec.ChangeType"
+                        data-operator="@rec.OperatorName"
+                        data-status="@rec.StatusText">
+                        <td class="text-center text-muted">@rec.RowNo</td>
+                        <td>
+                            <a href="@Url.Action("ReviewChangeRMBS1PS", "Officer")" class="fw-semibold text-primary text-decoration-none">@rec.ChangeRequestNo</a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("ReviewRMBS1PS", "Officer")" class="text-body text-decoration-none small">@rec.Rmbs1Number</a>
+                            @if (rec.CertificateBound)
+                            {
+                                <div class="mt-1">
+                                    <span class="badge bg-label-warning" style="font-size:0.6rem;"><i class="ri ri-file-warning-line me-1"></i>ออกใบรับรองแล้ว</span>
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge @rec.ChangeTypeClass">@rec.ChangeType</span>
+                        </td>
+                        <td class="small">@rec.OperatorName</td>
+                        <td class="text-center text-nowrap">@ToThaiDate(rec.SubmittedDate)</td>
+                        <td class="text-center">
+                            <span class="badge @rec.StatusClass">@rec.StatusText</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex gap-1 justify-content-center">
+                                <a href="@Url.Action("ReviewChangeRMBS1PS", "Officer")" class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                    <i class="ri ri-eye-line"></i>
+                                </a>
+                                @if (rec.StatusText == "ฉบับร่าง")
+                                {
+                                    <a href="@Url.Action("ReviewChangeRMBS1PS", "Officer")" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="แก้ไข">
+                                        <i class="ri ri-edit-line"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning btn-cancel-chg" data-chg="@rec.ChangeRequestNo" data-bs-toggle="tooltip" title="ยกเลิกคำขอ">
+                                        <i class="ri ri-close-circle-line text-warning"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-delete-chg" data-chg="@rec.ChangeRequestNo" data-bs-toggle="tooltip" title="ลบ">
+                                        <i class="ri ri-delete-bin-line text-danger"></i>
+                                    </button>
+                                }
+                                @if (rec.StatusText == "รออนุมัติ")
+                                {
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ">
+                                        <i class="ri ri-checkbox-circle-line text-success"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                <tr id="changeTableEmpty" class="d-none">
+                    <td colspan="8" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==================== Modal: ยืนยันยกเลิกคำขอเปลี่ยนแปลง ==================== -->
+<div class="modal fade" id="modalCancelChg" tabindex="-1" aria-labelledby="modalCancelChgLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalCancelChgLabel">
+                    <i class="ri ri-close-circle-line me-1 text-warning"></i> ยืนยันยกเลิกคำขอเปลี่ยนแปลง
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>คำขอ <strong id="cancelChgText"></strong> จะถูกยกเลิก ใช่หรือไม่?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" id="btnConfirmCancelChg" class="btn btn-warning">ยืนยันยกเลิก</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: ยืนยันลบคำขอเปลี่ยนแปลง ==================== -->
+<div class="modal fade" id="modalDeleteChg" tabindex="-1" aria-labelledby="modalDeleteChgLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalDeleteChgLabel">
+                    <i class="ri ri-delete-bin-line me-1 text-danger"></i> ยืนยันการลบ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>ต้องการลบคำขอ <strong id="deleteChgText"></strong> ใช่หรือไม่? การกระทำนี้ไม่สามารถกู้คืนได้</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" id="btnConfirmDeleteChg" class="btn btn-danger">ยืนยันลบ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Tooltips
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+        new bootstrap.Tooltip(el, { trigger: 'hover' });
+    });
+
+    // Flatpickr
+    flatpickr('.flatpickr-date', { dateFormat: 'd/m/Y', allowInput: true });
+
+    // ── Filter ──
+    function applyFilter() {
+        var search = document.getElementById('filterSearch').value.toLowerCase();
+        var type   = document.getElementById('filterChangeType').value.toLowerCase();
+        var status = document.getElementById('filterStatus').value.toLowerCase();
+        var rows   = document.querySelectorAll('#changeTableBody tr[data-change-no]');
+        var shown  = 0;
+        rows.forEach(function (row) {
+            var no   = (row.dataset.changeNo || '').toLowerCase();
+            var rmbs = (row.dataset.rmbs1 || '').toLowerCase();
+            var ct   = (row.dataset.changeType || '').toLowerCase();
+            var op   = (row.dataset.operator || '').toLowerCase();
+            var st   = (row.dataset.status || '').toLowerCase();
+            var matchSearch = !search || no.includes(search) || rmbs.includes(search) || op.includes(search);
+            var matchType   = !type   || ct.includes(type);
+            var matchStatus = !status || st.includes(status);
+            var visible = matchSearch && matchType && matchStatus;
+            row.classList.toggle('d-none', !visible);
+            if (visible) shown++;
+        });
+        document.getElementById('changeTableEmpty').classList.toggle('d-none', shown > 0);
+        document.getElementById('tableCountBadge').textContent = 'แสดง ' + shown + ' รายการ';
+    }
+
+    ['filterSearch','filterChangeType','filterStatus'].forEach(function (id) {
+        document.getElementById(id).addEventListener('input', applyFilter);
+    });
+
+    document.getElementById('btnFilterReset').addEventListener('click', function () {
+        document.getElementById('filterSearch').value = '';
+        document.getElementById('filterChangeType').value = '';
+        document.getElementById('filterStatus').value = '';
+        applyFilter();
+    });
+
+    // ── Cancel ──
+    var _cancelChgNo = '';
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-cancel-chg');
+        if (!btn) return;
+        _cancelChgNo = btn.dataset.chg;
+        document.getElementById('cancelChgText').textContent = _cancelChgNo;
+        new bootstrap.Modal(document.getElementById('modalCancelChg')).show();
+    });
+    document.getElementById('btnConfirmCancelChg').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalCancelChg')).hide();
+        showChgToast('ยกเลิกคำขอ ' + _cancelChgNo + ' เรียบร้อยแล้ว', 'warning');
+    });
+
+    // ── Delete ──
+    var _deleteChgNo = '';
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-delete-chg');
+        if (!btn) return;
+        _deleteChgNo = btn.dataset.chg;
+        document.getElementById('deleteChgText').textContent = _deleteChgNo;
+        new bootstrap.Modal(document.getElementById('modalDeleteChg')).show();
+    });
+    document.getElementById('btnConfirmDeleteChg').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalDeleteChg')).hide();
+        showChgToast('ลบคำขอ ' + _deleteChgNo + ' เรียบร้อยแล้ว', 'danger');
+    });
+
+    function showChgToast(msg, type) {
+        var bg   = type === 'success' ? 'bg-success' : type === 'danger' ? 'bg-danger' : type === 'warning' ? 'bg-warning' : 'bg-info';
+        var icon = type === 'success' ? 'ri-checkbox-circle-line' : type === 'danger' ? 'ri-delete-bin-line' : 'ri-close-circle-line';
+        var toastEl = document.createElement('div');
+        toastEl.className = 'position-fixed bottom-0 end-0 p-3';
+        toastEl.style.zIndex = 9999;
+        toastEl.innerHTML =
+            '<div class="toast show align-items-center text-white ' + bg + ' border-0" role="alert">' +
+            '  <div class="d-flex">' +
+            '    <div class="toast-body d-flex align-items-center gap-2">' +
+            '      <i class="ri ' + icon + ' fs-5"></i> ' + msg +
+            '    </div>' +
+            '    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+            '  </div>' +
+            '</div>';
+        document.body.appendChild(toastEl);
+        setTimeout(function () { toastEl.remove(); }, 3500);
+    }
+});
+</script>
+}

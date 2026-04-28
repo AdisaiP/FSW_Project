@@ -1,0 +1,16 @@
+# (3) เลือกพื้นที่ตั้ง RMBS1 ให้อยู่ในความรับผิดชอบของหน่วยงาน กตส.-ศตส.
+
+URL 1: http://localhost:5055/Admin/Organization
+URL 2: http://localhost:5055/Officer/IndexRMBS1PS
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. Admin/Organization > #govAgencyDetailModal > Tab 'พื้นที่รับผิดชอบ'
+   - accordion 'การอนุมัติ RMBS1' + ตาราง RMBS1 ที่อยู่ในพื้นที่
+2. ปุ่ม 'เปลี่ยนหน่วยงาน' บน RMBS1 > modal #changeRmbs1AgencyModal
+   - select หน่วยงาน + เหตุผล + วันที่มีผล
+3. Officer/IndexRMBS1PS > filter 'หน่วยงานรับผิดชอบ' (dropdown กตส./ศตส.)
+   - ตาราง RMBS1 + badge หน่วยงาน + badge สถานะ
+4. ปุ่ม 'มอบหมายหน่วยงาน' > modal #assignAgencyModal
+   - select กตส./ศตส. + วันที่มีผล + checkbox แจ้งเจ้าหน้าที่

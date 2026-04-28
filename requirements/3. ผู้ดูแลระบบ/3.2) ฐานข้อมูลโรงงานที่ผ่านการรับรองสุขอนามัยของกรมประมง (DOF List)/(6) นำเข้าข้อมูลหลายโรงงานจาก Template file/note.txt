@@ -1,0 +1,11 @@
+# (6) นำเข้าข้อมูลหลายโรงงานจาก Template file
+
+URL: http://localhost:5055/Admin/DofList
+
+จำนวนรูปที่ต้องแคป: 4 รูป
+
+รายการหน้าที่ต้องแคป
+1. ปุ่ม 'นำเข้าข้อมูล' + modal #dofImportModal Step 1: ดาวน์โหลด Template + drag-drop zone
+2. Step 2: อัปโหลดไฟล์ + progress bar parsing
+3. Step 3: Preview ตรวจสอบข้อมูล (แถวสีเขียว=ถูก / สีแดง=ผิดพลาด + เหตุผล)
+4. Step 4: ยืนยันนำเข้า + progress bar + toast 'นำเข้าสำเร็จ N รายการ'

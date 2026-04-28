@@ -1,0 +1,1401 @@
+@{
+    ViewData["Title"] = "รายละเอียดเอกสาร P1";
+
+    // ── Mockup data ──
+    string docNo          = "QC-2026-00303";
+    string companyName    = "บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด";
+    string companyReg     = "0205560012345";
+    string certType       = "DOF รับรองโรงงาน (ปลาโอ)";
+    string productName    = "ปลาโอสาแช่แข็ง";
+    string rawMaterialSrc = "วัตถุดิบนำเข้า (ไทย + นำเข้า)";
+    string docDate        = "21 เมษายน 2569";
+    string docPeriod      = "01/04/2569 – 30/04/2569";
+    string statusText     = "ค่าเบี่ยงเบน";
+    string statusClass    = "bg-label-danger";
+
+    // P1 items
+    var p1Items = new[]
+    {
+        new { ProductCode="3CCOSA001", ProductName="ปลาโอสา (แช่แข็ง) 500g", InputKg=20000m, OutputKg=12400m, ActualYield=62.0m, ApprovedYield=66.0m, Deviation=-4.0m, IsOver=true  },
+        new { ProductCode="3CCOSA002", ProductName="ปลาโอสา (แช่แข็ง) 1kg",  InputKg=25000m, OutputKg=15500m, ActualYield=62.0m, ApprovedYield=66.0m, Deviation=-4.0m, IsOver=true  },
+        new { ProductCode="3CCOSA003", ProductName="ปลาโอสา (แช่แข็ง) 5kg",  InputKg=15000m, OutputKg=10500m, ActualYield=70.0m, ApprovedYield=66.0m, Deviation= 4.0m, IsOver=true  },
+        new { ProductCode="3CCOTHR01", ProductName="ปลาโอ (อื่นๆ) แช่เย็น",    InputKg= 5000m, OutputKg= 3300m, ActualYield=66.0m, ApprovedYield=66.0m, Deviation= 0.0m, IsOver=false },
+    };
+
+    // P2 items
+    var p2Items = new[]
+    {
+        new { P2No="P2-2026-00401", ProductName="ปลาโอสา (แช่แข็ง) 500g", Destination="ญี่ปุ่น", WeightKg=12400m, P2Date="22/04/2569", StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
+        new { P2No="P2-2026-00402", ProductName="ปลาโอสา (แช่แข็ง) 1kg",  Destination="สหภาพยุโรป",  WeightKg=15500m, P2Date="22/04/2569", StatusText="รอตรวจสอบ",  StatusClass="bg-label-warning" },
+        new { P2No="P2-2026-00403", ProductName="ปลาโอสา (แช่แข็ง) 5kg",  Destination="สหรัฐอเมริกา",WeightKg= 8200m, P2Date="23/04/2569", StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
+        new { P2No="P2-2026-00404", ProductName="ปลาโอ (อื่นๆ) แช่เย็น",   Destination="จีน",         WeightKg= 3300m, P2Date="23/04/2569", StatusText="อนุมัติแล้ว", StatusClass="bg-label-success" },
+    };
+}
+
+@section PageStyles {
+<style>
+    .field-display {
+        font-size: 0.875rem;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.375rem;
+        padding: 0.4375rem 0.875rem;
+        min-height: 2.375rem;
+        display: flex;
+        align-items: center;
+        word-break: break-word;
+    }
+    .form-label.small { font-size: 0.8rem; font-weight: 500; margin-bottom: 0.25rem; }
+    .review-banner { border-left: 4px solid; padding: 1rem 1.25rem; border-radius: 0.5rem; }
+    .review-banner.deviation { border-color: #dc3545; background: rgba(220,53,69,.06); }
+    .review-banner.approved  { border-color: #28a745; background: rgba(40,167,69,.06); }
+    .history-timeline { list-style: none; padding-left: 0; position: relative; margin: 0; }
+    .history-timeline::before { content: ''; position: absolute; left: 1rem; top: 0; bottom: 0; width: 2px; background: var(--bs-border-color); }
+    .history-timeline li { position: relative; padding-left: 2.5rem; margin-bottom: 1.2rem; }
+    .history-timeline li::before { content: ''; position: absolute; left: 0.55rem; top: 0.3rem; width: 0.9rem; height: 0.9rem; border-radius: 50%; background: var(--bs-primary); border: 2px solid #fff; box-shadow: 0 0 0 2px var(--bs-primary); }
+    .history-timeline li.success::before { background: #28a745; box-shadow: 0 0 0 2px #28a745; }
+    .history-timeline li.warning::before { background: #ffc107; box-shadow: 0 0 0 2px #ffc107; }
+    .history-timeline li.danger::before  { background: #dc3545; box-shadow: 0 0 0 2px #dc3545; }
+    /* Tree Diagram */
+    .tree-node-officer { transition: box-shadow .15s; }
+    .tree-node-officer:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+    .tree-connector { color: #aaa; font-size: 1.3rem; line-height: 1; text-align: center; }
+    /* Print */
+    @@media print {
+        body * { visibility: hidden !important; }
+        #printP1Area, #printP1Area *, #printTreeArea, #printTreeArea *, #printMeasureArea, #printMeasureArea * { visibility: visible !important; }
+        #printP1Area, #printTreeArea, #printMeasureArea { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; font-size: 11pt; }
+        .modal-backdrop { display: none !important; }
+    }
+    .print-form-header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 16px; }
+    .print-form-table th, .print-form-table td { border: 1px solid #999; padding: 5px 8px; font-size: 0.82rem; }
+    .print-form-table { border-collapse: collapse; width: 100%; }
+    .sign-box { border: 1px solid #999; min-height: 70px; border-radius: 4px; }
+</style>
+}
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ─── Export buttons ───
+    document.getElementById('btnExportExcel').addEventListener('click', function () {
+        // TODO: export Excel via server API
+        alert('TODO: Export Excel — เชื่อมต่อ API สร้างไฟล์ Excel จริง');
+    });
+    document.getElementById('btnExportPdf').addEventListener('click', function () {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalPrintP1')).show();
+    });
+    document.getElementById('btnPrintP1').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalPrintP1')).hide();
+        setTimeout(function () { window.print(); }, 300);
+    });
+    document.getElementById('btnDownloadExcel2').addEventListener('click', function () {
+        // TODO: download Excel via server API
+        alert('TODO: Export Excel — เชื่อมต่อ API จริง');
+    });
+
+    // ─── Tree tab: Expand / Collapse all ───
+    document.getElementById('btnExpandAll').addEventListener('click', function () {
+        document.querySelectorAll('.tree-collapsible').forEach(function (el) { el.classList.remove('d-none'); });
+    });
+    document.getElementById('btnCollapseAll').addEventListener('click', function () {
+        document.querySelectorAll('.tree-collapsible').forEach(function (el) { el.classList.add('d-none'); });
+    });
+    document.querySelectorAll('.btn-tree-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var target = document.getElementById(btn.dataset.treeTarget);
+            if (target) {
+                target.classList.toggle('d-none');
+                var icon = btn.querySelector('i');
+                if (icon) { icon.classList.toggle('ri-subtract-line'); icon.classList.toggle('ri-add-line'); }
+            }
+        });
+    });
+
+    // ─── Tree: Export Excel ───
+    document.getElementById('btnTreeExportExcel').addEventListener('click', function () {
+        // TODO: export supply-chain tree as Excel via server API
+        alert('TODO: Export Excel ตลอดเส้นทาง — เชื่อมต่อ API จริง');
+    });
+    document.getElementById('btnTreeExportExcel2').addEventListener('click', function () {
+        alert('TODO: Export Excel ตลอดเส้นทาง — เชื่อมต่อ API จริง');
+    });
+
+    // ─── Tree: Export PDF / Print ───
+    document.getElementById('btnTreeExportPdf').addEventListener('click', function () {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalPrintTree')).show();
+    });
+    document.getElementById('btnPrintTree').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalPrintTree')).hide();
+        setTimeout(function () { window.print(); }, 300);
+    });
+
+    // ─── Tab 5: มาตรการประเทศคู่ค้า & สุขอนามัย ───
+    ['btnPrintMeasure', 'btnPrintMeasure2'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', function () {
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('modalPrintMeasure')).show();
+            });
+        }
+    });
+    document.getElementById('btnPrintMeasureModal').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalPrintMeasure')).hide();
+        setTimeout(function () { window.print(); }, 300);
+    });
+    document.getElementById('btnDownloadMeasurePdf').addEventListener('click', function () {
+        // TODO: submit form or call API — download PDF มาตรการ
+        alert('TODO: ดาวน์โหลด PDF มาตรการ — เชื่อมต่อ API จริง');
+    });
+
+    // ─── (ค) รายละเอียดการนำเข้า: toggle edit/view ───
+    document.getElementById('btnEditImportDetail').addEventListener('click', function () {
+        document.getElementById('importDetailView').style.display = 'none';
+        document.getElementById('importDetailEdit').style.display = '';
+    });
+    document.getElementById('btnCancelImportDetail').addEventListener('click', function () {
+        document.getElementById('importDetailEdit').style.display = 'none';
+        document.getElementById('importDetailView').style.display = '';
+    });
+    document.getElementById('btnSaveImportDetail').addEventListener('click', function () {
+        // Update view values from edit inputs
+        var fields = ['placeDepart','dateDepart','lastPort','transport','dateArrival','storage'];
+        fields.forEach(function(f) {
+            var editEl = document.getElementById('edit-' + f);
+            var viewEl = document.getElementById('val-' + f);
+            if (editEl && viewEl) viewEl.textContent = editEl.value;
+        });
+        var remarkEl = document.getElementById('edit-remark');
+        var remarkView = document.getElementById('val-remark');
+        if (remarkEl && remarkView) remarkView.textContent = remarkEl.value;
+        document.getElementById('importDetailEdit').style.display = 'none';
+        document.getElementById('importDetailView').style.display = '';
+        // TODO: submit form or call API — save import detail
+    });
+});
+</script>
+}
+
+@* ===== Content ===== *@
+<div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+    <h4 class="mb-0">รายละเอียดเอกสาร P1</h4>
+</div>
+<p class="mb-1 text-muted">ตรวจสอบรายละเอียดเอกสารควบคุมปริมาณสินค้า เอกสารที่ 1 รายผลิตภัณฑ์</p>
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="@Url.Action("IndexQuantityControl","Officer")" class="text-primary fw-semibold">ควบคุมปริมาณสินค้า (เอกสารที่ 1)</a></li>
+        <li class="breadcrumb-item active text-secondary">@docNo</li>
+    </ol>
+</nav>
+
+<!-- Status Banner -->
+@if (statusText == "ค่าเบี่ยงเบน")
+{
+    <div class="review-banner deviation mb-4 d-flex align-items-center gap-3">
+        <i class="ri ri-error-warning-line fs-4 text-danger"></i>
+        <div>
+            <div class="fw-semibold text-danger">ค่าเบี่ยงเบน — %Yield จริงเกินเกณฑ์ที่อนุมัติ</div>
+            <div class="small text-muted">กรุณาตรวจสอบรายละเอียดและดำเนินการตามขั้นตอน</div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="review-banner approved mb-4 d-flex align-items-center gap-3">
+        <i class="ri ri-checkbox-circle-line fs-4 text-success"></i>
+        <div>
+            <div class="fw-semibold text-success">@statusText</div>
+            <div class="small text-muted">เอกสารนี้ผ่านการตรวจสอบแล้ว</div>
+        </div>
+    </div>
+}
+
+<!-- Header Meta -->
+<div class="row g-2 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">เลขที่เอกสาร P1</div>
+        <div class="fw-semibold text-primary">@docNo</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">บริษัท</div>
+        <div class="fw-semibold">@companyName</div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="small text-muted">วันที่เอกสาร</div>
+        <div class="fw-semibold">@docDate</div>
+    </div>
+</div>
+
+<!-- Action Bar -->
+<div class="d-flex flex-wrap gap-2 mb-4" id="actionBar">
+    <button type="button" class="btn btn-outline-success btn-sm" id="btnExportExcel">
+        <i class="ri ri-file-excel-line me-1"></i> Export Excel
+    </button>
+    <button type="button" class="btn btn-outline-danger btn-sm" id="btnExportPdf">
+        <i class="ri ri-file-pdf-line me-1"></i> Export PDF / พิมพ์
+    </button>
+    <a href="@Url.Action("IndexQuantityControl","Officer")" class="btn btn-outline-secondary btn-sm ms-auto">
+        <i class="ri ri-arrow-left-line me-1"></i> กลับรายการ
+    </a>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" role="tablist">
+    <li class="nav-item"><button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">
+        <i class="ri ri-file-list-3-line me-1"></i> รายละเอียด P1
+    </button></li>
+    <li class="nav-item"><button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">
+        <i class="ri ri-file-copy-line me-1"></i> P2 (เอกสารลูก)
+        <span class="badge bg-primary ms-1">@p2Items.Length</span>
+    </button></li>
+    <li class="nav-item"><button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">
+        <i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ
+    </button></li>
+    <li class="nav-item"><button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab">
+        <i class="ri ri-node-tree me-1"></i> เส้นทางการซื้อขาย
+        <span class="badge bg-info ms-1">Tree</span>
+    </button></li>
+    <li class="nav-item"><button class="nav-link" id="tab5-tab" data-bs-toggle="tab" data-bs-target="#tab5" type="button" role="tab">
+        <i class="ri ri-shield-check-line me-1"></i> มาตรการประเทศคู่ค้า &amp; สุขอนามัย
+        <span class="badge bg-warning text-dark ms-1">1</span>
+    </button></li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ========================= Tab 1: P1 Detail ========================= -->
+<div class="tab-pane fade show active" id="tab1" role="tabpanel">
+
+    <!-- ข้อมูลสถานประกอบการ -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="mb-0"><i class="ri ri-building-2-line me-1"></i> ข้อมูลสถานประกอบการ</h6></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label small">ชื่อสถานประกอบการ</label>
+                    <div class="field-display">@companyName</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label small">เลขทะเบียนนิติบุคคล</label>
+                    <div class="field-display">@companyReg</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label small">ประเภทใบรับรอง</label>
+                    <div class="field-display">@certType</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label small">แหล่งวัตถุดิบ</label>
+                    <div class="field-display">@rawMaterialSrc</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label small">ช่วงวันที่ผลิต</label>
+                    <div class="field-display">@docPeriod</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label small">สถานะ</label>
+                    <div class="field-display"><span class="badge @statusClass">@statusText</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ตาราง P1 รายผลิตภัณฑ์ -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="mb-0"><i class="ri ri-table-line me-1"></i> รายละเอียด P1 รายผลิตภัณฑ์</h6></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="font-size:0.8rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th>รหัสสินค้า</th>
+                        <th>ชื่อผลิตภัณฑ์</th>
+                        <th class="text-end">น้ำหนักวัตถุดิบ (กก.)</th>
+                        <th class="text-end">น้ำหนักผลผลิต (กก.)</th>
+                        <th class="text-center">%Yield จริง</th>
+                        <th class="text-center">%Yield อนุมัติ</th>
+                        <th class="text-center">เบี่ยงเบน</th>
+                        <th class="text-center">ผลการตรวจสอบ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in p1Items)
+                    {
+                        <tr>
+                            <td class="text-muted small">@item.ProductCode</td>
+                            <td class="fw-semibold">@item.ProductName</td>
+                            <td class="text-end">@item.InputKg.ToString("N0")</td>
+                            <td class="text-end">@item.OutputKg.ToString("N0")</td>
+                            <td class="text-center @(item.IsOver ? "text-danger fw-bold" : "")">@item.ActualYield.ToString("F1")%</td>
+                            <td class="text-center">@item.ApprovedYield.ToString("F1")%</td>
+                            <td class="text-center @(item.IsOver ? "text-danger fw-bold" : "text-success fw-bold")">
+                                @(item.Deviation >= 0 ? "+" : "")@item.Deviation.ToString("F1")%
+                            </td>
+                            <td class="text-center">
+                                @if (item.IsOver)
+                                {
+                                    <span class="badge bg-label-danger">ค่าเบี่ยงเบน ❌</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-label-success">อยู่ในเกณฑ์ ✅</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light fw-semibold" style="font-size:0.8rem;">
+                    <tr>
+                        <td colspan="2">รวมทั้งหมด</td>
+                        <td class="text-end">@p1Items.Sum(x => x.InputKg).ToString("N0")</td>
+                        <td class="text-end">@p1Items.Sum(x => x.OutputKg).ToString("N0")</td>
+                        <td class="text-center">@((p1Items.Sum(x => x.OutputKg) / p1Items.Sum(x => x.InputKg) * 100).ToString("F1"))%</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- ปุ่ม export ล่าง -->
+    <div class="d-flex gap-2 mb-2">
+        <button type="button" class="btn btn-outline-success btn-sm" id="btnDownloadExcel2">
+            <i class="ri ri-file-excel-line me-1"></i> ดาวน์โหลด Excel
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalPrintP1">
+            <i class="ri ri-printer-line me-1"></i> พิมพ์ / PDF
+        </button>
+    </div>
+
+    <!-- ========================= Accordion: การเชื่อมโยงข้อมูล P1/P2 ========================= -->
+    <hr class="my-4">
+    <h6 class="mb-3 fw-semibold"><i class="ri ri-links-line me-1 text-primary"></i>การเชื่อมโยงข้อมูล P1/P2 → หนังสือรับรองตนเอง</h6>
+    <div class="accordion" id="accordionLinkData">
+
+        <!-- (ก) ตัดโควตา -->
+        <div class="accordion-item mb-2 border rounded">
+            <h2 class="accordion-header" id="headingLinkA">
+                <button class="accordion-button collapsed py-2" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseLinkA"
+                    aria-expanded="false" aria-controls="collapseLinkA" style="font-size:0.88rem;">
+                    <i class="ri ri-scissors-cut-line me-2 text-primary"></i>
+                    <strong>(ก)</strong>&nbsp;ข้อมูลตัดโควตา P1 / P2 → กระบวนงานหนังสือรับรองตนเอง
+                    <span class="badge bg-label-success ms-2 small">ส่งอัตโนมัติ ✅</span>
+                </button>
+            </h2>
+            <div id="collapseLinkA" class="accordion-collapse collapse" aria-labelledby="headingLinkA">
+                <div class="accordion-body pt-2 pb-3" style="font-size:0.85rem;">
+                    <div class="alert alert-success py-2 mb-3 small d-flex align-items-center gap-2">
+                        <i class="ri ri-checkbox-circle-line text-success fs-5 flex-shrink-0"></i>
+                        <span>ระบบส่งข้อมูลตัดโควตา P1 (<strong>@docNo</strong>) และ P2 รวม <strong>@p2Items.Length รายการ</strong>
+                            ไปยังกระบวนงานหนังสือรับรองตนเองอัตโนมัติแล้ว</span>
+                    </div>
+                    <div class="row g-2 mb-3" style="font-size:0.82rem;">
+                        <div class="col-sm-4">
+                            <div class="border rounded p-2 bg-light text-center">
+                                <div class="text-muted small">ปริมาณ P1 รวม (Input)</div>
+                                <div class="fw-bold fs-6">@p1Items.Sum(x => x.InputKg).ToString("N0") KGM</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="border rounded p-2 bg-light text-center">
+                                <div class="text-muted small">ปริมาณ P2 ส่งออกรวม</div>
+                                <div class="fw-bold fs-6">@p2Items.Sum(x => x.WeightKg).ToString("N0") KGM</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="border rounded p-2 bg-light text-center">
+                                <div class="text-muted small">จำนวนหนังสือรับรองที่อ้างอิง</div>
+                                <div class="fw-bold fs-6">@p2Items.Length ฉบับ</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-outline-primary btn-sm">
+                        <i class="ri ri-external-link-line me-1"></i>ดูรายการหนังสือรับรองตนเองที่ใช้โควตานี้
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- (ข) มาตรการประเทศคู่ค้า / สุขอนามัย -->
+        <div class="accordion-item mb-2 border rounded">
+            <h2 class="accordion-header" id="headingLinkB">
+                <button class="accordion-button collapsed py-2" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseLinkB"
+                    aria-expanded="false" aria-controls="collapseLinkB" style="font-size:0.88rem;">
+                    <i class="ri ri-shield-check-line me-2 text-success"></i>
+                    <strong>(ข)</strong>&nbsp;ผลมาตรการประเทศคู่ค้า / ด่านตรวจประมง + มาตรการสุขอนามัย กตส. → หนังสือรับรองตนเอง
+                    <span class="badge bg-label-success ms-2 small">ส่งอัตโนมัติ ✅</span>
+                </button>
+            </h2>
+            <div id="collapseLinkB" class="accordion-collapse collapse" aria-labelledby="headingLinkB">
+                <div class="accordion-body pt-2 pb-3" style="font-size:0.85rem;">
+                    <div class="alert alert-success py-2 mb-3 small d-flex align-items-center gap-2">
+                        <i class="ri ri-checkbox-circle-line text-success fs-5 flex-shrink-0"></i>
+                        <span>ระบบส่งผลมาตรการประเทศคู่ค้า / เงื่อนไขด่านตรวจประมง และมาตรการสุขอนามัย กตส.
+                            ไปยังกระบวนงานหนังสือรับรองตนเองอัตโนมัติแล้ว</span>
+                    </div>
+                    <div class="row g-2 small">
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <div class="fw-semibold mb-1"><i class="ri ri-global-line me-1"></i>มาตรการประเทศคู่ค้า</div>
+                                <ul class="mb-0 ps-3">
+                                    <li>🇯🇵 ญี่ปุ่น — Health Cert (JPN) <span class="badge bg-label-success">ผ่าน ✅</span></li>
+                                    <li>🇪🇺 EU — EU Health Cert <span class="badge bg-label-success">ผ่าน ✅</span></li>
+                                    <li>🇺🇸 USA — FDA Health Cert <span class="badge bg-label-success">ผ่าน ✅</span></li>
+                                    <li>🇨🇳 จีน — GACC Health Cert <span class="badge bg-label-success">ผ่าน ✅</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2">
+                                <div class="fw-semibold mb-1"><i class="ri ri-heart-pulse-line me-1"></i>มาตรการสุขอนามัย กตส.</div>
+                                <ul class="mb-0 ps-3">
+                                    <li>ตรวจสถานที่ผลิต <span class="badge bg-label-success">ผ่าน ✅</span></li>
+                                    <li>ระบบ HACCP <span class="badge bg-label-success">ผ่าน ✅</span></li>
+                                    <li>คุณภาพผลิตภัณฑ์ <span class="badge bg-label-success">ผ่าน ✅</span></li>
+                                    <li>มาตรฐานน้ำและน้ำแข็ง <span class="badge bg-label-warning">⚠️ รอตรวจสอบ (02/05/2569)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- (ค) รายละเอียดการนำเข้า -->
+        <div class="accordion-item mb-2 border rounded">
+            <h2 class="accordion-header" id="headingLinkC">
+                <button class="accordion-button collapsed py-2" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseLinkC"
+                    aria-expanded="false" aria-controls="collapseLinkC" style="font-size:0.88rem;">
+                    <i class="ri ri-ship-line me-2 text-info"></i>
+                    <strong>(ค)</strong>&nbsp;รายละเอียดการนำเข้า → ข้อมูลตั้งต้นใบรับรอง (แก้ไขได้)
+                    <span class="badge bg-label-success ms-2 small">พร้อมใช้ ✅</span>
+                </button>
+            </h2>
+            <div id="collapseLinkC" class="accordion-collapse collapse" aria-labelledby="headingLinkC">
+                <div class="accordion-body pt-2 pb-3" style="font-size:0.85rem;">
+                    <div class="alert alert-info py-2 mb-3 small d-flex align-items-center gap-2">
+                        <i class="ri ri-information-line text-info fs-5 flex-shrink-0"></i>
+                        <span>ข้อมูลด้านล่างถูกเชื่อมโยงจากเอกสารนำเข้า (RMBS1) — สามารถแก้ไขและแนบหลักฐานเพิ่มเติมได้</span>
+                    </div>
+                    <div id="importDetailView">
+                        <div class="row g-3 small mb-3">
+                            <div class="col-sm-6 col-md-4">
+                                <div class="field-display">
+                                    <div class="text-muted small">Place of Departure</div>
+                                    <div class="fw-semibold" id="val-placeDepart">Banda Aceh, Indonesia</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="field-display">
+                                    <div class="text-muted small">Date of Departure</div>
+                                    <div class="fw-semibold" id="val-dateDepart">12/03/2569</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="field-display">
+                                    <div class="text-muted small">Last Port / Airport</div>
+                                    <div class="fw-semibold" id="val-lastPort">Port of Belawan, North Sumatra</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="field-display">
+                                    <div class="text-muted small">Transport Details (Vessel / Flight / Container)</div>
+                                    <div class="fw-semibold" id="val-transport">MV Indo Star III / IMO: 9234567 / Container: TCKU3456781</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="field-display">
+                                    <div class="text-muted small">Date of Arrival to Place of Storage</div>
+                                    <div class="fw-semibold" id="val-dateArrival">17/03/2569</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="field-display">
+                                    <div class="text-muted small">Place of Storage</div>
+                                    <div class="fw-semibold" id="val-storage">ท่าเรือแหลมฉบัง — คลังสินค้า B3, จ.ชลบุรี</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2 small">
+                            <span class="text-muted">หมายเหตุ:</span>
+                            <span id="val-remark" class="ms-1">สินค้าผ่านพิธีการศุลกากรและตรวจสอบ ณ ด่านฯ แล้ว — รอรับรองสุขอนามัยน้ำ</span>
+                        </div>
+                        <div class="mb-3 small text-muted">
+                            <i class="ri ri-attachment-2 me-1"></i>หลักฐานแนบ:
+                            <a href="#" class="ms-1 text-primary">Bill_of_Lading_TCKU3456781.pdf</a>,
+                            <a href="#" class="ms-1 text-primary">Health_Certificate_IN2569_0234.pdf</a>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnEditImportDetail">
+                            <i class="ri ri-edit-line me-1"></i>แก้ไขรายละเอียด
+                        </button>
+                    </div>
+
+                    <!-- Edit form (hidden by default) -->
+                    <div id="importDetailEdit" style="display:none;">
+                        <div class="row g-2 small mb-2">
+                            <div class="col-sm-6 col-md-4">
+                                <label class="form-label fw-semibold mb-1">Place of Departure</label>
+                                <input type="text" class="form-control form-control-sm" id="edit-placeDepart" value="Banda Aceh, Indonesia">
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <label class="form-label fw-semibold mb-1">Date of Departure</label>
+                                <input type="text" class="form-control form-control-sm" id="edit-dateDepart" value="12/03/2569">
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <label class="form-label fw-semibold mb-1">Last Port / Airport</label>
+                                <input type="text" class="form-control form-control-sm" id="edit-lastPort" value="Port of Belawan, North Sumatra">
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <label class="form-label fw-semibold mb-1">Transport Details</label>
+                                <input type="text" class="form-control form-control-sm" id="edit-transport" value="MV Indo Star III / IMO: 9234567 / Container: TCKU3456781">
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <label class="form-label fw-semibold mb-1">Date of Arrival to Place of Storage</label>
+                                <input type="text" class="form-control form-control-sm" id="edit-dateArrival" value="17/03/2569">
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <label class="form-label fw-semibold mb-1">Place of Storage</label>
+                                <input type="text" class="form-control form-control-sm" id="edit-storage" value="ท่าเรือแหลมฉบัง — คลังสินค้า B3, จ.ชลบุรี">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold mb-1">หมายเหตุ</label>
+                                <textarea class="form-control form-control-sm" id="edit-remark" rows="2">สินค้าผ่านพิธีการศุลกากรและตรวจสอบ ณ ด่านฯ แล้ว — รอรับรองสุขอนามัยน้ำ</textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold mb-1">แนบหลักฐานเพิ่มเติม</label>
+                                <input type="file" class="form-control form-control-sm" id="edit-attachment" accept=".pdf,.jpg,.png" multiple>
+                                <div class="form-text text-muted">ไฟล์ที่รองรับ: PDF, JPG, PNG (ขนาดสูงสุด 10 MB ต่อไฟล์)</div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-1">
+                            <button type="button" class="btn btn-primary btn-sm" id="btnSaveImportDetail">
+                                <i class="ri ri-save-line me-1"></i>บันทึก
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCancelImportDetail">ยกเลิก</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- (ง) ลิงก์ RMBS1:PS / P1 → ใบรับรอง -->
+        <div class="accordion-item mb-2 border rounded">
+            <h2 class="accordion-header" id="headingLinkD">
+                <button class="accordion-button collapsed py-2" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseLinkD"
+                    aria-expanded="false" aria-controls="collapseLinkD" style="font-size:0.88rem;">
+                    <i class="ri ri-file-list-3-line me-2 text-warning"></i>
+                    <strong>(ง)</strong>&nbsp;ข้อมูล RMBS1:PS และ P1 → ใบรับรองแต่ละประเภท
+                    <span class="badge bg-label-success ms-2 small">เชื่อมโยงแล้ว ✅</span>
+                </button>
+            </h2>
+            <div id="collapseLinkD" class="accordion-collapse collapse" aria-labelledby="headingLinkD">
+                <div class="accordion-body pt-2 pb-3" style="font-size:0.85rem;">
+                    <div class="alert alert-success py-2 mb-3 small d-flex align-items-center gap-2">
+                        <i class="ri ri-checkbox-circle-line text-success fs-5 flex-shrink-0"></i>
+                        <span>ข้อมูล RMBS1:PS → P1 (<strong>@docNo</strong>) → ใบรับรองแต่ละประเภท เชื่อมโยงครบถ้วนแล้ว</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size:0.82rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ประเภทใบรับรอง</th>
+                                    <th>เลขที่ใบรับรอง</th>
+                                    <th>บริษัท / ปลายทาง</th>
+                                    <th>วันที่ออก</th>
+                                    <th class="text-center">สถานะ</th>
+                                    <th>RMBS1:PS อ้างอิง</th>
+                                    <th class="text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge bg-label-primary">Processing Statement (PS)</span></td>
+                                    <td class="fw-semibold">PS-2026-00401</td>
+                                    <td class="small">@companyName — 🇯🇵 ญี่ปุ่น</td>
+                                    <td class="small text-nowrap">22/04/2569</td>
+                                    <td class="text-center"><span class="badge bg-label-success">ออกแล้ว ✅</span></td>
+                                    <td class="small text-muted">RMBS1-2569-00112</td>
+                                    <td class="text-center"><a href="#" class="btn btn-xs btn-outline-primary py-0 px-1"><i class="ri ri-eye-line"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-label-primary">Processing Statement (PS)</span></td>
+                                    <td class="fw-semibold">PS-2026-00402</td>
+                                    <td class="small">@companyName — 🇪🇺 EU</td>
+                                    <td class="small text-nowrap">22/04/2569</td>
+                                    <td class="text-center"><span class="badge bg-label-success">ออกแล้ว ✅</span></td>
+                                    <td class="small text-muted">RMBS1-2569-00112</td>
+                                    <td class="text-center"><a href="#" class="btn btn-xs btn-outline-primary py-0 px-1"><i class="ri ri-eye-line"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-label-info">Non-Manipulation Document (NMD)</span></td>
+                                    <td class="fw-semibold">NMD-2026-00217</td>
+                                    <td class="small">@companyName — 🇺🇸 USA</td>
+                                    <td class="small text-nowrap">23/04/2569</td>
+                                    <td class="text-center"><span class="badge bg-label-success">ออกแล้ว ✅</span></td>
+                                    <td class="small text-muted">RMBS1-2569-00112</td>
+                                    <td class="text-center"><a href="#" class="btn btn-xs btn-outline-primary py-0 px-1"><i class="ri ri-eye-line"></i></a></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-label-info">Non-Manipulation Document (NMD)</span></td>
+                                    <td class="fw-semibold">NMD-2026-00218</td>
+                                    <td class="small">@companyName — 🇨🇳 จีน</td>
+                                    <td class="small text-nowrap">—</td>
+                                    <td class="text-center"><span class="badge bg-label-warning">⚠️ รอออก</span></td>
+                                    <td class="small text-muted">RMBS1-2569-00112</td>
+                                    <td class="text-center"><a href="#" class="btn btn-xs btn-outline-primary py-0 px-1"><i class="ri ri-eye-line"></i></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        <i class="ri ri-information-line me-1"></i>
+                        เส้นทางข้อมูล: RMBS1:PS (<strong>RMBS1-2569-00112</strong>) → P1 (<strong>@docNo</strong>) → ใบรับรองตามประเทศปลายทาง
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /accordionLinkData -->
+
+</div><!-- /tab1 -->
+
+<!-- ========================= Tab 2: P2 ========================= -->
+<div class="tab-pane fade" id="tab2" role="tabpanel">
+
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="mb-0"><i class="ri ri-file-copy-line me-1"></i> รายการ P2 (เอกสารลูก) ที่เกี่ยวข้อง</h6>
+            <span class="badge bg-primary">@p2Items.Length รายการ</span>
+        </div>
+        <div class="alert alert-info d-flex gap-2 py-2 small m-3 mb-0">
+            <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+            <span>P2 คือเอกสารแยกตามผลิตภัณฑ์ปลายทาง — ออกจาก P1 @docNo รวม @p2Items.Length ฉบับ / น้ำหนักรวม @p2Items.Sum(x => x.WeightKg).ToString("N0") กก.</span>
+        </div>
+        <div class="table-responsive mt-3">
+            <table class="table table-hover mb-0" style="font-size:0.8rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th>เลขที่ P2</th>
+                        <th>ผลิตภัณฑ์</th>
+                        <th>ประเทศปลายทาง</th>
+                        <th class="text-end">น้ำหนัก (กก.)</th>
+                        <th>วันที่</th>
+                        <th class="text-center">สถานะ</th>
+                        <th class="text-center">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p2 in p2Items)
+                    {
+                        <tr>
+                            <td><span class="fw-semibold text-primary">@p2.P2No</span></td>
+                            <td>@p2.ProductName</td>
+                            <td><i class="ri ri-map-pin-2-line me-1 text-muted"></i>@p2.Destination</td>
+                            <td class="text-end">@p2.WeightKg.ToString("N0")</td>
+                            <td>@p2.P2Date</td>
+                            <td class="text-center"><span class="badge rounded-pill @p2.StatusClass">@p2.StatusText</span></td>
+                            <td class="text-center">
+                                <button class="btn btn-icon btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="ดูรายละเอียด P2" onclick="alert('TODO: ดูรายละเอียด P2 — @p2.P2No')">
+                                    <i class="ri ri-eye-line ri-16px"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div><!-- /tab2 -->
+
+<!-- ========================= Tab 3: History ========================= -->
+<div class="tab-pane fade" id="tab3" role="tabpanel">
+
+    <div class="card">
+        <div class="card-header"><h6 class="mb-0"><i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ</h6></div>
+        <div class="card-body">
+            <ul class="history-timeline" id="historyList">
+                <li class="danger">
+                    <div class="fw-semibold small">ตรวจพบค่าเบี่ยงเบน</div>
+                    <div class="small text-muted">%Yield จริง 62.0% เบี่ยงเบนจาก %Yield อนุมัติ 66.0% — เกินเกณฑ์ที่กำหนด</div>
+                    <div class="small text-muted mt-1">22/04/2569 14:30 — ระบบ FSW</div>
+                </li>
+                <li>
+                    <div class="fw-semibold small">ยื่นเอกสาร P1</div>
+                    <div class="small text-muted">บริษัท โอเชียน ไพร์ม เอ็กซ์พอร์ต จำกัด ยื่น P1 รอบเดือนเมษายน 2569</div>
+                    <div class="small text-muted mt-1">21/04/2569 09:15 — ระบบ FSW (อัตโนมัติ)</div>
+                </li>
+                <li class="success">
+                    <div class="fw-semibold small">สร้างเอกสาร P2 ครบ 4 ฉบับ</div>
+                    <div class="small text-muted">สร้าง P2-2026-00401 ถึง P2-2026-00404 อัตโนมัติจากรายการผลิตภัณฑ์</div>
+                    <div class="small text-muted mt-1">21/04/2569 09:20 — ระบบ FSW (อัตโนมัติ)</div>
+                </li>
+                <li>
+                    <div class="fw-semibold small">รับเอกสาร</div>
+                    <div class="small text-muted">เจ้าหน้าที่รับเอกสาร P1 เพื่อตรวจสอบ</div>
+                    <div class="small text-muted mt-1">21/04/2569 10:00 — นางสาว สมใจ รักษ์ประมง (สปจ.สมุทรสาคร)</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div><!-- /tab3 -->
+
+<!-- ========================= Tab 4: Tree Diagram ========================= -->
+<div class="tab-pane fade" id="tab4" role="tabpanel">
+
+    <!-- Header + Controls -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h6 class="fw-semibold mb-0"><i class="ri ri-node-tree me-1 text-primary"></i>เส้นทางการซื้อขายวัตถุดิบ-ผลิตภัณฑ์ — Supply Chain Tree Diagram</h6>
+            <small class="text-muted">แสดงเฉพาะข้อมูลที่ผ่านการซื้อขายต่อกัน (Traceability Chain) | P1: @docNo</small>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnExpandAll"><i class="ri ri-add-box-line me-1"></i>ขยายทั้งหมด</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnCollapseAll"><i class="ri ri-subtract-line me-1"></i>ยุบทั้งหมด</button>
+            <button type="button" class="btn btn-sm btn-outline-success" id="btnTreeExportExcel"><i class="ri ri-file-excel-2-line me-1"></i>Export Excel</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" id="btnTreeExportPdf"><i class="ri ri-file-pdf-line me-1"></i>Export PDF</button>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="d-flex flex-wrap gap-3 small mb-4">
+        <span><span class="badge bg-primary me-1">RMBS1</span>ต้นทางวัตถุดิบ</span>
+        <span><span class="badge me-1" style="background:#00838f">IMD</span>ใบนำเข้า</span>
+        <span><span class="badge bg-success me-1">P1</span>ควบคุมปริมาณ เอกสาร 1</span>
+        <span><span class="badge bg-warning text-dark me-1">P2</span>ควบคุมปริมาณ เอกสาร 2 (ส่งออก)</span>
+        <span><span class="badge me-1" style="background:#7b1fa2">CERT</span>ใบรับรองการส่งออก</span>
+    </div>
+
+    <!-- Tree Diagram -->
+    <div class="card border mb-4">
+        <div class="card-body py-3">
+            <div class="d-flex flex-column align-items-center">
+
+                <!-- L0: RMBS1 ต้นทาง -->
+                <div class="tree-node-officer border rounded px-3 py-2 text-center mb-1" style="background:#e3f2fd;border-color:#1565c0!important;min-width:260px;">
+                    <div class="small text-muted"><i class="ri ri-ship-line me-1"></i>ต้นทางวัตถุดิบ</div>
+                    <div class="fw-bold text-primary">RMBS1:PS — RMBS1-2569-00112</div>
+                    <div class="small text-muted">ปลาโอสา แช่แข็ง (นำเข้าจากอินโดนีเซีย)<br/>ปริมาณรวม 65,000 KGM</div>
+                    <div class="d-flex gap-1 justify-content-center mt-1">
+                        <span class="badge bg-label-primary">ต้นทาง (L0)</span>
+                        <span class="badge bg-label-success">อนุมัติแล้ว</span>
+                    </div>
+                    <button class="btn btn-xs btn-outline-primary btn-tree-toggle mt-1 py-0 px-2" data-tree-target="treeBranchIMD"><i class="ri ri-subtract-line"></i></button>
+                </div>
+                <div class="tree-connector">│</div>
+
+                <!-- L1: IMD -->
+                <div id="treeBranchIMD" class="tree-collapsible d-flex flex-column align-items-center">
+                    <div class="tree-node-officer border rounded px-3 py-2 text-center mb-1" style="background:#e0f7fa;border-color:#00838f!important;min-width:260px;">
+                        <div class="small text-muted"><i class="ri ri-file-2-line me-1"></i>ใบรายงานการนำเข้า (IMD)</div>
+                        <div class="fw-bold" style="color:#00838f">IMD-2569-00112</div>
+                        <div class="small text-muted">ปลาโอสา 65,000 KGM<br/>ผู้ขาย: PT. Indo Fisheries International</div>
+                        <div class="d-flex gap-1 justify-content-center mt-1">
+                            <span class="badge bg-label-success">อนุมัติแล้ว</span>
+                            <span class="badge bg-label-info">L1</span>
+                        </div>
+                        <button class="btn btn-xs btn-outline-secondary btn-tree-toggle mt-1 py-0 px-2" data-tree-target="treeBranchP1"><i class="ri ri-subtract-line"></i></button>
+                    </div>
+                    <div class="tree-connector">│</div>
+
+                    <!-- L2: P1 -->
+                    <div id="treeBranchP1" class="tree-collapsible d-flex flex-column align-items-center">
+                        <div class="tree-node-officer border rounded px-3 py-2 text-center mb-1" style="background:#e8f5e9;border-color:#2e7d32!important;min-width:260px;">
+                            <div class="small text-muted"><i class="ri ri-file-list-3-line me-1"></i>Product Balance Stock No.1 (P1)</div>
+                            <div class="fw-bold text-success">@docNo</div>
+                            <div class="small text-muted">@companyName<br/>วัตถุดิบ @p1Items.Sum(x => x.InputKg).ToString("N0") KGM | ผลผลิต @p1Items.Sum(x => x.OutputKg).ToString("N0") KGM</div>
+                            <div class="d-flex gap-1 justify-content-center mt-1">
+                                <span class="badge @statusClass">@statusText</span>
+                                <span class="badge bg-label-info">L2</span>
+                            </div>
+                            <button class="btn btn-xs btn-outline-secondary btn-tree-toggle mt-1 py-0 px-2" data-tree-target="treeBranchP2"><i class="ri ri-subtract-line"></i></button>
+                        </div>
+                        <div class="tree-connector">├──────────────────────┤</div>
+
+                        <!-- L3: P2 branches -->
+                        <div id="treeBranchP2" class="tree-collapsible d-flex flex-wrap gap-4 justify-content-center mb-1">
+
+                            @foreach (var p2 in p2Items)
+                            {
+                                var certNo = "CERT-2026-005" + (Array.IndexOf(p2Items, p2) + 1).ToString("D2");
+                                var certStatus = p2.StatusText == "อนุมัติแล้ว" ? "ออกแล้ว" : "รอดำเนินการ";
+                                var certBadgeClass = p2.StatusText == "อนุมัติแล้ว" ? "background:#ede7f6;color:#7b1fa2" : "background:#fff3e0;color:#e65100";
+                                var p2BranchId = "treeCertBranch" + (Array.IndexOf(p2Items, p2) + 1);
+                                <div class="d-flex flex-column align-items-center">
+                                    <div class="tree-connector">↓</div>
+                                    <div class="tree-node-officer border rounded px-3 py-2 text-center" style="background:#fff8e1;border-color:#e65100!important;min-width:215px;">
+                                        <div class="small text-muted"><i class="ri ri-ship-line me-1"></i>ส่งออก P2</div>
+                                        <div class="fw-bold text-warning">@p2.P2No</div>
+                                        <div class="small text-muted">@p2.ProductName<br/>@p2.Destination — @p2.WeightKg.ToString("N0") KGM</div>
+                                        <div class="d-flex gap-1 justify-content-center mt-1">
+                                            <span class="badge @p2.StatusClass">@p2.StatusText</span>
+                                            <span class="badge bg-label-secondary">L3</span>
+                                        </div>
+                                        <button class="btn btn-xs btn-outline-secondary btn-tree-toggle mt-1 py-0 px-2" data-tree-target="@p2BranchId"><i class="ri ri-subtract-line"></i></button>
+                                    </div>
+                                    <div id="@p2BranchId" class="tree-collapsible d-flex flex-column align-items-center">
+                                        <div class="tree-connector">↓</div>
+                                        <div class="tree-node-officer border rounded px-3 py-2 text-center" style="background:#f3e5f5;border-color:#7b1fa2!important;min-width:215px;">
+                                            <div class="small text-muted"><i class="ri ri-award-line me-1"></i>ใบรับรองการส่งออก</div>
+                                            <div class="fw-bold" style="color:#7b1fa2">@certNo</div>
+                                            <div class="small text-muted">Health Certificate<br/>@p2.Destination — @p2.P2Date</div>
+                                            <div class="d-flex gap-1 justify-content-center mt-1">
+                                                <span class="badge" style="@certBadgeClass">@certStatus</span>
+                                                <span class="badge bg-label-secondary">L4</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        </div><!-- /P2 branches -->
+                    </div><!-- /treeBranchP1 -->
+                </div><!-- /treeBranchIMD -->
+
+            </div><!-- /d-flex center -->
+        </div><!-- /card-body -->
+    </div><!-- /tree card -->
+
+    <!-- ตารางสรุปเส้นทาง -->
+    <div class="card border mb-4">
+        <div class="card-header py-2 d-flex align-items-center justify-content-between">
+            <span class="fw-semibold small"><i class="ri ri-table-line me-1"></i>ตารางสรุปเส้นทางการซื้อขายตลอดสาย</span>
+            <button type="button" class="btn btn-sm btn-outline-success py-0" id="btnTreeExportExcel2"><i class="ri ri-file-excel-2-line me-1"></i>Export Excel</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle mb-0" style="font-size:0.82rem;">
+                <thead class="table-info text-center">
+                    <tr>
+                        <th style="width:4%">ลำดับ</th>
+                        <th style="width:7%">ระดับ</th>
+                        <th style="width:10%">ประเภท</th>
+                        <th style="width:18%">เลขที่เอกสาร</th>
+                        <th style="width:18%">ชื่อสินค้า / รายละเอียด</th>
+                        <th style="width:10%">ปริมาณ (KGM)</th>
+                        <th style="width:14%">คู่ค้า / ปลายทาง</th>
+                        <th style="width:9%">วันที่</th>
+                        <th style="width:10%">สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center">1</td>
+                        <td class="text-center"><span class="badge bg-label-secondary">L0</span></td>
+                        <td class="text-center"><span class="badge bg-primary">RMBS1</span></td>
+                        <td class="fw-semibold text-primary">RMBS1-2569-00112</td>
+                        <td>ปลาโอสา แช่แข็ง (นำเข้า)</td>
+                        <td class="text-end">65,000.000</td>
+                        <td class="small">PT. Indo Fisheries International</td>
+                        <td class="text-nowrap small">15/03/2569</td>
+                        <td><span class="badge bg-label-success">อนุมัติ</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">2</td>
+                        <td class="text-center"><span class="badge bg-label-secondary">L1</span></td>
+                        <td class="text-center"><span class="badge" style="background:#00838f">IMD</span></td>
+                        <td class="fw-semibold" style="color:#00838f">IMD-2569-00112</td>
+                        <td>ปลาโอสา แช่แข็ง</td>
+                        <td class="text-end">65,000.000</td>
+                        <td class="small">@companyName</td>
+                        <td class="text-nowrap small">18/03/2569</td>
+                        <td><span class="badge bg-label-success">อนุมัติ</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">3</td>
+                        <td class="text-center"><span class="badge bg-label-secondary">L2</span></td>
+                        <td class="text-center"><span class="badge bg-success">P1</span></td>
+                        <td class="fw-semibold text-success">@docNo</td>
+                        <td>ปลาโอสา/ปลาโอ รวม 4 ผลิตภัณฑ์</td>
+                        <td class="text-end">@p1Items.Sum(x => x.InputKg).ToString("N0").000</td>
+                        <td class="small">@companyName</td>
+                        <td class="text-nowrap small">21/04/2569</td>
+                        <td><span class="badge @statusClass">@statusText</span></td>
+                    </tr>
+                    @{ int rowNum = 4; }
+                    @foreach (var p2 in p2Items)
+                    {
+                        <tr>
+                            <td class="text-center">@rowNum</td>
+                            <td class="text-center"><span class="badge bg-label-secondary">L3</span></td>
+                            <td class="text-center"><span class="badge bg-warning text-dark">P2</span></td>
+                            <td class="fw-semibold text-warning">@p2.P2No</td>
+                            <td>@p2.ProductName</td>
+                            <td class="text-end">@p2.WeightKg.ToString("N0").000</td>
+                            <td class="small">@p2.Destination</td>
+                            <td class="text-nowrap small">@p2.P2Date</td>
+                            <td><span class="badge @p2.StatusClass">@p2.StatusText</span></td>
+                        </tr>
+                        rowNum++;
+                    }
+                    @foreach (var p2 in p2Items)
+                    {
+                        var certNo2 = "CERT-2026-005" + (Array.IndexOf(p2Items, p2) + 1).ToString("D2");
+                        var certSt2 = p2.StatusText == "อนุมัติแล้ว" ? "ออกแล้ว" : "รอดำเนินการ";
+                        var certBadge2 = p2.StatusText == "อนุมัติแล้ว" ? "bg-label-success" : "bg-label-warning";
+                        <tr>
+                            <td class="text-center">@rowNum</td>
+                            <td class="text-center"><span class="badge bg-label-secondary">L4</span></td>
+                            <td class="text-center"><span class="badge" style="background:#7b1fa2">CERT</span></td>
+                            <td class="fw-semibold" style="color:#7b1fa2">@certNo2</td>
+                            <td>Health Certificate</td>
+                            <td class="text-end">@p2.WeightKg.ToString("N0").000</td>
+                            <td class="small">@p2.Destination</td>
+                            <td class="text-nowrap small">@(p2.StatusText == "อนุมัติแล้ว" ? p2.P2Date : "—")</td>
+                            <td><span class="badge @certBadge2">@certSt2</span></td>
+                        </tr>
+                        rowNum++;
+                    }
+                </tbody>
+                <tfoot class="table-light fw-semibold small">
+                    <tr>
+                        <td colspan="5" class="text-end">รวมปริมาณ P2 (L3):</td>
+                        <td class="text-end">@p2Items.Sum(x => x.WeightKg).ToString("N0").000</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</div><!-- /tab4 -->
+
+<!-- ========================= Tab 5: มาตรการประเทศคู่ค้า & สุขอนามัย ========================= -->
+<div class="tab-pane fade" id="tab5" role="tabpanel">
+
+    <!-- Summary banner -->
+    <div class="alert alert-warning d-flex align-items-center gap-3 mb-4 py-3">
+        <i class="ri ri-alert-line fs-4 text-warning flex-shrink-0"></i>
+        <div>
+            <div class="fw-semibold">ผ่านมาตรการประเทศคู่ค้าทั้งหมด ✅ — มีรายการมาตรการสุขอนามัยรอตรวจสอบ ⚠️ 1 รายการ</div>
+            <div class="small text-muted">มาตรการประเทศคู่ค้า: ผ่านครบ 4 ประเทศ | มาตรการสุขอนามัย กตส.: 5 ผ่าน / 1 รอตรวจสอบ</div>
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" id="btnPrintMeasure">
+            <i class="ri ri-printer-line me-1"></i>พิมพ์ฟอร์มมาตรการ
+        </button>
+    </div>
+
+    <!-- ── ตาราง มาตรการประเทศคู่ค้า ── -->
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="mb-0"><i class="ri ri-global-line me-1 text-primary"></i>มาตรการประเทศคู่ค้า (Trading Partner Requirements)</h6>
+            <span class="badge bg-label-success">ผ่านครบ 4 ประเทศ ✅</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size:0.82rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th>ประเทศปลายทาง</th>
+                        <th>มาตรการที่ใช้บังคับ</th>
+                        <th>ประเภทใบรับรองที่ต้องการ</th>
+                        <th class="text-center">ผลการตรวจสอบ</th>
+                        <th>วันที่ตรวจ</th>
+                        <th>หมายเหตุ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-semibold">🇯🇵 ญี่ปุ่น</td>
+                        <td>
+                            <div class="small">IUU Regulation (JFT)</div>
+                            <div class="small text-muted">HACCP Equivalence</div>
+                        </td>
+                        <td><span class="badge bg-label-primary">Health Certificate (JPN)</span></td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">22/04/2569</td>
+                        <td class="small text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">🇪🇺 สหภาพยุโรป</td>
+                        <td>
+                            <div class="small">IUU Regulation EC 1005/2008</div>
+                            <div class="small text-muted">HACCP (852/2004), Cold Chain</div>
+                        </td>
+                        <td><span class="badge bg-label-primary">EU Health Certificate</span></td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">22/04/2569</td>
+                        <td class="small text-muted">ต้องแนบ IUU Statement</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">🇺🇸 สหรัฐอเมริกา</td>
+                        <td>
+                            <div class="small">MMPA (Marine Mammal Protection Act)</div>
+                            <div class="small text-muted">FDA Registration, HACCP</div>
+                        </td>
+                        <td><span class="badge bg-label-primary">FDA Health Certificate</span></td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">23/04/2569</td>
+                        <td class="small text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">🇨🇳 จีน</td>
+                        <td>
+                            <div class="small">GACC Registration</div>
+                            <div class="small text-muted">HACCP, Certificate of Origin</div>
+                        </td>
+                        <td><span class="badge bg-label-primary">GACC Health Certificate</span></td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">23/04/2569</td>
+                        <td class="small text-muted">โรงงานขึ้นทะเบียน GACC แล้ว</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── ตาราง มาตรการสุขอนามัย กตส. ── -->
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h6 class="mb-0"><i class="ri ri-heart-pulse-line me-1 text-danger"></i>มาตรการสุขอนามัย กตส. (Sanitary Measures — FQD)</h6>
+            <span class="badge bg-label-warning">5 ผ่าน / ⚠️ 1 รอตรวจสอบ</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size:0.82rem;">
+                <thead class="table-light">
+                    <tr>
+                        <th>รายการมาตรการ</th>
+                        <th>เกณฑ์ที่ตรวจสอบ</th>
+                        <th class="text-center">ผลการตรวจสอบ</th>
+                        <th>วันที่ตรวจ</th>
+                        <th>เจ้าหน้าที่</th>
+                        <th>หมายเหตุ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-semibold">การตรวจสอบสถานที่ผลิต</td>
+                        <td class="small text-muted">GMP, สุขลักษณะส่วนบุคคล, สภาพอาคาร</td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">15/04/2569</td>
+                        <td class="small">น.ส. สมใจ รักษ์ประมง</td>
+                        <td class="small text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">ระบบ HACCP</td>
+                        <td class="small text-muted">CCP, Critical Limits, Monitoring</td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">15/04/2569</td>
+                        <td class="small">น.ส. สมใจ รักษ์ประมง</td>
+                        <td class="small text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">การตรวจคุณภาพผลิตภัณฑ์</td>
+                        <td class="small text-muted">Sensory, Chemical, Microbiological</td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">18/04/2569</td>
+                        <td class="small">นาย วิชัย ใจดี</td>
+                        <td class="small text-muted">ผล Lab ผ่านเกณฑ์ EC/CODEX</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">การตรวจสอบสารปนเปื้อน</td>
+                        <td class="small text-muted">Heavy metals, Antibiotics, Pesticides</td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">18/04/2569</td>
+                        <td class="small">นาย วิชัย ใจดี</td>
+                        <td class="small text-muted">—</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">การตรวจสอบฉลากและบรรจุภัณฑ์</td>
+                        <td class="small text-muted">ข้อมูลบนฉลาก, ประเภท/วัสดุบรรจุภัณฑ์</td>
+                        <td class="text-center"><span class="badge bg-label-success">ผ่าน ✅</span></td>
+                        <td class="small text-nowrap">20/04/2569</td>
+                        <td class="small">น.ส. สมใจ รักษ์ประมง</td>
+                        <td class="small text-muted">—</td>
+                    </tr>
+                    <tr class="table-warning">
+                        <td class="fw-semibold">มาตรฐานน้ำและน้ำแข็ง</td>
+                        <td class="small text-muted">คุณภาพน้ำใช้ผลิต, แบคทีเรีย, Chlorine</td>
+                        <td class="text-center"><span class="badge bg-label-warning">⚠️ รอตรวจสอบ</span></td>
+                        <td class="small text-nowrap text-muted">—</td>
+                        <td class="small text-muted">—</td>
+                        <td class="small text-warning fw-semibold">นัดตรวจ 02/05/2569</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ปุ่ม print ล่าง -->
+    <div class="d-flex gap-2 mb-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnPrintMeasure2">
+            <i class="ri ri-printer-line me-1"></i>พิมพ์ฟอร์มมาตรการ
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm" id="btnDownloadMeasurePdf">
+            <i class="ri ri-file-pdf-line me-1"></i>ดาวน์โหลด PDF
+        </button>
+    </div>
+
+</div><!-- /tab5 -->
+
+</div><!-- /tab-content -->
+
+<!-- ==================== Modal: Print Tree Diagram ==================== -->
+<div class="modal fade" id="modalPrintTree" tabindex="-1" aria-labelledby="modalPrintTreeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalPrintTreeLabel">
+                    <i class="ri ri-node-tree me-1 text-primary"></i> พรีวิว Tree Diagram — @docNo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="printTreeArea" style="font-family: 'TH Sarabun New', sans-serif; font-size: 12pt; color: #111; background: #fff; padding: 20px;">
+                    <div class="print-form-header">
+                        <div style="font-size:1.4rem;">&#x1F41F;</div>
+                        <div class="fw-bold" style="font-size:1.05rem;">กรมประมง กระทรวงเกษตรและสหกรณ์</div>
+                        <div class="fw-bold" style="font-size:1.1rem;margin-top:4px;">แผนภาพเส้นทางการซื้อขายวัตถุดิบ-ผลิตภัณฑ์ (Supply Chain Tree Diagram)</div>
+                        <div class="text-muted small">Department of Fisheries, Ministry of Agriculture and Cooperatives</div>
+                    </div>
+                    <div class="row g-2 mb-3 small">
+                        <div class="col-6"><strong>เลขที่เอกสาร P1:</strong> @docNo</div>
+                        <div class="col-6 text-end"><strong>วันที่พิมพ์:</strong> @DateTime.Now.ToString("dd/MM/yyyy")</div>
+                        <div class="col-12"><strong>ชื่อสถานประกอบการ:</strong> @companyName</div>
+                        <div class="col-6"><strong>ประเภทใบรับรอง:</strong> @certType</div>
+                        <div class="col-6"><strong>แหล่งวัตถุดิบ:</strong> @rawMaterialSrc</div>
+                    </div>
+                    <div class="fw-bold small mb-1">ตารางสรุปเส้นทางการซื้อขายตลอดสาย</div>
+                    <table class="print-form-table mb-3">
+                        <thead style="background:#f0f0f0;">
+                            <tr>
+                                <th>ลำดับ</th><th>ระดับ</th><th>ประเภท</th><th>เลขที่เอกสาร</th>
+                                <th>ชื่อสินค้า / รายละเอียด</th><th class="text-end">ปริมาณ (KGM)</th>
+                                <th>คู่ค้า / ปลายทาง</th><th>วันที่</th><th>สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>L0</td><td>RMBS1</td><td>RMBS1-2569-00112</td><td>ปลาโอสา แช่แข็ง (นำเข้า)</td><td class="text-end">65,000.000</td><td>PT. Indo Fisheries International</td><td>15/03/2569</td><td>อนุมัติ</td></tr>
+                            <tr><td>2</td><td>L1</td><td>IMD</td><td>IMD-2569-00112</td><td>ปลาโอสา แช่แข็ง</td><td class="text-end">65,000.000</td><td>@companyName</td><td>18/03/2569</td><td>อนุมัติ</td></tr>
+                            <tr><td>3</td><td>L2</td><td>P1</td><td>@docNo</td><td>ปลาโอสา/ปลาโอ รวม 4 ผลิตภัณฑ์</td><td class="text-end">@p1Items.Sum(x => x.InputKg).ToString("N0")</td><td>@companyName</td><td>21/04/2569</td><td>@statusText</td></tr>
+                            @{ int pRow = 4; }
+                            @foreach (var p2 in p2Items)
+                            {
+                                <tr><td>@pRow</td><td>L3</td><td>P2</td><td>@p2.P2No</td><td>@p2.ProductName</td><td class="text-end">@p2.WeightKg.ToString("N0")</td><td>@p2.Destination</td><td>@p2.P2Date</td><td>@p2.StatusText</td></tr>
+                                pRow++;
+                            }
+                            @foreach (var p2 in p2Items)
+                            {
+                                var cNo = "CERT-2026-005" + (Array.IndexOf(p2Items, p2) + 1).ToString("D2");
+                                var cSt = p2.StatusText == "อนุมัติแล้ว" ? "ออกแล้ว" : "รอดำเนินการ";
+                                <tr><td>@pRow</td><td>L4</td><td>CERT</td><td>@cNo</td><td>Health Certificate</td><td class="text-end">@p2.WeightKg.ToString("N0")</td><td>@p2.Destination</td><td>@(p2.StatusText == "อนุมัติแล้ว" ? p2.P2Date : "—")</td><td>@cSt</td></tr>
+                                pRow++;
+                            }
+                        </tbody>
+                        <tfoot style="background:#f0f0f0;font-weight:600;">
+                            <tr><td colspan="5" class="text-end">รวมปริมาณ P2 (L3):</td><td class="text-end">@p2Items.Sum(x => x.WeightKg).ToString("N0")</td><td colspan="3"></td></tr>
+                        </tfoot>
+                    </table>
+                    <div class="row g-3 mt-2">
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อผู้ตรวจสอบ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">(...............................................)</div></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อหัวหน้ากลุ่ม / ตราประทับ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">สำนักงานประมงจังหวัด</div></div>
+                        </div>
+                    </div>
+                    <div class="small text-muted text-center mt-3">เอกสารนี้สร้างโดยระบบตรวจสอบสินค้าประมง (FSW) — วันที่พิมพ์: @DateTime.Now.ToString("dd/MM/yyyy")</div>
+                </div><!-- /printTreeArea -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-primary" id="btnPrintTree">
+                    <i class="ri ri-printer-line me-1"></i> สั่งพิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Modal: Print มาตรการประเทศคู่ค้า & สุขอนามัย ==================== -->
+<div class="modal fade" id="modalPrintMeasure" tabindex="-1" aria-labelledby="modalPrintMeasureLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalPrintMeasureLabel">
+                    <i class="ri ri-shield-check-line me-1 text-success"></i> พรีวิวฟอร์มมาตรการ — @docNo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="printMeasureArea" style="font-family: 'TH Sarabun New', sans-serif; font-size: 12pt; color: #111; background: #fff; padding: 20px;">
+                    <div class="print-form-header">
+                        <div style="font-size:1.4rem;">&#x1F41F;</div>
+                        <div class="fw-bold" style="font-size:1.05rem;">กรมประมง กระทรวงเกษตรและสหกรณ์</div>
+                        <div class="fw-bold" style="font-size:1.1rem;margin-top:4px;">แบบฟอร์มมาตรการประเทศคู่ค้าและมาตรการสุขอนามัย</div>
+                        <div class="text-muted small">Trading Partner Requirements &amp; Sanitary Measures Form</div>
+                    </div>
+                    <div class="row g-2 mb-3 small">
+                        <div class="col-6"><strong>เลขที่เอกสาร P1:</strong> @docNo</div>
+                        <div class="col-6 text-end"><strong>วันที่พิมพ์:</strong> @DateTime.Now.ToString("dd/MM/yyyy")</div>
+                        <div class="col-12"><strong>ชื่อสถานประกอบการ:</strong> @companyName</div>
+                        <div class="col-6"><strong>เลขทะเบียนนิติบุคคล:</strong> @companyReg</div>
+                        <div class="col-6"><strong>ประเภทใบรับรอง:</strong> @certType</div>
+                        <div class="col-12"><strong>ช่วงวันที่ผลิต:</strong> @docPeriod</div>
+                    </div>
+
+                    <div class="fw-bold small mb-1">ส่วนที่ 1 — มาตรการประเทศคู่ค้า (Trading Partner Requirements)</div>
+                    <table class="print-form-table mb-3">
+                        <thead style="background:#f0f0f0;">
+                            <tr>
+                                <th>ประเทศปลายทาง</th>
+                                <th>มาตรการที่ใช้บังคับ</th>
+                                <th>ประเภทใบรับรอง</th>
+                                <th>ผลการตรวจสอบ</th>
+                                <th>วันที่ตรวจ</th>
+                                <th>หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>🇯🇵 ญี่ปุ่น</td><td>IUU Regulation (JFT), HACCP Equivalence</td><td>Health Certificate (JPN)</td><td>ผ่าน ✅</td><td>22/04/2569</td><td>—</td></tr>
+                            <tr><td>🇪🇺 สหภาพยุโรป</td><td>IUU Regulation EC 1005/2008, HACCP (852/2004)</td><td>EU Health Certificate</td><td>ผ่าน ✅</td><td>22/04/2569</td><td>ต้องแนบ IUU Statement</td></tr>
+                            <tr><td>🇺🇸 สหรัฐอเมริกา</td><td>MMPA, FDA Registration, HACCP</td><td>FDA Health Certificate</td><td>ผ่าน ✅</td><td>23/04/2569</td><td>—</td></tr>
+                            <tr><td>🇨🇳 จีน</td><td>GACC Registration, HACCP, Certificate of Origin</td><td>GACC Health Certificate</td><td>ผ่าน ✅</td><td>23/04/2569</td><td>โรงงานขึ้นทะเบียน GACC แล้ว</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="fw-bold small mb-1">ส่วนที่ 2 — มาตรการสุขอนามัย กตส. (Sanitary Measures — FQD)</div>
+                    <table class="print-form-table mb-3">
+                        <thead style="background:#f0f0f0;">
+                            <tr>
+                                <th>รายการมาตรการ</th>
+                                <th>เกณฑ์ที่ตรวจสอบ</th>
+                                <th>ผลการตรวจสอบ</th>
+                                <th>วันที่ตรวจ</th>
+                                <th>เจ้าหน้าที่</th>
+                                <th>หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>การตรวจสอบสถานที่ผลิต</td><td>GMP, สุขลักษณะส่วนบุคคล, สภาพอาคาร</td><td>ผ่าน ✅</td><td>15/04/2569</td><td>น.ส. สมใจ รักษ์ประมง</td><td>—</td></tr>
+                            <tr><td>ระบบ HACCP</td><td>CCP, Critical Limits, Monitoring</td><td>ผ่าน ✅</td><td>15/04/2569</td><td>น.ส. สมใจ รักษ์ประมง</td><td>—</td></tr>
+                            <tr><td>การตรวจคุณภาพผลิตภัณฑ์</td><td>Sensory, Chemical, Microbiological</td><td>ผ่าน ✅</td><td>18/04/2569</td><td>นาย วิชัย ใจดี</td><td>ผล Lab ผ่านเกณฑ์ EC/CODEX</td></tr>
+                            <tr><td>การตรวจสอบสารปนเปื้อน</td><td>Heavy metals, Antibiotics, Pesticides</td><td>ผ่าน ✅</td><td>18/04/2569</td><td>นาย วิชัย ใจดี</td><td>—</td></tr>
+                            <tr><td>การตรวจสอบฉลากและบรรจุภัณฑ์</td><td>ข้อมูลบนฉลาก, ประเภท/วัสดุบรรจุภัณฑ์</td><td>ผ่าน ✅</td><td>20/04/2569</td><td>น.ส. สมใจ รักษ์ประมง</td><td>—</td></tr>
+                            <tr><td>มาตรฐานน้ำและน้ำแข็ง</td><td>คุณภาพน้ำใช้ผลิต, แบคทีเรีย, Chlorine</td><td>⚠️ รอตรวจสอบ</td><td>—</td><td>—</td><td>นัดตรวจ 02/05/2569</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row g-2 small mb-2">
+                        <div class="col-12"><strong>สรุปผล:</strong> ผ่านมาตรการประเทศคู่ค้าทั้งหมด ✅ | มาตรการสุขอนามัย: 5 ผ่าน / ⚠️ 1 รอตรวจสอบ</div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อเจ้าหน้าที่ผู้ตรวจสอบ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">(...............................................)</div></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อหัวหน้ากลุ่ม / ตราประทับ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">สำนักงานประมงจังหวัด</div></div>
+                        </div>
+                    </div>
+                    <div class="small text-muted text-center mt-3">เอกสารนี้สร้างโดยระบบตรวจสอบสินค้าประมง (FSW) — วันที่พิมพ์: @DateTime.Now.ToString("dd/MM/yyyy")</div>
+                </div><!-- /printMeasureArea -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-primary" id="btnPrintMeasureModal">
+                    <i class="ri ri-printer-line me-1"></i> สั่งพิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalPrintP1" tabindex="-1" aria-labelledby="modalPrintP1Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalPrintP1Label">
+                    <i class="ri ri-printer-line me-1 text-secondary"></i> พรีวิวเอกสาร P1 — @docNo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- PRINT AREA -->
+                <div id="printP1Area" style="font-family: 'TH Sarabun New', sans-serif; font-size: 13pt; color: #111; background: #fff; padding: 20px;">
+                    <div class="print-form-header">
+                        <div style="font-size: 1.4rem;">&#x1F41F;</div>
+                        <div class="fw-bold" style="font-size:1.05rem;">กรมประมง กระทรวงเกษตรและสหกรณ์</div>
+                        <div class="fw-bold" style="font-size:1.15rem; margin-top:4px;">เอกสารการควบคุมปริมาณสินค้า เอกสารที่ 1 (P1)</div>
+                        <div class="text-muted small">Department of Fisheries, Ministry of Agriculture and Cooperatives</div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 small"><strong>เลขที่เอกสาร P1:</strong> @docNo</div>
+                        <div class="col-6 small text-end"><strong>วันที่เอกสาร:</strong> @docDate</div>
+                        <div class="col-12 small"><strong>ชื่อสถานประกอบการ:</strong> @companyName</div>
+                        <div class="col-6 small"><strong>เลขทะเบียนนิติบุคคล:</strong> @companyReg</div>
+                        <div class="col-6 small"><strong>ประเภทใบรับรอง:</strong> @certType</div>
+                        <div class="col-6 small"><strong>แหล่งวัตถุดิบ:</strong> @rawMaterialSrc</div>
+                        <div class="col-6 small"><strong>ช่วงวันที่ผลิต:</strong> @docPeriod</div>
+                    </div>
+
+                    <div class="fw-bold small mb-1">รายละเอียด P1 รายผลิตภัณฑ์</div>
+                    <table class="print-form-table mb-3">
+                        <thead style="background: #f0f0f0;">
+                            <tr>
+                                <th>รหัสสินค้า</th>
+                                <th>ชื่อผลิตภัณฑ์</th>
+                                <th class="text-end">น้ำหนักวัตถุดิบ (กก.)</th>
+                                <th class="text-end">น้ำหนักผลผลิต (กก.)</th>
+                                <th class="text-center">%Yield จริง</th>
+                                <th class="text-center">%Yield อนุมัติ</th>
+                                <th class="text-center">เบี่ยงเบน</th>
+                                <th class="text-center">ผล</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in p1Items)
+                            {
+                                <tr>
+                                    <td>@item.ProductCode</td>
+                                    <td>@item.ProductName</td>
+                                    <td class="text-end">@item.InputKg.ToString("N0")</td>
+                                    <td class="text-end">@item.OutputKg.ToString("N0")</td>
+                                    <td class="text-center">@item.ActualYield.ToString("F1")%</td>
+                                    <td class="text-center">@item.ApprovedYield.ToString("F1")%</td>
+                                    <td class="text-center">@(item.Deviation >= 0 ? "+" : "")@item.Deviation.ToString("F1")%</td>
+                                    <td class="text-center">@(item.IsOver ? "เกิน ❌" : "ผ่าน ✅")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot style="background:#f0f0f0; font-weight:600;">
+                            <tr>
+                                <td colspan="2">รวม</td>
+                                <td class="text-end">@p1Items.Sum(x => x.InputKg).ToString("N0")</td>
+                                <td class="text-end">@p1Items.Sum(x => x.OutputKg).ToString("N0")</td>
+                                <td class="text-center">@((p1Items.Sum(x => x.OutputKg) / p1Items.Sum(x => x.InputKg) * 100).ToString("F1"))%</td>
+                                <td colspan="3"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อผู้ประกอบการ / ผู้มอบอำนาจ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">(...............................................)</div></div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small mb-1 fw-bold">ลายมือชื่อเจ้าหน้าที่ผู้ตรวจสอบ / ตราประทับ</div>
+                            <div class="sign-box p-2"><div style="height:50px;"></div><div class="small text-center text-muted mt-1">สำนักงานประมงจังหวัด</div></div>
+                        </div>
+                    </div>
+                    <div class="small text-muted text-center mt-3">เอกสารนี้สร้างโดยระบบตรวจสอบสินค้าประมง (FSW) — วันที่พิมพ์: @DateTime.Now.ToString("dd/MM/yyyy")</div>
+                </div>
+                <!-- / PRINT AREA -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-primary" id="btnPrintP1">
+                    <i class="ri ri-printer-line me-1"></i> สั่งพิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

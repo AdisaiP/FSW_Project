@@ -1,0 +1,13 @@
+# (7) เปิดสิทธิ์เจ้าหน้าที่ตรวจสอบและเห็นข้อมูลพื้นที่รับผิดชอบ กตส.-ศตส.
+
+URL: http://localhost:5055/Officer/IndexUserData
+
+จำนวนรูปที่ต้องแคป: 3 รูป
+
+รายการหน้าที่ต้องแคป
+1. IndexUserData > คอลัมน์ 'สิทธิ์ข้อมูล' + ปุ่ม 'กำหนดสิทธิ์ข้อมูล' (btn-outline-primary)
+   - badge แสดงสิทธิ์ปัจจุบัน (เฉพาะพื้นที่/ข้ามพื้นที่)
+2. Modal #dataAccessModal > ส่วนที่ 1 'ขอบเขตการเข้าถึงข้อมูล' + ส่วนที่ 2 'DOF List'
+   - radio เฉพาะพื้นที่/ข้ามพื้นที่ + checkbox เขต + switch DOF
+3. Modal #dataAccessModal > ส่วนที่ 3 'Cross-Area Access'
+   - multi-select หน่วยงาน + ช่วงวันที่ + เหตุผล

@@ -9,6 +9,8 @@
     var statusText   = "รอพิจารณา";
     var statusClass  = "bg-label-warning";
     var statusIcon   = "ri-time-line";
+    var receiptNo    = ""; // เลขที่รับคำขอ (ว่าง = ยังไม่ลงทะเบียน)
+    var isRegistered = string.IsNullOrEmpty(receiptNo) ? false : true;
 }
 
 @* ************** Content ************** *@
@@ -30,8 +32,8 @@
     <div class="card-body py-3">
         <div class="row align-items-center g-3">
             <div class="col-auto">
-                <span class="badge @statusClass rounded-pill px-3 py-2 fs-6">
-                    <i class="ri @statusIcon me-1"></i>@statusText
+                <span id="bannerStatusBadge" class="badge @statusClass rounded-pill px-3 py-2 fs-6">
+                    <i class="ri @statusIcon me-1"></i><span id="bannerStatusText">@statusText</span>
                 </span>
             </div>
             <div class="col">
@@ -52,7 +54,80 @@
                         <div class="small text-muted">ประเภทใบรับรอง</div>
                         <div class="fw-semibold">ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)</div>
                     </div>
+                    <div id="receiptNoBanner" class="@(isRegistered ? "" : "d-none")">
+                        <div class="small text-muted">เลขที่รับคำขอ</div>
+                        <div class="fw-semibold text-success">
+                            <i class="ri ri-checkbox-circle-line me-1"></i>
+                            <span id="bannerReceiptNo">@receiptNo</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="col-auto">
+                @if (!isRegistered && statusKey == "pending")
+                {
+                    <button type="button" class="btn btn-primary btn-sm" id="btnOpenRegister"
+                        data-bs-toggle="modal" data-bs-target="#modalRegisterReceive">
+                        <i class="ri ri-file-add-line me-1"></i>ลงทะเบียนรับคำขอ
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ขั้นตอนต่อไป (แสดงเมื่อลงทะเบียนรับเรื่องแล้ว) ===== -->
+<div id="nextStepFlow" class="d-none mb-4">
+    <div class="card border-0" style="background:linear-gradient(135deg,#e8f8f0 0%,#d4f1e4 100%);">
+        <div class="card-body py-3">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="ri ri-route-line text-success fs-5"></i>
+                <span class="fw-semibold text-success">ขั้นตอนดำเนินการ</span>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <!-- Step 1: ยื่นคำขอ -->
+                <div class="d-flex align-items-center gap-1">
+                    <span class="badge bg-label-success px-2 py-1">
+                        <i class="ri ri-send-plane-line me-1"></i>ยื่นคำขอ &#x2705;
+                    </span>
+                </div>
+                <i class="ri ri-arrow-right-line text-muted"></i>
+                <!-- Step 2: ลงทะเบียนรับเรื่อง -->
+                <div class="d-flex align-items-center gap-1">
+                    <span class="badge bg-label-success px-2 py-1">
+                        <i class="ri ri-file-add-line me-1"></i>ลงทะเบียนรับเรื่อง &#x2705;
+                    </span>
+                </div>
+                <i class="ri ri-arrow-right-line text-muted"></i>
+                <!-- Step 3: จัดทำใบรับรอง (current/done) -->
+                <div class="d-flex align-items-center gap-1">
+                    <span id="nextStepCertBadge" class="badge bg-label-info px-2 py-1">
+                        <i class="ri ri-file-text-line me-1"></i><span id="nextStepCertText">จัดทำใบรับรอง &#x1F4CB;</span>
+                    </span>
+                </div>
+                <i class="ri ri-arrow-right-line text-muted"></i>
+                <!-- Step 4: พิจารณา/อนุมัติ -->
+                <div class="d-flex align-items-center gap-1">
+                    <span id="nextStepApproveBadge" class="badge bg-label-secondary px-2 py-1">
+                        <i class="ri ri-checkbox-circle-line me-1"></i>พิจารณา/อนุมัติ
+                    </span>
+                </div>
+                <i class="ri ri-arrow-right-line text-muted"></i>
+                <!-- Step 5: ออกใบรับรอง -->
+                <div class="d-flex align-items-center gap-1">
+                    <span class="badge bg-label-secondary px-2 py-1">
+                        <i class="ri ri-file-certificate-line me-1"></i>ออกใบรับรอง
+                    </span>
+                </div>
+            </div>
+            <!-- next-action hint -->
+            <div id="nextStepHint" class="mt-3 small text-success d-flex align-items-center gap-2">
+                <i class="ri ri-arrow-right-circle-line fs-5"></i>
+                <span>ขั้นตอนถัดไป: กด <strong>"จัดทำใบรับรอง"</strong> ใน Action Bar ด้านล่างเพื่อเริ่มกระบวนการออกใบรับรอง</span>
+            </div>
+            <div id="nextStepDone" class="mt-3 small text-info d-flex align-items-center gap-2 d-none">
+                <i class="ri ri-checkbox-circle-fill fs-5"></i>
+                <span>กระบวนการจัดทำใบรับรองเริ่มต้นแล้ว — รอผลการพิจารณาขั้นสุดท้าย</span>
             </div>
         </div>
     </div>
@@ -80,6 +155,26 @@
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#tab-evidence" aria-controls="tab-evidence" aria-selected="false">
                         <i class="ri ri-folder-open-line me-1"></i> หลักฐานประกอบ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-grouping" aria-controls="tab-grouping" aria-selected="false">
+                        <i class="ri ri-git-merge-line me-1"></i> รวม RMBS2/P2
+                        <span class="badge bg-label-info ms-1 small">Grouping</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-history" aria-controls="tab-history" aria-selected="false">
+                        <i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-linkcheck" aria-controls="tab-linkcheck" aria-selected="false">
+                        <i class="ri ri-links-line me-1"></i> ตรวจสอบลิงก์ข้อมูล
+                        <span class="badge bg-label-warning ms-1 small">สำคัญ</span>
                     </button>
                 </li>
             </ul>
@@ -378,6 +473,266 @@
                     </div>
                     <!-- /accordion ส่วนเนื้อหา -->
                 </div>
+
+                <!-- ==================== Section: ส่งออกและตรวจปล่อย ==================== -->
+                <div class="card border mt-4" id="sectionExportInspection">
+                    <div class="card-header py-2 d-flex align-items-center gap-2 flex-wrap" style="background:#f4f6fb;">
+                        <i class="ri ri-ship-2-line text-primary"></i>
+                        <span class="fw-semibold">ส่งออกและตรวจปล่อย</span>
+                        <!-- 2.4(30): ข้อมูลตรวจปล่อยจากด่านฯ รับแล้ว -->
+                        <span class="badge bg-label-info ms-2" id="badgeReceivedFromPort">
+                            <i class="ri ri-download-cloud-2-line me-1"></i>ข้อมูลตรวจปล่อยจากด่านฯ รับแล้ว ✅
+                        </span>
+                        <!-- 2.4(31): ส่งข้อมูลใบรับรองไปด่านตรวจปล่อยแล้ว -->
+                        <span class="badge bg-label-success ms-1" id="badgeSentToInspection">
+                            <i class="ri ri-checkbox-circle-line me-1"></i>ส่งข้อมูลใบรับรองไปด่านตรวจปล่อยแล้ว ✅
+                        </span>
+                    </div>
+                    <div class="card-body" style="font-size:0.85rem;">
+                        <div class="row g-3">
+
+                            <!-- เลขที่ใบรับรอง (ออกอัตโนมัติ) -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">เลขที่ใบรับรอง (ออกอัตโนมัติ)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control bg-light" id="issuedCertNoDisplay"
+                                        value="PS-2569-00901" readonly />
+                                    <span class="input-group-text bg-success text-white">
+                                        <i class="ri ri-award-line"></i>
+                                    </span>
+                                </div>
+                                <div class="form-text text-success">
+                                    <i class="ri ri-checkbox-circle-fill me-1"></i>ออกเลขที่อัตโนมัติแล้วเมื่อ 28/04/2569
+                                </div>
+                            </div>
+
+                            <!-- วันที่ส่งออก -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">วันที่ส่งออก (Export Date)</label>
+                                <input type="text" class="form-control form-control-sm bg-light"
+                                    value="02/05/2569" readonly />
+                            </div>
+
+                            <!-- ด่านตรวจ -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">ด่านตรวจปล่อย</label>
+                                <input type="text" class="form-control form-control-sm bg-light"
+                                    value="ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง" readonly />
+                                <div class="mt-1">
+                                    <a href="#" class="small text-primary fw-semibold">
+                                        <i class="ri ri-external-link-line me-1"></i>ดูสถานะตรวจปล่อย ด่านตรวจประมง →
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- น้ำหนักที่ขอ (reference) -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">น้ำหนักที่ขอตามใบรับรอง (กก.)</label>
+                                <input type="text" class="form-control form-control-sm bg-light"
+                                    id="requestedWeightKg" value="12,450.00" readonly />
+                            </div>
+
+                            <!-- ปรับน้ำหนักส่งออก -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">
+                                    ปรับปริมาณน้ำหนักส่งออก (กก.)
+                                    <span class="text-muted small fw-normal">(≤ น้ำหนักที่ขอ)</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control" id="adjustedWeightKg"
+                                        placeholder="ระบุน้ำหนักจริงที่ส่งออก"
+                                        min="0.01" max="12450" step="0.01" />
+                                    <span class="input-group-text">กก.</span>
+                                    <button class="btn btn-outline-primary btn-sm" type="button" id="btnConfirmAdjustWeight">
+                                        <i class="ri ri-save-line"></i>
+                                    </button>
+                                </div>
+                                <div id="weightExceedAlert" class="d-none mt-1">
+                                    <span class="text-danger small">
+                                        <i class="ri ri-error-warning-line me-1"></i>⛔ น้ำหนักเกินกว่าที่ขอ (สูงสุด 12,450.00 กก.)
+                                    </span>
+                                </div>
+                                <div id="weightOkMsg" class="d-none mt-1">
+                                    <span class="text-success small">
+                                        <i class="ri ri-checkbox-circle-line me-1"></i>บันทึกน้ำหนักเรียบร้อยแล้ว
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- สถานะตรวจปล่อย -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">สถานะตรวจปล่อย</label>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="badge bg-label-success px-3 py-2">
+                                        <i class="ri ri-checkbox-circle-fill me-1"></i>ผ่านการตรวจปล่อยแล้ว ✅
+                                    </span>
+                                </div>
+                                <div class="small text-muted mt-1">วันที่ตรวจปล่อย: 30/04/2569 เวลา 08:15 น.</div>
+                            </div>
+
+                        </div>
+
+                        <!-- 2.4(31): Panel — ส่งข้อมูลใบรับรองไปยังระบบด่านตรวจปล่อย (Push to Port) -->
+                        <div class="mt-4 p-3 rounded-3 border border-success-subtle" id="panelPushToPort"
+                             style="background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);">
+                            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                <i class="ri ri-upload-cloud-2-line text-success fs-5"></i>
+                                <span class="fw-semibold text-success-emphasis">ส่งข้อมูลใบรับรองไปยังระบบด่านตรวจปล่อย (Push to Port System)</span>
+                                <!-- สถานะ: ส่งแล้ว -->
+                                <span class="badge bg-success ms-1" id="badgePushSent" style="font-size:.75rem;">
+                                    <i class="ri ri-checkbox-circle-fill me-1"></i>ส่งข้อมูลแล้ว ✅ เมื่อ 29/04/2569 14:22 น.
+                                </span>
+                                <!-- สถานะ: ยังไม่ส่ง (hidden by default — mockup demo) -->
+                                <span class="badge bg-label-warning d-none ms-1" id="badgePushPending" style="font-size:.75rem;">
+                                    <i class="ri ri-time-line me-1"></i>ยังไม่ได้ส่งข้อมูลไปด่าน
+                                </span>
+                                <!-- ปุ่มส่งซ้ำ (แสดงเมื่อส่งแล้ว) -->
+                                <button type="button" class="btn btn-outline-success btn-sm ms-auto" id="btnResendToPort"
+                                        data-bs-toggle="modal" data-bs-target="#modalSendToPort">
+                                    <i class="ri ri-refresh-line me-1"></i>ส่งข้อมูลอัปเดต
+                                </button>
+                                <!-- ปุ่มส่งครั้งแรก (hidden by default — mockup demo) -->
+                                <button type="button" class="btn btn-success btn-sm d-none ms-auto" id="btnFirstSendToPort"
+                                        data-bs-toggle="modal" data-bs-target="#modalSendToPort">
+                                    <i class="ri ri-send-plane-2-line me-1"></i>ส่งข้อมูลใบรับรองไปด่านตรวจปล่อย
+                                </button>
+                                <!-- Demo toggle -->
+                                <button type="button" class="btn btn-link btn-sm text-muted p-0 ms-2" id="btnTogglePushDemo"
+                                        title="สลับสถานะ Demo">
+                                    <i class="ri ri-swap-line"></i>Demo
+                                </button>
+                            </div>
+                            <!-- ข้อมูลที่ส่งออกไป -->
+                            <div class="row g-3" style="font-size:.85rem;">
+                                <div class="col-md-3">
+                                    <div class="small text-muted">เลขที่ใบรับรอง (ที่ส่ง)</div>
+                                    <div class="fw-semibold" style="font-family:monospace;">PS-2569-00901</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">ด่านปลายทาง</div>
+                                    <div class="fw-semibold">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">วันที่ส่งออก</div>
+                                    <div class="fw-semibold">02/05/2569</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">น้ำหนักตามใบรับรอง (กก.)</div>
+                                    <div class="fw-semibold text-primary">12,450.00</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">วันที่/เวลาส่งข้อมูล</div>
+                                    <div class="fw-semibold" id="pushSentTimestamp">29/04/2569 เวลา 14:22 น.</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">ส่งโดย</div>
+                                    <div class="fw-semibold">ระบบอัตโนมัติ (เมื่อออกใบรับรอง)</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">เลขอ้างอิงการส่ง</div>
+                                    <div class="fw-semibold" style="font-family:monospace;" id="pushRefNo">PUSH-2569-00901-001</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">สถานะการรับข้อมูล</div>
+                                    <div>
+                                        <span class="badge bg-label-success py-1 px-2">
+                                            <i class="ri ri-checkbox-circle-fill me-1"></i>ด่านรับข้อมูลแล้ว
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ประวัติการส่ง -->
+                            <div class="mt-3">
+                                <div class="small text-muted fw-semibold mb-1">
+                                    <i class="ri ri-history-line me-1"></i>ประวัติการส่งข้อมูล
+                                </div>
+                                <table class="table table-bordered table-sm mb-0" style="font-size:.82rem;">
+                                    <thead class="text-center table-light">
+                                        <tr>
+                                            <th style="width:2rem;">#</th>
+                                            <th>วันที่/เวลาส่ง</th>
+                                            <th>เลขอ้างอิง</th>
+                                            <th>ประเภท</th>
+                                            <th>ผลการส่ง</th>
+                                            <th>ส่งโดย</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center text-muted">1</td>
+                                            <td>29/04/2569 14:22 น.</td>
+                                            <td style="font-family:monospace;">PUSH-2569-00901-001</td>
+                                            <td>ส่งอัตโนมัติ (ออกใบรับรอง)</td>
+                                            <td><span class="badge bg-success">ด่านรับแล้ว ✅</span></td>
+                                            <td>ระบบ PS/NMD</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /Panel Push to Port -->
+
+                        <!-- 2.4(30): Panel — ข้อมูลตรวจปล่อยที่ได้รับจากด่านประมง -->
+                        <div class="mt-4 p-3 rounded-3 border border-info-subtle" style="background:linear-gradient(135deg,#e8f7ff 0%,#f0fbff 100%);">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="ri ri-download-cloud-2-line text-info fs-5"></i>
+                                <span class="fw-semibold text-info-emphasis">ข้อมูลตรวจปล่อยที่ได้รับจากด่านประมง (Pull from Port System)</span>
+                                <span class="badge bg-info ms-1" style="font-size:.72rem;">
+                                    <i class="ri ri-refresh-line me-1"></i>อัปเดตล่าสุด 30/04/2569 08:15 น.
+                                </span>
+                                <button type="button" class="btn btn-outline-info btn-sm ms-auto" id="btnSyncFromPort">
+                                    <i class="ri ri-refresh-line me-1"></i>ดึงข้อมูลใหม่
+                                </button>
+                                <button type="button" class="btn btn-info btn-sm text-white"
+                                        data-bs-toggle="modal" data-bs-target="#modalInspectionDetail">
+                                    <i class="ri ri-eye-line me-1"></i>ดูรายละเอียดตรวจปล่อย →
+                                </button>
+                            </div>
+                            <div class="row g-3" style="font-size:.85rem;">
+                                <div class="col-md-3">
+                                    <div class="small text-muted">เลขที่ใบรับรอง</div>
+                                    <div class="fw-semibold" style="font-family:monospace;">PS-2569-00901</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">ด่านตรวจปล่อย</div>
+                                    <div class="fw-semibold">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">เจ้าหน้าที่ด่าน</div>
+                                    <div class="fw-semibold">นายมณี ทองแท้</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">วันที่/เวลาตรวจปล่อย</div>
+                                    <div class="fw-semibold text-success">30/04/2569 เวลา 08:15 น.</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">น้ำหนักตรวจปล่อยจริง (กก.)</div>
+                                    <div class="fw-semibold text-primary">14,850.00</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">น้ำหนักที่ขอตามใบรับรอง (กก.)</div>
+                                    <div class="fw-semibold">12,450.00</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">ผลการตรวจปล่อย</div>
+                                    <div>
+                                        <span class="badge bg-success py-1 px-2">
+                                            <i class="ri ri-checkbox-circle-fill me-1"></i>ผ่านการตรวจปล่อย
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="small text-muted">เลขที่อ้างอิงด่าน</div>
+                                    <div class="fw-semibold" style="font-family:monospace;">PORT-2569-LC-04301</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /Panel ข้อมูลตรวจปล่อย -->
+
+                    </div>
+                </div>
+                <!-- /Section ส่งออกและตรวจปล่อย -->
+
                 <!-- /TAB 1 -->
 
                 <!-- ==================== TAB 2: รายการข้อมูลการผลิต ==================== -->
@@ -582,6 +937,844 @@
                 </div>
                 <!-- /TAB 3 -->
 
+                <!-- ==================== TAB 4: รวม RMBS2/P2 (Grouping) ==================== -->
+                <div id="tab-grouping" class="tab-pane fade" role="tabpanel">
+
+                    <div class="alert alert-info d-flex align-items-start gap-3 mb-4 py-3" style="font-size:0.85rem;">
+                        <i class="ri ri-information-line fs-4 flex-shrink-0 text-info mt-1"></i>
+                        <div>
+                            <div class="fw-semibold mb-1">ระบบจะรวมรายการ RMBS2/P2 ที่มี CC/SCC/RMBS1 เดียวกันให้เป็น 1 รายการในแบบฟอร์มใบรับรอง</div>
+                            <div class="text-muted">Size ต่างกันแต่ CC/RMBS1 เดียวกัน → รวมได้ | ต่าง CC/RMBS1 → แยกรายการ</div>
+                        </div>
+                    </div>
+
+                    <!-- Summary badges -->
+                    <div class="d-flex gap-3 flex-wrap mb-4" style="font-size:0.82rem;">
+                        <div class="border rounded px-3 py-2 bg-light text-center">
+                            <div class="text-muted small">รายการ RMBS2/P2 ทั้งหมด</div>
+                            <div class="fw-bold fs-6">7 รายการ</div>
+                        </div>
+                        <div class="border rounded px-3 py-2 bg-light text-center">
+                            <div class="text-muted small">รวมแล้ว (CC/RMBS1 เดียวกัน)</div>
+                            <div class="fw-bold fs-6 text-success">4 กลุ่ม &#x2705;</div>
+                        </div>
+                        <div class="border rounded px-3 py-2 bg-light text-center">
+                            <div class="text-muted small">แยกรายการ</div>
+                            <div class="fw-bold fs-6 text-warning">2 รายการ</div>
+                        </div>
+                        <div class="border rounded px-3 py-2 bg-light text-center">
+                            <div class="text-muted small">รายการในแบบฟอร์มหลังรวม</div>
+                            <div class="fw-bold fs-6 text-primary">5 รายการ</div>
+                        </div>
+                    </div>
+
+                    <!-- Grouping table -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex align-items-center justify-content-between py-2">
+                            <h6 class="mb-0 fw-semibold" style="font-size:0.88rem;">
+                                <i class="ri ri-table-line me-1 text-primary"></i>รายการ RMBS2/P2 และสถานะการรวม
+                            </h6>
+                            <button type="button" class="btn btn-primary btn-sm" id="btnMergeAll">
+                                <i class="ri ri-git-merge-line me-1"></i>รวมทุกรายการที่รวมได้
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" style="font-size:0.8rem;">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th style="width:2rem;"><input type="checkbox" id="chkSelectAllGroup" class="form-check-input"></th>
+                                        <th>#</th>
+                                        <th>RMBS1 / CC / SCC</th>
+                                        <th>ชนิดสัตว์น้ำ</th>
+                                        <th>Size</th>
+                                        <th>วันที่นำเข้า</th>
+                                        <th class="text-end">น้ำหนัก (KGM)</th>
+                                        <th class="text-center">สถานะรวม</th>
+                                        <th>กลุ่มรวม</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="groupingTbody">
+                                    <!-- Group A: CC-TH-2569-0047 (RMBS1: 10604204211700000090) -->
+                                    <tr class="table-light">
+                                        <td><input type="checkbox" class="form-check-input chk-group" data-group="A"></td>
+                                        <td class="text-center text-muted">1</td>
+                                        <td>
+                                            <div class="fw-semibold text-primary">10604204211700000090</div>
+                                            <div class="small text-muted">CC: CC-TH-2569-0047</div>
+                                        </td>
+                                        <td>Thunnus albacares (ทูน่า)</td>
+                                        <td>Mixed Sizes</td>
+                                        <td class="text-nowrap">15/03/2569</td>
+                                        <td class="text-end fw-semibold">1,540.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i>รวมแล้ว &#x2705;</span></td>
+                                        <td class="text-center small text-success fw-semibold">A</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="form-check-input chk-group" data-group="A"></td>
+                                        <td class="text-center text-muted">2</td>
+                                        <td>
+                                            <div class="fw-semibold text-primary">10604204211700000090</div>
+                                            <div class="small text-muted">CC: CC-TH-2569-0047</div>
+                                        </td>
+                                        <td>Thunnus albacares (ทูน่า)</td>
+                                        <td>3+ KG</td>
+                                        <td class="text-nowrap">15/03/2569</td>
+                                        <td class="text-end fw-semibold">980.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i>รวมแล้ว &#x2705;</span></td>
+                                        <td class="text-center small text-success fw-semibold">A</td>
+                                    </tr>
+                                    <!-- Group B: CC-TH-2569-0048 (RMBS1: 10604204211700000091) -->
+                                    <tr class="table-light">
+                                        <td><input type="checkbox" class="form-check-input chk-group" data-group="B"></td>
+                                        <td class="text-center text-muted">3</td>
+                                        <td>
+                                            <div class="fw-semibold text-primary">10604204211700000091</div>
+                                            <div class="small text-muted">CC: CC-TH-2569-0048</div>
+                                        </td>
+                                        <td>Thunnus albacares (ทูน่า)</td>
+                                        <td>2–3 KG</td>
+                                        <td class="text-nowrap">18/03/2569</td>
+                                        <td class="text-end fw-semibold">2,100.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i>รวมแล้ว &#x2705;</span></td>
+                                        <td class="text-center small text-success fw-semibold">B</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="form-check-input chk-group" data-group="B"></td>
+                                        <td class="text-center text-muted">4</td>
+                                        <td>
+                                            <div class="fw-semibold text-primary">10604204211700000091</div>
+                                            <div class="small text-muted">CC: CC-TH-2569-0048</div>
+                                        </td>
+                                        <td>Thunnus albacares (ทูน่า)</td>
+                                        <td>1–2 KG</td>
+                                        <td class="text-nowrap">18/03/2569</td>
+                                        <td class="text-end fw-semibold">1,750.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i>รวมแล้ว &#x2705;</span></td>
+                                        <td class="text-center small text-success fw-semibold">B</td>
+                                    </tr>
+                                    <!-- Group C: CC-TH-2569-0049 (RMBS1: 10604204211700000092) -->
+                                    <tr class="table-light">
+                                        <td><input type="checkbox" class="form-check-input chk-group" data-group="C"></td>
+                                        <td class="text-center text-muted">5</td>
+                                        <td>
+                                            <div class="fw-semibold text-primary">10604204211700000092</div>
+                                            <div class="small text-muted">CC: CC-TH-2569-0049</div>
+                                        </td>
+                                        <td>Thunnus albacares (ทูน่า)</td>
+                                        <td>Mixed Sizes</td>
+                                        <td class="text-nowrap">20/03/2569</td>
+                                        <td class="text-end fw-semibold">3,200.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i>รวมแล้ว &#x2705;</span></td>
+                                        <td class="text-center small text-success fw-semibold">C</td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="form-check-input chk-group" data-group="C"></td>
+                                        <td class="text-center text-muted">6</td>
+                                        <td>
+                                            <div class="fw-semibold text-primary">10604204211700000092</div>
+                                            <div class="small text-muted">CC: CC-TH-2569-0049</div>
+                                        </td>
+                                        <td>Thunnus albacares (ทูน่า)</td>
+                                        <td>0.5–1 KG</td>
+                                        <td class="text-nowrap">20/03/2569</td>
+                                        <td class="text-end fw-semibold">880.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i>รวมแล้ว &#x2705;</span></td>
+                                        <td class="text-center small text-success fw-semibold">C</td>
+                                    </tr>
+                                    <!-- Group D: CC ต่างกัน → แยกรายการ -->
+                                    <tr class="table-warning">
+                                        <td><input type="checkbox" class="form-check-input chk-group" data-group="D"></td>
+                                        <td class="text-center text-muted">7</td>
+                                        <td>
+                                            <div class="fw-semibold text-danger">10604204211700000095</div>
+                                            <div class="small text-muted">CC: CC-TH-2569-0055 (ต่างกลุ่ม)</div>
+                                        </td>
+                                        <td>Katsuwonus pelamis (โอ)</td>
+                                        <td>Mixed</td>
+                                        <td class="text-nowrap">25/03/2569</td>
+                                        <td class="text-end fw-semibold">4,500.000</td>
+                                        <td class="text-center"><span class="badge bg-label-warning">&#x26A0;&#xFE0F; แยกรายการ</span></td>
+                                        <td class="text-center small text-warning fw-semibold">D</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light fw-semibold" style="font-size:0.8rem;">
+                                    <tr>
+                                        <td colspan="6" class="text-end">น้ำหนักรวมทั้งหมด:</td>
+                                        <td class="text-end">14,950.000 KGM</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Merged result preview -->
+                    <div class="card mb-3">
+                        <div class="card-header py-2 d-flex align-items-center justify-content-between">
+                            <h6 class="mb-0 fw-semibold" style="font-size:0.88rem;">
+                                <i class="ri ri-list-check-3 me-1 text-success"></i>รายการในแบบฟอร์มใบรับรองหลังรวม
+                            </h6>
+                            <span class="badge bg-label-success">5 รายการ &#x2192; ใบรับรอง</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0" style="font-size:0.8rem;">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>กลุ่มรวม</th>
+                                        <th>RMBS1 อ้างอิง</th>
+                                        <th>CC อ้างอิง</th>
+                                        <th>ชนิดสัตว์น้ำ</th>
+                                        <th>Size ที่รวม</th>
+                                        <th class="text-end">น้ำหนักรวม (KGM)</th>
+                                        <th class="text-center">สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center">1</td>
+                                        <td class="text-center fw-semibold text-success">A</td>
+                                        <td class="small">10604204211700000090</td>
+                                        <td class="small">CC-TH-2569-0047</td>
+                                        <td>Thunnus albacares</td>
+                                        <td class="small">Mixed Sizes, 3+ KG</td>
+                                        <td class="text-end fw-semibold">2,520.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success">รวมแล้ว &#x2705;</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">2</td>
+                                        <td class="text-center fw-semibold text-success">B</td>
+                                        <td class="small">10604204211700000091</td>
+                                        <td class="small">CC-TH-2569-0048</td>
+                                        <td>Thunnus albacares</td>
+                                        <td class="small">2–3 KG, 1–2 KG</td>
+                                        <td class="text-end fw-semibold">3,850.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success">รวมแล้ว &#x2705;</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">3</td>
+                                        <td class="text-center fw-semibold text-success">C</td>
+                                        <td class="small">10604204211700000092</td>
+                                        <td class="small">CC-TH-2569-0049</td>
+                                        <td>Thunnus albacares</td>
+                                        <td class="small">Mixed, 0.5–1 KG</td>
+                                        <td class="text-end fw-semibold">4,080.000</td>
+                                        <td class="text-center"><span class="badge bg-label-success">รวมแล้ว &#x2705;</span></td>
+                                    </tr>
+                                    <tr class="table-warning">
+                                        <td class="text-center">4</td>
+                                        <td class="text-center fw-semibold text-warning">D</td>
+                                        <td class="small">10604204211700000095</td>
+                                        <td class="small">CC-TH-2569-0055</td>
+                                        <td>Katsuwonus pelamis</td>
+                                        <td class="small">Mixed (ต่างชนิด)</td>
+                                        <td class="text-end fw-semibold">4,500.000</td>
+                                        <td class="text-center"><span class="badge bg-label-warning">&#x26A0;&#xFE0F; แยกรายการ</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">5</td>
+                                        <td class="text-center fw-semibold text-info">E (P2)</td>
+                                        <td class="small text-muted">—</td>
+                                        <td class="small">P2-2569-00211</td>
+                                        <td>Thunnus albacares</td>
+                                        <td class="small">ผลิตภัณฑ์สำเร็จ</td>
+                                        <td class="text-end fw-semibold">—</td>
+                                        <td class="text-center"><span class="badge bg-label-info">อ้าง P2 &#x2705;</span></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light fw-semibold" style="font-size:0.8rem;">
+                                    <tr>
+                                        <td colspan="6" class="text-end">น้ำหนักรวม (ไม่รวมกลุ่ม D):</td>
+                                        <td class="text-end">10,450.000 KGM</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-2">
+                        <button type="button" class="btn btn-success btn-sm" id="btnConfirmGrouping">
+                            <i class="ri ri-check-double-line me-1"></i>ยืนยันการรวมรายการ
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnResetGrouping">
+                            <i class="ri ri-refresh-line me-1"></i>รีเซ็ตการรวม
+                        </button>
+                    </div>
+
+                </div>
+                <!-- /TAB 4 -->
+
+                <!-- ==================== TAB 5: ประวัติการดำเนินการ ==================== -->
+                <div id="tab-history" class="tab-pane fade" role="tabpanel">
+
+                    @{
+                        // Mock history log entries
+                        var historyLog = new[]
+                        {
+                            new { No=1, DateStr="15/04/2569 08:45", Actor="บริษัท ซีฟู้ด อินเตอร์เนชั่นแนล จำกัด", Role="ผู้ประกอบการ", ActionKey="submit", ActionText="ยื่นคำขอ", ActionClass="bg-label-secondary", Detail="ยื่นคำขอใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement) ผ่านระบบออนไลน์", Remark="", HasFile=false },
+                            new { No=2, DateStr="16/04/2569 09:10", Actor="นายวิชิต สุขเจริญ", Role="เจ้าหน้าที่รับเรื่อง", ActionKey="register", ActionText="ลงทะเบียนรับคำขอ", ActionClass="bg-label-primary", Detail="ลงทะเบียนรับคำขอ เลขที่ " + receiptNo, Remark="ครบถ้วน", HasFile=false },
+                            new { No=3, DateStr="17/04/2569 10:30", Actor="นางสาว วรรณา พิมพ์ทอง", Role="เจ้าหน้าที่พิจารณา", ActionKey="review_start", ActionText="เริ่มพิจารณา", ActionClass="bg-label-info", Detail="รับแฟ้มและเริ่มตรวจสอบรายละเอียดเอกสารประกอบคำขอ", Remark="", HasFile=false },
+                            new { No=4, DateStr="18/04/2569 14:15", Actor="นางสาว วรรณา พิมพ์ทอง", Role="เจ้าหน้าที่พิจารณา", ActionKey="request_doc", ActionText="ขอเอกสารเพิ่มเติม", ActionClass="bg-label-warning", Detail="แจ้งผู้ประกอบการส่งเอกสาร RMBS1 ฉบับล่าสุดเพิ่มเติม (ฉบับที่แนบมาล้าสมัย)", Remark="กำหนดส่งภายใน 2 วัน", HasFile=false },
+                            new { No=5, DateStr="19/04/2569 09:05", Actor="บริษัท ซีฟู้ด อินเตอร์เนชั่นแนล จำกัด", Role="ผู้ประกอบการ", ActionKey="upload_doc", ActionText="แนบเอกสารเพิ่มเติม", ActionClass="bg-label-success", Detail="อัปโหลด RMBS1_20040421_update.pdf (2.1 MB)", Remark="", HasFile=true },
+                            new { No=6, DateStr="20/04/2569 11:00", Actor="นางสาว วรรณา พิมพ์ทอง", Role="เจ้าหน้าที่พิจารณา", ActionKey="review_continue", ActionText="พิจารณาต่อ", ActionClass="bg-label-info", Detail="ตรวจสอบเอกสารเพิ่มเติมที่ได้รับ และตรวจสอบข้อมูลการผลิต", Remark="เอกสารถูกต้องครบถ้วน", HasFile=false },
+                            new { No=7, DateStr="20/04/2569 13:45", Actor="นางสาว วรรณา พิมพ์ทอง", Role="เจ้าหน้าที่พิจารณา", ActionKey="approve_draft", ActionText="จัดทำใบรับรอง (ร่าง)", ActionClass="bg-label-primary", Detail="จัดทำร่างใบรับรอง PS ฉบับแรก เพื่อเสนอผู้มีอำนาจลงนาม", Remark="", HasFile=false },
+                            new { No=8, DateStr="21/04/2569 09:30", Actor="นางสาว วรรณา พิมพ์ทอง", Role="เจ้าหน้าที่พิจารณา", ActionKey="propose_sign", ActionText="เสนอลงนาม", ActionClass="bg-label-primary", Detail="เสนอร่างใบรับรองไปยังผู้ลงนาม: นางสาวพรทิพย์ วงศ์ดี", Remark="กำหนดลงนามภายในวันที่ 22/04/2569", HasFile=false },
+                            new { No=9, DateStr="22/04/2569 10:15", Actor="นางสาวพรทิพย์ วงศ์ดี", Role="ผู้ลงนาม", ActionKey="signed", ActionText="ลงนามอนุมัติ", ActionClass="bg-label-success", Detail="ลงนามอนุมัติใบรับรอง Processing Statement (Original)", Remark="อนุมัติ", HasFile=false },
+                            new { No=10, DateStr="22/04/2569 10:30", Actor="ระบบ", Role="ระบบ", ActionKey="issue_cert", ActionText="ออกใบรับรอง (อัตโนมัติ)", ActionClass="bg-label-success", Detail="ออกเลขที่ใบรับรอง PS-2026-00889 อัตโนมัติ", Remark="เลขที่: PS-2026-00889", HasFile=false },
+                            new { No=11, DateStr="28/04/2569 08:50", Actor="นายมณี ทองแท้", Role="เจ้าหน้าที่ด่าน", ActionKey="inspection", ActionText="ตรวจปล่อยผ่านด่าน", ActionClass="bg-label-success", Detail="ตรวจปล่อย ณ ท่าเรือแหลมฉบัง — น้ำหนัก 14,850 กก.", Remark="ผ่านการตรวจปล่อย", HasFile=false },
+                        };
+                    }
+
+                    <!-- Header + Summary Stats -->
+                    <div class="row g-3 mb-4">
+                        <div class="col">
+                            <h6 class="fw-semibold mb-0" style="font-size:0.88rem;">
+                                <i class="ri ri-history-line me-1 text-primary"></i>ประวัติการดำเนินการทั้งหมด
+                            </h6>
+                            <div class="text-muted small mt-1">คำขอเลขที่ @requestNo — เลขที่รับคำขอ: @receiptNo</div>
+                        </div>
+                        <div class="col-auto d-flex gap-2 align-items-center flex-wrap">
+                            <span class="badge bg-label-secondary px-2 py-1" style="font-size:0.7rem;">
+                                ทั้งหมด @historyLog.Length รายการ
+                            </span>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary btn-sm active" id="btnViewTable" style="font-size:0.75rem;">
+                                    <i class="ri ri-table-line me-1"></i>ตาราง
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="btnViewTimeline" style="font-size:0.75rem;">
+                                    <i class="ri ri-git-branch-line me-1"></i>Timeline
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-outline-success btn-sm" id="btnAddHistoryEntry"
+                                    data-bs-toggle="collapse" data-bs-target="#collapseAddHistory"
+                                    style="font-size:0.75rem;">
+                                <i class="ri ri-add-line me-1"></i>บันทึกรายการใหม่
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary bar -->
+                    <div class="row g-2 mb-4">
+                        @{
+                            var hSubmit   = historyLog.Count(h => h.ActionKey == "submit" || h.ActionKey == "upload_doc");
+                            var hReview   = historyLog.Count(h => h.ActionKey.StartsWith("review"));
+                            var hSign     = historyLog.Count(h => h.ActionKey == "propose_sign" || h.ActionKey == "signed");
+                            var hIssue    = historyLog.Count(h => h.ActionKey == "issue_cert" || h.ActionKey == "inspection");
+                        }
+                        <div class="col-6 col-md-3">
+                            <div class="rounded p-2 text-center" style="background:#f0f9f0;border:1px solid #c3e6cb;font-size:0.78rem;">
+                                <div class="fw-semibold">@hSubmit</div>
+                                <div class="text-muted small">ยื่น/แนบเอกสาร</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="rounded p-2 text-center" style="background:#e8f4fd;border:1px solid #bee5eb;font-size:0.78rem;">
+                                <div class="fw-semibold">@hReview</div>
+                                <div class="text-muted small">พิจารณา</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="rounded p-2 text-center" style="background:#fff3cd;border:1px solid #ffc107;font-size:0.78rem;">
+                                <div class="fw-semibold">@hSign</div>
+                                <div class="text-muted small">เสนอ/ลงนาม</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="rounded p-2 text-center" style="background:#d4edda;border:1px solid #28a745;font-size:0.78rem;">
+                                <div class="fw-semibold">@hIssue</div>
+                                <div class="text-muted small">ออกใบรับรอง/ตรวจปล่อย</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter bar -->
+                    <div class="d-flex gap-2 align-items-center flex-wrap mb-3" style="font-size:0.8rem;">
+                        <label class="mb-0 text-muted">กรองตาม:</label>
+                        <select class="form-select form-select-sm" id="histFilterAction" style="width:auto;">
+                            <option value="">ทุกการกระทำ</option>
+                            <option value="submit">ยื่น/แนบเอกสาร</option>
+                            <option value="review">พิจารณา</option>
+                            <option value="sign">เสนอ/ลงนาม</option>
+                            <option value="issue">ออกใบรับรอง</option>
+                            <option value="request_doc">ขอเอกสารเพิ่ม</option>
+                        </select>
+                        <input type="text" class="form-control form-control-sm" id="histFilterText"
+                               placeholder="ค้นหาผู้ดำเนินการ / รายละเอียด..." style="width:220px;" />
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearHistFilter">
+                            <i class="ri ri-refresh-line"></i>
+                        </button>
+                        <div class="ms-auto">
+                            <span class="text-muted small">แสดง <span id="histVisibleCount">@historyLog.Length</span> / @historyLog.Length รายการ</span>
+                        </div>
+                    </div>
+
+                    <!-- ── TABLE VIEW ── -->
+                    <div id="viewTable">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover align-middle mb-0" style="font-size:0.78rem;" id="historyTable">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th style="width:30px;">#</th>
+                                        <th style="width:120px;">วันที่/เวลา</th>
+                                        <th>ผู้ดำเนินการ</th>
+                                        <th style="width:80px;">บทบาท</th>
+                                        <th style="width:140px;">การกระทำ</th>
+                                        <th>รายละเอียด</th>
+                                        <th style="width:130px;">หมายเหตุ</th>
+                                        <th style="width:40px;">ไฟล์</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var h in historyLog)
+                                    {
+                                        <tr data-action-key="@h.ActionKey" data-actor="@h.Actor.ToLower()" data-detail="@h.Detail.ToLower()">
+                                            <td class="text-center text-muted">@h.No</td>
+                                            <td class="text-center" style="white-space:nowrap;">
+                                                @{
+                                                    var dateParts = h.DateStr.Split(' ');
+                                                }
+                                                <div class="fw-semibold">@dateParts[0]</div>
+                                                @if (dateParts.Length > 1) {
+                                                    <div class="text-muted small">@dateParts[1] น.</div>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="fw-semibold">@h.Actor</div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-label-secondary" style="font-size:0.62rem;">@h.Role</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge @h.ActionClass" style="font-size:0.68rem;">@h.ActionText</span>
+                                            </td>
+                                            <td>@h.Detail</td>
+                                            <td class="text-muted small">
+                                                @if (!string.IsNullOrEmpty(h.Remark)) {
+                                                    <span>@h.Remark</span>
+                                                } else {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                @if (h.HasFile) {
+                                                    <a href="#" class="text-danger" data-bs-toggle="tooltip" title="ดาวน์โหลดไฟล์แนบ">
+                                                        <i class="ri ri-file-pdf-line"></i>
+                                                    </a>
+                                                } else {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr id="historyEmpty" class="d-none">
+                                        <td colspan="8" class="text-center text-muted py-3">ไม่พบรายการที่ตรงกับเงื่อนไข</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ── TIMELINE VIEW ── -->
+                    <div id="viewTimeline" class="d-none">
+                        <div class="timeline-history ps-2" style="font-size:0.82rem;">
+                            @foreach (var h in historyLog)
+                            {
+                                var isLast = h.No == historyLog.Length;
+                                <div class="d-flex gap-3 @(isLast ? "mb-2" : "mb-4")" data-action-key="@h.ActionKey" data-actor="@h.Actor.ToLower()" data-detail="@h.Detail.ToLower()">
+                                    <div class="flex-shrink-0 d-flex flex-column align-items-center" style="width:2rem;">
+                                        <span class="badge @h.ActionClass rounded-circle d-flex align-items-center justify-content-center" style="width:2rem;height:2rem;">
+                                            @{
+                                                var icon = h.ActionKey switch {
+                                                    "submit"         => "ri-upload-2-line",
+                                                    "register"       => "ri-file-add-line",
+                                                    "review_start"   => "ri-search-eye-line",
+                                                    "review_continue"=> "ri-search-eye-line",
+                                                    "request_doc"    => "ri-question-line",
+                                                    "upload_doc"     => "ri-attachment-2",
+                                                    "approve_draft"  => "ri-draft-line",
+                                                    "propose_sign"   => "ri-send-plane-line",
+                                                    "signed"         => "ri-pen-nib-line",
+                                                    "issue_cert"     => "ri-award-line",
+                                                    "inspection"     => "ri-shield-check-line",
+                                                    _                => "ri-checkbox-circle-line"
+                                                };
+                                            }
+                                            <i class="ri @icon"></i>
+                                        </span>
+                                        @if (!isLast) {
+                                            <div class="flex-grow-1 border-start border-2 border-light mt-1" style="min-height:2.5rem;"></div>
+                                        }
+                                    </div>
+                                    <div class="pt-1">
+                                        <div class="fw-semibold">@h.ActionText</div>
+                                        <div class="text-muted small">@h.DateStr น. — @h.Actor
+                                            <span class="badge bg-label-secondary ms-1" style="font-size:0.6rem;">@h.Role</span>
+                                        </div>
+                                        <div class="mt-1 small">@h.Detail</div>
+                                        @if (!string.IsNullOrEmpty(h.Remark)) {
+                                            <div class="mt-1">
+                                                <span class="badge bg-label-light border" style="font-size:0.65rem;color:#555;">
+                                                    <i class="ri ri-chat-1-line me-1"></i>@h.Remark
+                                                </span>
+                                            </div>
+                                        }
+                                        @if (h.HasFile) {
+                                            <div class="mt-1">
+                                                <a href="#" class="small text-danger">
+                                                    <i class="ri ri-file-pdf-line me-1"></i>ดาวน์โหลดไฟล์แนบ
+                                                </a>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- ── บันทึกรายการใหม่ (Add Entry form) ── -->
+                    <div class="collapse mt-4" id="collapseAddHistory">
+                        <div class="card border-success">
+                            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f0fff4;">
+                                <i class="ri ri-add-circle-line text-success"></i>
+                                <span class="fw-semibold small">บันทึกรายการประวัติใหม่</span>
+                            </div>
+                            <div class="card-body" style="font-size:0.82rem;">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">ประเภทการกระทำ <span class="text-danger">*</span></label>
+                                        <select class="form-select form-select-sm" id="newHistActionType">
+                                            <option value="">-- เลือกประเภท --</option>
+                                            <option value="note">บันทึกหมายเหตุ</option>
+                                            <option value="request_doc">ขอเอกสารเพิ่มเติม</option>
+                                            <option value="review_continue">ดำเนินการพิจารณา</option>
+                                            <option value="propose_sign">เสนอลงนาม</option>
+                                            <option value="return">ส่งกลับแก้ไข</option>
+                                            <option value="other">อื่นๆ</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">ผู้ดำเนินการ</label>
+                                        <input type="text" class="form-control form-control-sm" id="newHistActor"
+                                               value="นางสาว วรรณา พิมพ์ทอง" placeholder="ชื่อเจ้าหน้าที่" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">วันที่/เวลา</label>
+                                        <input type="text" class="form-control form-control-sm" id="newHistDate"
+                                               value="28/04/2569 14:00" placeholder="วว/ดด/ปปปป HH:mm" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">ไฟล์แนบ (ถ้ามี)</label>
+                                        <input type="file" class="form-control form-control-sm" id="newHistFile" accept=".pdf,.jpg,.png" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-semibold">รายละเอียด <span class="text-danger">*</span></label>
+                                        <textarea class="form-control form-control-sm" id="newHistDetail" rows="2"
+                                                  placeholder="อธิบายรายละเอียดการดำเนินการ..."></textarea>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">หมายเหตุ</label>
+                                        <textarea class="form-control form-control-sm" id="newHistRemark" rows="2"
+                                                  placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+                                    </div>
+                                    <div class="col-12 d-flex gap-2">
+                                        <button type="button" class="btn btn-success btn-sm" id="btnSaveHistEntry">
+                                            <i class="ri ri-save-line me-1"></i>บันทึกรายการ
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                data-bs-toggle="collapse" data-bs-target="#collapseAddHistory">
+                                            ยกเลิก
+                                        </button>
+                                        <div id="histSaveSuccess" class="d-none ms-2 d-flex align-items-center">
+                                            <span class="badge bg-label-success px-2 py-1 small">
+                                                <i class="ri ri-checkbox-circle-line me-1"></i>บันทึกแล้ว
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /collapseAddHistory -->
+
+                    <div class="d-flex align-items-center gap-2 mt-3">
+                        <span class="badge @(isRegistered ? "bg-label-success" : "bg-label-secondary") @(isRegistered ? "" : "d-none")" id="receiptBadgeHistory">
+                            <i class="ri ri-checkbox-circle-line me-1"></i>รับคำขอแล้ว — <span class="receipt-no-ref">@receiptNo</span>
+                        </span>
+                        <span class="text-muted small ms-auto">
+                            ข้อมูล mockup — ระบบจริงดึงจาก audit_log ในฐานข้อมูล
+                        </span>
+                    </div>
+
+                </div>
+                <!-- /TAB 5 -->
+
+                <!-- ==================== TAB 6: ตรวจสอบลิงก์ข้อมูล ==================== -->
+                <div id="tab-linkcheck" class="tab-pane fade" role="tabpanel">
+                    <div class="pt-3 pb-2">
+
+                        <!-- ─── Section: RMBS1 → RMBS2 ─── -->
+                        <div class="card border mb-4">
+                            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f4f6fb;">
+                                <i class="ri ri-link-m fs-5 text-primary"></i>
+                                <span class="fw-semibold">RMBS1 → RMBS2 (สายการผลิตจากวัตถุดิบ)</span>
+                                <span class="badge bg-label-success ms-auto">เชื่อมโยงแล้ว &#x2705;</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0" style="font-size:0.82rem;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="text-center" style="width:140px;">เลขที่ RMBS1</th>
+                                                <th>ชนิดสัตว์น้ำ</th>
+                                                <th class="text-end" style="width:110px;">น้ำหนักคงเหลือ (kg)</th>
+                                                <th class="text-center" style="width:140px;">เลขที่ RMBS2</th>
+                                                <th>ชนิดผลิตภัณฑ์</th>
+                                                <th class="text-end" style="width:110px;">น้ำหนักผลิต (kg)</th>
+                                                <th class="text-center" style="width:90px;">สถานะ</th>
+                                                <th class="text-center" style="width:70px;">รายละเอียด</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-center"><a href="#" class="text-primary">RMBS1-2569-00042</a></td>
+                                                <td>ปลาทูนา (Bluefin Tuna)</td>
+                                                <td class="text-end">12,450.00</td>
+                                                <td class="text-center"><a href="#" class="text-primary">RMBS2-2569-00131</a></td>
+                                                <td>ปลาทูนากระป๋อง</td>
+                                                <td class="text-end">9,004.50</td>
+                                                <td class="text-center"><span class="badge bg-label-success">เชื่อมโยง &#x2705;</span></td>
+                                                <td class="text-center"><a href="#" class="small"><i class="ri ri-eye-line"></i></a></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center"><a href="#" class="text-primary">RMBS1-2569-00043</a></td>
+                                                <td>ปลาอินทรี</td>
+                                                <td class="text-end">8,200.00</td>
+                                                <td class="text-center"><a href="#" class="text-primary">RMBS2-2569-00132</a></td>
+                                                <td>ปลาอินทรีแช่แข็ง</td>
+                                                <td class="text-end">5,986.00</td>
+                                                <td class="text-center"><span class="badge bg-label-success">เชื่อมโยง &#x2705;</span></td>
+                                                <td class="text-center"><a href="#" class="small"><i class="ri ri-eye-line"></i></a></td>
+                                            </tr>
+                                            <tr class="table-warning">
+                                                <td class="text-center"><a href="#" class="text-primary">RMBS1-2569-00044</a></td>
+                                                <td>ปลาสอด</td>
+                                                <td class="text-end">3,100.00</td>
+                                                <td class="text-center text-muted small">— ยังไม่เชื่อมโยง —</td>
+                                                <td class="text-muted small">ยังไม่ระบุชนิดผลิตภัณฑ์</td>
+                                                <td class="text-end text-muted">—</td>
+                                                <td class="text-center"><span class="badge bg-label-warning">รอเชื่อม &#x26A0;</span></td>
+                                                <td class="text-center"><span class="text-muted small">—</span></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                            <tr>
+                                                <td colspan="2" class="fw-semibold">รวมรายการ RMBS1</td>
+                                                <td class="text-end fw-semibold">23,750.00 kg</td>
+                                                <td colspan="2" class="fw-semibold">รวมรายการ RMBS2</td>
+                                                <td class="text-end fw-semibold">14,990.50 kg</td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Section: ก1 → Pb ─── -->
+                        <div class="card border mb-4">
+                            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f4f6fb;">
+                                <i class="ri ri-links-line fs-5 text-purple"></i>
+                                <span class="fw-semibold">กู1 (ใบอนุญาตทำหนด) → Pb (ตารางสุรุปการผลิต)</span>
+                                <span class="badge bg-label-success ms-auto">เชื่อมโยงแล้ว &#x2705;</span>
+                            </div>
+                            <div class="card-body" style="font-size:0.83rem;">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="p-3 rounded border">
+                                            <div class="fw-semibold mb-2"><i class="ri ri-file-text-line me-1 text-primary"></i>เลขที่ กู1</div>
+                                            <div class="mb-1"><span class="text-muted">เลขที่:</span> <strong>PP-2569-00188</strong></div>
+                                            <div class="mb-1"><span class="text-muted">วันที่อนุญาต:</span> 15/03/2569</div>
+                                            <div><span class="text-muted">ผลผลิตภัณฑ์ที่อนุญาต:</span> ปลาแช่แข็ง / ปลากระป๋อง</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 rounded border border-success">
+                                            <div class="fw-semibold mb-2"><i class="ri ri-file-chart-line me-1 text-success"></i>เอกสาร Pb ที่เชื่อมโยง</div>
+                                            <div class="mb-1"><span class="text-muted">เลขที่ Pb:</span> <strong>Pb-2569-00099</strong></div>
+                                            <div class="mb-1"><span class="text-muted">วันที่อนุมัติ:</span> 20/03/2569</div>
+                                            <div><span class="badge bg-label-success"><i class="ri ri-checkbox-circle-line me-1"></i>พบเอกสาร Pb แล้ว &#x2705;</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Example of missing Pb (commented style reference) -->
+                                <div class="alert alert-secondary py-2 mt-3 small d-flex gap-2 align-items-start">
+                                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                                    <div>กรณีไม่พบเอกสาร Pb: ระบบจะแสดง <span class="badge bg-label-danger">ไม่พบเอกสาร Pb &#x274C;</span> และอนุญาตไม่ให้ออกใบรับรอง</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Section: %Yield ตรวจโรงงาน ─── -->
+                        <div class="card border mb-4">
+                            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f4f6fb;">
+                                <i class="ri ri-bar-chart-line fs-5 text-info"></i>
+                                <span class="fw-semibold">%Yield ผลการตรวจโรงงาน</span>
+                                <span class="badge bg-label-success ms-auto">อยู่ในเกณฑ์ &#x2705;</span>
+                            </div>
+                            <div class="card-body" style="font-size:0.83rem;">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-4">
+                                        <div class="p-3 rounded border text-center">
+                                            <div class="text-muted small mb-1">%Yield อนุมัติโรงงาน</div>
+                                            <div class="fw-bold fs-4 text-primary">72.5%</div>
+                                            <div class="text-muted small">เกณฑ์สูงสุดที่อนุญาต</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="p-3 rounded border text-center">
+                                            <div class="text-muted small mb-1">%Yield จริง (คำนวณจากสำนวนคำขอ)</div>
+                                            <div class="fw-bold fs-4 text-success">71.8%</div>
+                                            <div class="text-muted small">จาก RMBS2 ที่ยื่น</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="p-3 rounded border text-center">
+                                            <div class="text-muted small mb-1">ผลการตรวจสอบ</div>
+                                            <div class="fw-bold fs-5 text-success mt-1">✅ อยู่ในเกณฑ์</div>
+                                            <div class="small text-muted">71.8% &le; 72.5%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0" style="font-size:0.81rem;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>ผลิตภัณฑ์</th>
+                                                <th class="text-end">Input (kg)</th>
+                                                <th class="text-end">Output (kg)</th>
+                                                <th class="text-center">%Yield จริง</th>
+                                                <th class="text-center">%Yield อนุมัติ</th>
+                                                <th class="text-center">ผลตรวจสอบ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>ปลาทูนากระป๋อง</td>
+                                                <td class="text-end">9,004.50</td>
+                                                <td class="text-end">6,570.00</td>
+                                                <td class="text-center">73.0%</td>
+                                                <td class="text-center">75.0%</td>
+                                                <td class="text-center"><span class="badge bg-label-success">ผ่าน &#x2705;</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>ปลาอินทรีแช่แข็ง</td>
+                                                <td class="text-end">5,986.00</td>
+                                                <td class="text-end">4,180.00</td>
+                                                <td class="text-center">69.8%</td>
+                                                <td class="text-center">70.5%</td>
+                                                <td class="text-center"><span class="badge bg-label-success">ผ่าน &#x2705;</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Section: มาตรการประเทศคู่ค้า ─── -->
+                        <div class="card border mb-4">
+                            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f4f6fb;">
+                                <i class="ri ri-global-line fs-5 text-warning"></i>
+                                <span class="fw-semibold">มาตรการประเทศคู่ค้า / เงื่อนไขด่านตรวจประมง</span>
+                                <span class="badge bg-label-success ms-auto">ผ่านมาตรการ &#x2705;</span>
+                            </div>
+                            <div class="card-body" style="font-size:0.83rem;">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-2 fw-semibold"><i class="ri ri-flag-line me-1"></i>ประเทศปลายทาง</div>
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <span class="badge bg-label-primary px-3 py-2">&#x1F1EF;&#x1F1F5; ญี่ปุ่น</span>
+                                            <span class="badge bg-label-info px-3 py-2">&#x1F1FA;&#x1F1F8; สหรัฐอเมริกา</span>
+                                        </div>
+                                        <table class="table table-sm table-bordered" style="font-size:0.8rem;">
+                                            <thead class="table-light"><tr><th>ประเทศ</th><th>มาตรการ</th><th class="text-center">ผล</th></tr></thead>
+                                            <tbody>
+                                                <tr><td>ญี่ปุ่น</td><td>IUU Regulation (MAFF)</td><td class="text-center"><span class="badge bg-label-success">ผ่าน &#x2705;</span></td></tr>
+                                                <tr><td>สหรัฐอเมริกา</td><td>Seafood Import Monitoring Program</td><td class="text-center"><span class="badge bg-label-success">ผ่าน &#x2705;</span></td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-2 fw-semibold"><i class="ri ri-building-4-line me-1"></i>เงื่อนไขด่านตรวจประมง</div>
+                                        <div class="p-3 rounded border border-success">
+                                            <div class="mb-1"><span class="text-muted">ด่านที่แจ้ง:</span> สุวรรณภูมิ</div>
+                                            <div class="mb-1"><span class="text-muted">พนักงานด่าน:</span> นายกว้าง ดีคูณ (สรด็ก)</div>
+                                            <div class="mb-2"><span class="text-muted">ผลการตรวจ:</span> <span class="badge bg-label-success">ผ่าน &#x2705;</span></div>
+                                            <div class="small text-muted">วันที่ตรวจ: 25/04/2569</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Case: ติดมาตรการ -->
+                                <div class="alert alert-secondary py-2 mt-3 small d-flex gap-2 align-items-start">
+                                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                                    <div>กรณีติดมาตรการ: ระบบจะแสดง <span class="badge bg-label-danger">ติดมาตรการ &#x274C;</span> และ ไม่สามารถออกใบรับรองได้</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Section: มาตรการสุขอนามัย ─── -->
+                        <div class="card border mb-4">
+                            <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#f4f6fb;">
+                                <i class="ri ri-shield-check-line fs-5 text-success"></i>
+                                <span class="fw-semibold">มาตรการสุขอนามัย / ใบรับรอง CC</span>
+                                <span class="badge bg-label-success ms-auto">ผ่าน &#x2705;</span>
+                            </div>
+                            <div class="card-body" style="font-size:0.83rem;">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <table class="table table-sm table-bordered mb-0" style="font-size:0.8rem;">
+                                            <thead class="table-light"><tr><th>รายการ</th><th>ข้อมูล</th></tr></thead>
+                                            <tbody>
+                                                <tr><td>เลขที่ CC</td><td><strong>CC-TH-2569-44892</strong></td></tr>
+                                                <tr><td>Validation Date</td><td>30/04/2569</td></tr>
+                                                <tr><td>สถานะ CC</td><td><span class="badge bg-label-success">Active &#x2705;</span></td></tr>
+                                                <tr><td>ประเทศออก</td><td>ญี่ปุ่น / สหรัฐอเมริกา</td></tr>
+                                                <tr><td>IUU</td><td><span class="badge bg-label-success">ไม่ติด IUU &#x2705;</span></td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 rounded border border-success h-100">
+                                            <div class="fw-semibold mb-2"><i class="ri ri-checkbox-circle-line text-success me-1"></i>ผลการประมวลผลมาตรการสุขอนามัย</div>
+                                            <div class="mb-2"><span class="badge bg-label-success px-3 py-2 fs-6">ผ่านทุกมาตรการ &#x2705;</span></div>
+                                            <ul class="small text-muted mb-0 ps-3">
+                                                <li>CC ยังไม่หมดอายุ (Valid until 30/04/2569)</li>
+                                                <li>ไม่ติดรายชื่อ IUU</li>
+                                                <li>ประเทศปลายทางไม่อยู่ในบัญชีดำ เอกสาร Embargo</li>
+                                            </ul>
+                                        </div>
+                                        <!-- Alert for IUU case -->
+                                        <div class="alert alert-secondary py-2 mt-2 small d-flex gap-2 align-items-start mb-0">
+                                            <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                                            <div>กรณีติด IUU: ระบบจะแสดง <span class="badge bg-label-danger">IUU &#x274C;</span> และปิดไม่ให้ออกใบรับรอง</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Summary row ─── -->
+                        <div class="alert alert-success d-flex align-items-center gap-3 py-3 mb-0">
+                            <i class="ri ri-checkbox-circle-fill fs-4 text-success flex-shrink-0"></i>
+                            <div>
+                                <div class="fw-semibold">ผลการตรวจสอบลิงก์ข้อมูล: ผ่านทุกรายการ</div>
+                                <div class="small">ระบบประมวลผลอัตโนมัติเมื่อ 28/04/2569 08:42 น. — RMBS1→2 &#x2705; | กู1→Pb &#x2705; | %Yield &#x2705; | มาตรการประเทศคู่ค้า &#x2705; | สุขอนามัย &#x2705;</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /TAB 6 -->
+
             </div><!-- /tab-content -->
         </div><!-- /nav-align-top -->
 
@@ -653,32 +1846,360 @@
         </div>
         <!-- /accordion ความเห็นเจ้าหน้าที่ -->
 
-        <!-- ===== Action Buttons ===== -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <a href="@Url.Action("IndexIssueCertificate", "Officer")" class="btn btn-outline-secondary">
-                <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
-            </a>
-            <div class="d-flex gap-2">
-                <button type="button" class="btn btn-outline-danger" id="btnReject"
-                    data-bs-toggle="modal" data-bs-target="#modalConfirmAction"
-                    data-action="reject" data-action-text="ปฏิเสธ" data-action-class="btn-danger">
-                    <i class="ri ri-close-circle-line me-1"></i> ปฏิเสธ
-                </button>
-                <button type="button" class="btn btn-outline-warning" id="btnReturn"
-                    data-bs-toggle="modal" data-bs-target="#modalConfirmAction"
-                    data-action="return" data-action-text="ส่งคืนแก้ไข" data-action-class="btn-warning">
-                    <i class="ri ri-reply-line me-1"></i> ส่งคืนแก้ไข
-                </button>
-                <button type="button" class="btn btn-success" id="btnApprove"
-                    data-bs-toggle="modal" data-bs-target="#modalConfirmAction"
-                    data-action="approve" data-action-text="ออกใบรับรอง" data-action-class="btn-success">
-                    <i class="ri ri-checkbox-circle-line me-1"></i> ออกใบรับรอง
-                </button>
+        <!-- ===== Action Bar ===== -->
+        <div class="card border-0 shadow-none bg-light rounded-3 px-3 py-3 mt-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <a href="@Url.Action("IndexIssueCertificate", "Officer")" class="btn btn-outline-secondary btn-sm">
+                    <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </a>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <!-- ลงทะเบียนรับเรื่อง (เฉพาะก่อน register) -->
+                    <button type="button" class="btn btn-primary btn-sm @(isRegistered ? "d-none" : "")"
+                        id="btnActionRegister" data-bs-toggle="modal" data-bs-target="#modalRegisterReceive">
+                        <i class="ri ri-file-add-line me-1"></i>ลงทะเบียนรับเรื่อง
+                    </button>
+                    <!-- แจ้งแก้ไข (ก่อน register เท่านั้น) -->
+                    <button type="button" class="btn btn-outline-warning btn-sm @(isRegistered ? "d-none" : "")"
+                        id="btnActionNotify" data-bs-toggle="modal" data-bs-target="#modalNotifyFixReview">
+                        <i class="ri ri-error-warning-line me-1"></i>แจ้งแก้ไข
+                    </button>
+                    <!-- จัดทำใบรับรอง (หลัง register แล้ว) -->
+                    <button type="button" class="btn btn-info btn-sm text-white @(isRegistered ? "" : "d-none")"
+                        id="btnActionPrepareCert" data-bs-toggle="modal" data-bs-target="#modalPrepareCert">
+                        <i class="ri ri-file-text-line me-1"></i>จัดทำใบรับรอง
+                    </button>
+                    <!-- ดูรายละเอียดแจ้งแก้ไข -->
+                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                        id="btnActionNotifyDetail" data-bs-toggle="modal" data-bs-target="#modalNotifyDetail">
+                        <i class="ri ri-file-damage-line me-1"></i>รายละเอียดแจ้งแก้ไข
+                    </button>
+                    <!-- ดูประวัติ -->
+                    <button type="button" class="btn btn-outline-info btn-sm" id="btnActionHistory"
+                        onclick="document.querySelector('[data-bs-target=\'#tab-history\']')?.click(); window.scrollTo({top:0,behavior:'smooth'});">
+                        <i class="ri ri-history-line me-1"></i>ดูประวัติ
+                    </button>
+                    <!-- ถอยสถานะ (เฉพาะหลัง register แล้ว ใน mockup แสดงเสมอ เพราะ isRegistered=false) -->
+                    <button type="button" class="btn btn-outline-danger btn-sm @(isRegistered ? "" : "d-none")"
+                        id="btnActionRevert" data-bs-toggle="modal" data-bs-target="#modalRevertReview">
+                        <i class="ri ri-arrow-go-back-line me-1"></i>ถอยสถานะ
+                    </button>
+                    <!-- ส่งคืน / ปฏิเสธ / ออกใบรับรอง -->
+                    <button type="button" class="btn btn-outline-warning btn-sm" id="btnReturn"
+                        data-bs-toggle="modal" data-bs-target="#modalConfirmAction"
+                        data-action="return" data-action-text="ส่งคืนแก้ไข" data-action-class="btn-warning">
+                        <i class="ri ri-reply-line me-1"></i>ส่งคืนแก้ไข
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="btnReject"
+                        data-bs-toggle="modal" data-bs-target="#modalConfirmAction"
+                        data-action="reject" data-action-text="ปฏิเสธ" data-action-class="btn-danger">
+                        <i class="ri ri-close-circle-line me-1"></i>ปฏิเสธ
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" id="btnApprove"
+                        data-bs-toggle="modal" data-bs-target="#modalConfirmAction"
+                        data-action="approve" data-action-text="ออกใบรับรอง" data-action-class="btn-success">
+                        <i class="ri ri-checkbox-circle-line me-1"></i>ออกใบรับรอง
+                    </button>
+                </div>
             </div>
         </div>
 
     </div><!-- /col -->
 </div><!-- /row -->
+
+<!-- ==================== Modal: ถอยสถานะ (ReviewProcessing) ==================== -->
+<div class="modal fade" id="modalRevertReview" tabindex="-1" aria-labelledby="modalRevertReviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRevertReviewLabel">
+                    <i class="ri ri-arrow-go-back-line me-1 text-danger"></i> ถอยสถานะกลับ (ก่อนรับคำขอ)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.85rem;">
+                <div class="alert alert-danger py-2 small mb-3 d-flex gap-2 align-items-start">
+                    <i class="ri ri-error-warning-line mt-1 flex-shrink-0"></i>
+                    <div>การถอยสถานะจะยกเลิกเลขที่รับคำขอ <strong id="revertReviewReceiptDisplay">@(string.IsNullOrEmpty(receiptNo) ? "—" : receiptNo)</strong> และเปลี่ยนสถานะกลับเป็น <strong>&ldquo;รอพิจารณา&rdquo;</strong> — ไม่สามารถย้อนกลับได้</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เลขที่คำขอ</label>
+                    <input type="text" class="form-control form-control-sm bg-light" value="@requestNo" readonly disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เหตุผลการถอยสถานะ <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="revertReviewReason" rows="4"
+                        placeholder="ระบุเหตุผลที่ต้องถอยสถานะ เช่น พบข้อผิดพลาดในเอกสาร RMBS1..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">ผู้อนุมัติถอยสถานะ</label>
+                    <input type="text" class="form-control form-control-sm bg-light" value="นางสาว วรรณา พิมพ์ทอง" readonly disabled>
+                </div>
+                <div id="revertReviewSuccess" class="d-none">
+                    <div class="alert alert-warning py-2 d-flex align-items-center gap-2 mb-0">
+                        <i class="ri ri-error-warning-line text-warning fs-5"></i>
+                        <div>
+                            <div class="fw-semibold">ถอยสถานะแล้ว &#x2192; รอพิจารณา &#x26A0;&#xFE0F;</div>
+                            <div class="small">ยกเลิกเลขที่รับคำขอเรียบร้อยแล้ว — คำขอกลับไปในสถานะ <strong>&ldquo;รอพิจารณา&rdquo;</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnConfirmRevertReview">
+                    <i class="ri ri-arrow-go-back-line me-1"></i>ยืนยันถอยสถานะ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal ถอยสถานะ -->
+
+<!-- ==================== Modal: แจ้งแก้ไข (Review page) ==================== -->
+<div class="modal fade" id="modalNotifyFixReview" tabindex="-1" aria-labelledby="modalNotifyFixReviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNotifyFixReviewLabel">
+                    <i class="ri ri-error-warning-line me-1 text-warning"></i> แจ้งแก้ไขผู้ประกอบการ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.85rem;">
+                <div class="alert alert-warning py-2 small mb-3 d-flex gap-2 align-items-start">
+                    <i class="ri ri-information-line mt-1 flex-shrink-0"></i>
+                    <div>ฟังก์ชันนี้ใช้ได้เฉพาะ <strong>ก่อนลงทะเบียนรับคำขอ</strong></div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">เลขที่คำขอ</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="@requestNo" readonly disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ผู้ประกอบการ</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="@submittedBy" readonly disabled>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">รายละเอียดที่ต้องแก้ไข <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="notifyFixReviewDetail" rows="5"
+                            placeholder="ระบุรายละเอียดข้อบกพร่องที่ต้องแก้ไข เช่น เอกสารหน้า 3 RMBS1 ไม่ครบถ้วน..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">แนบหลักฐานประกอบ (ถ้ามี)</label>
+                        <input type="file" class="form-control form-control-sm" id="notifyFixReviewFiles"
+                            accept=".pdf,.jpg,.png,.docx" multiple>
+                        <div class="form-text text-muted">รองรับ PDF, JPG, PNG, DOCX (สูงสุด 10 MB ต่อไฟล์)</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">กำหนดส่งเอกสารคืนภายใน</label>
+                        <input type="text" class="form-control form-control-sm" id="notifyFixReviewDeadline" value="05/05/2569">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ผู้แจ้ง</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="นางสาว วรรณา พิมพ์ทอง" readonly disabled>
+                    </div>
+                </div>
+                <div id="notifyFixReviewSuccess" class="d-none mt-3">
+                    <div class="alert alert-warning py-2 d-flex align-items-center gap-2 mb-0">
+                        <i class="ri ri-error-warning-line text-warning fs-5"></i>
+                        <div><div class="fw-semibold">ส่งกลับแก้ไข &#x26A0;&#xFE0F;</div>
+                        <div class="small">แจ้งเตือนผู้ประกอบการเรียบร้อยแล้ว — รอผู้ประกอบการส่งเอกสารคืนภายในวันที่กำหนด</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-warning btn-sm" id="btnSendNotifyFixReview">
+                    <i class="ri ri-send-plane-2-line me-1"></i>ส่งแจ้งเตือนกลับผู้ประกอบการ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal แจ้งแก้ไข -->
+
+<!-- ==================== Modal: จัดทำใบรับรอง ==================== -->
+<div class="modal fade" id="modalPrepareCert" tabindex="-1" aria-labelledby="modalPrepareCertLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPrepareCertLabel">
+                    <i class="ri ri-file-text-line me-1 text-info"></i> จัดทำใบรับรอง
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.85rem;">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="ri ri-information-line me-1"></i>
+                    ยืนยันการจัดทำใบรับรองสำหรับคำขอ <strong>@requestNo</strong>
+                    เมื่อยืนยันแล้ว สถานะจะเปลี่ยนเป็น <strong>"กำลังจัดทำใบรับรอง 📋"</strong>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">เลขที่คำขอ</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="@requestNo" readonly disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ผู้ประกอบการ</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="@submittedBy" readonly disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ประเภทใบรับรอง</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="Processing Statement (PS)" readonly disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">วันที่จัดทำ</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="28/04/2569" readonly disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">ผู้จัดทำ</label>
+                        <input type="text" class="form-control form-control-sm bg-light" value="นางสาว วรรณา พิมพ์ทอง" readonly disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">หมายเหตุ</label>
+                        <textarea class="form-control form-control-sm" id="prepareCertNote" rows="2" placeholder="ระบุหมายเหตุ (ถ้ามี)..."></textarea>
+                    </div>
+                </div>
+                <div id="prepareCertSuccess" class="d-none mt-3">
+                    <div class="alert alert-info py-2 d-flex align-items-center gap-2 mb-0">
+                        <i class="ri ri-file-text-line text-info fs-5"></i>
+                        <div><div class="fw-semibold">กำลังจัดทำใบรับรอง &#x1F4CB;</div>
+                        <div class="small">เริ่มกระบวนการจัดทำใบรับรองแล้ว — รอผลการพิจารณาขั้นสุดท้าย</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-info btn-sm text-white" id="btnConfirmPrepareCert">
+                    <i class="ri ri-file-text-line me-1"></i>ยืนยันจัดทำใบรับรอง
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal จัดทำใบรับรอง -->
+
+<!-- ==================== Modal: รายละเอียดแจ้งแก้ไข ==================== -->
+<div class="modal fade" id="modalNotifyDetail" tabindex="-1" aria-labelledby="modalNotifyDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNotifyDetailLabel">
+                    <i class="ri ri-file-damage-line me-1 text-secondary"></i> รายละเอียดประวัติแจ้งแก้ไข
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.84rem;">
+                <div class="mb-3">
+                    <div class="fw-semibold mb-2"><i class="ri ri-list-check-3 me-1 text-primary"></i>ประวัติการแจ้งแก้ไขทั้งหมด</div>
+                    <!-- Item 1 -->
+                    <div class="card border border-warning mb-3">
+                        <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#fffbf0;">
+                            <span class="badge bg-label-warning">ครั้งที่ 1</span>
+                            <span class="text-muted small ms-auto">22/04/2569 14:30 น.</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="mb-2">
+                                <span class="text-muted small">รายละเอียดที่แจ้ง:</span>
+                                <div class="mt-1">เอกสาร RMBS1 หน้า 3 ข้อมูลน้ำหนักไม่ตรงกับ IMD — กรุณาแก้ไขและส่งเอกสารใหม่</div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-muted small">ไฟล์แนบ:</span>
+                                <div class="mt-1 d-flex gap-2 flex-wrap">
+                                    <a href="#" class="btn btn-outline-secondary btn-sm py-0 px-2">
+                                        <i class="ri ri-file-pdf-line me-1 text-danger"></i>ตัวอย่างข้อผิดพลาด.pdf
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-muted small">กำหนดส่งคืน:</span> <strong>25/04/2569</strong>
+                                <span class="badge bg-label-success ms-2">ส่งคืนแล้ว ✅</span>
+                            </div>
+                            <div class="mt-1"><span class="text-muted small">ผู้แจ้ง:</span> นางสาว วรรณา พิมพ์ทอง</div>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="card border border-warning mb-0">
+                        <div class="card-header py-2 d-flex align-items-center gap-2" style="background:#fffbf0;">
+                            <span class="badge bg-label-warning">ครั้งที่ 2</span>
+                            <span class="text-muted small ms-auto">26/04/2569 10:15 น.</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="mb-2">
+                                <span class="text-muted small">รายละเอียดที่แจ้ง:</span>
+                                <div class="mt-1">ข้อมูลโควตาใน RMBS2 หน้า 2 ไม่ครบถ้วน — กรุณาเพิ่มข้อมูล lot number</div>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-muted small">ไฟล์แนบ:</span>
+                                <span class="text-muted small fst-italic">— ไม่มีไฟล์แนบ —</span>
+                            </div>
+                            <div>
+                                <span class="text-muted small">กำหนดส่งคืน:</span> <strong>30/04/2569</strong>
+                                <span class="badge bg-label-warning ms-2">รอเอกสาร ⚠️</span>
+                            </div>
+                            <div class="mt-1"><span class="text-muted small">ผู้แจ้ง:</span> นางสาว วรรณา พิมพ์ทอง</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal รายละเอียดแจ้งแก้ไข -->
+
+<!-- ==================== Modal: ลงทะเบียนรับคำขอ ==================== -->
+<div class="modal fade" id="modalRegisterReceive" tabindex="-1" aria-labelledby="modalRegisterReceiveLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRegisterReceiveLabel">
+                    <i class="ri ri-file-add-line me-1 text-primary"></i> ลงทะเบียนรับคำขอ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.85rem;">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="ri ri-information-line me-1"></i>
+                    ยืนยันการลงทะเบียนรับคำขอ <strong>@requestNo</strong><br>
+                    ระบบจะออก <strong>เลขที่รับคำขออัตโนมัติ</strong> เมื่อยืนยัน
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">เลขที่คำขอ</label>
+                    <input type="text" class="form-control form-control-sm bg-light" value="@requestNo" readonly disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">วันที่ลงทะเบียนรับ</label>
+                    <input type="text" class="form-control form-control-sm bg-light" value="28/04/2569" readonly disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">ผู้ลงทะเบียนรับ</label>
+                    <input type="text" class="form-control form-control-sm bg-light" value="นางสาว วรรณา พิมพ์ทอง" readonly disabled>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label fw-semibold">หมายเหตุ (ถ้ามี)</label>
+                    <textarea class="form-control form-control-sm" id="registerReceiveNote" rows="2" placeholder="ระบุหมายเหตุ..."></textarea>
+                </div>
+                <div id="registerReceiveResult" class="d-none mt-3">
+                    <div class="alert alert-success py-2 small mb-0">
+                        <i class="ri ri-checkbox-circle-line me-1"></i>
+                        ลงทะเบียนรับคำขอเรียบร้อยแล้ว —
+                        เลขที่รับคำขอ: <strong id="newReceiptNoText" class="text-primary"></strong>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnConfirmRegisterReceive">
+                    <i class="ri ri-file-add-line me-1"></i>ยืนยันลงทะเบียนรับคำขอ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal ลงทะเบียนรับคำขอ -->
 
 <!-- ==================== Modal: ยืนยันการดำเนินการ ==================== -->
 <div class="modal fade" id="modalConfirmAction" tabindex="-1" aria-labelledby="modalConfirmActionLabel" aria-hidden="true">
@@ -718,9 +2239,345 @@
 </div>
 <!-- /Modal ยืนยัน -->
 
+<!-- ==================== Modal: รายละเอียดตรวจปล่อย (2.4(30)) ==================== -->
+<div class="modal fade" id="modalInspectionDetail" tabindex="-1" aria-labelledby="modalInspectionDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#0dcaf0 0%,#0a94b7 100%);color:#fff;">
+                <h5 class="modal-title" id="modalInspectionDetailLabel">
+                    <i class="ri ri-shield-check-line me-1"></i>รายละเอียดข้อมูลตรวจปล่อยจากด่านประมง
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:.85rem;">
+
+                <!-- Source badge -->
+                <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-3" role="alert">
+                    <i class="ri ri-download-cloud-2-line fs-5 flex-shrink-0"></i>
+                    <div>
+                        ข้อมูลนี้ได้รับจาก <strong>ระบบตรวจปล่อยด่านประมง (Port Inspection System)</strong>
+                        แบบอัตโนมัติ &nbsp;|&nbsp; อัปเดตล่าสุด: <strong>30/04/2569 08:15 น.</strong>
+                    </div>
+                </div>
+
+                <!-- Cert reference -->
+                <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded bg-light border">
+                    <i class="ri ri-award-line text-primary fs-5"></i>
+                    <div>
+                        <div class="fw-semibold">ใบรับรอง: <span style="font-family:monospace;color:#1a3c6d;">PS-2569-00901</span></div>
+                        <div class="text-muted small">Processing Statement — บริษัท ซีฟู้ด อินเตอร์เนชั่นแนล จำกัด</div>
+                    </div>
+                </div>
+
+                <!-- Grid: inspection detail -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-map-pin-line me-1 text-danger"></i>
+                                <span class="fw-semibold small">ข้อมูลด่านตรวจปล่อย</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">ด่านตรวจ</td><td class="fw-semibold">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง</td></tr>
+                                    <tr><td class="text-muted">รหัสด่าน</td><td style="font-family:monospace;">PORT-LC-01</td></tr>
+                                    <tr><td class="text-muted">จังหวัด</td><td>ชลบุรี</td></tr>
+                                    <tr><td class="text-muted">เลขที่อ้างอิงด่าน</td><td style="font-family:monospace;">PORT-2569-LC-04301</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-user-star-line me-1 text-primary"></i>
+                                <span class="fw-semibold small">เจ้าหน้าที่ผู้ตรวจ</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">ชื่อ-นามสกุล</td><td class="fw-semibold">นายมณี ทองแท้</td></tr>
+                                    <tr><td class="text-muted">ตำแหน่ง</td><td>เจ้าหน้าที่ด่านตรวจปล่อย อาวุโส</td></tr>
+                                    <tr><td class="text-muted">วันที่ตรวจ</td><td>30/04/2569</td></tr>
+                                    <tr><td class="text-muted">เวลา</td><td class="fw-semibold text-success">08:15 น.</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-scales-3-line me-1 text-warning"></i>
+                                <span class="fw-semibold small">น้ำหนักและปริมาณ</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">น้ำหนักตามใบรับรอง</td><td>12,450.00 กก.</td></tr>
+                                    <tr><td class="text-muted">น้ำหนักตรวจปล่อยจริง</td><td class="fw-semibold text-primary">14,850.00 กก.</td></tr>
+                                    <tr><td class="text-muted">ผลต่าง</td><td class="text-success">+2,400.00 กก.</td></tr>
+                                    <tr><td class="text-muted">จำนวนหีบห่อ</td><td>1,485 กล่อง</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border h-100">
+                            <div class="card-header py-2" style="background:#f4f6fb;">
+                                <i class="ri ri-truck-line me-1 text-success"></i>
+                                <span class="fw-semibold small">การขนส่งและเรือ</span>
+                            </div>
+                            <div class="card-body py-2">
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr><td class="text-muted w-50">ชื่อเรือ / พาหนะ</td><td class="fw-semibold">MV. OCEAN STAR III</td></tr>
+                                    <tr><td class="text-muted">เลขที่ตู้สินค้า</td><td style="font-family:monospace;">TGBU4829371</td></tr>
+                                    <tr><td class="text-muted">ท่าเรือต้นทาง</td><td>แหลมฉบัง (THLCH)</td></tr>
+                                    <tr><td class="text-muted">ท่าเรือปลายทาง</td><td>โยโกฮาม่า (JPYOK)</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ผลการตรวจปล่อย -->
+                <div class="p-3 rounded border border-success-subtle" style="background:#f0fdf4;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="ri ri-checkbox-circle-fill text-success fs-4"></i>
+                        <span class="fw-bold text-success fs-6">ผลการตรวจปล่อย: ผ่าน ✅</span>
+                    </div>
+                    <div class="row g-2 small">
+                        <div class="col-md-6">
+                            <span class="text-muted">หมายเหตุจากด่าน:</span>
+                            <span class="ms-1">ตรวจปล่อย ณ ท่าเรือแหลมฉบัง — น้ำหนัก 14,850 กก. ผ่านการตรวจปล่อย</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted">เลขที่รายงานตรวจปล่อย:</span>
+                            <span class="ms-1 fw-semibold" style="font-family:monospace;">RPT-2569-LC-00431</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-outline-info btn-sm" onclick="window.print()">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์รายละเอียด
+                </button>
+                <button type="button" class="btn btn-info text-white btn-sm">
+                    <i class="ri ri-download-2-line me-1"></i>ดาวน์โหลดรายงาน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal รายละเอียดตรวจปล่อย -->
+
+<!-- ==================== Modal: ส่งข้อมูลใบรับรองไปด่านตรวจปล่อย (2.4(31)) ==================== -->
+<div class="modal fade" id="modalSendToPort" tabindex="-1" aria-labelledby="modalSendToPortLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#198754 0%,#157347 100%);color:#fff;">
+                <h5 class="modal-title" id="modalSendToPortLabel">
+                    <i class="ri ri-upload-cloud-2-line me-1"></i>ส่งข้อมูลใบรับรองไปยังด่านตรวจปล่อย
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size:.85rem;">
+
+                <!-- Info alert -->
+                <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-3" role="alert">
+                    <i class="ri ri-information-line fs-5 flex-shrink-0"></i>
+                    <div>
+                        ระบบจะส่งข้อมูลใบรับรอง PS/NMD นี้ไปยัง <strong>ระบบด่านตรวจปล่อยประมง</strong> โดยอัตโนมัติ
+                        เพื่อให้เจ้าหน้าที่ด่านสามารถตรวจสอบสินค้าได้ก่อนส่งออก
+                    </div>
+                </div>
+
+                <!-- ข้อมูลใบรับรองที่จะส่ง -->
+                <div class="card border mb-3">
+                    <div class="card-header py-2" style="background:#f4f6fb;">
+                        <i class="ri ri-award-line me-1 text-success"></i>
+                        <span class="fw-semibold small">ข้อมูลใบรับรองที่จะส่ง</span>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="small text-muted">เลขที่ใบรับรอง</div>
+                                <div class="fw-bold" style="font-family:monospace;font-size:1.05rem;color:#1a3c6d;">PS-2569-00901</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">ประเภทใบรับรอง</div>
+                                <div class="fw-semibold">Processing Statement (PS)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">ผู้ประกอบการ / บริษัท</div>
+                                <div class="fw-semibold">บริษัท ซีฟู้ด อินเตอร์เนชั่นแนล จำกัด</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">สินค้า</div>
+                                <div class="fw-semibold">ทูน่ากระป๋อง (Canned Tuna in Oil)</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">น้ำหนักตามใบรับรอง (กก.)</div>
+                                <div class="fw-semibold text-primary">12,450.00</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">วันที่ส่งออก</div>
+                                <div class="fw-semibold">02/05/2569</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">ประเทศปลายทาง</div>
+                                <div class="fw-semibold">ญี่ปุ่น (JP)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- เลือกด่านปลายทาง -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="ri ri-map-pin-line me-1 text-danger"></i>ด่านตรวจปล่อยปลายทาง
+                        <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select form-select-sm" id="selectTargetPort">
+                        <option value="LC" selected>ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง (PORT-LC-01)</option>
+                        <option value="BKK">ด่านตรวจสัตว์น้ำ ท่าอากาศยานสุวรรณภูมิ (PORT-BKK-01)</option>
+                        <option value="PKT">ด่านตรวจสัตว์น้ำ ท่าเรือภูเก็ต (PORT-PKT-01)</option>
+                        <option value="SGK">ด่านตรวจสัตว์น้ำ ท่าเรือสงขลา (PORT-SGK-01)</option>
+                    </select>
+                    <div class="form-text">ด่านตรวจปล่อยที่สินค้าจะผ่าน ก่อนส่งออก</div>
+                </div>
+
+                <!-- หมายเหตุ -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">หมายเหตุ (ถ้ามี)</label>
+                    <textarea class="form-control form-control-sm" id="sendToPortRemark" rows="2"
+                        placeholder="ระบุข้อความพิเศษหรือคำแนะนำสำหรับเจ้าหน้าที่ด่าน"></textarea>
+                </div>
+
+                <!-- ยืนยัน -->
+                <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-0" role="alert">
+                    <i class="ri ri-alert-line fs-5 flex-shrink-0 text-warning"></i>
+                    <div class="small">
+                        <strong>หมายเหตุ:</strong> เมื่อยืนยันการส่งแล้ว ระบบด่านจะได้รับข้อมูลทันที
+                        และเจ้าหน้าที่ด่านจะดำเนินการตรวจปล่อยสินค้าตามข้อมูลนี้
+                    </div>
+                </div>
+
+                <!-- spinner (hidden) -->
+                <div id="sendToPortSpinner" class="d-none text-center py-3">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">กำลังส่ง...</span>
+                    </div>
+                    <div class="mt-2 text-success fw-semibold">กำลังส่งข้อมูลไปยังระบบด่าน...</div>
+                </div>
+
+                <!-- success (hidden) -->
+                <div id="sendToPortSuccess" class="d-none mt-3 p-3 rounded bg-success bg-opacity-10 border border-success-subtle text-center">
+                    <i class="ri ri-checkbox-circle-fill text-success fs-3"></i>
+                    <div class="fw-bold text-success mt-1">ส่งข้อมูลสำเร็จ!</div>
+                    <div class="small text-muted mt-1" id="sendSuccessDetail">ด่านตรวจสัตว์น้ำ ท่าเรือแหลมฉบัง รับข้อมูลแล้ว เมื่อ 28/04/2569 14:22 น.</div>
+                </div>
+
+            </div>
+            <div class="modal-footer" id="sendToPortFooter">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success" id="btnConfirmSendToPort">
+                    <i class="ri ri-send-plane-2-line me-1"></i>ยืนยันส่งข้อมูลไปด่านตรวจปล่อย
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal ส่งข้อมูลใบรับรองไปด่านตรวจปล่อย -->
+
 @section PageScripts {
 <script>
     $(document).ready(function () {
+
+        // ── 2.4(30): ปุ่มดึงข้อมูลใหม่จากด่าน ──
+        $('#btnSyncFromPort').on('click', function () {
+            var $btn = $(this);
+            var orig = $btn.html();
+            $btn.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>กำลังดึง...').prop('disabled', true);
+            setTimeout(function () {
+                $btn.html(orig).prop('disabled', false);
+                // TODO: call API to sync inspection data from port system
+                alert('ข้อมูลตรวจปล่อยล่าสุดแล้ว (Mockup)');
+            }, 1500);
+        });
+
+        // ── 2.4(31): Demo toggle สถานะ Push to Port ──
+        var _pushSentState = true; // default: ส่งแล้ว
+        $('#btnTogglePushDemo').on('click', function () {
+            _pushSentState = !_pushSentState;
+            if (_pushSentState) {
+                // สถานะ: ส่งแล้ว
+                $('#badgePushSent').removeClass('d-none');
+                $('#badgePushPending').addClass('d-none');
+                $('#btnResendToPort').removeClass('d-none');
+                $('#btnFirstSendToPort').addClass('d-none');
+            } else {
+                // สถานะ: ยังไม่ส่ง
+                $('#badgePushSent').addClass('d-none');
+                $('#badgePushPending').removeClass('d-none');
+                $('#btnResendToPort').addClass('d-none');
+                $('#btnFirstSendToPort').removeClass('d-none');
+            }
+        });
+
+        // ── 2.4(31): ยืนยันส่งข้อมูลไปด่าน ──
+        $('#btnConfirmSendToPort').on('click', function () {
+            var $form = $('#selectTargetPort, #sendToPortRemark');
+            // show spinner
+            $form.prop('disabled', true);
+            $(this).prop('disabled', true);
+            $('#sendToPortFooter button').prop('disabled', true);
+            $('#sendToPortSpinner').removeClass('d-none');
+            setTimeout(function () {
+                $('#sendToPortSpinner').addClass('d-none');
+                var portName = $('#selectTargetPort option:selected').text().split(' (')[0];
+                var now = new Date();
+                var thYear = now.getFullYear() + 543;
+                var pad = function(n){ return String(n).padStart(2,'0'); };
+                var ts = pad(now.getDate()) + '/' + pad(now.getMonth()+1) + '/' + thYear
+                       + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' น.';
+                $('#sendSuccessDetail').text(portName + ' รับข้อมูลแล้ว เมื่อ ' + ts);
+                $('#sendToPortSuccess').removeClass('d-none');
+                $('#sendToPortFooter').html(
+                    '<button type="button" class="btn btn-success" data-bs-dismiss="modal" id="btnDoneAfterSend">'
+                  + '<i class="ri ri-checkbox-circle-fill me-1"></i>เสร็จสิ้น</button>'
+                );
+                // update badge in header + panel
+                _pushSentState = true;
+                $('#badgePushSent').text('').html(
+                    '<i class="ri ri-checkbox-circle-fill me-1"></i>ส่งข้อมูลแล้ว ✅ เมื่อ ' + ts
+                ).removeClass('d-none');
+                $('#badgePushPending').addClass('d-none');
+                $('#badgeSentToInspection').removeClass('d-none');
+                $('#btnFirstSendToPort').addClass('d-none');
+                $('#btnResendToPort').removeClass('d-none');
+                $('#pushSentTimestamp').text(ts);
+                // TODO: call API to send cert data to port system
+            }, 2000);
+        });
+
+        // reset modal state on close
+        $('#modalSendToPort').on('hidden.bs.modal', function () {
+            $('#sendToPortSpinner').addClass('d-none');
+            $('#sendToPortSuccess').addClass('d-none');
+            $('#selectTargetPort, #sendToPortRemark').prop('disabled', false);
+            $('#sendToPortFooter').html(
+                '<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>'
+              + '<button type="button" class="btn btn-success" id="btnConfirmSendToPort">'
+              + '<i class="ri ri-send-plane-2-line me-1"></i>ยืนยันส่งข้อมูลไปด่านตรวจปล่อย</button>'
+            );
+            // re-bind confirm button after DOM replacement
+            $(document).off('click', '#btnConfirmSendToPort').on('click', '#btnConfirmSendToPort', function () {
+                $('#modalSendToPort').trigger('confirmSend');
+            });
+        });
+        $(document).on('click', '#btnConfirmSendToPort', function () {
+            $('#modalSendToPort').find('#btnConfirmSendToPort').trigger('click');
+        });
 
         // ── Toggle sub-row (expand/collapse) ──
         $(document).on('click', '.btn-toggle-sub', function () {
@@ -756,6 +2613,227 @@
             // Placeholder feedback
             alert('ดำเนินการเรียบร้อยแล้ว');
         });
+
+        // ── RMBS2/P2 Grouping Tab ──
+        $('#chkSelectAllGroup').on('change', function () {
+            $('.chk-group').prop('checked', $(this).is(':checked'));
+        });
+
+        $('#btnMergeAll').on('click', function () {
+            // Simulate: mark all mergeable rows as merged
+            $('.chk-group').each(function () {
+                var group = $(this).data('group');
+                var $row = $(this).closest('tr');
+                if (group !== 'D') {
+                    // already merged, just highlight
+                    $row.find('.badge.bg-label-warning').replaceWith('<span class="badge bg-label-success"><i class="ri ri-check-line me-1"></i>รวมแล้ว &#x2705;</span>');
+                }
+            });
+            $(this).prop('disabled', true).html('<i class="ri ri-check-double-line me-1"></i>รวมแล้ว');
+            // TODO: call API to merge RMBS2/P2 records
+        });
+
+        $('#btnConfirmGrouping').on('click', function () {
+            // TODO: confirm grouping and proceed to certificate creation
+            alert('ยืนยันการรวมรายการเรียบร้อยแล้ว สามารถสร้างใบรับรองได้');
+        });
+
+        $('#btnResetGrouping').on('click', function () {
+            location.reload();
+        });
+
+        // ── ลงทะเบียนรับคำขอ ──
+        $('#btnConfirmRegisterReceive').on('click', function () {
+            var newNo = 'รบ. 2026-00' + (Math.floor(Math.random() * 50) + 900);
+            document.getElementById('newReceiptNoText').textContent = newNo;
+            document.getElementById('registerReceiveResult').classList.remove('d-none');
+            $(this).prop('disabled', true);
+            // Update status banner
+            $('#bannerReceiptNo').text(newNo);
+            $('#receiptNoBanner').removeClass('d-none');
+            $('#btnOpenRegister').remove();
+            // Show จัดทำใบรับรอง, hide ลงทะเบียน+แจ้งแก้ไข
+            $('#btnActionRegister, #btnActionNotify').addClass('d-none');
+            $('#btnActionPrepareCert').removeClass('d-none');
+            // Update status badge
+            $('#bannerStatusBadge').removeClass().addClass('badge bg-label-primary rounded-pill px-3 py-2 fs-6');
+            $('#bannerStatusText').text('รับคำขอแล้ว');
+            // Show next-step flow
+            $('#nextStepFlow').removeClass('d-none');
+            // Update history tab
+            $('#histStepRegIcon').removeClass('bg-label-secondary').addClass('bg-label-primary');
+            $('#histStepRegTitle').text('ลงทะเบียนรับคำขอแล้ว');
+            $('#histStepRegDate').text('28/04/2569 — เจ้าหน้าที่ระบบ');
+            $('#histStepRegNo').html('<span class="badge bg-label-primary">เลขที่รับคำขอ: ' + newNo + '</span>');
+            $('#receiptBadgeHistory').removeClass('d-none').find('.receipt-no-ref').text(newNo);
+            // TODO: submit form or call API
+        });
+
+        // ── ปรับน้ำหนักส่งออก (≤ ที่ขอ) ──
+        (function () {
+            var MAX_WEIGHT = 12450; // mock — น้ำหนักที่ขอตามใบรับรอง (กก.)
+            var weightInput = document.getElementById('adjustedWeightKg');
+            var exceedAlert = document.getElementById('weightExceedAlert');
+            var okMsg = document.getElementById('weightOkMsg');
+            if (!weightInput) return;
+            weightInput.addEventListener('input', function () {
+                var val = parseFloat(this.value);
+                var exceed = !isNaN(val) && val > MAX_WEIGHT;
+                exceedAlert.classList.toggle('d-none', !exceed);
+                okMsg.classList.add('d-none');
+            });
+            document.getElementById('btnConfirmAdjustWeight').addEventListener('click', function () {
+                var val = parseFloat(weightInput.value);
+                if (isNaN(val) || val <= 0) { alert('กรุณาระบุน้ำหนักที่ถูกต้อง'); return; }
+                if (val > MAX_WEIGHT) {
+                    exceedAlert.classList.remove('d-none');
+                    return;
+                }
+                exceedAlert.classList.add('d-none');
+                okMsg.classList.remove('d-none');
+                // TODO: submit form or call API — adjust export weight
+            });
+        })();
+
+        // ── ถอยสถานะ (ReviewProcessing) ──
+        $('#btnConfirmRevertReview').on('click', function () {
+            var reason = $('#revertReviewReason').val().trim();
+            if (!reason) { alert('กรุณาระบุเหตุผลการถอยสถานะ'); return; }
+            document.getElementById('revertReviewSuccess').classList.remove('d-none');
+            $(this).prop('disabled', true);
+            // Update status badge
+            $('#bannerStatusBadge').removeClass().addClass('badge bg-label-warning rounded-pill px-3 py-2 fs-6');
+            $('#bannerStatusText').text('รอพิจารณา');
+            // Swap buttons
+            $('#btnActionRevert').addClass('d-none');
+            $('#btnActionPrepareCert').addClass('d-none');
+            $('#btnActionRegister, #btnActionNotify').removeClass('d-none');
+            // TODO: submit form or call API — revert status
+        });
+
+        // ── แจ้งแก้ไข (Review page) ──
+        $('#btnSendNotifyFixReview').on('click', function () {
+            var detail = $('#notifyFixReviewDetail').val().trim();
+            if (!detail) { alert('กรุณาระบุรายละเอียดที่ต้องแก้ไข'); return; }
+            document.getElementById('notifyFixReviewSuccess').classList.remove('d-none');
+            $(this).prop('disabled', true);
+            // TODO: submit form or call API — notify fix to operator
+        });
+
+        // ── จัดทำใบรับรอง ──
+        $('#btnConfirmPrepareCert').on('click', function () {
+            document.getElementById('prepareCertSuccess').classList.remove('d-none');
+            $(this).prop('disabled', true);
+            // Update status badge
+            $('#bannerStatusBadge').removeClass().addClass('badge bg-label-info rounded-pill px-3 py-2 fs-6');
+            $('#bannerStatusText').html('กำลังจัดทำใบรับรอง &#x1F4CB;');
+            // Update next-step flow
+            $('#nextStepCertBadge').removeClass('bg-label-info').addClass('bg-label-success');
+            $('#nextStepCertText').html('จัดทำใบรับรอง &#x2705;');
+            $('#nextStepApproveBadge').removeClass('bg-label-secondary').addClass('bg-label-warning');
+            $('#nextStepHint').addClass('d-none');
+            $('#nextStepDone').removeClass('d-none');
+            // Hide จัดทำ button, show approve
+            $('#btnActionPrepareCert').addClass('d-none');
+            // TODO: submit form or call API — prepare certificate
+        });
+
+        // ── ประวัติการดำเนินการ (2.4(21)) ──
+        (function () {
+            var btnTable    = document.getElementById('btnViewTable');
+            var btnTimeline = document.getElementById('btnViewTimeline');
+            var viewTable   = document.getElementById('viewTable');
+            var viewTL      = document.getElementById('viewTimeline');
+            if (!btnTable) return;
+
+            // Toggle table / timeline
+            btnTable.addEventListener('click', function () {
+                viewTable.classList.remove('d-none');
+                viewTL.classList.add('d-none');
+                btnTable.classList.add('active');
+                btnTimeline.classList.remove('active');
+            });
+            btnTimeline.addEventListener('click', function () {
+                viewTable.classList.add('d-none');
+                viewTL.classList.remove('d-none');
+                btnTimeline.classList.add('active');
+                btnTable.classList.remove('active');
+            });
+
+            // Filter
+            var actionFilter = document.getElementById('histFilterAction');
+            var textFilter   = document.getElementById('histFilterText');
+            var visibleCountEl = document.getElementById('histVisibleCount');
+            var emptyRow     = document.getElementById('historyEmpty');
+
+            function applyHistFilter() {
+                var act  = (actionFilter.value || '').toLowerCase();
+                var txt  = (textFilter.value || '').trim().toLowerCase();
+                var rows = document.querySelectorAll('#historyTable tbody tr[data-action-key]');
+                var tl   = document.querySelectorAll('#viewTimeline [data-action-key]');
+                var vis  = 0;
+                var actMap = { 'submit':'submit|upload_doc', 'review':'review_start|review_continue', 'sign':'propose_sign|signed', 'issue':'issue_cert|inspection', 'request_doc':'request_doc' };
+                var actPattern = act ? (actMap[act] || act) : '';
+
+                rows.forEach(function (row) {
+                    var rowAct    = row.dataset.actionKey || '';
+                    var rowActor  = row.dataset.actor     || '';
+                    var rowDetail = row.dataset.detail    || '';
+                    var actMatch  = !actPattern || actPattern.split('|').some(function (p) { return rowAct.includes(p); });
+                    var txtMatch  = !txt || rowActor.includes(txt) || rowDetail.includes(txt);
+                    var show = actMatch && txtMatch;
+                    row.classList.toggle('d-none', !show);
+                    if (show) vis++;
+                });
+                tl.forEach(function (item) {
+                    var rowAct    = item.dataset.actionKey || '';
+                    var rowActor  = item.dataset.actor     || '';
+                    var rowDetail = item.dataset.detail    || '';
+                    var actMatch  = !actPattern || (actMap[act]||act).split('|').some(function (p) { return rowAct.includes(p); });
+                    var txtMatch  = !txt || rowActor.includes(txt) || rowDetail.includes(txt);
+                    item.classList.toggle('d-none', !(actMatch && txtMatch));
+                });
+                if (emptyRow) emptyRow.classList.toggle('d-none', vis !== 0);
+                if (visibleCountEl) visibleCountEl.textContent = vis;
+            }
+
+            actionFilter.addEventListener('change', applyHistFilter);
+            textFilter.addEventListener('input', applyHistFilter);
+            var btnClearHist = document.getElementById('btnClearHistFilter');
+            if (btnClearHist) {
+                btnClearHist.addEventListener('click', function () {
+                    actionFilter.value = '';
+                    textFilter.value   = '';
+                    applyHistFilter();
+                });
+            }
+
+            // Add entry
+            var btnSaveEntry = document.getElementById('btnSaveHistEntry');
+            if (btnSaveEntry) {
+                btnSaveEntry.addEventListener('click', function () {
+                    var actionType = document.getElementById('newHistActionType').value;
+                    var detail     = document.getElementById('newHistDetail').value.trim();
+                    if (!actionType || !detail) { alert('กรุณาเลือกประเภทการกระทำและระบุรายละเอียด'); return; }
+                    document.getElementById('histSaveSuccess').classList.remove('d-none');
+                    this.disabled = true;
+                    setTimeout(function () {
+                        document.getElementById('histSaveSuccess').classList.add('d-none');
+                        document.getElementById('btnSaveHistEntry').disabled = false;
+                        document.getElementById('newHistDetail').value = '';
+                        document.getElementById('newHistRemark').value = '';
+                        document.getElementById('newHistActionType').value = '';
+                        // TODO: submit form or call API — save new history entry
+                    }, 2500);
+                });
+            }
+
+            // Auto-open tab if URL hash is #tab-history
+            if (window.location.hash === '#tab-history') {
+                var tabBtn = document.querySelector('[data-bs-target="#tab-history"]');
+                if (tabBtn) tabBtn.click();
+            }
+        })();
 
     });
 </script>

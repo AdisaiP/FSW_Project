@@ -1,0 +1,14 @@
+# (3) กำหนดลายมือชื่ออิเล็กทรอนิกส์ + แสดงบนใบรับรองอัตโนมัติ
+
+URL: http://localhost:5055/Admin/CertificateTemplate
+
+จำนวนรูปที่ต้องแคป: 3 รูป
+
+รายการหน้าที่ต้องแคป
+1. Modal field builder > field 'ลายมือชื่อผู้รับรอง' (Type=signature) + ปุ่ม 'ตั้งค่า' (ri-pen-nib-line)
+   sub-panel 'ตั้งค่าลายมือชื่ออิเล็กทรอนิกส์':
+   - select ผู้ลงนาม (3 ตัวเลือก) + card ชื่อ/ตำแหน่ง/หน่วยงาน + toggle 'ประทับอัตโนมัติ'
+2. Modal #modalPreview > footer section
+   - placeholder ลายมือชื่อ (dashed box) + ชื่อ/ตำแหน่ง/หน่วยงานผู้ลงนาม
+   - placeholder ตราประทับ (วงกลม dashed + ri-seal-line)
+3. badge 'ประทับอัตโนมัติเมื่อออกใบรับรอง (auto-stamp)' สีเขียว + ชื่อผู้ลงนาม

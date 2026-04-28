@@ -453,7 +453,125 @@
                 <!-- ==================== TAB 3: สร้างหนังสือรับรองแหล่งที่มาของปลาป่น ==================== -->
                 <div id="tab-fishmeal" class="tab-pane fade" role="tabpanel">
 
-                    <div class="alert alert-success d-flex align-items-start gap-3 mb-4" role="alert">
+                    <!-- TOR 1.6(19.2): P1 Reference Banner -->
+                    <div class="alert alert-secondary d-flex align-items-start gap-2 py-2 mb-3" style="font-size:0.82rem;">
+                        <i class="ri ri-file-paper-line fs-5 flex-shrink-0 mt-1"></i>
+                        <div>
+                            <strong>ที่มาของเศษเหลือ (P1):</strong>
+                            อ้างอิง P1 <span class="text-primary fw-semibold">P1-2569-00046</span>
+                            &nbsp;|&nbsp; หนังสือกำกับ <span class="text-primary fw-semibold">SCR-2569-0003</span>
+                            &nbsp;|&nbsp; น้ำหนักเศษเหลือที่ซื้อ: <strong>750.000 กก.</strong>
+                            &nbsp;|&nbsp; ประเภท: กระดูก/ก้าง + เครื่องใน
+                        </div>
+                    </div>
+
+                    <!-- TOR 1.6(19.2): ข้อมูลสายการส่ง (Chain) -->
+                    <div class="card border mb-3">
+                        <div class="card-header py-2 d-flex align-items-center justify-content-between" style="background:#e3f2fd;">
+                            <span class="fw-semibold small text-primary">
+                                <i class="ri ri-git-fork-line me-1"></i>เส้นทางข้อมูลไประบบปลาป่น
+                            </span>
+                            <span class="badge bg-label-warning small">รอส่ง</span>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:0.82rem;">
+                                <div class="text-center px-2 py-1 bg-light rounded border">
+                                    <div class="small text-muted">RMBS1</div>
+                                    <div class="fw-semibold text-primary" style="font-size:0.78rem;">10604204211700000093</div>
+                                </div>
+                                <i class="ri ri-arrow-right-line text-muted"></i>
+                                <div class="text-center px-2 py-1 bg-light rounded border">
+                                    <div class="small text-muted">P1</div>
+                                    <div class="fw-semibold text-primary" style="font-size:0.78rem;">P1-2569-00046</div>
+                                </div>
+                                <i class="ri ri-arrow-right-line text-muted"></i>
+                                <div class="text-center px-2 py-1 bg-light rounded border">
+                                    <div class="small text-muted">เศษเหลือ (Scrap)</div>
+                                    <div class="fw-semibold text-secondary" style="font-size:0.78rem;">SCR-2569-0003</div>
+                                </div>
+                                <i class="ri ri-arrow-right-line text-muted"></i>
+                                <div class="text-center px-2 py-1 rounded border border-info" style="background:#e3f9ff;">
+                                    <div class="small text-muted">หนังสือรับรองปลาป่น</div>
+                                    <div class="fw-semibold text-info" style="font-size:0.78rem;">(รอสร้าง)</div>
+                                </div>
+                            </div>
+                            <!-- ข้อมูลที่จะส่ง -->
+                            <div class="row g-2 mt-2" style="font-size:0.81rem;">
+                                <div class="col-12">
+                                    <div class="fw-semibold text-muted mb-1">ข้อมูลที่ระบบจะส่งไประบบปลาป่น:</div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge bg-label-primary">เลขที่ RMBS1:PS</span>
+                                        <span class="badge bg-label-primary">ชื่อสัตว์น้ำ / ชนิด</span>
+                                        <span class="badge bg-label-primary">วันที่ผลิต / รุ่นการผลิต</span>
+                                        <span class="badge bg-label-primary">น้ำหนักเศษเหลือ (กก.)</span>
+                                        <span class="badge bg-label-primary">ผู้ขาย (สถานประกอบการ)</span>
+                                        <span class="badge bg-label-primary">ผู้ซื้อ (โรงงานปลาป่น)</span>
+                                        <span class="badge bg-label-secondary">เลขที่ IMD อ้างอิง</span>
+                                        <span class="badge bg-label-secondary">เลขที่ P1 อ้างอิง</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOR 1.6(19.2): สถานะการส่งข้อมูล -->
+                    <div class="card border mb-3">
+                        <div class="card-header py-2" style="background:#e3f2fd;">
+                            <span class="fw-semibold small text-primary">
+                                <i class="ri ri-send-plane-line me-1"></i>สถานะการส่งข้อมูลไประบบปลาป่น
+                            </span>
+                        </div>
+                        <div class="card-body py-2">
+                            <table class="table table-bordered table-sm small mb-2">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th style="width:3rem;">#</th>
+                                        <th class="text-start">ขั้นตอน</th>
+                                        <th style="width:9rem;">สถานะ</th>
+                                        <th style="width:9rem;">วันที่</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center">1</td>
+                                        <td>ยืนยันรับซื้อ</td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-circle bg-success d-inline-flex align-items-center justify-content-center me-1" style="width:14px;height:14px;">
+                                            </span>เสร็จแล้ว
+                                        </td>
+                                        <td class="text-center">28/04/2569</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">2</td>
+                                        <td>สร้างหนังสือรับรองปลาป่น</td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-circle bg-warning d-inline-flex align-items-center justify-content-center me-1" style="width:14px;height:14px;">
+                                            </span>รอดำเนินการ
+                                        </td>
+                                        <td class="text-center text-muted">—</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">3</td>
+                                        <td>ส่งข้อมูลไประบบปลาป่น</td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center me-1" style="width:14px;height:14px;">
+
+                                            </span>ยังไม่ส่ง
+                                        </td>
+                                        <td class="text-center text-muted">—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-outline-info btn-sm"
+                                    data-bs-toggle="modal" data-bs-target="#modalSendFishmeal">
+                                    <i class="ri ri-external-link-line me-1"></i>ส่งข้อมูลไประบบปลาป่น
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger d-flex align-items-start gap-3 mb-4" role="alert">
                         <i class="ri ri-file-shield-2-line fs-4 flex-shrink-0 mt-1"></i>
                         <div>
                             <strong>สร้างหนังสือรับรองแหล่งที่มาของปลาป่น</strong><br />
@@ -610,7 +728,7 @@
                 <i class="ri ri-arrow-left-line me-1"></i> กลับรายการ
             </a>
             <div class="d-flex gap-2">
-                <!-- Preview PDF -->
+                @* <!-- Preview PDF -->
                 <button type="button" class="btn btn-outline-info" id="btnPreviewPdf">
                     <i class="ri ri-file-pdf-line me-1"></i> พรีวิว PDF
                 </button>
@@ -621,21 +739,159 @@
                 <!-- ยืนยันรับซื้อ -->
                 <button type="button" class="btn btn-success" id="btnConfirmPurchase">
                     <i class="ri ri-checkbox-circle-line me-1"></i> ยืนยันรับซื้อ
-                </button>
+                </button> *@
                 <!-- บันทึกขายต่อ -->
-                <button type="button" class="btn btn-primary" id="btnSaveResell">
+                @* <button type="button" class="btn btn-primary" id="btnSaveResell">
                     <i class="ri ri-arrow-right-up-line me-1"></i> บันทึกขายต่อและออกหนังสือกำกับ
-                </button>
+                </button> *@
                 <!-- สร้างหนังสือปลาป่น -->
-                <button type="button" class="btn btn-outline-success" id="btnCreateFishmeal">
+                <button type="button" class="btn btn-primary" id="btnCreateFishmeal">
                     <i class="ri ri-file-shield-2-line me-1"></i> สร้างหนังสือรับรองปลาป่น
                 </button>
+                <!-- ส่งข้อมูลไประบบปลาป่น -->
+                @* <button type="button" class="btn btn-primary" id="btnSendFishmeal"
+                    data-bs-toggle="modal" data-bs-target="#modalSendFishmeal">
+                    <i class="ri ri-external-link-line me-1"></i> ส่งข้อมูลไประบบปลาป่น
+                </button> *@
             </div>
         </div>
 
         </form>
     </div><!-- /col -->
 </div><!-- /row -->
+
+<!-- ==================== Modal: ส่งข้อมูลไประบบหนังสือรับรองปลาป่น (TOR 1.6(19.2)) ==================== -->
+<div class="modal fade" id="modalSendFishmeal" tabindex="-1" aria-labelledby="modalSendFishmealLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h5 class="modal-title" id="modalSendFishmealLabel">
+                    <i class="ri ri-external-link-line me-2"></i>ส่งข้อมูลเศษเหลือไประบบหนังสือรับรองปลาป่น
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="ri ri-information-line me-1"></i>
+                    ระบบจะนำข้อมูลชุดด้านล่างส่งไประบบออกหนังสือรับรองแหล่งที่มาของปลาป่น (Fish Meal Certificate)
+                    ซึ่งเชื่อมโยงมาจาก P1 <strong>P1-2569-00046</strong> → เศษเหลือ <strong>SCR-2569-0003</strong>
+                </div>
+
+                <!-- ส่วนที่ 1: ข้อมูลที่มา (P1 Chain) -->
+                <div class="fw-semibold small text-muted mb-1">
+                    <i class="ri ri-git-fork-line me-1"></i>ข้อมูลที่มา (จาก P1 → เศษเหลือ)
+                </div>
+                <table class="table table-bordered table-sm small mb-3">
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold bg-light" style="width:38%;">เลขที่ P1 อ้างอิง</td>
+                            <td class="text-primary fw-semibold">P1-2569-00046</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold bg-light">เลขที่ RMBS1:PS</td>
+                            <td class="text-primary fw-semibold">10604204211700000093</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold bg-light">เลขทะเบียน IMD</td>
+                            <td>IMD-2567-001234</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold bg-light">เลขที่หนังสือกำกับซื้อขาย</td>
+                            <td class="text-secondary fw-semibold">SCR-2569-0003</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ส่วนที่ 2: ข้อมูลสัตว์น้ำ / การผลิต -->
+                <div class="fw-semibold small text-muted mb-1">
+                    <i class="ri ri-fish-line me-1"></i>ข้อมูลสัตว์น้ำและการผลิต
+                </div>
+                <table class="table table-bordered table-sm small mb-3">
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold bg-light" style="width:38%;">ชื่อสัตว์น้ำ / ชนิด</td>
+                            <td>ปลาทูน่าครีบเหลือง (Yellowfin Tuna — YFT)</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold bg-light">วันที่ผลิต / รุ่น</td>
+                            <td>05/04/2569 &nbsp;|&nbsp; LOT-2561-001, LOT-2561-002</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold bg-light">สถานประกอบการผู้ขาย (แปรรูป)</td>
+                            <td>บริษัท ซีฟู้ด โปรเซสซิ่ง จำกัด <span class="text-muted small">(TH-SMK-2025-0312)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- ส่วนที่ 3: ข้อมูลเศษเหลือที่จะส่ง -->
+                <div class="fw-semibold small text-muted mb-1">
+                    <i class="ri ri-recycle-line me-1"></i>รายการเศษเหลือที่ส่งไประบบปลาป่น
+                </div>
+                <table class="table table-bordered table-sm small mb-3">
+                    <thead class="table-secondary text-center">
+                        <tr>
+                            <th>#</th>
+                            <th>ประเภทเศษเหลือ</th>
+                            <th>รุ่นการผลิต</th>
+                            <th class="text-end">น้ำหนัก (กก.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td>กระดูก / ก้างปลา</td>
+                            <td>LOT-2561-001</td>
+                            <td class="text-end fw-semibold">400.000</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td>เครื่องในสัตว์น้ำ</td>
+                            <td>LOT-2561-002</td>
+                            <td class="text-end fw-semibold">350.000</td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="3" class="text-end fw-semibold">รวมน้ำหนักเศษเหลือ (กก.)</td>
+                            <td class="text-end fw-bold text-success">750.000</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <!-- ส่วนที่ 4: ผู้ซื้อ (โรงงานปลาป่น) -->
+                <div class="fw-semibold small text-muted mb-1">
+                    <i class="ri ri-building-2-line me-1"></i>ผู้รับข้อมูล (โรงงานปลาป่น)
+                </div>
+                <table class="table table-bordered table-sm small mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold bg-light" style="width:38%;">ชื่อโรงงานปลาป่น</td>
+                            <td>บริษัท ปลาป่นไทย จำกัด</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold bg-light">เลขทะเบียนนิติบุคคล</td>
+                            <td>0105563089444</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold bg-light">ประเภทกิจการ</td>
+                            <td>โรงงานผลิตปลาป่น</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i> ยกเลิก
+                </button>
+                <button type="button" class="btn btn-info text-white btn-sm"
+                    onclick="alert('\u0e2a\u0e48\u0e07\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e44\u0e1b\u0e23\u0e30\u0e1a\u0e1a\u0e2b\u0e19\u0e31\u0e07\u0e2a\u0e37\u0e2d\u0e23\u0e31\u0e1a\u0e23\u0e2d\u0e07\u0e1b\u0e25\u0e32\u0e1b\u0e48\u0e19\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22\u0e41\u0e25\u0e49\u0e27 (mockup)\n\u0e2a\u0e16\u0e32\u0e19\u0e30: \u0e23\u0e2d\u0e2d\u0e19\u0e38\u0e21\u0e31\u0e15\u0e34\u0e08\u0e32\u0e01\u0e23\u0e30\u0e1a\u0e1a\u0e1b\u0e25\u0e32\u0e1b\u0e48\u0e19')">
+                    <i class="ri ri-external-link-line me-1"></i> ยืนยันส่งข้อมูลไประบบปลาป่น
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal ส่งข้อมูลไประบบปลาป่น TOR 1.6(19.2) -->
 
 <!-- ==================== Modal: ค้นหาผู้ซื้อต่อในระบบ ==================== -->
 <div class="modal fade" id="modalSearchResellBuyer" tabindex="-1" aria-labelledby="modalSearchResellBuyerLabel" aria-hidden="true">

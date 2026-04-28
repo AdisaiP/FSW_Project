@@ -28,7 +28,12 @@
             CertificationStatusClass = "bg-label-danger",
             CertificationStatusIcon = "ri-file-warning-line",
             StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning"
+            StatusClass = "bg-label-warning",
+            ApprovalDate = (DateTime?)null,
+            ApprovedBy = "",
+            DestCountry = "",
+            OwnerOrganization = "Alpha Office Automation Co., Ltd. (สาขา 00001)",
+            AccessScope = "own"
         },
         new
         {
@@ -53,7 +58,42 @@
             CertificationStatusClass = "bg-label-success",
             CertificationStatusIcon = "ri-file-check-line",
             StatusText = "อนุมัติแล้ว",
-            StatusClass = "bg-label-success"
+            StatusClass = "bg-label-success",
+            ApprovalDate = (DateTime?)new DateTime(2018, 8, 20),
+            ApprovedBy = "นายสมชาย แสนดี ตำแหน่งผู้อำนวยการตรวจประมง",
+            DestCountry = "สหภาพยุโรป (EU)",
+            OwnerOrganization = "บริษัท ตัวแทน จำกัด (ในนาม Alpha Office Automation Co., Ltd. (สาขา 00001))",
+            AccessScope = "agent"
+        },
+        new
+        {
+            RowNo = 3,
+            TransactionDate = new DateTime(2018, 8, 18, 9, 45, 0),
+            Rmbs1Number = "10611280211800000559",
+            ImdNumber = "235012013161000081",
+            CcNumber = "ACC817FR1040",
+            ValidationDate = new DateTime(2018, 7, 28),
+            VesselName = "SEA STAR 99",
+            RegistrationNo = "TH-REG-0099",
+            FishingStartDate = new DateTime(2018, 5, 3),
+            FishingEndDate = new DateTime(2018, 5, 20),
+            GearType = "อวนลาก (Trawl)",
+            CatchDescription = "ACC817FR1040",
+            FisheryProducts = "0303.89.90 000/KGM [F020071S10030010/KGM]=ปลาสคิปแจ็ก ทั้งตัว แช่แข็ง",
+            QtyInCC = 0m,
+            QtyEnteringFactory = 180000m,
+            DocumentType = "cc",
+            SourceText = "ภายนอกระบบ [FSW]",
+            CertificationStatusText = "CCSCC มาแล้ว",
+            CertificationStatusClass = "bg-label-success",
+            CertificationStatusIcon = "ri-file-check-line",
+            StatusText = "รออนุมัติ",
+            StatusClass = "bg-label-warning",
+            ApprovalDate = (DateTime?)null,
+            ApprovedBy = "",
+            DestCountry = "สหรัฐอเมริกา (US)",
+            OwnerOrganization = "บริษัท โรงงานคู่ค้า จำกัด",
+            AccessScope = "external"
         }
     };
 }
@@ -184,6 +224,8 @@
             var ccNo = (document.getElementById('filterCcNumber').value || '').trim().toLowerCase();
             var vessel = (document.getElementById('filterVessel').value || '').trim().toLowerCase();
             var registrationNo = (document.getElementById('filterRegistrationNo').value || '').trim().toLowerCase();
+            var status = (document.getElementById('filterStatus').value || '').trim();
+            var currentOrganization = 'Alpha Office Automation Co., Ltd. (สาขา 00001)';
             var logFromDate = parseDateInput(document.getElementById('filterLogDateFrom').value, false);
             var logToDate = parseDateInput(document.getElementById('filterLogDateTo').value, true);
             var logExcludeRange = document.getElementById('filterLogDateExclude').checked;
@@ -199,12 +241,17 @@
                 var fishingEnd = new Date(row.dataset.fishingEndDate);
                 var inLogRange = (!logFromDate || txDate >= logFromDate) && (!logToDate || txDate <= logToDate);
                 var inFishingRange = (!fishingFromDate || fishingStart >= fishingFromDate) && (!fishingToDate || fishingEnd <= fishingToDate);
+                var ownerOrg = row.dataset.ownerOrg || '';
+                var accessScope = row.dataset.accessScope || '';
+                var isVisibleByScope = ownerOrg === currentOrganization || accessScope === 'agent' || accessScope === 'same-establishment' || accessScope === 'own';
                 var match =
+                    isVisibleByScope &&
                     (!rmbs1No || (row.dataset.rmbs1Number || '').toLowerCase().includes(rmbs1No)) &&
                     (!imdNo || (row.dataset.imdNumber || '').toLowerCase().includes(imdNo)) &&
                     (!ccNo || (row.dataset.ccNumber || '').toLowerCase().includes(ccNo)) &&
                     (!vessel || (row.dataset.vessel || '').toLowerCase().includes(vessel)) &&
                     (!registrationNo || (row.dataset.registrationNo || '').toLowerCase().includes(registrationNo)) &&
+                    (!status || (row.dataset.status || '') === status) &&
                     ((!logFromDate && !logToDate) || (logExcludeRange ? !inLogRange : inLogRange)) &&
                     ((!fishingFromDate && !fishingToDate) || inFishingRange);
 
@@ -217,7 +264,7 @@
 
         document.getElementById('btnSearch').addEventListener('click', filterRows);
         document.getElementById('btnReset').addEventListener('click', function () {
-            ['filterRmbs1Number', 'filterImdNumber', 'filterCcNumber', 'filterVessel', 'filterRegistrationNo', 'filterLogDateFrom', 'filterLogDateTo', 'filterFishingDateFrom', 'filterFishingDateTo'].forEach(function (id) {
+            ['filterRmbs1Number', 'filterImdNumber', 'filterCcNumber', 'filterVessel', 'filterRegistrationNo', 'filterStatus', 'filterLogDateFrom', 'filterLogDateTo', 'filterFishingDateFrom', 'filterFishingDateTo'].forEach(function (id) {
                 document.getElementById(id).value = '';
             });
             document.getElementById('filterLogDateExclude').checked = false;
@@ -225,10 +272,40 @@
         });
 
         document.getElementById('filterLogDateExclude').addEventListener('change', filterRows);
+        document.getElementById('filterStatus').addEventListener('change', filterRows);
 
         ['filterRmbs1Number', 'filterImdNumber', 'filterCcNumber', 'filterVessel', 'filterRegistrationNo', 'filterLogDateFrom', 'filterLogDateTo', 'filterFishingDateFrom', 'filterFishingDateTo'].forEach(function (id) {
             document.getElementById(id).addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
+            });
+        });
+
+        // PDF Preview modal - populate from row data-attributes
+        document.querySelectorAll('.btn-ps-pdf').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = btn.closest('tr');
+                if (!row) return;
+                document.getElementById('pdfPsRmbs1No').textContent = row.dataset.rmbs1Number || '-';
+                document.getElementById('pdfPsImdNo').textContent = row.dataset.imdNumber || '-';
+                document.getElementById('pdfPsVessel').textContent = row.dataset.vessel || '-';
+                document.getElementById('pdfPsCcNo').textContent = row.dataset.ccNumber || '-';
+                document.getElementById('pdfPsApprovalDate').textContent = row.dataset.approvalDate || '-';
+                document.getElementById('pdfPsApprovalDate2').textContent = row.dataset.approvalDate || '-';
+                document.getElementById('pdfPsApprovedBy').textContent = row.dataset.approvedBy || '-';
+                document.getElementById('pdfPsDestCountry').textContent = row.dataset.destCountry || '-';
+                var product = row.dataset.product || '';
+                var speciesBody = document.getElementById('pdfPsSpeciesBody');
+                speciesBody.innerHTML = '';
+                if (product) {
+                    var parts = product.split('=');
+                    var hsCode = parts[0] ? parts[0].split('[')[0].trim() : '-';
+                    var name = parts[1] ? parts[1].trim() : '-';
+                    var qty = '240,000.000';
+                    speciesBody.innerHTML = '<tr><td style="border:1px solid #aaa;padding:4px 8px;">' + hsCode + '</td>' +
+                        '<td style="border:1px solid #aaa;padding:4px 8px;">' + name + '</td>' +
+                        '<td style="border:1px solid #aaa;padding:4px 8px;text-align:right;">' + qty + '</td>' +
+                        '<td style="border:1px solid #aaa;padding:4px 8px;text-align:center;">KGM</td></tr>';
+                }
             });
         });
     });
@@ -246,6 +323,20 @@
         </li>
     </ol>
 </nav>
+
+<div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-4" role="alert">
+    <i class="ri ri-shield-user-line"></i>
+    <div>
+        <div class="fw-semibold d-flex align-items-center gap-2 flex-wrap">
+            แสดงข้อมูลของ: Alpha Office Automation Co., Ltd. (สาขา 00001)
+            <span class="badge bg-success ms-1" title="อยู่ในการรับรองของกรมประมง">
+                <i class="ri ri-shield-check-line me-1"></i>ในการรับรอง ✔
+            </span>
+            <span class="badge bg-label-success" style="font-size:0.68rem;">ตรวจสอบ %Yield อัตโนมัติ</span>
+        </div>
+        <div class="small">สิทธิ์การเห็นรายการ: เฉพาะที่ตนสร้าง/ตัวแทน หรือสถานประกอบการเดียวกัน</div>
+    </div>
+</div>
 
 <!-- Filter card -->
 <div class="card mb-4">
@@ -273,6 +364,15 @@
             <div class="col-md-6 col-xl-4">
                 <label for="filterRegistrationNo" class="form-label filter-form-label">เลขทะเบียนเรือ</label>
                 <input type="text" id="filterRegistrationNo" class="form-control form-control-sm" placeholder="ระบุเลขทะเบียนเรือ" />
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <label for="filterStatus" class="form-label filter-form-label">สถานะคำขอ PS</label>
+                <select id="filterStatus" class="form-select form-select-sm">
+                    <option value="">ทั้งหมด</option>
+                    <option value="รออนุมัติ">รออนุมัติ</option>
+                    <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
+                    <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
+                </select>
             </div>
             <div class="col-12">
                 <div class="row g-2 align-items-end">
@@ -326,8 +426,16 @@
             <p class="text-muted small mb-0">แสดงรายการการควบคุมปริมาณวัตถุดิบสัตว์นํ้านำเข้า (RMBS1:PS)
 
 </p>
-        </div>
-    </div>
+        </div>        <div>
+            <a href="@Url.Action("CreateAdjustRMBS1PS", "ImportAdjustment")" class="btn btn-primary btn-sm">
+                <i class="ri ri-add-line me-1"></i> สร้างคำขอ RMBS1:PS
+            </a>
+            <button type="button" class="btn btn-outline-success btn-sm ms-1"
+                title="ดาวน์โหลดข้อมูล RMBS1 เป็นไฟล์ Excel" data-bs-toggle="tooltip" data-bs-placement="top"
+                onclick="alert('เริ่มดาวน์โหลด Excel (mockup)')">
+                <i class="ri ri-file-excel-2-line me-1"></i> Export Excel
+            </button>
+        </div>    </div>
     <div class="table-responsive p-1">
         <table class="table table-bordered table-hover align-middle mb-0 imd-table">
             <thead class="text-center">
@@ -341,6 +449,9 @@
                     <th>เครื่องมือทำการประมง</th>
                     <th style="min-width:280px;">ชนิดสัตว์น้ำ</th>
                     <th>ปริมาณสัตว์น้ำเข้าโรงงาน</th>
+                    <th>สถานะโควตา</th>
+                    <th>สถานะคำขอ PS</th>
+                    <th>จัดการ</th>
                 </tr>
             </thead>
             <tbody id="imdTableBody">
@@ -351,6 +462,11 @@
                         data-imd-number="@rec.ImdNumber"
                         data-doc-type="@rec.DocumentType"
                         data-status="@rec.StatusText"
+                        data-owner-org="@rec.OwnerOrganization"
+                        data-access-scope="@rec.AccessScope"
+                        data-approval-date="@(rec.ApprovalDate.HasValue ? ToThaiDate(rec.ApprovalDate.Value) : "")"
+                        data-approved-by="@rec.ApprovedBy"
+                        data-dest-country="@rec.DestCountry"
                         data-vessel="@rec.VesselName"
                         data-registration-no="@rec.RegistrationNo"
                         data-fishing-start-date="@rec.FishingStartDate.ToString("yyyy-MM-ddTHH:mm:ss")"
@@ -384,12 +500,160 @@
                         <td>@rec.GearType</td>
                         <td style="max-width:280px;">@rec.FisheryProducts</td>
                         <td class="text-end">@rec.QtyEnteringFactory.ToString("N2")</td>
+                        <td class="text-center">
+                            @{
+                                var pct = rec.QtyEnteringFactory > 0 ? (rec.QtyEnteringFactory - 3700) / rec.QtyEnteringFactory * 100 : 100;
+                                string quotaBadgeClass = pct > 10 ? "bg-success" : (pct > 0 ? "bg-warning" : "bg-danger");
+                                string quotaBadgeIcon = pct > 10 ? "ri-checkbox-circle-line" : (pct > 0 ? "ri-alert-line" : "ri-close-circle-line");
+                                string quotaBadgeText = pct > 10 ? "โควตาปกติ" : (pct > 0 ? "โควตาเหลือน้อย" : "โควตาหมด");
+                            }
+                            <span class="badge @quotaBadgeClass">
+                                <i class="ri @quotaBadgeIcon me-1"></i>@quotaBadgeText
+                            </span>
+                            <div class="text-muted small mt-1">@(rec.QtyEnteringFactory > 0 ? $"{(rec.QtyEnteringFactory - 3700):N0} / {rec.QtyEnteringFactory:N0} กก." : "—")</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @rec.StatusClass">@rec.StatusText</span>
+                        </td>
+                        <td class="text-center text-nowrap">
+                            <a href="@Url.Action("CreateAdjustRMBS1PS", "ImportAdjustment")" class="btn btn-sm btn-icon btn-outline-primary me-1" title="แก้ไข">
+                                <i class="ri ri-pencil-line"></i>
+                            </a>
+                            @if (rec.StatusText == "รออนุมัติ")
+                            {
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-warning me-1" title="ยกเลิกคำขอ"
+                                    onclick="if(confirm('ยืนยันยกเลิกคำขอ RMBS1:PS นี้?')) alert('ยกเลิกคำขอเรียบร้อย (mockup)')">
+                                    <i class="ri ri-close-circle-line"></i>
+                                </button>
+                            }
+                            @if (rec.StatusText == "อนุมัติแล้ว")
+                            {
+                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger me-1 btn-ps-pdf"
+                                    title="ดูเอกสาร RMBS1:PS"
+                                    data-bs-toggle="modal" data-bs-target="#modalPsPdfPreview">
+                                    <i class="ri ri-file-pdf-line"></i>
+                                </button>
+                            }
+                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="ลบ"
+                                onclick="if(confirm('ต้องการลบรายการนี้?')) alert('ลบเรียบร้อย (mockup)')">
+                                <i class="ri ri-delete-bin-line"></i>
+                            </button>
+                        </td>
                     </tr>
                 }
                 <tr id="imdTableEmpty" class="d-none">
-                    <td colspan="9" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="12" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- ==================== Modal: ดูเอกสาร RMBS1:PS (PDF Preview) ==================== -->
+<div class="modal fade" id="modalPsPdfPreview" tabindex="-1" aria-labelledby="modalPsPdfPreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalPsPdfPreviewLabel">
+                    <i class="ri ri-file-pdf-line me-2"></i>เอกสาร RMBS1:PS &mdash; ตัวอย่างใบรับรอง
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- A4 Mock Document -->
+                <div id="psPdfDocBody" style="background:#fff;padding:2rem 2.5rem;font-family:'TH Sarabun New',sans-serif;font-size:15px;line-height:1.7;">
+
+                    <!-- Header -->
+                    <div class="text-center mb-3">
+                        <div style="font-size:1.05rem;font-weight:700;กรมประมง">&#x1F3E3;&nbsp;กรมประมง กระทรวงเกษตรและสหกรณ์</div>
+                        <div style="font-size:0.95rem;">Department of Fisheries, Ministry of Agriculture and Cooperatives</div>
+                        <hr style="border-top:2px solid #198754;margin:0.5rem 0;" />
+                        <div style="font-size:1.2rem;font-weight:700;color:#198754;">เอกสารการควบคุมปริมาณวัตถุดิบสัตว์น้ำนำเข้าเพื่อแปรรูปส่งออก (RMBS1:PS)</div>
+                        <div style="font-size:0.85rem;color:#555;">สถานะ: อนุมัติ (PS - Prior Season)</div>
+                    </div>
+
+                    <!-- Doc Ref Box -->
+                    <div class="d-flex justify-content-between align-items-start mb-3" style="border:1px solid #198754;border-radius:6px;padding:0.6rem 1rem;background:#f0fff4;">
+                        <div>
+                            <div><strong>เลขที่เอกสาร RMBS1:</strong> <span id="pdfPsRmbs1No" class="fw-semibold text-success"></span></div>
+                            <div><strong>เลขที่ IMD:</strong> <span id="pdfPsImdNo"></span></div>
+                            <div><strong>วันที่อนุมัติ:</strong> <span id="pdfPsApprovalDate" class="text-success fw-semibold"></span></div>
+                        </div>
+                        <div class="text-end">
+                            <div><strong>ประเทศปลายทาง:</strong> <span id="pdfPsDestCountry"></span></div>
+                            <div class="mt-1"><span class="badge bg-success fs-6 px-3">&#10003; อนุมัติโดยเจ้าหน้าที่</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Operator Info -->
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:1rem;">
+                        <tr>
+                            <td style="width:30%;font-weight:600;">ชื่อผู้ประกอบการ:</td>
+                            <td>บริษัท ทะเลทอง ฟิชเชอรี่ จำกัด</td>
+                            <td style="width:30%;font-weight:600;">เลขทะเบียนโรงงาน:</td>
+                            <td>1061128021</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">ชื่อเรือ:</td>
+                            <td id="pdfPsVessel"></td>
+                            <td style="font-weight:600;">เลขทะเบียนเรือ:</td>
+                            <td>PNG-REG-472</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600;">เลขที่ Catch Certificate:</td>
+                            <td id="pdfPsCcNo"></td>
+                            <td style="font-weight:600;">ประเภทใบรับรอง:</td>
+                            <td>RMBS1:PS (สอดคล้อง IUU/MMPA)</td>
+                        </tr>
+                    </table>
+
+                    <!-- Species table -->
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:700;margin-bottom:0.3rem;ชนิดสัตว์น้ำ">ชนิดสัตว์น้ำและปริมาณ:</div>
+                        <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+                            <thead>
+                                <tr style="background:#e8f5e9;">
+                                    <th style="border:1px solid #aaa;padding:4px 8px;ชนิด">รหัส HS</th>
+                                    <th style="border:1px solid #aaa;padding:4px 8px;">ชนิดสัตว์น้ำ</th>
+                                    <th style="border:1px solid #aaa;padding:4px 8px;text-align:right;">ปริมาณ (KGM)</th>
+                                    <th style="border:1px solid #aaa;padding:4px 8px;text-align:center;">หน่วย</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pdfPsSpeciesBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Sanitary summary -->
+                    <div style="margin-bottom:1.2rem;">
+                        <div style="font-weight:700;margin-bottom:0.3rem;">ผลการตรวจสอบมาตรการสุขอนามัย:</div>
+                        <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+                            <span style="background:#d4edda;border-radius:4px;padding:2px 10px;font-size:0.85rem;">&#10003; IUU Regulation (EU)</span>
+                            <span style="background:#d4edda;border-radius:4px;padding:2px 10px;font-size:0.85rem;">&#10003; MMPA Provisions (US)</span>
+                            <span style="background:#fff3cd;border-radius:4px;padding:2px 10px;font-size:0.85rem;">&#9888; IUU Japan Law (JP) &mdash; รอตรวจสอบ</span>
+                            <span style="background:#d4edda;border-radius:4px;padding:2px 10px;font-size:0.85rem;">&#10003; ด่านตรวจ DOF (TH)</span>
+                        </div>
+                    </div>
+
+                    <!-- Approval Stamp -->
+                    <div class="d-flex justify-content-end">
+                        <div style="border:2px solid #198754;border-radius:8px;padding:0.8rem 1.5rem;text-align:center;min-width:200px;">
+                            <div style="font-weight:700;">เจ้าหน้าทีผู้อนุมัติ</div>
+                            <div style="margin:0.5rem 0;font-style:italic;color:#555;ลายเซ็น">[ลายเซ็น]</div>
+                            <div id="pdfPsApprovedBy" style="font-size:0.85rem;"></div>
+                            <div style="font-size:0.8rem;color:#555;">วันที่: <span id="pdfPsApprovalDate2"></span></div>
+                            <div style="margin-top:0.5rem;"><span class="badge bg-success px-3">RMBS1:PS อนุมัติแล้ว</span></div>
+                        </div>
+                    </div>
+
+                </div><!-- /psPdfDocBody -->
+            </div>
+            <div class="modal-footer">
+                <span class="text-muted small me-auto"><i class="ri ri-information-line me-1"></i>เอกสารนี้เป็นตัวอย่าง (Mockup) สำหรับการประเมินระบบเท่านั้น</span>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-success btn-sm" onclick="alert('ฟังก์ชัน Print/Download PDF จะใช้ได้ในระบบจริง (mockup)')"><i class="ri ri-printer-line me-1"></i>พิมพ์/ดาวน์โหลด PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal PDF Preview -->

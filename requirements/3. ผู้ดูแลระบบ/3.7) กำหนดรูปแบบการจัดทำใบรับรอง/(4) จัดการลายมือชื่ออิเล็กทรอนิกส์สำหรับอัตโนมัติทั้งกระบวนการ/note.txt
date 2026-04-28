@@ -1,0 +1,18 @@
+# (4) จัดการลายมือชื่ออิเล็กทรอนิกส์สำหรับอัตโนมัติทั้งกระบวนการ
+# (กำหนด/เพิ่ม/แก้ไข/ลบ/ระงับ + ช่วงวันที่ + มาตรฐานความปลอดภัย)
+
+URL: http://localhost:5055/Admin/ESignature
+
+จำนวนรูปที่ต้องแคป: 5 รูป
+
+รายการหน้าที่ต้องแคป
+1. หน้า Admin/ESignature + summary cards (ทั้งหมด 6/ใช้งาน 4/ใกล้หมดอายุ 1/ระงับ+ยกเลิก 2)
+   + security alert 'การเพิ่ม/แก้ไขลายมือชื่อจะถูก log' + ตาราง 6 รายการ
+2. Modal #modalAddESignature > ส่วนที่ 1
+   - select ผู้ลงนาม + card auto-fill + radio ประเภทการใช้งาน 4 ตัวเลือก
+3. Modal > ส่วนที่ 2
+   - upload drop zone (PNG/SVG, 500KB) + file preview + template preview ตำแหน่งบนใบรับรอง
+   - ช่วงวันที่ (validFrom/validTo) + duration preview + select มาตรฐาน + คำอธิบาย
+4. ปุ่มต่อแถว: แก้ไข/ระงับ/ยกเลิก + modal #modalSuspendESign + #modalCancelESign
+5. Modal #modalESignHistory > audit log ตาราง 8 รายการ
+   วันที่/เลขใบรับรอง/รหัสผู้ลงนาม/ผู้ดำเนินการ/ผล (สำเร็จ/ล้มเหลว) + ปุ่ม 'ส่งออก CSV'

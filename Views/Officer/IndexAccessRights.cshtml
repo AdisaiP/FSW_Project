@@ -1,0 +1,620 @@
+@{
+    ViewData["Title"] = "จัดการสิทธิ์และพื้นที่ความรับผิดชอบ";
+
+    // TODO: ดึงจากฐานข้อมูลจริง
+    var officers = new[]
+    {
+        new { RowNo=1,  UserId="USR-0003", FullName="นางสาวสมหญิง ใจดี",     Email="officer1@dof.go.th",   Agency="กตส.",       AgencyFull="กองตรวจสอบคุณภาพสินค้าประมง (กตส.)",
+              Roles=new[]{"เจ้าหน้าที่รับเรื่อง","เจ้าหน้าที่พิจารณา"},
+              Areas=new[]{"กรุงเทพมหานคร","สมุทรปราการ"},
+              CanApprove=false, CanSign=false, InMyArea=true,  StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=2,  UserId="USR-0004", FullName="นายประสิทธิ์ วงค์ดี",   Email="admin@dof.go.th",      Agency="กตส.",       AgencyFull="กองตรวจสอบคุณภาพสินค้าประมง (กตส.)",
+              Roles=new[]{"ผู้อนุมัติ RMBS1","ผู้ลงนามใบรับรอง"},
+              Areas=new[]{"กรุงเทพมหานคร","นนทบุรี","ปทุมธานี","ทุกพื้นที่"},
+              CanApprove=true, CanSign=true,  InMyArea=true,  StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=3,  UserId="USR-0007", FullName="นายวิทยา ทองดี",         Email="wittaya@dof.go.th",    Agency="ศตส.เขต 3",  AgencyFull="ศูนย์ตรวจสอบสัตว์น้ำและผลิตภัณฑ์สัตว์น้ำ เขต 3 (สงขลา)",
+              Roles=new[]{"เจ้าหน้าที่รับเรื่อง","ผู้ตรวจสอบ Traceability","ผู้ลงนามใบรับรอง"},
+              Areas=new[]{"สงขลา","สตูล","พัทลุง"},
+              CanApprove=false, CanSign=true,  InMyArea=false, StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=4,  UserId="USR-0008", FullName="นางสาวพิมพ์ใจ ชูศรี",   Email="pimjai@dof.go.th",     Agency="ศตส.เขต 5",  AgencyFull="ศูนย์ตรวจสอบสัตว์น้ำและผลิตภัณฑ์สัตว์น้ำ เขต 5 (สมุทรสาคร)",
+              Roles=new[]{"ผู้อนุมัติ RMBS1","เจ้าหน้าที่พิจารณา"},
+              Areas=new[]{"สมุทรสาคร","สมุทรสงคราม","เพชรบุรี"},
+              CanApprove=true, CanSign=false, InMyArea=false, StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=5,  UserId="USR-0009", FullName="นายเชาวลิต พรหมรัตน์",  Email="chao@dof.go.th",       Agency="กตส.",       AgencyFull="กองตรวจสอบคุณภาพสินค้าประมง (กตส.)",
+              Roles=new[]{"เจ้าหน้าที่พิจารณา"},
+              Areas=new[]{"กรุงเทพมหานคร","สมุทรสาคร"},
+              CanApprove=false, CanSign=false, InMyArea=true,  StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=6,  UserId="USR-0010", FullName="นางสาวรัตนา สุขทวี",     Email="rattana@dof.go.th",    Agency="ศตส.เขต 1",  AgencyFull="ศูนย์ตรวจสอบสัตว์น้ำและผลิตภัณฑ์สัตว์น้ำ เขต 1 (เชียงใหม่)",
+              Roles=new[]{"เจ้าหน้าที่รับเรื่อง","ผู้อนุมัติ RMBS1"},
+              Areas=new[]{"เชียงใหม่","เชียงราย","ลำปาง"},
+              CanApprove=true, CanSign=false, InMyArea=false, StatusText="ใช้งาน", StatusClass="bg-label-success" },
+        new { RowNo=7,  UserId="USR-0011", FullName="นายกมล วงศ์ประเสริฐ",   Email="kamon@dof.go.th",      Agency="ศตส.เขต 6",  AgencyFull="ศูนย์ตรวจสอบสัตว์น้ำและผลิตภัณฑ์สัตว์น้ำ เขต 6 (ระยอง)",
+              Roles=new[]{"ผู้ลงนามใบรับรอง","ผู้ตรวจสอบ Traceability"},
+              Areas=new[]{"ระยอง","ชลบุรี","จันทบุรี"},
+              CanApprove=false, CanSign=true,  InMyArea=false, StatusText="ระงับ", StatusClass="bg-label-warning" },
+    };
+
+    // Mock: เจ้าหน้าที่ที่ login อยู่ (ผู้ใช้ปัจจุบัน = กตส. ดูแล กทม./สมุทรปราการ)
+    var currentOfficer = new
+    {
+        UserId  = "USR-0004",
+        Name    = "นายประสิทธิ์ วงค์ดี",
+        Agency  = "กตส.",
+        Areas   = new[] { "กรุงเทพมหานคร", "นนทบุรี", "ปทุมธานี" },
+        CanSign = true,
+        CanApprove = true
+    };
+
+    // Mock: รายการตัวอย่างคำขอ (สำหรับแสดง approve/sign conditional)
+    var pendingItems = new[]
+    {
+        new { No=1, ReqNo="RMBS2-2026-04201", ReqType="RMBS2/P2",          Establishment="บริษัท ทูน่าโปรดักส์ จำกัด",     Province="กรุงเทพมหานคร",  WaitDays=2, InScope=true  },
+        new { No=2, ReqNo="PS-TH-2026-00931", ReqType="ออกใบรับรอง PS",   Establishment="บริษัท ไทยซีฟู้ด จำกัด",         Province="สมุทรปราการ",     WaitDays=3, InScope=true  },
+        new { No=3, ReqNo="RMBS2-2026-04198", ReqType="RMBS2/P2",          Establishment="บริษัท โอเชียน ไพร์ม จำกัด",     Province="สงขลา",           WaitDays=1, InScope=false },
+        new { No=4, ReqNo="NMD-2026-00215",   ReqType="ออกใบรับรอง NMD",  Establishment="บริษัท แหลมทองมาริน จำกัด",     Province="สมุทรสาคร",       WaitDays=4, InScope=false },
+        new { No=5, ReqNo="RMBS1-2026-02301", ReqType="RMBS1/P1",         Establishment="บริษัท สยาม มารีน ฟู้ดส์ จำกัด", Province="นนทบุรี",          WaitDays=1, InScope=true  },
+    };
+}
+
+@section PageStyles {
+<style>
+    .access-table-compact { font-size: 0.78rem; }
+    .access-table-compact th,
+    .access-table-compact td { padding: 0.45rem 0.55rem; vertical-align: middle; }
+    .area-badge { font-size: 0.65rem; }
+    .scope-badge { font-size: 0.7rem; white-space: nowrap; }
+    .current-officer-bar { background: linear-gradient(135deg,rgba(105,108,255,0.1),rgba(105,108,255,0.04)); border-left: 4px solid #696cff; }
+</style>
+}
+
+@* **************** Content **************** *@
+<h4 class="mb-1">จัดการสิทธิ์และพื้นที่ความรับผิดชอบ</h4>
+<p class="mb-1">กำหนดพื้นที่รับผิดชอบ บทบาท และสิทธิ์อนุมัติ/ลงนามของเจ้าหน้าที่ กตส. และ ศตส. แต่ละเขต</p>
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-6">
+    <ol class="breadcrumb breadcrumb-style1" style="--bs-breadcrumb-divider: '>'; font-size: 0.75rem;">
+        <li class="breadcrumb-item"><a href="#" class="text-primary fw-semibold">เจ้าหน้าที่</a></li>
+        <li class="breadcrumb-item active text-secondary">จัดการสิทธิ์และพื้นที่ความรับผิดชอบ</li>
+    </ol>
+</nav>
+
+<!-- Current officer scope banner (2.13(1): badge แสดงพื้นที่ความรับผิดชอบของผู้ login) -->
+<div class="card mb-4 current-officer-bar">
+    <div class="card-body py-3">
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            <div>
+                <span class="badge bg-primary rounded-pill px-3 py-1 me-1">
+                    <i class="ri ri-shield-user-line me-1"></i>@currentOfficer.Agency
+                </span>
+                <span class="fw-semibold">@currentOfficer.Name</span>
+                <span class="text-muted small ms-2">(@currentOfficer.UserId)</span>
+            </div>
+            <div class="vr d-none d-md-block"></div>
+            <div class="d-flex flex-wrap gap-1 align-items-center">
+                <span class="text-muted small me-1">พื้นที่รับผิดชอบ:</span>
+                @foreach (var a in currentOfficer.Areas)
+                {
+                    <span class="badge bg-label-primary scope-badge">
+                        <i class="ri ri-map-pin-2-line me-1"></i>@a
+                    </span>
+                }
+            </div>
+            <div class="vr d-none d-md-block"></div>
+            <div class="d-flex gap-2">
+                @if (currentOfficer.CanApprove)
+                {
+                    <span class="badge bg-success"><i class="ri ri-checkbox-circle-line me-1"></i>ผู้อนุมัติ ✅</span>
+                }
+                @if (currentOfficer.CanSign)
+                {
+                    <span class="badge bg-primary"><i class="ri ri-pen-nib-line me-1"></i>ผู้ลงนาม ✅</span>
+                }
+            </div>
+            <div class="ms-auto">
+                <span class="badge bg-label-info small">
+                    <i class="ri ri-eye-line me-1"></i>แสดงเฉพาะข้อมูลในพื้นที่ที่รับผิดชอบ
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-6 g-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@officers.Length</h5>
+                        <small>เจ้าหน้าที่ทั้งหมด</small>
+                    </div>
+                    <span class="badge bg-label-primary rounded-circle p-2">
+                        <i class="icon-base ri ri-group-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@officers.Count(x => x.CanSign)</h5>
+                        <small>มีสิทธิ์ลงนาม</small>
+                    </div>
+                    <span class="badge bg-label-success rounded-circle p-2">
+                        <i class="icon-base ri ri-pen-nib-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@officers.Count(x => x.CanApprove)</h5>
+                        <small>มีสิทธิ์อนุมัติ</small>
+                    </div>
+                    <span class="badge bg-label-info rounded-circle p-2">
+                        <i class="icon-base ri ri-checkbox-circle-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-1">@officers.Select(x => x.Agency).Distinct().Count()</h5>
+                        <small>หน่วยงาน กตส./ศตส.</small>
+                    </div>
+                    <span class="badge bg-label-warning rounded-circle p-2">
+                        <i class="icon-base ri ri-government-line icon-24px"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="arFilterKeyword" class="form-label">ค้นหา</label>
+                <input id="arFilterKeyword" type="text" class="form-control" placeholder="ชื่อ / รหัส / อีเมล" />
+            </div>
+            <div class="col-md-3">
+                <label for="arFilterAgency" class="form-label">หน่วยงาน</label>
+                <select id="arFilterAgency" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="กตส.">กตส.</option>
+                    @foreach (var i in Enumerable.Range(1,9))
+                    {
+                        <option value="ศตส.เขต @i">ศตส. เขต @i</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="arFilterRole" class="form-label">สิทธิ์พิเศษ</label>
+                <select id="arFilterRole" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="sign">ผู้ลงนาม</option>
+                    <option value="approve">ผู้อนุมัติ</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="arFilterStatus" class="form-label">สถานะ</label>
+                <select id="arFilterStatus" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="ใช้งาน">ใช้งาน</option>
+                    <option value="ระงับ">ระงับ</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="button" id="arBtnSearch" class="btn btn-outline-primary" style="min-width:40px;">
+                    <i class="ri ri-search-line"></i>
+                </button>
+                <button type="button" id="arBtnReset" class="btn btn-outline-secondary" style="min-width:40px;">
+                    <i class="ri ri-refresh-line"></i>
+                </button>
+                <button type="button" class="btn btn-success btn-sm ms-auto" onclick="alert('// TODO: Export Excel รายชื่อเจ้าหน้าที่และสิทธิ์')">
+                    <i class="ri ri-file-excel-line me-1"></i>Export
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Officers Table -->
+<div class="card mb-6">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <div>
+            <h5 class="card-title mb-1">รายชื่อเจ้าหน้าที่และสิทธิ์การใช้งาน</h5>
+            <p class="text-muted small mb-0">แสดงเฉพาะเจ้าหน้าที่ กตส. / ศตส. ที่มีสิทธิ์ปฏิบัติการในระบบ</p>
+        </div>
+    </div>
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0 access-table-compact" id="arTable">
+            <thead class="text-center table-light">
+                <tr>
+                    <th style="width:40px">#</th>
+                    <th>รหัสผู้ใช้</th>
+                    <th>ชื่อ-สกุล</th>
+                    <th>หน่วยงาน (กตส./ศตส.)</th>
+                    <th>พื้นที่ความรับผิดชอบ</th>
+                    <th>บทบาทในระบบ</th>
+                    <th style="width:90px;">สิทธิ์อนุมัติ</th>
+                    <th style="width:90px;">สิทธิ์ลงนาม</th>
+                    <th>สถานะ</th>
+                    <th style="width:70px;"></th>
+                </tr>
+            </thead>
+            <tbody id="arTBody">
+                @foreach (var o in officers)
+                {
+                    <tr data-agency="@o.Agency" data-status="@o.StatusText"
+                        data-can-sign="@o.CanSign.ToString().ToLower()"
+                        data-can-approve="@o.CanApprove.ToString().ToLower()"
+                        data-search="@o.FullName.ToLower() @o.UserId.ToLower() @o.Email.ToLower() @o.Agency.ToLower()">
+                        <td class="text-center text-muted">@o.RowNo</td>
+                        <td><span class="fw-semibold text-primary">@o.UserId</span></td>
+                        <td>
+                            @o.FullName
+                            <br/><span class="text-muted small">@o.Email</span>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill bg-label-@(o.Agency == "กตส." ? "primary" : "warning") scope-badge">
+                                <i class="ri ri-government-line me-1"></i>@o.Agency
+                            </span>
+                            <br/><small class="text-muted" style="font-size:0.65rem;">@o.AgencyFull</small>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var a in o.Areas)
+                                {
+                                    <span class="badge bg-label-secondary area-badge">
+                                        <i class="ri ri-map-pin-line me-1"></i>@a
+                                    </span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var r in o.Roles)
+                                {
+                                    <span class="badge bg-label-info area-badge">@r</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            @if (o.CanApprove)
+                            {
+                                <span class="badge bg-success"><i class="ri ri-checkbox-circle-line me-1"></i>ได้</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-secondary"><i class="ri ri-close-circle-line me-1"></i>ไม่ได้</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (o.CanSign)
+                            {
+                                <span class="badge bg-primary"><i class="ri ri-pen-nib-line me-1"></i>ได้</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-secondary"><i class="ri ri-close-circle-line me-1"></i>ไม่ได้</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill @o.StatusClass">@o.StatusText</span>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-icon btn-sm btn-outline-primary btn-edit-access"
+                                    data-user-id="@o.UserId" data-bs-toggle="tooltip" title="แก้ไขสิทธิ์">
+                                <i class="ri ri-edit-line text-primary"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                <tr id="arEmpty" class="d-none">
+                    <td colspan="10" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 2.13(1): ตัวอย่างคำขอรออนุมัติ — แสดง conditional approve/sign ตามพื้นที่ -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-1">
+            <i class="ri ri-inbox-archive-line me-2 text-warning"></i>
+            ตัวอย่าง: คำขอรออนุมัติ — แสดงสิทธิ์ตามพื้นที่ความรับผิดชอบ
+        </h5>
+        <p class="text-muted small mb-0">
+            ปุ่ม "อนุมัติ" / "ลงนาม" จะ <span class="text-success fw-semibold">เปิดใช้งาน</span> เฉพาะคำขอในพื้นที่ของเจ้าหน้าที่คนนั้น
+            และ <span class="text-danger fw-semibold">ปิดใช้งาน</span> พร้อม tooltip สำหรับนอกพื้นที่
+        </p>
+    </div>
+    <div class="table-responsive p-1">
+        <table class="table table-bordered align-middle mb-0 access-table-compact">
+            <thead class="text-center table-light">
+                <tr>
+                    <th>#</th>
+                    <th>เลขที่คำขอ</th>
+                    <th>ประเภทกระบวนงาน</th>
+                    <th>สถานประกอบการ</th>
+                    <th>จังหวัด</th>
+                    <th>รอมา (วัน)</th>
+                    <th>พื้นที่ตรงกัน</th>
+                    <th style="min-width:180px;">การดำเนินการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in pendingItems)
+                {
+                    <tr>
+                        <td class="text-center text-muted">@item.No</td>
+                        <td><span class="fw-semibold text-primary">@item.ReqNo</span></td>
+                        <td>@item.ReqType</td>
+                        <td>@item.Establishment</td>
+                        <td>
+                            <span class="badge @(item.InScope ? "bg-label-success" : "bg-label-secondary")">
+                                <i class="ri ri-map-pin-2-line me-1"></i>@item.Province
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @(item.WaitDays > 3 ? "bg-label-danger" : "bg-label-warning")">
+                                @item.WaitDays วัน
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            @if (item.InScope)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="ri ri-check-line me-1"></i>ในพื้นที่
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-label-danger">
+                                    <i class="ri ri-close-line me-1"></i>นอกพื้นที่
+                                </span>
+                            }
+                        </td>
+                        <td class="text-center text-nowrap">
+                            @if (item.InScope && currentOfficer.CanApprove)
+                            {
+                                <button class="btn btn-sm btn-success me-1"
+                                        onclick="alert('// TODO: อนุมัติ @item.ReqNo\nเจ้าหน้าที่: @currentOfficer.Name')">
+                                    <i class="ri ri-checkbox-circle-line me-1"></i>อนุมัติ
+                                </button>
+                            }
+                            else if (!item.InScope)
+                            {
+                                <button class="btn btn-sm btn-secondary me-1" disabled
+                                        data-bs-toggle="tooltip"
+                                        title="ไม่มีสิทธิ์ดำเนินการ (นอกพื้นที่ความรับผิดชอบ — @item.Province ไม่ใช่พื้นที่ @string.Join(", ", currentOfficer.Areas))">
+                                    <i class="ri ri-lock-line me-1"></i>อนุมัติ
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-secondary me-1" disabled
+                                        data-bs-toggle="tooltip" title="ไม่มีสิทธิ์อนุมัติ">
+                                    <i class="ri ri-lock-line me-1"></i>อนุมัติ
+                                </button>
+                            }
+                            @if (item.InScope && currentOfficer.CanSign)
+                            {
+                                <button class="btn btn-sm btn-primary"
+                                        onclick="alert('// TODO: ลงนาม @item.ReqNo\nเจ้าหน้าที่: @currentOfficer.Name')">
+                                    <i class="ri ri-pen-nib-line me-1"></i>ลงนาม
+                                </button>
+                            }
+                            else if (!item.InScope)
+                            {
+                                <button class="btn btn-sm btn-secondary" disabled
+                                        data-bs-toggle="tooltip"
+                                        title="ไม่มีสิทธิ์ดำเนินการ (นอกพื้นที่ความรับผิดชอบ — @item.Province ไม่ใช่พื้นที่ @string.Join(", ", currentOfficer.Areas))">
+                                    <i class="ri ri-lock-line me-1"></i>ลงนาม
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-secondary" disabled
+                                        data-bs-toggle="tooltip" title="ไม่มีสิทธิ์ลงนาม">
+                                    <i class="ri ri-lock-line me-1"></i>ลงนาม
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer py-2">
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="alert alert-info border-0 py-2 mb-0 small" role="alert">
+                    <i class="ri ri-information-line me-1"></i>
+                    <strong>หมายเหตุ:</strong> ปุ่มสีเทา (disabled) = นอกพื้นที่ความรับผิดชอบ
+                    hover เพื่อดูรายละเอียดสาเหตุที่ไม่สามารถดำเนินการได้
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-success border-0 py-2 mb-0 small" role="alert">
+                    <i class="ri ri-shield-check-line me-1"></i>
+                    <strong>Data Scoping:</strong> เจ้าหน้าที่เห็นเฉพาะคำขอในจังหวัดที่ตนรับผิดชอบ
+                    ระบบกรองข้อมูลอัตโนมัติตาม Agency + ResponsibleArea
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: แก้ไขสิทธิ์ -->
+<div class="modal fade" id="editAccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ri ri-shield-keyhole-line me-2"></i>แก้ไขสิทธิ์และพื้นที่ความรับผิดชอบ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning border-0 py-2 mb-4 small">
+                    <i class="ri ri-error-warning-line me-1"></i>
+                    การเปลี่ยนแปลงสิทธิ์ต้องได้รับการยืนยันจาก Admin ระดับ กตส. ก่อนมีผล
+                </div>
+                <div class="row g-3">
+                    <!-- หน่วยงาน -->
+                    <div class="col-md-6">
+                        <label for="editAgency" class="form-label fw-semibold">หน่วยงานสังกัด</label>
+                        <select id="editAgency" class="form-select">
+                            <option value="กตส.">กองตรวจสอบคุณภาพสินค้าประมง (กตส.)</option>
+                            @foreach (var i in Enumerable.Range(1,9))
+                            {
+                                <option value="ศตส.เขต @i">ศตส. เขต @i</option>
+                            }
+                        </select>
+                    </div>
+                    <!-- บทบาท -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">บทบาทในระบบ</label>
+                        <div class="border rounded p-2 bg-light">
+                            @foreach (var role in new[]{"เจ้าหน้าที่รับเรื่อง","เจ้าหน้าที่พิจารณา","ผู้อนุมัติ RMBS1","ผู้ลงนามใบรับรอง","ผู้ตรวจสอบ Traceability","ผู้จัดการ DOF List"})
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input edit-role-cb" type="checkbox" id="editRole_@role.Replace(" ","_")" value="@role">
+                                    <label class="form-check-label small" for="editRole_@role.Replace(" ","_")">@role</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <!-- พื้นที่รับผิดชอบ -->
+                    <div class="col-12">
+                        <label for="editAreas" class="form-label fw-semibold">พื้นที่ความรับผิดชอบ (จังหวัด)</label>
+                        <select id="editAreas" class="form-select" multiple size="5">
+                            @foreach (var prov in new[]{"กรุงเทพมหานคร","นนทบุรี","ปทุมธานี","สมุทรปราการ","สมุทรสาคร","สมุทรสงคราม","เพชรบุรี","ระยอง","ชลบุรี","จันทบุรี","ตราด","สงขลา","สตูล","พัทลุง","ปัตตานี","สุราษฎร์ธานี","ขอนแก่น","เชียงใหม่","เชียงราย","ลำปาง","พิษณุโลก"})
+                            {
+                                <option value="@prov">@prov</option>
+                            }
+                        </select>
+                        <div class="form-text">กด Ctrl/Cmd ค้างเพื่อเลือกหลายจังหวัด</div>
+                    </div>
+                    <!-- สิทธิ์พิเศษ -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">สิทธิ์พิเศษ</label>
+                        <div class="row g-2 border rounded p-2 bg-light">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="editCanApprove" role="switch">
+                                    <label class="form-check-label fw-semibold" for="editCanApprove">
+                                        <i class="ri ri-checkbox-circle-line me-1 text-success"></i>
+                                        สิทธิ์อนุมัติคำขอ (RMBS1/RMBS2/P1/P2)
+                                    </label>
+                                </div>
+                                <div class="form-text ms-4">มีอำนาจอนุมัติเอกสารในพื้นที่รับผิดชอบเท่านั้น</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="editCanSign" role="switch">
+                                    <label class="form-check-label fw-semibold" for="editCanSign">
+                                        <i class="ri ri-pen-nib-line me-1 text-primary"></i>
+                                        สิทธิ์ลงนามใบรับรอง PS/NMD
+                                    </label>
+                                </div>
+                                <div class="form-text ms-4">มีอำนาจลงนามเฉพาะในพื้นที่รับผิดชอบเท่านั้น</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- หมายเหตุ -->
+                    <div class="col-12">
+                        <label for="editNote" class="form-label fw-semibold">หมายเหตุการเปลี่ยนแปลง</label>
+                        <textarea id="editNote" class="form-control" rows="2" placeholder="ระบุเหตุผลในการเปลี่ยนแปลงสิทธิ์..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ยกเลิก
+                </button>
+                <button type="button" class="btn btn-primary" onclick="alert('// TODO: บันทึกสิทธิ์ใหม่ — ส่งคำขอยืนยันไปยัง Admin กตส.')">
+                    <i class="ri ri-save-line me-1"></i>บันทึกและส่งขออนุมัติ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageScripts {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // tooltips
+    if (window.bootstrap && bootstrap.Tooltip) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            new bootstrap.Tooltip(el);
+        });
+    }
+
+    // filter
+    function filterTable() {
+        var kw     = (document.getElementById('arFilterKeyword').value || '').trim().toLowerCase();
+        var agency = (document.getElementById('arFilterAgency').value || '').trim();
+        var role   = (document.getElementById('arFilterRole').value || '').trim();
+        var status = (document.getElementById('arFilterStatus').value || '').trim();
+        var rows   = document.querySelectorAll('#arTBody tr[data-agency]');
+        var count  = 0;
+        rows.forEach(function (row) {
+            var txt    = row.dataset.search || '';
+            var ag     = row.dataset.agency || '';
+            var st     = row.dataset.status || '';
+            var canS   = row.dataset.canSign   === 'true';
+            var canA   = row.dataset.canApprove === 'true';
+            var agMatch = !agency || ag === agency;
+            var roleMatch = !role
+                || (role === 'sign' && canS)
+                || (role === 'approve' && canA);
+            var show = (!kw || txt.includes(kw)) && agMatch && roleMatch && (!status || st === status);
+            row.classList.toggle('d-none', !show);
+            if (show) count++;
+        });
+        document.getElementById('arEmpty').classList.toggle('d-none', count !== 0);
+    }
+    document.getElementById('arBtnSearch').addEventListener('click', filterTable);
+    document.getElementById('arBtnReset').addEventListener('click', function () {
+        ['arFilterKeyword','arFilterAgency','arFilterRole','arFilterStatus'].forEach(function (id) {
+            document.getElementById(id).value = '';
+        });
+        filterTable();
+    });
+    ['arFilterAgency','arFilterRole','arFilterStatus'].forEach(function (id) {
+        document.getElementById(id).addEventListener('change', filterTable);
+    });
+    document.getElementById('arFilterKeyword').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') filterTable();
+    });
+
+    // edit modal
+    document.querySelectorAll('.btn-edit-access').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var userId = this.dataset.userId;
+            // TODO: pre-fill modal with user data
+            new bootstrap.Modal(document.getElementById('editAccessModal')).show();
+        });
+    });
+});
+</script>
+}

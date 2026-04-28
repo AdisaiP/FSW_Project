@@ -1,0 +1,9 @@
+# (4) หมายเลขรับรองโรงงาน (Approval Number)
+
+URL: http://localhost:5055/Admin/TraceabilityList
+
+จำนวนรูปที่ต้องแคป: 2 รูป
+
+รายการหน้าที่ต้องแคป
+1. Detail modal > accordion 'ข้อมูลทั่วไป' > EstNo + ApprovalNo + DofRefNo (อ้างอิง DOF List)
+2. badge 'อ้างอิงจาก DOF List' ใน detail modal

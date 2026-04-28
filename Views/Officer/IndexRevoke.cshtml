@@ -1,153 +1,30 @@
 @{
     ViewData["Title"] = "พิจารณายกเลิกใบรับรอง";
 
+    // 2.7(2)+(3): รองรับ 4 ประเภท + ฟิลด์ครบ 9 เพื่อ CRUD/ค้นหา
     var requests = new[]
     {
-        new
-        {
-            RequestNumber = "10611180331800049",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 20, 17, 21, 49),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180131800118",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 20, 16, 53, 46),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180232800201",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 21, 9, 10, 5),
-            StatusText = "อนุมัติ",
-            StatusClass = "bg-label-success",
-            StatusIcon = "ri-checkbox-circle-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180232800202",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 21, 11, 30, 0),
-            StatusText = "ไม่อนุมัติ",
-            StatusClass = "bg-label-danger",
-            StatusIcon = "ri-close-circle-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180332800305",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 21, 13, 45, 22),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180132800410",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 22, 8, 5, 11),
-            StatusText = "อนุมัติ",
-            StatusClass = "bg-label-success",
-            StatusIcon = "ri-checkbox-circle-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180332800501",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 22, 10, 20, 33),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180132800612",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 22, 14, 55, 7),
-            StatusText = "ยกเลิก",
-            StatusClass = "bg-label-secondary",
-            StatusIcon = "ri-forbid-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180233800700",
-            CertificateKey = "declaration",
-            CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (Declaration)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 23, 9, 0, 0),
-            StatusText = "รออนุมัติ",
-            StatusClass = "bg-label-warning",
-            StatusIcon = "ri-mail-send-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        },
-        new
-        {
-            RequestNumber = "10611180133800811",
-            CertificateKey = "processing",
-            CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (Processing Statement)",
-            Subject = "ยกเลิกใบอนุญาต/ใบรับรองทางอิเล็กทรอนิกส์แบบไร้กระดาษ (Paperless)",
-            TransactionAt = new DateTime(2026, 4, 23, 15, 40, 18),
-            StatusText = "อนุมัติ",
-            StatusClass = "bg-label-success",
-            StatusIcon = "ri-checkbox-circle-line",
-            RequestedByText = "ผู้เข้าใช้ระบบ",
-            RequestedByClass = "bg-label-danger",
-            RequestedByIcon = "ri-user-3-line"
-        }
+        new { RequestNumber = "10611180331800049", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",     CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",        Subject = "ยกเลิกใบรับรอง — ใบรับรองชำรุด/เสียหาย",                              TransactionAt = new DateTime(2026, 4, 20, 17, 21, 49), StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งแช่แข็ง",     DestinationCountry = "ญี่ปุ่น",        ReceivedNo = "" },
+        new { RequestNumber = "10611180131800118", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",  CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",          Subject = "ยกเลิกใบรับรอง — ใบรับรองสูญหาย",                                     TransactionAt = new DateTime(2026, 4, 20, 16, 53, 46), StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาทูน่ากระป๋อง", DestinationCountry = "สหภาพยุโรป",    ReceivedNo = "" },
+        new { RequestNumber = "10611180232800201", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",     CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",        Subject = "ยกเลิกใบรับรอง — ข้อมูลไม่ถูกต้อง",                                  TransactionAt = new DateTime(2026, 4, 21, 9, 10, 5),   StatusText = "อนุมัติ",    StatusClass = "bg-label-success",   StatusIcon = "ri-checkbox-circle-line", RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งแช่แข็ง",     DestinationCountry = "ญี่ปุ่น",        ReceivedNo = "รบ-ยก.2569-00201" },
+        new { RequestNumber = "10611180232800202", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",  CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",          Subject = "ยกเลิกใบรับรอง — ยกเลิกคำสั่งซื้อ",                                  TransactionAt = new DateTime(2026, 4, 21, 11, 30, 0),  StatusText = "ไม่อนุมัติ", StatusClass = "bg-label-danger",    StatusIcon = "ri-close-circle-line",    RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาทูน่ากระป๋อง", DestinationCountry = "สหภาพยุโรป",    ReceivedNo = "รบ-ยก.2569-00202" },
+        new { RequestNumber = "10611180332800305", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",     CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",        Subject = "ยกเลิกใบรับรอง — เปลี่ยนแปลงผู้นำเข้า",                             TransactionAt = new DateTime(2026, 4, 21, 13, 45, 22), StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งสดแช่แข็ง",   DestinationCountry = "สหรัฐอเมริกา",   ReceivedNo = "รบ-ยก.2569-00305" },
+        new { RequestNumber = "10611180132800410", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",  CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",          Subject = "ยกเลิกใบรับรอง — ใบรับรองชำรุด/เสียหาย",                              TransactionAt = new DateTime(2026, 4, 22, 8, 5, 11),   StatusText = "อนุมัติ",    StatusClass = "bg-label-success",   StatusIcon = "ri-checkbox-circle-line", RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท ไทย ฟิชเชอรี่ จำกัด",           FactoryRegNo = "0105548067890", ProductName = "ปลาหมึกแช่แข็ง",  DestinationCountry = "จีน",            ReceivedNo = "รบ-ยก.2569-00410" },
+        new { RequestNumber = "10611180332800501", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",     CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",        Subject = "ยกเลิกใบรับรอง — ใบรับรองสูญหาย",                                     TransactionAt = new DateTime(2026, 4, 22, 10, 20, 33), StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท ทะเลไทย เอ็กซ์พอร์ต จำกัด",    FactoryRegNo = "0105548078901", ProductName = "ปูม้าสด",          DestinationCountry = "ออสเตรเลีย",    ReceivedNo = "รบ-ยก.2569-00501" },
+        new { RequestNumber = "10611180132800612", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",  CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",          Subject = "ยกเลิกใบรับรอง — ข้อมูลไม่ถูกต้อง",                                  TransactionAt = new DateTime(2026, 4, 22, 14, 55, 7),  StatusText = "ยกเลิก",     StatusClass = "bg-label-secondary", StatusIcon = "ri-forbid-line",          RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท อินเตอร์เนชั่นแนล ซีฟู้ด จำกัด", FactoryRegNo = "0105548012345", ProductName = "ปลาแซลมอน",       DestinationCountry = "ญี่ปุ่น",        ReceivedNo = "รบ-ยก.2569-00612" },
+        new { RequestNumber = "10611180233800700", CertificateKey = "NMD",  CertTypeBadge = "cert-type-nmd",     CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMD)",        Subject = "ยกเลิกใบรับรอง — เปลี่ยนแปลงปริมาณ",                                TransactionAt = new DateTime(2026, 4, 23, 9, 0, 0),    StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท สยาม โปรเซสซิ่ง จำกัด",         FactoryRegNo = "0105548054321", ProductName = "กุ้งแช่แข็ง",     DestinationCountry = "ญี่ปุ่น",        ReceivedNo = "รบ-ยก.2569-00700" },
+        new { RequestNumber = "10611180133800811", CertificateKey = "PS",   CertTypeBadge = "bg-label-primary",  CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PS)",          Subject = "ยกเลิกใบรับรอง — ยกเลิกการส่งออก",                                   TransactionAt = new DateTime(2026, 4, 23, 15, 40, 18), StatusText = "อนุมัติ",    StatusClass = "bg-label-success",   StatusIcon = "ri-checkbox-circle-line", RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท ไทย ฟิชเชอรี่ จำกัด",           FactoryRegNo = "0105548067890", ProductName = "ปลาหมึกแช่แข็ง",  DestinationCountry = "จีน",            ReceivedNo = "รบ-ยก.2569-00811" },
+        new { RequestNumber = "10611PST21800901",  CertificateKey = "PST",  CertTypeBadge = "bg-label-info",     CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PST — ไทย)", Subject = "ยกเลิกใบรับรอง — ข้อผิดพลาดต้องแก้ไขหลังสินค้าออกจากประเทศ",       TransactionAt = new DateTime(2026, 4, 24, 10, 30, 0),  StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท ไทย ฟิชเชอรี่ จำกัด",           FactoryRegNo = "0105548067890", ProductName = "ปลาหมึกแช่แข็ง",  DestinationCountry = "จีน",            ReceivedNo = "รบ-ยก.2569-00901" },
+        new { RequestNumber = "10611PST21801002",  CertificateKey = "PST",  CertTypeBadge = "bg-label-info",     CertificateName = "ใบรับรองการแปรรูปสัตว์น้ำ (PST — ไทย)", Subject = "ยกเลิกใบรับรอง — เชื่อมโยง/ส่งต่อข้อมูลไปยังระบบภายนอกแล้ว",       TransactionAt = new DateTime(2026, 4, 25, 9, 15, 0),   StatusText = "อนุมัติ",    StatusClass = "bg-label-success",   StatusIcon = "ri-checkbox-circle-line", RequestedByText = "เจ้าหน้าที่",    RequestedByClass = "bg-label-primary", RequestedByIcon = "ri-user-star-line", EstablishmentName = "บริษัท ไทย ฟิชเชอรี่ จำกัด",           FactoryRegNo = "0105548067890", ProductName = "ปลาหมึกแช่แข็ง",  DestinationCountry = "จีน",            ReceivedNo = "รบ-ยก.2569-01002" },
+        new { RequestNumber = "10611NMDT1801101",  CertificateKey = "NMDT", CertTypeBadge = "bg-label-secondary", CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMDT — ไทย)", Subject = "ยกเลิกใบรับรอง — สำแดงใบรับรองกับลูกค้าแล้ว",                        TransactionAt = new DateTime(2026, 4, 25, 14, 0, 0),   StatusText = "รออนุมัติ",  StatusClass = "bg-label-warning",   StatusIcon = "ri-mail-send-line",       RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท ทะเลไทย เอ็กซ์พอร์ต จำกัด",    FactoryRegNo = "0105548078901", ProductName = "ปูม้าสด",          DestinationCountry = "ออสเตรเลีย",    ReceivedNo = "รบ-ยก.2569-01101" },
+        new { RequestNumber = "10611NMDT1801202",  CertificateKey = "NMDT", CertTypeBadge = "bg-label-secondary", CertificateName = "ใบรับรองสัตว์น้ำไม่แปรรูป (NMDT — ไทย)", Subject = "ยกเลิกใบรับรอง — ใบรับรองสูญหาย",                                     TransactionAt = new DateTime(2026, 4, 26, 11, 45, 0),  StatusText = "ฉบับร่าง",   StatusClass = "bg-label-secondary", StatusIcon = "ri-file-3-line",          RequestedByText = "ผู้เข้าใช้ระบบ", RequestedByClass = "bg-label-danger",  RequestedByIcon = "ri-user-3-line",   EstablishmentName = "บริษัท ทะเลไทย เอ็กซ์พอร์ต จำกัด",    FactoryRegNo = "0105548078901", ProductName = "ปูม้าสด",          DestinationCountry = "ออสเตรเลีย",    ReceivedNo = "" },
     };
 
     var totalRequestCount = requests.Length;
-    var declarationCount = requests.Count(r => r.CertificateKey == "declaration");
-    var processingCount = requests.Count(r => r.CertificateKey == "processing");
+    var nmdCount  = requests.Count(r => r.CertificateKey == "NMD");
+    var psCount   = requests.Count(r => r.CertificateKey == "PS");
+    var pstCount  = requests.Count(r => r.CertificateKey == "PST");
+    var nmdtCount = requests.Count(r => r.CertificateKey == "NMDT");
 }
 
 @section VendorStyles {
@@ -218,6 +95,12 @@
         align-items: center;
         justify-content: center;
     }
+
+    /* 2.7(2): NMD cert type badge (purple) */
+    .cert-type-nmd {
+        background-color: rgba(123, 31, 162, 0.15);
+        color: #7b1fa2;
+    }
 </style>
 }
 
@@ -228,100 +111,123 @@
 @section PageScripts {
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var fromInput = document.getElementById('filterDraftDateFrom');
-        var toInput = document.getElementById('filterDraftDateTo');
-
-        if (fromInput) {
-            flatpickr(fromInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
-
-        if (toInput) {
-            flatpickr(toInput, {
-                dateFormat: 'd/m/Y',
-                allowInput: true
-            });
-        }
-
+        // Tooltips
         if (window.bootstrap && bootstrap.Tooltip) {
-            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
-                new bootstrap.Tooltip(element);
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+                new bootstrap.Tooltip(el);
             });
         }
 
+        // flatpickr with Thai Buddhist Era for date inputs
+        ['filterDraftDateFrom', 'filterDraftDateTo'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            flatpickr(el, {
+                dateFormat: 'd/m/Y',
+                allowInput: true,
+                formatDate: function (date) {
+                    var d = date.getDate().toString().padStart(2, '0');
+                    var m = (date.getMonth() + 1).toString().padStart(2, '0');
+                    var y = date.getFullYear() + 543;
+                    return d + '/' + m + '/' + y;
+                },
+                parseDate: function (str) {
+                    var parts = str.split('/');
+                    if (parts.length < 3) return null;
+                    var year = parseInt(parts[2], 10);
+                    if (year > 2500) year -= 543;
+                    return new Date(year, parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+                }
+            });
+        });
+
+        // ── 2.7(3): Filter with 9 criteria ────────────────────────
         function parseDateInput(value, endOfDay) {
-            if (!value) {
-                return null;
-            }
-
+            if (!value) return null;
             var parts = value.split('/');
-            if (parts.length !== 3) {
-                return null;
-            }
-
-            var day = parseInt(parts[0], 10);
+            if (parts.length !== 3) return null;
+            var day   = parseInt(parts[0], 10);
             var month = parseInt(parts[1], 10) - 1;
-            var year = parseInt(parts[2], 10);
-            var hours = endOfDay ? 23 : 0;
+            var year  = parseInt(parts[2], 10);
+            if (year > 2500) year -= 543;
+            var hours   = endOfDay ? 23 : 0;
             var minutes = endOfDay ? 59 : 0;
             var seconds = endOfDay ? 59 : 0;
-            var parsed = new Date(year, month, day, hours, minutes, seconds);
-
+            var parsed  = new Date(year, month, day, hours, minutes, seconds);
             return Number.isNaN(parsed.getTime()) ? null : parsed;
         }
 
         function filterRows() {
-            var status = (document.getElementById('filterStatus').value || '').trim();
-            var fromDate = parseDateInput(document.getElementById('filterDraftDateFrom').value, false);
-            var toDate = parseDateInput(document.getElementById('filterDraftDateTo').value, true);
-            var excludeRange = document.getElementById('filterDateExclude').checked;
+            var certType   = (document.getElementById('filterCertType').value || '').trim();
+            var status     = (document.getElementById('filterStatus').value || '').trim();
+            var reqNo      = (document.getElementById('filterReqNo')?.value || '').trim().toLowerCase();
+            var estab      = (document.getElementById('filterEstab')?.value || '').trim().toLowerCase();
+            var factory    = (document.getElementById('filterFactory')?.value || '').trim().toLowerCase();
+            var product    = (document.getElementById('filterProduct')?.value || '').trim().toLowerCase();
+            var country    = (document.getElementById('filterCountry')?.value || '').trim().toLowerCase();
+            var receivedNo = (document.getElementById('filterReceivedNo')?.value || '').trim().toLowerCase();
+            var fromDate   = parseDateInput(document.getElementById('filterDraftDateFrom')?.value, false);
+            var toDate     = parseDateInput(document.getElementById('filterDraftDateTo')?.value, true);
+            var exclude    = document.getElementById('filterDateExclude')?.checked || false;
+
             var rows = document.querySelectorAll('#requestTableBody tr[data-certificate]');
             var visibleCount = 0;
 
             rows.forEach(function (row) {
-                var rowStatus = row.dataset.status || '';
-                var rowDraftDate = new Date(row.dataset.draftDate || '');
-                var statusMatch = !status || rowStatus === status;
-                var dateMatch;
-                if (!fromDate && !toDate) {
-                    dateMatch = true;
-                } else if (excludeRange) {
-                    var inRange = (!fromDate || rowDraftDate >= fromDate) && (!toDate || rowDraftDate <= toDate);
-                    dateMatch = !inRange;
-                } else {
-                    dateMatch = (!fromDate || rowDraftDate >= fromDate) && (!toDate || rowDraftDate <= toDate);
-                }
-                var isVisible = statusMatch && dateMatch;
+                var certTypeMatch   = !certType   || (row.dataset.certtype    || '') === certType;
+                var statusMatch     = !status     || (row.dataset.status      || '') === status;
+                var reqNoMatch      = !reqNo      || (row.dataset.reqno       || '').includes(reqNo);
+                var estabMatch      = !estab      || (row.dataset.estab       || '').includes(estab);
+                var factoryMatch    = !factory    || (row.dataset.factory     || '').includes(factory);
+                var productMatch    = !product    || (row.dataset.product     || '').includes(product);
+                var countryMatch    = !country    || (row.dataset.country     || '').includes(country);
+                var receivedNoMatch = !receivedNo || (row.dataset.receivedno  || '').includes(receivedNo);
 
-                row.classList.toggle('d-none', !isVisible);
-                if (isVisible) {
-                    visibleCount += 1;
+                var dateMatch = true;
+                if (fromDate || toDate) {
+                    var rowDate = new Date(row.dataset.draftDate || '');
+                    if (!isNaN(rowDate.getTime())) {
+                        var inRange = (!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate);
+                        dateMatch = exclude ? !inRange : inRange;
+                    }
                 }
+
+                var visible = certTypeMatch && statusMatch && reqNoMatch && estabMatch
+                           && factoryMatch && productMatch && countryMatch && receivedNoMatch && dateMatch;
+                row.classList.toggle('d-none', !visible);
+                if (visible) visibleCount++;
             });
 
             document.getElementById('requestTableEmpty').classList.toggle('d-none', visibleCount !== 0);
         }
 
         document.getElementById('btnSearchRequests').addEventListener('click', filterRows);
+        document.getElementById('filterCertType').addEventListener('change', filterRows);
         document.getElementById('filterStatus').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateFrom').addEventListener('change', filterRows);
-        document.getElementById('filterDraftDateTo').addEventListener('change', filterRows);
-        document.getElementById('filterDateExclude').addEventListener('change', filterRows);
-        document.querySelectorAll('#filterStatus, #filterDraftDateFrom, #filterDraftDateTo').forEach(function (element) {
-            element.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    filterRows();
-                }
+        document.getElementById('filterDateExclude')?.addEventListener('change', filterRows);
+
+        // Enter key on any filter input triggers search
+        document.querySelectorAll('#filterCertType, #filterStatus, #filterReqNo, #filterEstab, #filterFactory, #filterProduct, #filterCountry, #filterReceivedNo, #filterDraftDateFrom, #filterDraftDateTo').forEach(function (el) {
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); filterRows(); }
             });
         });
+
         document.getElementById('btnResetRequests').addEventListener('click', function () {
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterDraftDateFrom').value = '';
-            document.getElementById('filterDraftDateTo').value = '';
-            document.getElementById('filterDateExclude').checked = false;
+            ['filterCertType','filterStatus','filterReqNo','filterEstab','filterFactory',
+             'filterProduct','filterCountry','filterReceivedNo','filterDraftDateFrom','filterDraftDateTo'
+            ].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            var chk = document.getElementById('filterDateExclude');
+            if (chk) chk.checked = false;
+            // collapse advanced panel
+            var adv = document.getElementById('advancedSearch');
+            if (adv && adv.classList.contains('show')) {
+                var bsInst = bootstrap.Collapse.getInstance(adv);
+                if (bsInst) bsInst.hide();
+            }
             filterRows();
         });
     });
@@ -330,7 +236,7 @@
 
 @* ************** Content ************** *@
 <h4 class="mb-1">พิจารณายกเลิกใบรับรอง</h4>
-<p class="mb-1">พิจารณาคำขอยกเลิกใบรับรองการแปรรูปสัตว์นํ้า (PS) และใบรับรองไม่แปรรูปสัตว์นํ้า (Declaration)</p>
+<p class="mb-1">พิจารณาคำขอยกเลิกใบรับรองการแปรรูปสัตว์นํ้า (PS/PST) และใบรับรองไม่แปรรูปสัตว์นํ้า (NMD/NMDT)</p>
 
 <!-- Breadcrumb -->
 <nav aria-label="breadcrumb" class="mb-6">
@@ -341,49 +247,106 @@
     </ol>
 </nav>
 
+@* 2.7(3): Summary badges *@
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <span class="badge bg-label-secondary fs-6 px-3 py-2">
+        <i class="ri ri-list-check me-1"></i>ทั้งหมด @totalRequestCount รายการ
+    </span>
+    <span class="badge cert-type-nmd px-3 py-2">NMD @nmdCount</span>
+    <span class="badge bg-label-primary px-3 py-2">PS @psCount</span>
+    <span class="badge bg-label-info px-3 py-2">PST @pstCount</span>
+    <span class="badge bg-label-secondary px-3 py-2">NMDT @nmdtCount</span>
+</div>
+
 <div class="card mb-4">
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
-            <h5 class="card-title mb-1">ตัวกรองการค้นหา</h5>
-            <p class="text-muted small mb-0">ค้นหารายการคำขอยกเลิกตามสถานะและช่วงวันที่ทำรายการ</p>
+            <h5 class="card-title mb-1">ค้นหาคำขอยกเลิก</h5>
+            <p class="text-muted small mb-0">ค้นหาจากประเภทใบรับรอง / สถานะ หรือเปิด "ค้นหาขั้นสูง" สำหรับเงื่อนไขเพิ่มเติม</p>
         </div>
+        @* 2.7(3): ปุ่มสร้างคำขอยกเลิก *@
+        <button type="button" class="btn btn-primary" id="btnCreateRevokeRequest"
+                onclick="alert('TODO: สร้างคำขอยกเลิก (เจ้าหน้าที่)')">
+            <i class="ri ri-add-line me-1"></i>สร้างคำขอยกเลิก (เจ้าหน้าที่)
+        </button>
     </div>
-    <div class="card-body">
-        <div class="row g-3 align-items-end">
+    <div class="card-body pb-2">
+        @* --- แถวหลัก: ประเภท + สถานะ + ปุ่ม --- *@
+        <div class="row g-3 align-items-end mb-3">
+            <div class="col-md-4 col-lg-3">
+                <label for="filterCertType" class="form-label">ประเภทใบรับรอง</label>
+                <select id="filterCertType" class="form-select">
+                    <option value="">ทั้งหมด</option>
+                    <option value="NMD">NMD — ใบรับรองสัตว์น้ำไม่แปรรูป</option>
+                    <option value="PS">PS — ใบรับรองการแปรรูปสัตว์น้ำ</option>
+                    <option value="PST">PST — ใบรับรองการแปรรูป (ไทย)</option>
+                    <option value="NMDT">NMDT — ใบรับรองไม่แปรรูป (ไทย)</option>
+                </select>
+            </div>
             <div class="col-md-4 col-lg-3">
                 <label for="filterStatus" class="form-label">สถานะ</label>
                 <select id="filterStatus" class="form-select">
                     <option value="">ทั้งหมด</option>
                     <option value="รออนุมัติ">รออนุมัติ</option>
-                    <option value="อนุมัติ">อนุมัติ</option>
-                    <option value="ไม่อนุมัติ">ไม่อนุมัติ</option>
+                    <option value="อนุมัติ">อนุมัติ ✅</option>
+                    <option value="ไม่อนุมัติ">ไม่อนุมัติ ❌</option>
                     <option value="ยกเลิก">ยกเลิก</option>
+                    <option value="ฉบับร่าง">ฉบับร่าง</option>
                 </select>
             </div>
-            <div class="col-md-12 col-lg-9">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-4">
-                        <label for="filterDraftDateFrom" class="form-label">วันที่ทำรายการ</label>
-                        <input type="text" id="filterDraftDateFrom" class="form-control" placeholder="วว/ดด/ปปปป" />
-                    </div>
-                    <div class="col-md-4">
-                        <label for="filterDraftDateTo" class="form-label">ถึงวันที่</label>
-                        <input type="text" id="filterDraftDateTo" class="form-control" placeholder="วว/ดด/ปปปป" />
-                    </div>
-                    <div class="col-auto">
-                        <div class="form-check mb-2">
+            <div class="col-auto d-flex align-items-end gap-2">
+                <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square filter-action-buttons" title="ค้นหา">
+                    <i class="ri ri-search-line"></i>
+                </button>
+                <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square filter-action-buttons">
+                    <i class="ri ri-refresh-line"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm"
+                        data-bs-toggle="collapse" data-bs-target="#advancedSearch" aria-expanded="false">
+                    <i class="ri ri-equalizer-line me-1"></i>ค้นหาขั้นสูง
+                </button>
+            </div>
+        </div>
+
+        @* --- ค้นหาขั้นสูง (Collapsible) --- *@
+        <div class="collapse" id="advancedSearch">
+            <hr class="my-2" />
+            <div class="row g-3 align-items-end pb-2">
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterReqNo" class="form-label small">เลขที่คำขอ</label>
+                    <input type="text" id="filterReqNo" class="form-control form-control-sm" placeholder="เลขที่คำขอ" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterEstab" class="form-label small">ชื่อสถานประกอบการ</label>
+                    <input type="text" id="filterEstab" class="form-control form-control-sm" placeholder="ชื่อสถานประกอบการ" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterFactory" class="form-label small">เลขทะเบียนโรงงาน</label>
+                    <input type="text" id="filterFactory" class="form-control form-control-sm" placeholder="เลขทะเบียนโรงงาน" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterProduct" class="form-label small">ชื่อสินค้า</label>
+                    <input type="text" id="filterProduct" class="form-control form-control-sm" placeholder="ชื่อสินค้า" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterCountry" class="form-label small">ประเทศปลายทาง</label>
+                    <input type="text" id="filterCountry" class="form-control form-control-sm" placeholder="ประเทศปลายทาง" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterReceivedNo" class="form-label small">เลขที่รับคำขอ</label>
+                    <input type="text" id="filterReceivedNo" class="form-control form-control-sm" placeholder="เลขที่รับคำขอ" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterDraftDateFrom" class="form-label small">วันที่ยื่น (ตั้งแต่)</label>
+                    <input type="text" id="filterDraftDateFrom" class="form-control form-control-sm" placeholder="วว/ดด/ปปปป" />
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label for="filterDraftDateTo" class="form-label small">ถึงวันที่</label>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="text" id="filterDraftDateTo" class="form-control form-control-sm" placeholder="วว/ดด/ปปปป" />
+                        <div class="form-check mb-0 flex-shrink-0">
                             <input class="form-check-input" type="checkbox" id="filterDateExclude" />
                             <label class="form-check-label small" for="filterDateExclude">ไม่อยู่ในช่วง</label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <div class="d-flex gap-2 filter-action-buttons">
-                            <button type="button" id="btnSearchRequests" class="btn btn-outline-primary btn-square" title="ค้นหา">
-                                <i class="ri ri-search-line"></i>
-                            </button>
-                            <button type="button" id="btnResetRequests" class="btn btn-outline-secondary btn-square">
-                                <i class="ri ri-refresh-line"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -396,24 +359,36 @@
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
             <h5 class="card-title mb-1">รายการคำขอยกเลิกใบรับรอง</h5>
-            <p class="text-muted small mb-0">รายการคำขอยกเลิกใบรับรองการแปรรูปสัตว์นํ้า (PS) และใบรับรองไม่แปรรูปสัตว์นํ้า (Declaration)</p>
+            <p class="text-muted small mb-0">รายการคำขอยกเลิกใบรับรอง NMD / PS / PST / NMDT ทั้งหมด @totalRequestCount รายการ</p>
         </div>
     </div>
     <div class="table-responsive p-1">
         <table class="table table-bordered align-middle mb-0 request-table-compact">
             <thead class="text-center">
                 <tr>
-                    <th style="min-width:180px;">เลขที่ใบรับรอง</th>
-                    <th style="min-width:200px;">ใบรับรอง</th>
+                    <th style="min-width:180px;">เลขที่คำขอ</th>
+                    <th style="width:4.5rem;">ประเภท</th>
+                    <th style="min-width:180px;">สถานประกอบการ</th>
+                    <th style="min-width:140px;">สินค้า / ประเทศ</th>
                     <th>เรื่อง</th>
-                    <th style="min-width:150px;">วันที่ทำรายการ</th>
-                    <th style="width:6rem;"></th>
+                    <th style="min-width:120px;">วันที่ยื่น</th>
+                    <th style="min-width:140px;">เลขที่รับคำขอ</th>
+                    <th style="width:7rem;"></th>
                 </tr>
             </thead>
             <tbody id="requestTableBody">
                 @foreach (var request in requests)
                 {
-                    <tr data-certificate="@request.CertificateKey" data-status="@request.StatusText" data-draft-date="@request.TransactionAt.ToString("yyyy-MM-ddTHH:mm:ss")">
+                    <tr data-certificate="@request.CertificateKey"
+                        data-certtype="@request.CertificateKey"
+                        data-status="@request.StatusText"
+                        data-draft-date="@request.TransactionAt.ToString("yyyy-MM-ddTHH:mm:ss")"
+                        data-reqno="@request.RequestNumber.ToLower()"
+                        data-estab="@request.EstablishmentName.ToLower()"
+                        data-factory="@request.FactoryRegNo.ToLower()"
+                        data-product="@request.ProductName.ToLower()"
+                        data-country="@request.DestinationCountry.ToLower()"
+                        data-receivedno="@request.ReceivedNo.ToLower()">
                         <td>
                             <span class="fw-semibold text-primary d-block mb-1">@request.RequestNumber</span>
                             <div class="d-flex flex-column gap-1">
@@ -429,31 +404,79 @@
                                     </span>
                                     <span>ขอโดย: @request.RequestedByText</span>
                                 </div>
+                                @* ReceivedNo แสดงใน column เลขที่รับคำขอ แล้ว (2.7(5)) *@
                             </div>
                         </td>
-                        <td class="small">@request.CertificateName</td>
+                        <td class="text-center">
+                            <span class="badge @request.CertTypeBadge">@request.CertificateKey</span>
+                        </td>
+                        <td class="small">
+                            <span class="fw-semibold d-block">@request.EstablishmentName</span>
+                            <span class="text-muted" style="font-size:0.72rem;">@request.FactoryRegNo</span>
+                        </td>
+                        <td class="small">
+                            <span class="d-block">@request.ProductName</span>
+                            <span class="text-muted" style="font-size:0.72rem;">@request.DestinationCountry</span>
+                        </td>
                         <td class="small">@request.Subject</td>
                         <td class="text-center small text-nowrap">
-                            @request.TransactionAt.ToString("dd/MM/yyyy")<br />
-                            <span class="text-muted">(@request.TransactionAt.ToString("HH:mm:ss"))</span>
+                            @{ var beYear = request.TransactionAt.Year + 543; }
+                            @request.TransactionAt.ToString("dd/MM/")@beYear<br />
+                            <span class="text-muted">(@request.TransactionAt.ToString("HH:mm"))</span>
+                        </td>
+                        @* 2.7(5): เลขที่รับคำขอ dedicated column *@
+                        <td class="text-center small">
+                            @if (!string.IsNullOrEmpty(request.ReceivedNo))
+                            {
+                                <span class="fw-semibold text-success d-block">
+                                    <i class="ri ri-inbox-archive-line me-1"></i>@request.ReceivedNo
+                                </span>
+                            }
+                            else if (request.StatusText == "รออนุมัติ")
+                            {
+                                <span class="badge bg-label-warning">
+                                    <i class="ri ri-time-line me-1"></i>รอลงทะเบียน
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
                         </td>
                         <td class="text-center">
-                            <div class="d-flex gap-1 justify-content-center">
-                                @if (request.StatusText == "รออนุมัติ")
+                            <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                @{ var isProcessingType = request.CertificateKey == "PS" || request.CertificateKey == "PST"; }
+                                @if (request.StatusText == "รออนุมัติ" || request.StatusText == "ฉบับร่าง")
                                 {
-                                    <a href="@(request.CertificateKey == "processing" ? Url.Action("CreateManageCertificatePS", "PSDeclaration") : Url.Action("CreateManageCertificateNoPS", "PSDeclaration"))" class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                    <a href="@Url.Action("ReviewRevoke", "Officer")"
+                                       class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                         <i class="ri ri-eye-line"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ">
-                                        <i class="ri ri-checkbox-circle-line text-success"></i>
+                                    @* 2.7(3): ปุ่มแก้ไข/ลบ *@
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="แก้ไข"
+                                            onclick="alert('TODO: แก้ไขคำขอยกเลิก @request.RequestNumber')">
+                                        <i class="ri ri-edit-line"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="ไม่อนุมัติ">
-                                        <i class="ri ri-close-circle-line text-danger"></i>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="ลบ"
+                                            onclick="if(confirm('ยืนยันลบคำขอยกเลิก @request.RequestNumber ?')) alert('TODO: ลบ')">
+                                        <i class="ri ri-delete-bin-line"></i>
                                     </button>
+                                    @if (request.StatusText == "รออนุมัติ")
+                                    {
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-success" data-bs-toggle="tooltip" title="อนุมัติ"
+                                                onclick="if(confirm('ยืนยันอนุมัติคำขอยกเลิก @request.RequestNumber ?')) alert('TODO: อนุมัติ')">
+                                            <i class="ri ri-checkbox-circle-line text-success"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="ไม่อนุมัติ"
+                                                onclick="if(confirm('ยืนยันไม่อนุมัติคำขอยกเลิก @request.RequestNumber ?')) alert('TODO: ไม่อนุมัติ')">
+                                            <i class="ri ri-close-circle-line text-danger"></i>
+                                        </button>
+                                    }
                                 }
                                 @if (request.StatusText == "อนุมัติ" || request.StatusText == "ไม่อนุมัติ")
                                 {
-                                    <a href="@(request.CertificateKey == "processing" ? Url.Action("CreateManageCertificatePS", "PSDeclaration") : Url.Action("CreateManageCertificateNoPS", "PSDeclaration"))" class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
+                                    <a href="@Url.Action("ReviewRevoke", "Officer")"
+                                       class="btn btn-sm btn-icon btn-outline-secondary" data-bs-toggle="tooltip" title="ดูรายละเอียด">
                                         <i class="ri ri-eye-line"></i>
                                     </a>
                                 }
@@ -466,7 +489,7 @@
                     </tr>
                 }
                 <tr id="requestTableEmpty" class="d-none">
-                    <td colspan="5" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
+                    <td colspan="8" class="text-center text-muted py-4">ไม่พบข้อมูลตามเงื่อนไขที่ค้นหา</td>
                 </tr>
             </tbody>
         </table>

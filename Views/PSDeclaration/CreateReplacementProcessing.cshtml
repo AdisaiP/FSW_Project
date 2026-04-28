@@ -32,7 +32,47 @@
 <div class="row">
     <div class="col-12">
 
+        @* TOR 1.8(1): Alert สำหรับใบรับรองที่ถูก lock (เชื่อมโยงภายนอก/สำแดงแล้ว) *@
+        @* ในระบบจริง จะแสดง/ซ่อน alert นี้ตาม ViewData หรือ Model property *@
+        @* mockup: uncomment บรรทัดด้านล่างเพื่อแสดง locked state *@
+        @*
+        <div class="alert alert-danger d-flex align-items-start gap-3 mb-4" role="alert">
+            <i class="ri ri-lock-2-line fs-4 flex-shrink-0 mt-1"></i>
+            <div>
+                <div class="fw-bold mb-1">🔒 ใบรับรองนี้ไม่สามารถแก้ไขได้ในขณะนี้</div>
+                <div class="small">ใบรับรองนี้ถูกส่งต่อระบบภายนอกหรือสำแดงกับลูกค้าแล้ว
+                    ไม่อนุญาตให้แก้ไขหรือเปลี่ยนแปลงข้อมูลใดๆ
+                    กรุณาติดต่อเจ้าหน้าที่หากต้องการดำเนินการ</div>
+                <a href="@Url.Action("IndexReplacementCertificate", "PSDeclaration")" class="btn btn-sm btn-outline-danger mt-2">
+                    <i class="ri ri-arrow-left-line me-1"></i>กลับไปรายการ
+                </a>
+            </div>
+        </div>
+        *@
+
         <form method="post" action="#">
+
+        <!-- TOR 1.8(7): Alert กรณีมีการตรวจปล่อยอยู่แล้ว -->
+        <div class="alert alert-warning d-flex align-items-start gap-3 mb-4" role="alert" id="alertInspectionExists">
+            <i class="ri ri-alert-line fs-4 flex-shrink-0 mt-1"></i>
+            <div class="flex-grow-1">
+                <div class="fw-bold mb-1">⚠️ ใบรับรองนี้มีการตรวจปล่อยจากด่านตรวจประมงอยู่แล้ว</div>
+                <div class="small mb-2">
+                    หากต้องการแก้ไขน้ำหนักส่งออก กรุณาลบ/ยกเลิกการตรวจปล่อยด่านตรวจก่อน แล้วจึงสร้างคำขอเปลี่ยนแปลง<br />
+                    หากไม่แก้ไขน้ำหนัก ระบบจะปรับปรุงอัตโนมัติโดยไม่ต้องขอตรวจปล่อยใหม่
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="@Url.Action("IndexApproveReturnWeight", "PSDeclaration")" class="btn btn-sm btn-warning">
+                        <i class="ri ri-login-box-line me-1"></i>ไปยังหน้าตรวจปล่อย
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-warning"
+                            onclick="document.getElementById('alertInspectionExists').style.display='none'; document.getElementById('amendmentTypeSection').style.display='';"
+                            title="ถ้าไม่แก้ไขน้ำหนัก ปิด alert นี้และดำเนินการต่อ">
+                        <i class="ri ri-arrow-right-line me-1"></i>ไม่แก้ไขน้ำหนัก — ดำเนินการต่อ
+                    </button>
+                </div>
+            </div>
+        </div>
         <div class="nav-align-top nav-tabs-shadow mb-4">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
@@ -51,6 +91,12 @@
                     <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                         data-bs-target="#tab-evidence" aria-controls="tab-evidence" aria-selected="false">
                         <i class="ri ri-folder-open-line me-1"></i> หลักฐานประกอบ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                        data-bs-target="#tab-history" aria-controls="tab-history" aria-selected="false">
+                        <i class="ri ri-history-line me-1"></i> ประวัติการดำเนินการ
                     </button>
                 </li>
             </ul>
@@ -152,25 +198,47 @@
                                             <div class="col-12">
                                                 <label class="form-label d-block mb-2">เหตุผล <span class="text-danger">●</span></label>
                                                 <div class="border rounded p-3">
+                                                    <!-- TOR 1.9(1): เงื่อนไขที่รองรับการขอทดแทน -->
                                                     <div class="form-check mb-2">
                                                         <input class="form-check-input" type="radio" name="replacementReason"
-                                                            id="reasonLost" value="lost" checked />
+                                                            id="reasonLost" value="lost" checked
+                                                            onchange="toggleReasonOtherDetail()" />
                                                         <label class="form-check-label" for="reasonLost">
                                                             ใบรับรองสูญหาย
                                                         </label>
                                                     </div>
                                                     <div class="form-check mb-2">
                                                         <input class="form-check-input" type="radio" name="replacementReason"
-                                                            id="reasonDamaged" value="damaged" />
+                                                            id="reasonPostExport" value="post_export"
+                                                            onchange="toggleReasonOtherDetail()" />
+                                                        <label class="form-check-label" for="reasonPostExport">
+                                                            ข้อมูลผิดพลาดหลังสินค้าออกจากประเทศไทยแล้ว
+                                                            <span class="badge bg-label-warning ms-1 small">หลังสินค้าออก</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="radio" name="replacementReason"
+                                                            id="reasonLinkedExternal" value="linked_external"
+                                                            onchange="toggleReasonOtherDetail()" />
+                                                        <label class="form-check-label" for="reasonLinkedExternal">
+                                                            เชื่อมโยง / แลกเปลี่ยน / ส่งต่อระบบภายนอกแล้ว หรือสำแดงกับลูกค้าแล้ว
+                                                            <span class="badge bg-label-danger ms-1 small">ใบรับรอง lock</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="radio" name="replacementReason"
+                                                            id="reasonDamaged" value="damaged"
+                                                            onchange="toggleReasonOtherDetail()" />
                                                         <label class="form-check-label" for="reasonDamaged">
-                                                            ใบรับรองชำรุด/เสียหาย
+                                                            ใบรับรองชำรุด / เสียหาย
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="replacementReason"
-                                                            id="reasonOther" value="other" />
+                                                            id="reasonOther" value="other"
+                                                            onchange="toggleReasonOtherDetail()" />
                                                         <label class="form-check-label" for="reasonOther">
-                                                            เหตุผลอื่น (ระบุในรายละเอียด)
+                                                            อื่นๆ (ระบุในรายละเอียด)
                                                         </label>
                                                     </div>
                                                 </div>
@@ -179,6 +247,44 @@
                                                 <label for="replacementDetail" class="form-label">รายละเอียดเพิ่มเติม <span class="text-danger">●</span></label>
                                                 <textarea id="replacementDetail" class="form-control" rows="4"
                                                     placeholder="ระบุรายละเอียดเหตุผลการขอใบรับรองทดแทน" required></textarea>
+                                            </div>
+
+                                            <!-- TOR 1.8(7): ประเภทการแก้ไข -->
+                                            <div class="col-12" id="amendmentTypeSection">
+                                                <label class="form-label d-block mb-2">ประเภทการแก้ไข <span class="text-danger">●</span></label>
+                                                <div class="border rounded p-3">
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="radio" name="amendmentType"
+                                                               id="amendNoWeight" value="no_weight" checked
+                                                               onchange="document.getElementById('infoAutoUpdate').classList.remove('d-none'); document.getElementById('infoNeedReInspect').classList.add('d-none');" />
+                                                        <label class="form-check-label" for="amendNoWeight">
+                                                            <span class="fw-semibold">แก้ไขรายละเอียด (ไม่เปลี่ยนน้ำหนัก)</span>
+                                                            <span class="badge bg-label-success ms-2 small">ระบบปรับปรุงอัตโนมัติ</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="amendmentType"
+                                                               id="amendWithWeight" value="with_weight"
+                                                               onchange="document.getElementById('infoAutoUpdate').classList.add('d-none'); document.getElementById('infoNeedReInspect').classList.remove('d-none');" />
+                                                        <label class="form-check-label" for="amendWithWeight">
+                                                            <span class="fw-semibold">แก้ไขน้ำหนักส่งออก</span>
+                                                            <span class="badge bg-label-warning ms-2 small">ต้องขอตรวจปล่อยใหม่</span>
+                                                        </label>
+                                                    </div>
+                                                    <!-- Info: ปรับปรุงอัตโนมัติ -->
+                                                    <div id="infoAutoUpdate" class="alert alert-success small py-2 mt-3 mb-0">
+                                                        <i class="ri ri-robot-line me-2"></i>
+                                                        <strong>ระบบปรับปรุงอัตโนมัติ</strong> —
+                                                        หลังอนุมัติ ระบบจะอัปเดตใบรับรองและเชื่อมโยงไปยังระบบด่านตรวจประมงโดยอัตโนมัติ
+                                                        โดยไม่ต้องขอตรวจปล่อยใหม่
+                                                    </div>
+                                                    <!-- Info: ต้องขอตรวจปล่อยใหม่ -->
+                                                    <div id="infoNeedReInspect" class="alert alert-warning small py-2 mt-3 mb-0 d-none">
+                                                        <i class="ri ri-alert-line me-2"></i>
+                                                        <strong>ต้องดำเนินการเพิ่มเติม</strong> —
+                                                        หลังอนุมัติ คุณต้องยื่นคำขอตรวจปล่อยใหม่ด้วย เนื่องจากน้ำหนักส่งออกเปลี่ยนแปลง
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -445,6 +551,73 @@
                     </div>
                     <!-- /Accordion Processing Info -->
 
+                    <!-- TOR 1.8(5): หมายเหตุประกอบการพิจารณา -->
+                    <div class="accordion mt-3" id="accordionRemark">
+                        <div class="accordion-item border">
+                            <h2 class="accordion-header" id="headingRemark">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#collapseRemark"
+                                        aria-expanded="false" aria-controls="collapseRemark">
+                                    <i class="ri ri-sticky-note-line me-2 text-warning"></i>
+                                    <span class="fw-semibold">หมายเหตุประกอบการพิจารณา</span>
+                                    <span class="badge bg-label-warning ms-2 small">สำหรับเจ้าหน้าที่</span>
+                                </button>
+                            </h2>
+                            <div id="collapseRemark" class="accordion-collapse collapse"
+                                 aria-labelledby="headingRemark" data-bs-parent="#accordionRemark">
+                                <div class="accordion-body">
+                                    <div class="alert alert-warning small py-2 mb-3">
+                                        <i class="ri ri-lock-line me-1"></i>
+                                        ข้อมูลในส่วนนี้ใช้ภายในระบบเท่านั้น ผู้ประกอบการจะไม่เห็นข้อความนี้
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label for="officerRemark" class="form-label">
+                                                หมายเหตุสำหรับเจ้าหน้าที่พิจารณา
+                                                <span class="text-muted small">(ใช้ภายในระบบเท่านั้น)</span>
+                                            </label>
+                                            <textarea id="officerRemark" class="form-control" rows="4"
+                                                      placeholder="ระบุรายละเอียดเพิ่มเติมสำหรับเจ้าหน้าที่ผู้พิจารณา เช่น ข้อสังเกต เงื่อนไขพิเศษ หรือประวัติการยื่นคำขอที่เกี่ยวข้อง"></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="remarkCategory" class="form-label">ประเภทหมายเหตุ</label>
+                                            <select id="remarkCategory" class="form-select">
+                                                <option value="">-- เลือกประเภท --</option>
+                                                <option value="1">ข้อสังเกตทั่วไป</option>
+                                                <option value="2">ประวัติการยื่นคำขอ</option>
+                                                <option value="3">เงื่อนไขพิเศษ</option>
+                                                <option value="4">ต้องการข้อมูลเพิ่มเติม</option>
+                                                <option value="5">อื่นๆ</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="remarkPriority" class="form-label">ระดับความสำคัญ</label>
+                                            <select id="remarkPriority" class="form-select">
+                                                <option value="normal" selected>ปกติ</option>
+                                                <option value="important">สำคัญ</option>
+                                                <option value="urgent">เร่งด่วน</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">ประวัติหมายเหตุก่อนหน้า</label>
+                                            <div class="border rounded p-3 bg-light small" style="max-height:140px;overflow-y:auto;">
+                                                <div class="d-flex gap-2 mb-2">
+                                                    <span class="badge bg-label-secondary flex-shrink-0">18/04/2569 10:20</span>
+                                                    <span class="text-muted">ผู้ยื่น: <strong>นาย สมชาย รักษาผล</strong> — ยื่นคำขอเดิมเลขที่ REP821B211301 เหตุผล: ใบรับรองชำรุด/เสียหาย</span>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <span class="badge bg-label-warning flex-shrink-0">20/04/2569 09:05</span>
+                                                    <span class="text-muted">เจ้าหน้าที่: <strong>นางสาว วิภา ตรวจสอบ</strong> — ขอเอกสารเพิ่มเติม: สำเนาใบแจ้งความ</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /TOR 1.8(5) -->
+
                 </div>
                 <!-- /TAB 1 -->
 
@@ -626,6 +799,39 @@
                                             </button>
                                         </td>
                                     </tr>
+                                    @* TOR 1.9(4): mockup หลักฐาน Replacement เพิ่มเติม *@
+                                    <tr>
+                                        <td class="text-center text-muted">2</td>
+                                        <td><span class="badge bg-label-warning">รายงานสูญหาย</span></td>
+                                        <td>รายงานการสูญหายของใบรับรองฉบับเดิม</td>
+                                        <td class="text-center">15/04/2026</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-label-secondary">
+                                                <i class="ri ri-file-text-line me-1"></i> lost_certificate_report.pdf
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-evidence" title="ลบ">
+                                                <i class="ri ri-delete-bin-line text-danger"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center text-muted">3</td>
+                                        <td><span class="badge bg-label-info">ยืนยันส่งออก</span></td>
+                                        <td>เอกสารยืนยันสินค้าออกจากประเทศไทยแล้ว (Bill of Lading)</td>
+                                        <td class="text-center">16/04/2026</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-label-secondary">
+                                                <i class="ri ri-ship-line me-1"></i> bill_of_lading_TCKU3456789.pdf
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-icon btn-outline-danger btn-remove-evidence" title="ลบ">
+                                                <i class="ri ri-delete-bin-line text-danger"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                     <tr id="evidenceTableEmpty" class="d-none">
                                         <td colspan="6" class="text-center text-muted py-4">ยังไม่มีหลักฐานประกอบ</td>
                                     </tr>
@@ -636,19 +842,315 @@
                 </div>
                 <!-- /TAB 3 -->
 
+                <!-- ==================== TAB 4: ประวัติการดำเนินการ ==================== -->
+                <div id="tab-history" class="tab-pane fade" role="tabpanel">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h6 class="mb-1 fw-semibold">ประวัติข้อมูลการดำเนินการ</h6>
+                            <p class="text-muted small mb-0">บันทึกการกระทำทุกครั้งที่เกิดขึ้นกับใบรับรองฉบับนี้</p>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                onclick="alert('[mockup] Export ประวัติ')">
+                            <i class="ri ri-download-2-line me-1"></i>Export
+                        </button>
+                    </div>
+
+                    <!-- Timeline-style audit trail -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle small mb-0">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th style="min-width:145px;">วันที่-เวลา</th>
+                                    <th style="min-width:160px;">ผู้ดำเนินการ</th>
+                                    <th style="min-width:110px;">บทบาท</th>
+                                    <th style="min-width:180px;">การกระทำ</th>
+                                    <th style="min-width:130px;">สถานะหลังการกระทำ</th>
+                                    <th>หมายเหตุ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-nowrap text-center">
+                                        <div>18/04/2569</div>
+                                        <div class="text-muted">10:20:11</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">นาย สมชาย รักษาผล</div>
+                                        <div class="text-muted small">บริษัท อัลฟา ซีฟู้ด จำกัด</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-danger">ผู้ประกอบการ</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-label-secondary me-1"><i class="ri ri-add-circle-line"></i></span>
+                                        สร้างคำขอทดแทนใบรับรอง
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-secondary">ฉบับร่าง</span>
+                                    </td>
+                                    <td class="text-muted small">เลขที่คำขอ: REP821B211302</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-nowrap text-center">
+                                        <div>19/04/2569</div>
+                                        <div class="text-muted">14:33:52</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">นาย สมชาย รักษาผล</div>
+                                        <div class="text-muted small">บริษัท อัลฟา ซีฟู้ด จำกัด</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-danger">ผู้ประกอบการ</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-label-primary me-1"><i class="ri ri-send-plane-line"></i></span>
+                                        ยื่นคำขอ (ส่งเจ้าหน้าที่พิจารณา)
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-warning">รออนุมัติ</span>
+                                    </td>
+                                    <td class="text-muted small">ส่งพร้อมหลักฐาน  2 รายการ</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-nowrap text-center">
+                                        <div>20/04/2569</div>
+                                        <div class="text-muted">09:05:44</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">นางสาว วิภา ตรวจสอบ</div>
+                                        <div class="text-muted small">กรมประมง — ศตส. สมุทรสาคร</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-primary">เจ้าหน้าที่</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-label-warning me-1"><i class="ri ri-search-eye-line"></i></span>
+                                        รับคำขอ + สืบค้นเอกสาร
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-warning">รออนุมัติ</span>
+                                    </td>
+                                    <td class="text-muted small">เลขรับ: RCV-2569-0302</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-nowrap text-center">
+                                        <div>20/04/2569</div>
+                                        <div class="text-muted">09:45:00</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">นางสาว วิภา ตรวจสอบ</div>
+                                        <div class="text-muted small">กรมประมง — ศตส. สมุทรสาคร</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-primary">เจ้าหน้าที่</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-label-info me-1"><i class="ri ri-file-info-line"></i></span>
+                                        ขอเอกสารเพิ่มเติม
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-warning">รออนุมัติ</span>
+                                    </td>
+                                    <td class="text-muted small">ช็องว่างแนบสำเนาใบแจ้งความและใบรับรองเดิมที่ชำรุด</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-nowrap text-center">
+                                        <div>22/04/2569</div>
+                                        <div class="text-muted">10:00:00</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">นาย สมชาย รักษาผล</div>
+                                        <div class="text-muted small">บริษัท อัลฟา ซีฟู้ด จำกัด</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-danger">ผู้ประกอบการ</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-label-secondary me-1"><i class="ri ri-upload-2-line"></i></span>
+                                        ส่งเอกสารเพิ่มเติม
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-warning">รออนุมัติ</span>
+                                    </td>
+                                    <td class="text-muted small">สำเนาใบแจ้งความ + ใบรับรองเดิม</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td class="text-nowrap text-center">
+                                        <div>23/04/2569</div>
+                                        <div class="text-muted">11:15:30</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">นาย วิชาชาญ อนุมัติการ</div>
+                                        <div class="text-muted small">กรมประมง — ลงนามอนุมัติ</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-success">ผู้อนุมัติ</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success me-1"><i class="ri ri-checkbox-circle-line"></i></span>
+                                        <strong>อนุมัติคำขอ</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">อนุมัติ</span>
+                                    </td>
+                                    <td class="text-muted small">ออกใบรับรองทดแทน: <strong>AC821B2171902</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /TAB 4 -->
+
             </div><!-- /tab-content -->
         </div><!-- /nav-align-top -->
 
+        <!-- TOR 1.8(4): ลงนามลายเซ็นอิเล็กทรอนิกส์ -->
+        <div class="card mt-4" id="eSignatureCard">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="ri ri-pen-nib-line me-2 text-primary"></i>ลงนามลายเซ็นอิเล็กทรอนิกส์ (E-Signature)
+                </h6>
+                <p class="text-muted small mb-0 mt-1">วาดลายเซ็นหรืออัปโหลดภาพลายเซ็น เพื่อรับรองความถูกต้องของคำขอ</p>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- ส่วนซ้าย: ผู้ลงนาม + วันที่ -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="signerName" class="form-label">ชื่อผู้ลงนาม <span class="text-danger">*</span></label>
+                            <input type="text" id="signerName" class="form-control" value="นาย สมชาย รักษาผล" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="signerPosition" class="form-label">ตำแหน่ง</label>
+                            <input type="text" id="signerPosition" class="form-control" value="ผู้จัดการฝ่ายส่งออก" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="signDate" class="form-label">วันที่ลงนาม <span class="text-danger">*</span></label>
+                            <input type="text" id="signDate" class="form-control flatpickr-date" value="28/04/2569" />
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label">วิธีลงนาม</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="signMethod" id="signMethodDraw" value="draw" checked />
+                                    <label class="form-check-label" for="signMethodDraw">วาดลายเซ็น</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="signMethod" id="signMethodUpload" value="upload" />
+                                    <label class="form-check-label" for="signMethodUpload">อัปโหลดภาพ</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนขวา: Signature Canvas / Upload -->
+                    <div class="col-md-8">
+                        <!-- Panel: วาดลายเซ็น -->
+                        <div id="panelDraw">
+                            <label class="form-label d-flex align-items-center gap-2">
+                                วาดลายเซ็น
+                                <span class="badge bg-label-primary small">Canvas</span>
+                            </label>
+                            <div class="border rounded position-relative bg-white" style="height:160px;">
+                                <canvas id="signatureCanvas" width="100%" height="150"
+                                        style="width:100%;height:150px;cursor:crosshair;display:block;"
+                                        class="rounded"></canvas>
+                                <span class="position-absolute bottom-0 start-0 text-muted small ms-2 mb-1"
+                                      id="canvasHint" style="pointer-events:none;">วาดลายเซ็นในกรอบนี้</span>
+                            </div>
+                            <div class="d-flex gap-2 mt-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearSign">
+                                    <i class="ri ri-eraser-line me-1"></i>ล้างลายเซ็น
+                                </button>
+                                <button type="button" class="btn btn-outline-success btn-sm" id="btnSaveSign"
+                                        onclick="document.getElementById('signedBadge').classList.remove('d-none'); document.getElementById('canvasHint').classList.add('d-none'); this.textContent='✅ บันทึกแล้ว'; this.disabled=true;">
+                                    <i class="ri ri-save-line me-1"></i>บันทึกลายเซ็น
+                                </button>
+                                <span id="signedBadge" class="badge bg-success d-none align-self-center">
+                                    <i class="ri ri-checkbox-circle-line me-1"></i>ลงนามแล้ว
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Panel: อัปโหลดภาพ -->
+                        <div id="panelUpload" class="d-none">
+                            <label class="form-label">อัปโหลดภาพลายเซ็น</label>
+                            <div class="border rounded p-3 text-center bg-light" style="min-height:160px;"
+                                 id="uploadDropZone">
+                                <div id="uploadPlaceholder">
+                                    <i class="ri ri-image-add-line text-muted" style="font-size:2.5rem;"></i>
+                                    <p class="text-muted small mt-2 mb-2">ลากไฟล์มาวางที่นี่ หรือ</p>
+                                    <label class="btn btn-outline-primary btn-sm" for="signImageInput">
+                                        <i class="ri ri-upload-2-line me-1"></i>เลือกไฟล์ภาพ
+                                    </label>
+                                    <input type="file" id="signImageInput" class="d-none" accept=".jpg,.jpeg,.png,.gif"
+                                           onchange="
+                                               var f=this.files[0];
+                                               if(f){
+                                                   var r=new FileReader();
+                                                   r.onload=function(e){
+                                                       document.getElementById('uploadPreview').src=e.target.result;
+                                                       document.getElementById('uploadPreviewWrap').classList.remove('d-none');
+                                                       document.getElementById('uploadPlaceholder').classList.add('d-none');
+                                                       document.getElementById('uploadSignedBadge').classList.remove('d-none');
+                                                   };
+                                                   r.readAsDataURL(f);
+                                               }"/>
+                                    <p class="text-muted small mt-2 mb-0">รองรับ JPG, PNG, GIF</p>
+                                </div>
+                                <div id="uploadPreviewWrap" class="d-none">
+                                    <img id="uploadPreview" src="#" alt="signature preview"
+                                         style="max-height:130px;max-width:100%;object-fit:contain;" class="border rounded" />
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                onclick="document.getElementById('signImageInput').value='';document.getElementById('uploadPreviewWrap').classList.add('d-none');document.getElementById('uploadPlaceholder').classList.remove('d-none');document.getElementById('uploadSignedBadge').classList.add('d-none');">
+                                            <i class="ri ri-close-line me-1"></i>เปลี่ยนภาพ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span id="uploadSignedBadge" class="badge bg-success d-none">
+                                    <i class="ri ri-checkbox-circle-line me-1"></i>แนบภาพลายเซ็นแล้ว
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
-        <div class="d-flex justify-content-end gap-2 mt-3">
+        <div class="d-flex justify-content-end gap-2 mt-3 flex-wrap">
             <a href="@Url.Action("SelectTypeReplacement", "PSDeclaration")" class="btn btn-outline-secondary">
                 <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
             </a>
             <button type="button" class="btn btn-outline-primary">
                 <i class="ri ri-save-line me-1"></i> บันทึกร่าง
             </button>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary"
+                onclick="event.preventDefault(); document.getElementById('modalAutoIssue').setAttribute('data-shown','1'); var m = new bootstrap.Modal(document.getElementById('modalAutoIssue')); m.show();">
                 <i class="ri ri-send-plane-line me-1"></i> ส่งคำขอ
+            </button>
+            @* TOR 1.8(7): ส่งไปด่านตรวจ — แสดงหลัง submit (mockup: แสดงเสมอ) *@
+            <button type="button" class="btn btn-outline-info"
+                    onclick="alert('[mockup] ส่งข้อมูลใบรับรองใหม่ไปยังด่านตรวจประมงเรียบร้อยแล้ว')">
+                <i class="ri ri-share-forward-line me-1"></i> ส่งข้อมูลไปด่านตรวจ
+            </button>
+            @* TOR 1.8(8): PDF/A-3 และ พิมพ์ฉบับ Copy — mockup: แสดงเสมอ (จริงจะแสดงเฉพาะสถานะอนุมัติ) *@
+            <button type="button" class="btn btn-outline-danger"
+                    data-bs-toggle="modal" data-bs-target="#modalPdfPreview">
+                <i class="ri ri-file-pdf-line me-1"></i> ดาวน์โหลด PDF/A-3
+            </button>
+            <button type="button" class="btn btn-outline-secondary"
+                    data-bs-toggle="modal" data-bs-target="#modalPrintCopy">
+                <i class="ri ri-printer-line me-1"></i> พิมพ์ฉบับ Copy
+            </button>
+            @* TOR 1.9(8): ดูใบรับรองฉบับเก่าที่ถูกยกเลิก *@
+            <button type="button" class="btn btn-outline-danger"
+                    data-bs-toggle="modal" data-bs-target="#modalCancelledCertPreview"
+                    title="ดูใบรับรองฉบับเก่าที่ถูกยกเลิก (CANCELLED)">
+                <i class="ri ri-file-damage-line me-1"></i> ดูใบรับรองฉบับเก่า (CANCELLED)
             </button>
         </div>
 
@@ -657,7 +1159,536 @@
     </div><!-- /col -->
 </div><!-- /row -->
 
-<!-- ==================== Modal: ค้นหา RMBS1 ==================== -->
+<!-- ==================== TOR 1.8(2)/1.9(2): Modal ออกใบรับรองทดแทนอัตโนมัติ ==================== -->
+<div class="modal fade" id="modalAutoIssue" tabindex="-1" aria-labelledby="modalAutoIssueLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center px-5 pb-2">
+                <div class="mb-3">
+                    <span class="badge bg-primary rounded-circle p-3">
+                        <i class="ri ri-checkbox-circle-line" style="font-size:2.5rem;"></i>
+                    </span>
+                </div>
+                <h5 class="mb-1">คำขอบันทึกและอนุมัติเรียบร้อยแล้ว</h5>
+                <p class="text-muted small mb-3">ระบบออกใบรับรองทดแทนอัตโนมัติหลังอนุมัติ (TOR 1.8 แก้ไข / TOR 1.9 ทดแทน)</p>
+                <div class="alert alert-primary text-start small mb-3">
+                    <i class="ri ri-robot-line me-2"></i>
+                    <strong>ระบบออกใบรับรองทดแทนอัตโนมัติแล้ว</strong><br>
+                    เลขที่ใบรับรองใหม่: <span class="fw-bold text-primary">PS-TH-2569-REP-00015</span>
+                </div>
+                <table class="table table-sm table-bordered text-start small mb-3">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width:45%;">ประเภทใบรับรอง</th>
+                            <td>
+                                Processing Statement Thailand (PS-TH)
+                                <span class="badge bg-label-success ms-1 small">ออกอัตโนมัติ</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">เลขที่ใบรับรองเดิม</th>
+                            <td>AC821B2171001</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">วันที่ออกใบรับรอง</th>
+                            <td>28/04/2569</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">สถานะ</th>
+                            <td><span class="badge bg-success">ออกอัตโนมัติแล้ว ✅</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- ประเภทใบรับรองที่รองรับ (TOR 1.9(2)) -->
+                <div class="border rounded p-3 mb-2 text-start">
+                    <div class="small fw-semibold text-muted mb-2">ระบบรองรับการออกใบรับรองทดแทนอัตโนมัติ (4 ประเภท)</div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-label-primary small">PS</span>
+                                <span class="small">Processing Statement</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-label-success small">PS-TH</span>
+                                <span class="small">ออกอัตโนมัติ ✅</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-label-primary small">NMD</span>
+                                <span class="small">Non-Manipulation Document</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-label-success small">NMD-TH</span>
+                                <span class="small">ออกอัตโนมัติ ✅</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <a href="@Url.Action("IndexReplacementCertificate", "PSDeclaration")" class="btn btn-primary">
+                    <i class="ri ri-list-check-2 me-1"></i>ดูรายการ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TOR 1.8(8): Modal preview PDF/A-3 ==================== -->
+<div class="modal fade" id="modalPdfPreview" tabindex="-1" aria-labelledby="modalPdfPreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPdfPreviewLabel">
+                    <i class="ri ri-file-pdf-line me-2 text-danger"></i>ตัวอย่าง PDF/A-3 — ใบรับรองการแปรรูปสัตว์น้ำ (ฉบับแก้ไข)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-secondary bg-opacity-10">
+                <!-- A4 preview container -->
+                <div class="mx-auto my-4 bg-white shadow" style="width:794px; min-height:1123px; padding:60px 72px; font-size:0.88rem; line-height:1.6; position:relative;">
+
+                    <!-- Header: กรมประมง -->
+                    <div class="text-center mb-4">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                            <div style="width:64px;height:64px;background:#e0f0e8;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                <i class="ri ri-government-line" style="font-size:2rem;color:#1a7a43;"></i>
+                            </div>
+                            <div class="text-start">
+                                <div style="font-size:1.05rem;font-weight:700;">กรมประมง</div>
+                                <div class="text-muted small">DEPARTMENT OF FISHERIES — THAILAND</div>
+                                <div class="text-muted small">กระทรวงเกษตรและสหกรณ์</div>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold mb-0" style="letter-spacing:0.5px;">ใบรับรองการแปรรูปสัตว์น้ำ (ฉบับแก้ไข)</h5>
+                        <div class="text-muted small">PROCESSING STATEMENT — AMENDMENT COPY</div>
+                        @* TOR 1.9(8): banner ใบแทนใบรับรอง *@
+                        <div class="mt-2 py-1 px-3 rounded fw-semibold" style="background:#e8f5e9;border:1.5px solid #388e3c;color:#1a7a43;font-size:0.93rem;display:inline-block;letter-spacing:0.5px;">
+                            <i class="ri ri-file-copy-2-line me-1"></i>ใบแทนใบรับรอง (REPLACEMENT CERTIFICATE)
+                        </div>
+                        <hr class="my-2" style="border-top:2px solid #1a7a43;" />
+                    </div>
+
+                    <!-- Certificate details -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">เลขที่ใบรับรองใหม่</div>
+                                <div class="fw-bold text-success" style="font-size:1rem;">PS-TH-2569-REPLACE-00012</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">เลขที่ใบรับรองเดิม</div>
+                                <div class="fw-bold">AC821B2171001</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">ผู้ประกอบการ</div>
+                                <div>Alpha Office Automation Co., Ltd. (สาขา 00001)</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">วันที่ออกใบรับรอง</div>
+                                <div>28/04/2569</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- เหตุผลการแก้ไข -->
+                    <div class="border rounded p-3 mb-3">
+                        <div class="fw-semibold mb-1 small text-muted">เหตุผลการขอใบรับรองแก้ไข / REASON FOR AMENDMENT</div>
+                        <div>ใบรับรองสูญหาย — ขอออกฉบับใหม่ทดแทนฉบับเดิม</div>
+                    </div>
+
+                    <!-- ข้อมูลสินค้า/ใบรับรอง -->
+                    <table class="table table-sm table-bordered mb-3" style="font-size:0.82rem;">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>ชื่อสินค้า / Product</th>
+                                <th>ประเทศปลายทาง</th>
+                                <th>น้ำหนักสุทธิ (กก.)</th>
+                                <th>เลขที่คอนเทนเนอร์</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Canned Tuna in Oil</td>
+                                <td>สหรัฐอเมริกา (US)</td>
+                                <td class="text-end">12,500.00</td>
+                                <td>TCKU3456789</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ข้อมูลการผลิต -->
+                    <div class="border rounded p-3 mb-3">
+                        <div class="fw-semibold mb-2 small text-muted">ข้อมูลการผลิต / PRODUCTION INFORMATION</div>
+                        <table class="table table-sm table-bordered mb-0" style="font-size:0.82rem;">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th>หมายเลข RMBS1</th>
+                                    <th>เลขที่ CC</th>
+                                    <th>วันที่ตรวจสอบ CC</th>
+                                    <th class="text-end">น้ำหนัก (กก.)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>10604204211700000091</td>
+                                    <td>CC-TH-2569-0048</td>
+                                    <td class="text-center">12/04/2026</td>
+                                    <td class="text-end">8,750.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ลายเซ็น -->
+                    <div class="row g-3 mb-4 mt-2">
+                        <div class="col-6 text-center">
+                            <div class="border rounded p-3" style="min-height:80px;">
+                                <div class="text-muted small mb-2">ลายเซ็นผู้ประกอบการ / E-Signature</div>
+                                <div class="fst-italic text-secondary" style="font-family:cursive;font-size:1.2rem;">A. Operator</div>
+                            </div>
+                            <div class="small mt-1">นาย สมชาย ใจดี</div>
+                            <div class="text-muted" style="font-size:0.78rem;">ผู้ผ่านพิธีการ</div>
+                            <div class="text-muted" style="font-size:0.78rem;">วันที่ลงนาม: 28/04/2569</div>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div class="border rounded p-3" style="min-height:80px;">
+                                <div class="text-muted small mb-2">ลายเซ็นเจ้าหน้าที่อนุมัติ</div>
+                                <div class="fst-italic text-secondary" style="font-family:cursive;font-size:1.2rem;">J. Officer</div>
+                            </div>
+                            <div class="small mt-1">นาง สุดา มีสุข</div>
+                            <div class="text-muted" style="font-size:0.78rem;">เจ้าหน้าที่กรมประมง</div>
+                            <div class="text-muted" style="font-size:0.78rem;">วันที่อนุมัติ: 28/04/2569</div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <hr style="border-top:1px solid #ccc;" />
+                    <div class="row text-muted" style="font-size:0.75rem;">
+                        <div class="col-6">เอกสารออกโดย: ระบบ RMBS (Fisheries Information System)</div>
+                        <div class="col-6 text-end">วันที่พิมพ์: 28/04/2569 | ไฟล์มาตรฐาน PDF/A-3</div>
+                    </div>
+
+                    <!-- PDF/A-3 badge -->
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge bg-danger" style="font-size:0.75rem;">PDF/A-3</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                        data-bs-toggle="modal" data-bs-target="#modalPrintCopy">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์ฉบับ Copy
+                </button>
+                <button type="button" class="btn btn-danger"
+                        onclick="alert('[mockup] กำลังดาวน์โหลด PS-TH-2569-REPLACE-00012.pdf (PDF/A-3)...')">
+                    <i class="ri ri-download-line me-1"></i>ดาวน์โหลด PDF/A-3
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TOR 1.8(8): Modal พิมพ์ฉบับ Copy + Watermark ==================== -->
+<div class="modal fade" id="modalPrintCopy" tabindex="-1" aria-labelledby="modalPrintCopyLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPrintCopyLabel">
+                    <i class="ri ri-printer-line me-2"></i>พิมพ์ฉบับ Copy
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-secondary bg-opacity-10">
+                <!-- A4 preview with COPY watermark -->
+                <div class="mx-auto my-4 bg-white shadow" style="width:794px; min-height:1123px; padding:60px 72px; font-size:0.88rem; line-height:1.6; position:relative; overflow:hidden;">
+
+                    <!-- COPY watermark -->
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:9rem;font-weight:900;color:rgba(200,0,0,0.08);pointer-events:none;letter-spacing:0.2rem;white-space:nowrap;z-index:0;">
+                        COPY
+                    </div>
+
+                    <!-- Header -->
+                    <div class="text-center mb-4" style="position:relative;z-index:1;">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                            <div style="width:64px;height:64px;background:#e0f0e8;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                <i class="ri ri-government-line" style="font-size:2rem;color:#1a7a43;"></i>
+                            </div>
+                            <div class="text-start">
+                                <div style="font-size:1.05rem;font-weight:700;">กรมประมง</div>
+                                <div class="text-muted small">DEPARTMENT OF FISHERIES — THAILAND</div>
+                                <div class="text-muted small">กระทรวงเกษตรและสหกรณ์</div>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold mb-0">ใบรับรองการแปรรูปสัตว์น้ำ (ฉบับแก้ไข)</h5>
+                        <div class="text-muted small">PROCESSING STATEMENT — AMENDMENT COPY</div>
+                        <span class="badge bg-danger px-3 py-2 mt-1" style="font-size:0.9rem;letter-spacing:0.15rem;">COPY</span>
+                        <hr class="my-2" style="border-top:2px solid #1a7a43;" />
+                    </div>
+
+                    <!-- Certificate info (same content as PDF modal) -->
+                    <div class="row g-2 mb-3" style="position:relative;z-index:1;">
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">เลขที่ใบรับรองใหม่</div>
+                                <div class="fw-bold text-success">PS-TH-2569-REPLACE-00012</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">เลขที่ใบรับรองเดิม</div>
+                                <div class="fw-bold">AC821B2171001</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">ผู้ประกอบการ</div>
+                                <div>Alpha Office Automation Co., Ltd. (สาขา 00001)</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">วันที่ออกใบรับรอง</div>
+                                <div>28/04/2569</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded p-3 mb-3" style="position:relative;z-index:1;">
+                        <div class="fw-semibold mb-1 small text-muted">เหตุผลการขอใบรับรองแก้ไข / REASON FOR AMENDMENT</div>
+                        <div>ใบรับรองสูญหาย — ขอออกฉบับใหม่ทดแทนฉบับเดิม</div>
+                    </div>
+
+                    <table class="table table-sm table-bordered mb-3" style="font-size:0.82rem;position:relative;z-index:1;">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>ชื่อสินค้า / Product</th>
+                                <th>ประเทศปลายทาง</th>
+                                <th>น้ำหนักสุทธิ (กก.)</th>
+                                <th>เลขที่คอนเทนเนอร์</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Canned Tuna in Oil</td>
+                                <td>สหรัฐอเมริกา (US)</td>
+                                <td class="text-end">12,500.00</td>
+                                <td>TCKU3456789</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row g-3 mb-4 mt-2" style="position:relative;z-index:1;">
+                        <div class="col-6 text-center">
+                            <div class="border rounded p-3" style="min-height:80px;">
+                                <div class="text-muted small mb-2">ลายเซ็นผู้ประกอบการ</div>
+                                <div class="fst-italic text-secondary" style="font-family:cursive;font-size:1.2rem;">A. Operator</div>
+                            </div>
+                            <div class="small mt-1">นาย สมชาย ใจดี</div>
+                            <div class="text-muted" style="font-size:0.78rem;">28/04/2569</div>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div class="border rounded p-3" style="min-height:80px;">
+                                <div class="text-muted small mb-2">ลายเซ็นเจ้าหน้าที่</div>
+                                <div class="fst-italic text-secondary" style="font-family:cursive;font-size:1.2rem;">J. Officer</div>
+                            </div>
+                            <div class="small mt-1">นาง สุดา มีสุข</div>
+                            <div class="text-muted" style="font-size:0.78rem;">28/04/2569</div>
+                        </div>
+                    </div>
+
+                    <hr style="border-top:1px solid #ccc;position:relative;z-index:1;" />
+                    <div class="row text-muted" style="font-size:0.75rem;position:relative;z-index:1;">
+                        <div class="col-6">เอกสารออกโดย: ระบบ RMBS</div>
+                        <div class="col-6 text-end">วันที่พิมพ์: 28/04/2569</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-danger"
+                        onclick="alert('[mockup] กำลังดาวน์โหลด PS-TH-2569-REPLACE-00012_COPY.pdf (PDF/A-3)...')">
+                    <i class="ri ri-file-pdf-line me-1"></i>ดาวน์โหลด PDF/A-3
+                </button>
+                <button type="button" class="btn btn-primary"
+                        onclick="alert('[mockup] กำลังส่งงานพิมพ์ฉบับ Copy ไปยังเครื่องพิมพ์...')">
+                    <i class="ri ri-printer-line me-1"></i>พิมพ์
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ==================== TOR 1.9(8): Modal ใบรับรองฉบับเก่า CANCELLED ==================== *@
+<div class="modal fade" id="modalCancelledCertPreview" tabindex="-1" aria-labelledby="modalCancelledCertPreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger bg-opacity-10">
+                <h5 class="modal-title text-danger" id="modalCancelledCertPreviewLabel">
+                    <i class="ri ri-file-damage-line me-2"></i>ใบรับรองฉบับเก่า — ถูกยกเลิกแล้ว (CANCELLED)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-secondary bg-opacity-10">
+                <!-- A4 preview container -->
+                <div class="mx-auto my-4 bg-white shadow" style="width:794px; min-height:1123px; padding:60px 72px; font-size:0.88rem; line-height:1.6; position:relative; overflow:hidden;">
+
+                    @* Diagonal CANCELLED watermark *@
+                    <div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10;">
+                        <div style="transform:rotate(-35deg);font-size:7rem;font-weight:900;color:#e53935;opacity:0.10;letter-spacing:0.1em;white-space:nowrap;user-select:none;">
+                            CANCELLED
+                        </div>
+                    </div>
+
+                    @* Red CANCELLED band at top *@
+                    <div class="mb-4 py-2 px-3 rounded text-center fw-bold" style="background:#ffebee;border:2px solid #e53935;color:#e53935;font-size:1rem;position:relative;z-index:1;">
+                        <i class="ri ri-close-circle-line me-2"></i>ใบรับรองฉบับนี้ถูยกเลิกแล้ว — CANCELLED
+                        <div class="small fw-normal mt-1 text-muted">
+                            วันที่ยกเลิก: 28/04/2569 &nbsp;|&nbsp;
+                            ทดแทนด้วยใบรับรองเลขที่: <span class="fw-semibold text-danger">PS-TH-2569-REP-00015</span>
+                        </div>
+                    </div>
+
+                    <!-- Header: กรมประมง -->
+                    <div class="text-center mb-4" style="position:relative;z-index:1;">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                            <div style="width:64px;height:64px;background:#e0f0e8;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                <i class="ri ri-government-line" style="font-size:2rem;color:#1a7a43;"></i>
+                            </div>
+                            <div class="text-start">
+                                <div style="font-size:1.05rem;font-weight:700;">กรมประมง</div>
+                                <div class="text-muted small">DEPARTMENT OF FISHERIES — THAILAND</div>
+                                <div class="text-muted small">กระทรวงเกษตรและสหกรณ์</div>
+                            </div>
+                        </div>
+                        <h5 class="fw-bold mb-0" style="letter-spacing:0.5px;text-decoration:line-through;color:#9e9e9e;">ใบรับรองการแปรรูปสัตว์น้ำ</h5>
+                        <div class="text-muted small">PROCESSING STATEMENT — ORIGINAL (CANCELLED)</div>
+                        <hr class="my-2" style="border-top:2px solid #e53935;" />
+                    </div>
+
+                    <!-- Certificate details (cancelled) -->
+                    <div class="row g-2 mb-3" style="position:relative;z-index:1;">
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100" style="border-color:#e53935!important;background:#fff8f8;">
+                                <div class="text-muted small mb-1">เลขที่ใบรับรองเดิม (ถูกยกเลิก)</div>
+                                <div class="fw-bold text-danger" style="font-size:1rem;text-decoration:line-through;">AC821B2171001</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100" style="border-color:#e53935!important;background:#fff8f8;">
+                                <div class="text-muted small mb-1">ใบรับรองทดแทน (ฉบับใหม่)</div>
+                                <div class="fw-bold text-success" style="font-size:1rem;">PS-TH-2569-REP-00015</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">ผู้ประกอบการ</div>
+                                <div>Alpha Office Automation Co., Ltd. (สาขา 00001)</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 h-100">
+                                <div class="text-muted small mb-1">วันที่ออกใบรับรองเดิม</div>
+                                <div class="text-muted" style="text-decoration:line-through;">15/02/2569</div>
+                                <div class="text-danger small">ยกเลิก 28/04/2569</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- เหตุผลการขอทดแทน -->
+                    <div class="border rounded p-3 mb-3" style="border-color:#e53935!important;background:#fff8f8;position:relative;z-index:1;">
+                        <div class="fw-semibold mb-1 small text-danger">สาเหตุการยกเลิก / REASON FOR CANCELLATION</div>
+                        <div>ใบรับรองสูญหาย — ออกใบรับรองฉบับทดแทนแล้ว (Replacement Certificate)</div>
+                    </div>
+
+                    <!-- Production summary (greyed) -->
+                    <div style="position:relative;z-index:1;opacity:0.5;">
+                        <div class="fw-semibold mb-2 small text-muted">ข้อมูลการผลิต (จากใบรับรองเดิม)</div>
+                        <table class="table table-sm table-bordered mb-3" style="font-size:0.8rem;">
+                            <thead class="table-light">
+                                <tr class="text-center">
+                                    <th>สินค้า</th>
+                                    <th>ชนิดกระป๋อง</th>
+                                    <th>จำนวน (กล่อง)</th>
+                                    <th>น้ำหนักรวม (กก.)</th>
+                                    <th>ประเทศปลายทาง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center">
+                                    <td>ปลาทูน่ากระป๋อง</td>
+                                    <td>185g × 12</td>
+                                    <td>1,500</td>
+                                    <td>3,330</td>
+                                    <td>ญี่ปุ่น (JP)</td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td>ปลาทูน่ากระป๋อง</td>
+                                    <td>185g × 24</td>
+                                    <td>800</td>
+                                    <td>3,552</td>
+                                    <td>ญี่ปุ่น (JP)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Signatures (greyed) -->
+                    <div class="row mt-4" style="position:relative;z-index:1;opacity:0.5;">
+                        <div class="col-6 text-center">
+                            <div style="border-top:1px solid #999;padding-top:6px;margin-top:40px;" class="text-muted small">
+                                ผู้ประกอบการ / Operator<br />Alpha Office Automation Co., Ltd.
+                            </div>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div style="border-top:1px solid #999;padding-top:6px;margin-top:40px;" class="text-muted small">
+                                เจ้าหน้าที่กรมประมง / Fisheries Officer<br />(ถูกยกเลิกแล้ว — CANCELLED)
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="border-top:1px solid #e53935;position:relative;z-index:1;margin-top:2rem;" />
+                    <div class="row text-muted" style="font-size:0.75rem;position:relative;z-index:1;">
+                        <div class="col-6">เอกสารนี้ถูกยกเลิกแล้ว — ใช้ไม่ได้อีกต่อไป</div>
+                        <div class="col-6 text-end">วันที่ยกเลิก: 28/04/2569 | ระบบ RMBS</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="ri ri-close-line me-1"></i>ปิด
+                </button>
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="alert('[mockup] กำลังดาวน์โหลด AC821B2171001_CANCELLED.pdf...')">
+                    <i class="ri ri-file-pdf-line me-1"></i>ดาวน์โหลดฉบับที่ถูกยกเลิก (PDF)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="modalSearchRMBS1" tabindex="-1" aria-labelledby="modalSearchRMBS1Label" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
@@ -791,6 +1822,21 @@
 
 @section PageScripts {
 <script>
+    // TOR 1.9(1): toggle placeholder ของ textarea รายละเอียดตามเหตุผลที่เลือก
+    function toggleReasonOtherDetail() {
+        var selected = document.querySelector('input[name="replacementReason"]:checked');
+        var ta = document.getElementById('replacementDetail');
+        if (!selected || !ta) return;
+        var placeholders = {
+            'lost': 'ระบุรายละเอียดการสูญหาย เช่น วันที่สูญหาย สถานที่ ฯลฯ',
+            'post_export': 'ระบุรายละเอียดข้อมูลที่ผิดพลาด และยืนยันว่าสินค้าออกจากประเทศไทยแล้ว',
+            'linked_external': 'ระบุระบบภายนอกหรือลูกค้าที่ได้รับการเชื่อมโยง/สำแดงใบรับรองนี้',
+            'damaged': 'ระบุรายละเอียดความเสียหาย เช่น สาเหตุ ระดับความเสียหาย ฯลฯ',
+            'other': 'ระบุรายละเอียดเหตุผลการขอใบรับรองทดแทน'
+        };
+        ta.placeholder = placeholders[selected.value] || 'ระบุรายละเอียดเหตุผลการขอใบรับรองทดแทน';
+    }
+
     $(document).ready(function () {
         // Select2
         $('.select2').select2({ width: '100%' });
@@ -908,6 +1954,103 @@
             $(this).closest('tr').remove();
             reindexEvidence();
         });
+
+        // ==================== TOR 1.8(4): E-Signature Canvas ====================
+        // Toggle draw/upload panel
+        $('input[name=signMethod]').on('change', function () {
+            if ($(this).val() === 'draw') {
+                $('#panelDraw').removeClass('d-none');
+                $('#panelUpload').addClass('d-none');
+            } else {
+                $('#panelDraw').addClass('d-none');
+                $('#panelUpload').removeClass('d-none');
+            }
+        });
+
+        // Canvas drawing
+        var canvas = document.getElementById('signatureCanvas');
+        if (canvas) {
+            var ctx = canvas.getContext('2d');
+            // Make canvas fill its container
+            function resizeCanvas() {
+                var rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width || 400;
+                canvas.height = 150;
+                ctx.strokeStyle = '#1a1a2e';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            var drawing = false;
+            var hasDraw = false;
+            var lastX = 0, lastY = 0;
+
+            function getPos(e) {
+                var rect = canvas.getBoundingClientRect();
+                if (e.touches && e.touches[0]) {
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                }
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            }
+
+            canvas.addEventListener('mousedown', function (e) {
+                drawing = true;
+                var p = getPos(e);
+                lastX = p.x; lastY = p.y;
+                if (!hasDraw) {
+                    document.getElementById('canvasHint').classList.add('d-none');
+                    hasDraw = true;
+                }
+            });
+            canvas.addEventListener('mousemove', function (e) {
+                if (!drawing) return;
+                var p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                lastX = p.x; lastY = p.y;
+            });
+            canvas.addEventListener('mouseup', function () { drawing = false; });
+            canvas.addEventListener('mouseleave', function () { drawing = false; });
+
+            canvas.addEventListener('touchstart', function (e) {
+                e.preventDefault();
+                drawing = true;
+                var p = getPos(e);
+                lastX = p.x; lastY = p.y;
+                if (!hasDraw) {
+                    document.getElementById('canvasHint').classList.add('d-none');
+                    hasDraw = true;
+                }
+            }, { passive: false });
+            canvas.addEventListener('touchmove', function (e) {
+                e.preventDefault();
+                if (!drawing) return;
+                var p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                lastX = p.x; lastY = p.y;
+            }, { passive: false });
+            canvas.addEventListener('touchend', function () { drawing = false; });
+
+            document.getElementById('btnClearSign').addEventListener('click', function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                hasDraw = false;
+                document.getElementById('canvasHint').classList.remove('d-none');
+                var saveBtn = document.getElementById('btnSaveSign');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="ri ri-save-line me-1"></i>บันทึกลายเซ็น';
+                document.getElementById('signedBadge').classList.add('d-none');
+            });
+        }
+        // ==================== /TOR 1.8(4) ====================
+
     });
 </script>
 }
