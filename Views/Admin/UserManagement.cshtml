@@ -3,6 +3,15 @@
   ViewData["Title"] = "บริหารจัดการผู้ใช้งาน";
 }
 
+@section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.css" />
+<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css" />
+}
+
+@section VendorScripts {
+<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
+}
+
 @section PageStyles {
 <style>
   :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
@@ -25,7 +34,12 @@
 document.addEventListener('DOMContentLoaded', function () {
   /* ── DataTable ── */
   var dt = $('#userTable').DataTable({
-    language: { url: '/json/datatable-th.json', sEmptyTable: 'ไม่พบข้อมูล', sZeroRecords: 'ไม่พบผลการค้นหา' },
+    language: {
+      search: 'ค้นหา:', lengthMenu: 'แสดง _MENU_ รายการ',
+      info: 'แสดง _START_-_END_ จาก _TOTAL_ รายการ',
+      infoEmpty: 'ไม่พบข้อมูล', zeroRecords: 'ไม่พบผลการค้นหา',
+      paginate: { first:'แรก', last:'สุดท้าย', next:'ถัดไป', previous:'ก่อนหน้า' }
+    },
     pageLength: 10,
     order: [[0, 'asc']],
     columnDefs: [{ orderable: false, targets: [-1] }]
@@ -47,45 +61,56 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ── Modal: แก้ไข ── */
-  document.querySelectorAll('.btn-edit-user').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.getElementById('modalUserTitle').textContent = 'แก้ไขผู้ใช้งาน';
-      document.getElementById('uFirstname').value = this.dataset.fname || '';
-      document.getElementById('uLastname').value = this.dataset.lname || '';
-      document.getElementById('uEmail').value = this.dataset.email || '';
-      document.getElementById('uType').value = this.dataset.type || '';
-      document.getElementById('uRole').value = this.dataset.role || '';
-      document.getElementById('uStatus').value = this.dataset.status || 'Active';
-      new bootstrap.Modal(document.getElementById('modalUser')).show();
-    });
+  document.getElementById('userTable').addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-edit-user');
+    if (!btn) return;
+    document.getElementById('modalUserTitle').textContent = 'แก้ไขผู้ใช้งาน';
+    document.getElementById('uFirstname').value = btn.dataset.fname || '';
+    document.getElementById('uLastname').value = btn.dataset.lname || '';
+    document.getElementById('uEmail').value = btn.dataset.email || '';
+    document.getElementById('uType').value = btn.dataset.type || '';
+    document.getElementById('uRole').value = btn.dataset.role || '';
+    document.getElementById('uStatus').value = btn.dataset.status || 'Active';
+    new bootstrap.Modal(document.getElementById('modalUser')).show();
   });
 
   /* ── Modal: กำหนดกลุ่ม ── */
-  document.querySelectorAll('.btn-assign-group').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.getElementById('assignUserName').textContent = this.dataset.name || '';
-      new bootstrap.Modal(document.getElementById('modalAssignGroup')).show();
-    });
+  document.getElementById('userTable').addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-assign-group');
+    if (!btn) return;
+    document.getElementById('assignUserName').textContent = btn.dataset.name || '';
+    new bootstrap.Modal(document.getElementById('modalAssignGroup')).show();
   });
 
   /* ── Reset Password ── */
-  document.querySelectorAll('.btn-reset-pwd').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var name = this.closest('tr').querySelector('.user-name').textContent;
-      if (confirm('รีเซ็ตรหัสผ่านให้ ' + name + '?\nระบบจะส่งรหัสผ่านชั่วคราวทางอีเมล')) {
-        alert('ส่งรหัสผ่านชั่วคราวไปยังอีเมลสำเร็จ');
-      }
-    });
+  document.getElementById('userTable').addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-reset-pwd');
+    if (!btn) return;
+    var row = btn.closest('tr');
+    var name = row.querySelector('.user-name').textContent;
+    var email = btn.dataset.email || row.querySelector('td:nth-child(3)')?.textContent || '';
+    document.getElementById('resetPwdName').textContent = name;
+    document.getElementById('resetPwdEmail').textContent = email;
+    new bootstrap.Modal(document.getElementById('modalResetPwd')).show();
+  });
+
+  document.getElementById('btnConfirmReset').addEventListener('click', function () {
+    bootstrap.Modal.getInstance(document.getElementById('modalResetPwd')).hide();
+    showToast('ส่งรหัสผ่านชั่วคราวไปยังอีเมลสำเร็จ', 'success');
   });
 
   /* ── Suspend / Revoke ── */
-  document.querySelectorAll('.btn-suspend-user').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var name = this.closest('tr').querySelector('.user-name').textContent;
-      if (confirm('ระงับการใช้งานบัญชี ' + name + '?')) {
-        alert('ระงับบัญชีสำเร็จ');
-      }
-    });
+  document.getElementById('userTable').addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-suspend-user');
+    if (!btn) return;
+    var name = btn.closest('tr').querySelector('.user-name').textContent;
+    document.getElementById('suspendUserName').textContent = name;
+    new bootstrap.Modal(document.getElementById('modalSuspend')).show();
+  });
+
+  document.getElementById('btnConfirmSuspend').addEventListener('click', function () {
+    bootstrap.Modal.getInstance(document.getElementById('modalSuspend')).hide();
+    showToast('ระงับบัญชีสำเร็จ', 'warning');
   });
 
   /* Save User */
@@ -93,14 +118,25 @@ document.addEventListener('DOMContentLoaded', function () {
     var form = document.getElementById('formUser');
     if (!form.checkValidity()) { form.reportValidity(); return; }
     bootstrap.Modal.getInstance(document.getElementById('modalUser')).hide();
-    alert('บันทึกข้อมูลผู้ใช้งานสำเร็จ');
+    showToast('บันทึกข้อมูลผู้ใช้งานสำเร็จ', 'success');
   });
 
   /* Save Group Assignment */
   document.getElementById('btnSaveGroup').addEventListener('click', function () {
     bootstrap.Modal.getInstance(document.getElementById('modalAssignGroup')).hide();
-    alert('บันทึกกลุ่มและบทบาทสำเร็จ');
+    showToast('บันทึกกลุ่มและบทบาทสำเร็จ', 'success');
   });
+
+  /* ── Toast helper ── */
+  function showToast(msg, type) {
+    var icons = { success: 'ri-checkbox-circle-line', warning: 'ri-error-warning-line', danger: 'ri-close-circle-line' };
+    var colors = { success: 'var(--dpim-green)', warning: '#e6940a', danger: '#dc3545' };
+    var el = document.getElementById('dpimToast');
+    el.querySelector('.toast-icon').className = 'toast-icon ri ' + (icons[type] || icons.success);
+    el.querySelector('.toast-icon').style.color = colors[type] || colors.success;
+    el.querySelector('.toast-msg').textContent = msg;
+    bootstrap.Toast.getOrCreateInstance(el, { delay: 3000 }).show();
+  }
 });
 </script>
 }
@@ -344,6 +380,78 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
   </div>
 
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index:9999">
+  <div id="dpimToast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body d-flex align-items-center gap-2">
+        <i class="toast-icon ri ri-checkbox-circle-line fs-5"></i>
+        <span class="toast-msg"></span>
+      </div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: รีเซ็ตรหัสผ่าน -->
+<div class="modal fade" id="modalResetPwd" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:2px solid #e6940a;">
+        <h5 class="modal-title" style="color:#e6940a;">
+          <i class="ri ri-lock-password-line me-2"></i>รีเซ็ตรหัสผ่าน
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-1">ยืนยันการรีเซ็ตรหัสผ่านสำหรับผู้ใช้:</p>
+        <p class="fw-semibold mb-1" id="resetPwdName" style="color:var(--dpim-blue);"></p>
+        <p class="text-muted mb-3" style="font-size:.85rem;">อีเมล: <span id="resetPwdEmail"></span></p>
+        <div class="alert alert-warning d-flex gap-2 align-items-start py-2" role="alert">
+          <i class="ri ri-information-line mt-1"></i>
+          <span style="font-size:.85rem;">ระบบจะสร้างรหัสผ่านชั่วคราวและส่งให้ผู้ใช้ทางอีเมลโดยอัตโนมัติ
+          ผู้ใช้ต้องเปลี่ยนรหัสผ่านเมื่อเข้าสู่ระบบครั้งถัดไป</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnConfirmReset" class="btn btn-warning text-white">
+          <i class="ri ri-mail-send-line me-1"></i>ส่งรหัสผ่านชั่วคราว
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: ระงับบัญชีผู้ใช้งาน -->
+<div class="modal fade" id="modalSuspend" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:2px solid #dc3545;">
+        <h5 class="modal-title text-danger">
+          <i class="ri ri-forbid-line me-2"></i>ระงับบัญชีผู้ใช้งาน
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-1">คุณต้องการระงับการใช้งานบัญชีของ:</p>
+        <p class="fw-semibold mb-3" id="suspendUserName" style="color:var(--dpim-blue);"></p>
+        <div class="alert alert-danger d-flex gap-2 align-items-start py-2" role="alert">
+          <i class="ri ri-alert-line mt-1"></i>
+          <span style="font-size:.85rem;">ผู้ใช้จะไม่สามารถเข้าสู่ระบบได้จนกว่าจะเปิดใช้งานอีกครั้ง
+          การดำเนินการนี้ไม่สามารถยกเลิกได้อัตโนมัติ</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+        <button type="button" id="btnConfirmSuspend" class="btn btn-danger">
+          <i class="ri ri-forbid-line me-1"></i>ระงับบัญชี
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal: เพิ่ม/แก้ไขผู้ใช้งาน -->

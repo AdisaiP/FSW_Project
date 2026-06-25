@@ -79,8 +79,32 @@ document.addEventListener('DOMContentLoaded', function () {
     </ol>
   </nav>
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="page-title-dpim mb-0">บัญชีที่อยู่</h4>
+  <h4 class="page-title-dpim mb-4">บัญชีที่อยู่</h4>
+
+  <ul class="nav nav-pills mb-4 flex-wrap gap-2">
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewAccount">
+        <i class="ri ri-user-line me-1"></i>ข้อมูลส่วนตัว
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewSecurity">
+        <i class="ri ri-shield-line me-1"></i>ความปลอดภัย
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="/Users/ViewAddresses">
+        <i class="ri ri-map-line me-1"></i>บัญชีที่อยู่
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/Users/ViewAccount#favorite-menu">
+        <i class="ri ri-star-line me-1"></i>เมนูโปรด
+      </a>
+    </li>
+  </ul>
+
+  <div class="d-flex justify-content-end mb-4">
     <button class="btn btn-dpim" data-address-id="">
       <i class="ri ri-add-line me-1"></i>เพิ่มที่อยู่
     </button>

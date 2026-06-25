@@ -4,11 +4,13 @@
 }
 
 @section VendorStyles {
+<link rel="stylesheet" href="~/vendor/libs/bs-stepper/bs-stepper.css" />
 <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
 <link rel="stylesheet" href="~/vendor/libs/dropzone/dropzone.css" />
 }
 
 @section VendorScripts {
+<script src="~/vendor/libs/bs-stepper/bs-stepper.js"></script>
 <script src="~/vendor/libs/cleave-zen/cleave-zen.js"></script>
 <script src="~/vendor/libs/select2/select2.js"></script>
 <script src="~/vendor/libs/dropzone/dropzone.js"></script>
@@ -18,76 +20,37 @@
 <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
 <style>
   :root { --dpim-green:#41AD49; --dpim-blue:#23408F; }
-  html, body { height:100%; margin:0; }
-  .reg-wrapper { display:flex; min-height:100vh; flex-direction:column; background:var(--bs-body-bg); }
 
-  /* Top bar */
-  .reg-topbar {
-    display:flex; align-items:center; gap:.75rem;
-    padding:.85rem 1.5rem;
+  /* page shell */
+  body { background: var(--bs-body-bg); }
+  .reg-page { min-height:100vh; display:flex; flex-direction:column; }
+
+  /* logo header */
+  .reg-logo-header {
+    text-align:center;
+    padding:1.75rem 1.5rem 1rem;
+  }
+
+  /* wrap the bs-stepper card */
+  .reg-body {
+    flex:1;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:2rem 1rem;
+  }
+  .reg-card {
+    width:100%;
+    max-width:960px;
     background:var(--bs-card-bg);
-    border-bottom:1px solid var(--bs-border-color);
-    position:sticky; top:0; z-index:100;
+    border:1px solid var(--bs-border-color);
+    border-radius:var(--bs-card-border-radius, .375rem);
+    overflow:hidden;
   }
 
-  /* Main area */
-  .reg-main { display:flex; flex:1; overflow:hidden; }
-
-  /* Left panel — vertical steps */
-  .reg-steps-panel {
-    width:260px; min-width:260px;
-    background:var(--bs-card-bg);
-    border-right:1px solid var(--bs-border-color);
-    padding:1.5rem 1.25rem;
-    overflow-y:auto;
-  }
-  @@media(max-width:767px){ .reg-steps-panel { display:none; } }
-
-  .vstep-list { list-style:none; padding:0; margin:0; }
-  .vstep-item { display:flex; gap:.9rem; position:relative; }
-  .vstep-item:not(:last-child)::before {
-    content:"";
-    position:absolute;
-    left:15px; top:32px;
-    width:2px; bottom:-12px;
-    background:var(--bs-border-color);
-  }
-  .vstep-item.active::before { background:var(--dpim-blue); }
-  .vstep-item.done::before { background:var(--dpim-green); }
-
-  .vstep-dot {
-    width:32px; height:32px; min-width:32px; border-radius:50%;
-    border:2px solid var(--bs-border-color);
-    display:flex; align-items:center; justify-content:center;
-    font-size:.8rem; font-weight:700; color:var(--bs-secondary-color);
-    background:var(--bs-body-bg); z-index:1; margin-top:2px;
-  }
-  .vstep-item.active .vstep-dot {
-    border-color:var(--dpim-blue); background:var(--dpim-blue); color:#fff;
-  }
-  .vstep-item.done .vstep-dot {
-    border-color:var(--dpim-green); background:var(--dpim-green); color:#fff;
-  }
-  .vstep-info { padding-bottom:1.5rem; }
-  .vstep-title { font-weight:600; font-size:.88rem; color:var(--bs-heading-color); }
-  .vstep-sub { font-size:.78rem; color:var(--bs-secondary-color); }
-  .vstep-item.active .vstep-title { color:var(--dpim-blue); }
-  .vstep-item.done .vstep-title { color:var(--dpim-green); }
-
-  /* Right: content */
-  .reg-content-area {
-    flex:1; overflow-y:auto;
-    padding:2rem 2.5rem;
-    display:flex; flex-direction:column; align-items:center;
-  }
-  @@media(max-width:767px){ .reg-content-area { padding:1.25rem; } }
-  .reg-step-content { width:100%; max-width:680px; }
-  .reg-step-content > .step-pane { display:none; }
-  .reg-step-content > .step-pane.active { display:block; }
-
-  /* Terms scroll box */
+  /* terms scroll box */
   .terms-box {
-    height:340px; overflow-y:auto;
+    height:320px; overflow-y:auto;
     border:1px solid var(--bs-border-color);
     border-radius:8px; padding:1.25rem 1.5rem;
     font-size:.875rem; line-height:1.8;
@@ -96,7 +59,8 @@
   .terms-box::-webkit-scrollbar { width:6px; }
   .terms-box::-webkit-scrollbar-thumb { background:var(--bs-border-color); border-radius:3px; }
 
-  /* Dropzone */
+  .doc-hint { background:var(--bs-light); border-left:3px solid var(--bs-primary); padding:.75rem 1rem; border-radius:4px; font-size:.875rem; }
+
   .dropzone-dpim {
     border:2px dashed var(--bs-border-color); border-radius:8px;
     padding:2rem; text-align:center; cursor:pointer;
@@ -104,54 +68,49 @@
   }
   .dropzone-dpim:hover,.dropzone-dpim.dz-drag-hover { border-color:var(--bs-primary); }
   .dropzone-dpim .dz-message { margin:0; }
-  .doc-hint { background:var(--bs-light); border-left:3px solid var(--bs-primary); padding:.75rem 1rem; border-radius:4px; font-size:.875rem; }
 
-  /* step nav bottom */
-  .step-nav { display:flex; justify-content:space-between; align-items:center; margin-top:1.75rem; padding-top:1.25rem; border-top:1px solid var(--bs-border-color); }
+  .cert-upload-box {
+    border:2px dashed var(--bs-border-color); border-radius:8px;
+    padding:1.25rem 1.5rem; background:var(--bs-body-bg);
+    transition:border-color .2s;
+  }
+  .cert-upload-box:hover { border-color:var(--bs-primary); }
+  .cert-upload-box .cert-label { font-weight:600; font-size:.875rem; margin-bottom:.35rem; }
+  .cert-upload-box .cert-desc { font-size:.8rem; color:var(--bs-secondary-color); margin-bottom:.75rem; }
 </style>
 }
 
 @section PageScripts {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  // ---- Init bs-stepper ----
+  const stepperEl = document.getElementById('regStepper');
+  const stepper = new Stepper(stepperEl, { linear: false, animation: true });
 
-  /* ---- State ---- */
-  let currentStep = 0;
-  const totalSteps = 5;
-
-  const stepPanes  = document.querySelectorAll('.step-pane');
-  const vstepItems = document.querySelectorAll('.vstep-item');
-
-  function goTo(n) {
-    if (n < 0 || n >= totalSteps) return;
-    stepPanes.forEach((p, i)  => p.classList.toggle('active', i === n));
-    vstepItems.forEach((el, i) => {
-      el.classList.toggle('active', i === n);
-      el.classList.toggle('done',   i < n);
-    });
-    currentStep = n;
-    window.scrollTo(0, 0);
-    document.querySelector('.reg-content-area')?.scrollTo(0, 0);
-  }
-
+  // Next buttons
   document.querySelectorAll('[data-step-next]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (currentStep === 0) {
+    btn.addEventListener('click', function () {
+      const step = parseInt(this.dataset.stepNext);
+      // Step 0: validate terms acceptance
+      if (step === 1) {
         if (!document.getElementById('agreeTerms').checked) {
           document.getElementById('termsAlert').classList.remove('d-none');
           return;
         }
         document.getElementById('termsAlert').classList.add('d-none');
       }
-      if (currentStep === 3) { updateReview(); }
-      goTo(currentStep + 1);
+      // Step 3 (Review): populate summary
+      if (step === 3) { updateReview(); }
+      stepper.next();
     });
   });
+
+  // Prev buttons
   document.querySelectorAll('[data-step-prev]').forEach(btn => {
-    btn.addEventListener('click', () => goTo(currentStep - 1));
+    btn.addEventListener('click', () => stepper.previous());
   });
 
-  /* ---- Terms scroll detection ---- */
+  // Terms scroll hint
   const termsBox = document.getElementById('termsBox');
   const scrollNote = document.getElementById('termsScrollNote');
   if (termsBox) {
@@ -162,29 +121,27 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* ---- Member type ---- */
+  // Member type → prefix + doc hint
   const memberTypeSelect = document.getElementById('memberType');
   const prefixWrap = document.getElementById('prefixWrap');
   const docHintEl  = document.getElementById('docHint');
   const docHints = {
-    'บุคคลธรรมดา': '<strong>เอกสารที่ต้องแนบ:</strong><ul class="mb-0 ps-3 mt-1"><li>สำเนาบัตรประชาชน</li><li>สำเนาทะเบียนบ้าน</li></ul>',
-    'นิติบุคคล': '<strong>เอกสารที่ต้องแนบ:</strong><ul class="mb-0 ps-3 mt-1"><li>หนังสือรับรองบริษัท (ไม่เกิน 3 เดือน)</li><li>สำเนาบัตรประชาชนผู้มีอำนาจ</li><li>หนังสือมอบอำนาจ (ถ้ามี)</li></ul>',
-    'วิสาหกิจชุมชน': '<strong>เอกสารที่ต้องแนบ:</strong><ul class="mb-0 ps-3 mt-1"><li>หนังสือรับรองวิสาหกิจ</li><li>สำเนาบัตรประชาชนประธาน</li></ul>'
+    '\u0e1a\u0e38\u0e04\u0e04\u0e25\u0e18\u0e23\u0e23\u0e21\u0e14\u0e32': '<strong>\u0e40\u0e2d\u0e01\u0e2a\u0e32\u0e23\u0e17\u0e35\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e41\u0e19\u0e1a:</strong><ul class="mb-0 ps-3 mt-1"><li>\u0e2a\u0e33\u0e40\u0e19\u0e32\u0e1a\u0e31\u0e15\u0e23\u0e1b\u0e23\u0e30\u0e0a\u0e32\u0e0a\u0e19</li><li>\u0e2a\u0e33\u0e40\u0e19\u0e32\u0e17\u0e30\u0e40\u0e1a\u0e35\u0e22\u0e19\u0e1a\u0e49\u0e32\u0e19</li></ul>',
+    '\u0e19\u0e34\u0e15\u0e34\u0e1a\u0e38\u0e04\u0e04\u0e25': '<strong>\u0e40\u0e2d\u0e01\u0e2a\u0e32\u0e23\u0e17\u0e35\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e41\u0e19\u0e1a:</strong><ul class="mb-0 ps-3 mt-1"><li>\u0e2b\u0e19\u0e31\u0e07\u0e2a\u0e37\u0e2d\u0e23\u0e31\u0e1a\u0e23\u0e2d\u0e07\u0e1a\u0e23\u0e34\u0e29\u0e31\u0e17 (\u0e44\u0e21\u0e48\u0e40\u0e01\u0e34\u0e19 3 \u0e40\u0e14\u0e37\u0e2d\u0e19)</li><li>\u0e2a\u0e33\u0e40\u0e19\u0e32\u0e1a\u0e31\u0e15\u0e23\u0e1b\u0e23\u0e30\u0e0a\u0e32\u0e0a\u0e19\u0e1c\u0e39\u0e49\u0e21\u0e35\u0e2d\u0e33\u0e19\u0e32\u0e08</li><li>\u0e2b\u0e19\u0e31\u0e07\u0e2a\u0e37\u0e2d\u0e21\u0e2d\u0e1a\u0e2d\u0e33\u0e19\u0e32\u0e08 (\u0e16\u0e49\u0e32\u0e21\u0e35)</li></ul>',
+    '\u0e27\u0e34\u0e2a\u0e32\u0e2b\u0e01\u0e34\u0e08\u0e0a\u0e38\u0e21\u0e0a\u0e19': '<strong>\u0e40\u0e2d\u0e01\u0e2a\u0e32\u0e23\u0e17\u0e35\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e41\u0e19\u0e1a:</strong><ul class="mb-0 ps-3 mt-1"><li>\u0e2b\u0e19\u0e31\u0e07\u0e2a\u0e37\u0e2d\u0e23\u0e31\u0e1a\u0e23\u0e2d\u0e07\u0e27\u0e34\u0e2a\u0e32\u0e2b\u0e01\u0e34\u0e08</li><li>\u0e2a\u0e33\u0e40\u0e19\u0e32\u0e1a\u0e31\u0e15\u0e23\u0e1b\u0e23\u0e30\u0e0a\u0e32\u0e0a\u0e19\u0e1b\u0e23\u0e30\u0e18\u0e32\u0e19</li></ul>'
   };
   function updateMemberType(val) {
-    if (prefixWrap) prefixWrap.style.display = val === 'บุคคลธรรมดา' ? '' : 'none';
-    if (docHintEl)  docHintEl.innerHTML = docHints[val] || '<span class="text-muted">กรุณาเลือกประเภทสมาชิกก่อน</span>';
+    if (prefixWrap) prefixWrap.style.display = (val === '\u0e1a\u0e38\u0e04\u0e04\u0e25\u0e18\u0e23\u0e23\u0e21\u0e14\u0e32') ? '' : 'none';
+    if (docHintEl)  docHintEl.innerHTML = docHints[val] || '<span class="text-muted">\u0e01\u0e23\u0e38\u0e13\u0e32\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e1b\u0e23\u0e30\u0e40\u0e20\u0e17\u0e2a\u0e21\u0e32\u0e0a\u0e34\u0e01\u0e01\u0e48\u0e2d\u0e19</span>';
   }
   if (memberTypeSelect) {
     memberTypeSelect.addEventListener('change', () => updateMemberType(memberTypeSelect.value));
-    if (typeof $ !== 'undefined') {
-      $(memberTypeSelect).on('select2:select', e => updateMemberType(e.params.data.text));
-    }
+    if (typeof $ !== 'undefined') $(memberTypeSelect).on('select2:select', e => updateMemberType(e.params.data.text));
   }
 
-  /* ---- Duplicate ID check (mock) ---- */
-  const idInput  = document.getElementById('idNumber');
-  const idAlert  = document.getElementById('idDuplicateAlert');
+  // Duplicate ID check (mock)
+  const idInput = document.getElementById('idNumber');
+  const idAlert = document.getElementById('idDuplicateAlert');
   const MOCK_DUP = ['1234567890123'];
   if (idInput) {
     idInput.addEventListener('blur', function () {
@@ -193,418 +150,474 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* ---- Review summary ---- */
+  // Review summary
   function updateReview() {
     const g = id => (document.getElementById(id)?.value || '');
     const typeEl = document.getElementById('memberType');
-    document.getElementById('rv-memberType').textContent = typeEl?.options[typeEl.selectedIndex]?.text || '—';
     const px = document.getElementById('prefix');
+    document.getElementById('rv-memberType').textContent = typeEl?.options[typeEl.selectedIndex]?.text || '\u2014';
     const pxText = px ? (px.options[px.selectedIndex]?.text || '') : '';
-    document.getElementById('rv-name').textContent = (pxText + ' ' + g('firstName') + ' ' + g('lastName')).trim() || '—';
-    document.getElementById('rv-idNumber').textContent = g('idNumber') || '—';
-    document.getElementById('rv-email').textContent    = g('email') || '—';
-    document.getElementById('rv-phone').textContent    = g('phone') || '—';
+    document.getElementById('rv-name').textContent = (pxText + ' ' + g('firstName') + ' ' + g('lastName')).trim() || '\u2014';
+    document.getElementById('rv-idNumber').textContent = g('idNumber') || '\u2014';
+    document.getElementById('rv-email').textContent    = g('email') || '\u2014';
+    document.getElementById('rv-phone').textContent    = g('phone') || '\u2014';
   }
 
-  /* ---- Submit (mock) ---- */
-  document.getElementById('btnSubmitReg')?.addEventListener('click', () => goTo(4));
+  // Submit (mock)
+  document.getElementById('btnSubmitReg')?.addEventListener('click', () => stepper.next());
 
-  /* ---- Copy ref ---- */
+  // Copy ref
   document.getElementById('btnCopyRef')?.addEventListener('click', function () {
     navigator.clipboard?.writeText('REG-2569-00001');
-    this.textContent = 'คัดลอกแล้ว!';
-    setTimeout(() => { this.textContent = 'คัดลอก'; }, 2000);
+    this.textContent = '\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01\u0e41\u0e25\u0e49\u0e27!';
+    setTimeout(() => { this.textContent = '\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01'; }, 2000);
   });
 
-  /* ---- Select2 ---- */
+  // Select2
   if (typeof $ !== 'undefined' && $.fn.select2) {
     $('#memberType, #prefix').select2({ dropdownParent: document.body });
   }
 
-  /* ---- Dropzone ---- */
+  // Dropzone
   if (typeof Dropzone !== 'undefined') {
     Dropzone.autoDiscover = false;
     new Dropzone('#dropzoneArea', {
       url: '#', maxFilesize: 5, acceptedFiles: '.pdf,.jpg,.jpeg,.png',
-      dictDefaultMessage: '',
-      autoProcessQueue: false
+      dictDefaultMessage: '', autoProcessQueue: false
     });
   }
 
-  goTo(0);
+  // Certificate file name display
+  ['certDPIM', 'certCA'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', function () {
+      const nameEl = document.getElementById(id + 'Name');
+      if (nameEl) nameEl.textContent = this.files[0]?.name || 'ยังไม่ได้เลือกไฟล์';
+    });
+  });
 });
 </script>
 }
 
 @* ============================================================ *@
-<div class="reg-wrapper">
+<div class="reg-page">
 
-  <!-- Top bar -->
-  <div class="reg-topbar">
-    <a href="/" class="d-flex align-items-center gap-2 text-decoration-none">
-      <img src="~/img/dpim-logo.png" alt="DPIM" style="width:36px;height:36px;object-fit:contain;" />
-      <span class="fw-bold" style="color:var(--dpim-blue);font-size:.95rem;">DPIM Portal</span>
-    </a>
-    <span class="ms-3 text-muted" style="font-size:.85rem;">ลงทะเบียนสมาชิก — Mining Account</span>
-    <a href="/Auth/RegisterChannel" class="btn btn-sm btn-outline-secondary ms-auto">
-      <i class="ri ri-close-line"></i> ยกเลิก
-    </a>
+  <!-- Logo Header -->
+  <div class="reg-logo-header">
+    <img src="~/img/dpim-logo.png" alt="DPIM" style="width:72px;height:72px;object-fit:contain;" class="mb-2" />
+    <h5 class="fw-bold mb-1" style="color:var(--dpim-blue);">กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่</h5>
+    <p class="text-muted mb-0" style="font-size:.85rem;">ระบบลงทะเบียนผู้ใช้งานอิเล็กทรอนิกส์ (Mining Account)</p>
   </div>
 
-  <div class="reg-main">
+  <!-- Body -->
+  <div class="reg-body">
+    <div class="reg-card">
 
-    <!-- ====== Left: Vertical Steps ====== -->
-    <div class="reg-steps-panel">
-      <p class="text-uppercase fw-semibold mb-3" style="font-size:.72rem;letter-spacing:.08em;color:var(--bs-secondary-color);">ขั้นตอนการลงทะเบียน</p>
-      <ul class="vstep-list">
-        <li class="vstep-item" data-vstep="0">
-          <div class="vstep-dot">01</div>
-          <div class="vstep-info">
-            <div class="vstep-title">ข้อตกลงและเงื่อนไข</div>
-            <div class="vstep-sub">อ่านและยอมรับข้อตกลง</div>
-          </div>
-        </li>
-        <li class="vstep-item" data-vstep="1">
-          <div class="vstep-dot">02</div>
-          <div class="vstep-info">
-            <div class="vstep-title">ข้อมูลพื้นฐาน</div>
-            <div class="vstep-sub">กรอกข้อมูลสมาชิก</div>
-          </div>
-        </li>
-        <li class="vstep-item" data-vstep="2">
-          <div class="vstep-dot">03</div>
-          <div class="vstep-info">
-            <div class="vstep-title">แนบเอกสาร</div>
-            <div class="vstep-sub">อัปโหลดเอกสารประกอบ</div>
-          </div>
-        </li>
-        <li class="vstep-item" data-vstep="3">
-          <div class="vstep-dot">04</div>
-          <div class="vstep-info">
-            <div class="vstep-title">ตรวจสอบ</div>
-            <div class="vstep-sub">ทบทวนและยืนยัน</div>
-          </div>
-        </li>
-        <li class="vstep-item" data-vstep="4">
-          <div class="vstep-dot">05</div>
-          <div class="vstep-info">
-            <div class="vstep-title">สำเร็จ</div>
-            <div class="vstep-sub">การลงทะเบียนเสร็จสิ้น</div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <!-- /Left -->
+      <!-- bs-stepper: wizard-vertical (same class as CreateDeal) -->
+      <div id="regStepper" class="bs-stepper wizard-vertical vertical mt-2">
 
-    <!-- ====== Right: Content ====== -->
-    <div class="reg-content-area">
-      <div class="reg-step-content">
+        <!-- ===== LEFT: Step Header ===== -->
+        <div class="bs-stepper-header gap-lg-2 border-end">
 
-        <!-- header brand (mobile only banner) -->
-        <div class="text-center mb-5 d-lg-none">
-          <img src="~/img/dpim-logo.png" alt="กพร." style="width:56px;height:56px;object-fit:contain;" class="mb-2" />
-          <h5 class="fw-bold mb-0">ลงทะเบียนสมาชิก</h5>
-          <p class="text-muted small">กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ (กพร.)</p>
-        </div>
-
-        <!-- ===== STEP 0: ข้อตกลงและเงื่อนไข ===== -->
-        <div class="step-pane" id="pane-0">
-          <div class="mb-4">
-            <h5 class="fw-bold mb-1"><i class="ri ri-file-text-line me-2 text-primary"></i>ข้อตกลงและเงื่อนไข</h5>
-            <p class="text-muted mb-0" style="font-size:.87rem;">การขอรับชื่อผู้ใช้และรหัสผ่าน (Username &amp; Password) และการใช้บริการระบบลงทะเบียนผู้ใช้งานอิเล็กทรอนิกส์ (Mining Account) ของกรมอุตสาหกรรมพื้นฐานและการเหมืองแร่</p>
-          </div>
-
-          <div id="termsBox" class="terms-box mb-2">
-            <p style="font-size:.83rem;color:var(--bs-secondary-color);">ข้าพเจ้าผู้สมัครขอรับชื่อผู้ใช้และรหัสผ่าน (Username &amp; Password) สำหรับการใช้งานระบบลงทะเบียนผู้ใช้งานอิเล็กทรอนิกส์ (Mining Account) โดยตกลงและยินยอมผูกพันและปฏิบัติตามข้อตกลงและเงื่อนไขดังต่อไปนี้ทุกประการ</p>
-            <p><strong>ข้อ 1</strong> ข้อตกลงและเงื่อนไขนี้ใช้บังคับระหว่าง กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ ซึ่งต่อไปนี้จะเรียกว่า "กรม" กับผู้สมัครขอรับชื่อผู้ใช้และรหัสผ่าน (Username &amp; Password) เพื่อใช้บริการระบบลงทะเบียนผู้ใช้งานอิเล็กทรอนิกส์ (Mining Account) ซึ่งต่อไปนี้จะเรียกว่า "ผู้รับบริการ"</p>
-            <p><strong>ข้อ 2</strong> ผู้รับบริการ จะต้องกรอกหรือระบุข้อมูลรายละเอียดต่าง ๆ ตามความเป็นจริงให้ครบถ้วน ทั้งนี้ เพื่อประโยชน์แก่ผู้รับบริการ และผู้รับบริการตกลงยินยอมให้ กรม ตรวจสอบความถูกต้องและเปิดเผยข้อมูลตามที่ได้ระบุไว้ หากตรวจพบว่าข้อมูลของผู้รับบริการไม่เป็นความจริง กรมอาจระงับหรือยกเลิกสิทธิการใช้งานของผู้รับบริการได้โดยไม่ต้องแจ้งให้ทราบล่วงหน้า และผู้รับบริการจะต้องรับผิดชอบในความเสียหายที่เกิดขึ้นจากการกรอกข้อมูลอันเป็นเท็จดังกล่าว</p>
-            <p><strong>ข้อ 3</strong> เมื่อผู้รับบริการทำการกรอกข้อมูลรายละเอียดต่าง ๆ เรียบร้อยแล้ว ให้ผู้รับบริการดำเนินการยืนยันตัวผ่านช่องทางใดช่องทางหนึ่ง ได้แก่</p>
-            <p><u>กรณีบุคคลธรรมดา</u></p>
-            <ol>
-              <li>ยืนยันตัวตนต่อหน้าเจ้าหน้าที่ด้วยตนเอง โดยแสดงบัตรประจำตัวประชาชนที่ยังไม่หมดอายุ</li>
-              <li>ยืนยันตัวตนผ่านระบบอิเล็กทรอนิกส์ (Electronic Know Your Customer : e-KYC) โดยใช้บัตรประจำตัวประชาชน ประกอบกับการถ่ายภาพใบหน้าด้วยตัวเอง (Selfie)</li>
-              <li>ยืนยันตัวตนโดยใช้ใบรับรองอิเล็กทรอนิกส์ที่ได้รับจากกรมออกใบรับรองอิเล็กทรอนิกส์ (Certification Authority : CA)</li>
-              <li>มอบอำนาจให้บุคคลธรรมดาที่มีสัญชาติไทยเป็นผู้ดำเนินการยื่นเอกสารยืนยันตัวตนแทน โดยสั่งพิมพ์ (Print out) คำขอรับชื่อผู้ใช้และรหัสผ่าน เพื่อทำการลงลายมือชื่อผู้รับบริการ ผู้รับมอบอำนาจ และพยานอย่างน้อยหนึ่งคนแล้วนำไปยื่นต่อเจ้าหน้าที่พร้อมแนบเอกสารประกอบตามที่กำหนดไว้</li>
-            </ol>
-            <p>กรณีผู้รับบริการสมัครเป็นผู้แทน จะไม่สามารถยืนยันตัวตนผ่านช่องทางตาม (4) ได้</p>
-            <p><u>กรณีนิติบุคคล</u></p>
-            <ol>
-              <li>ยืนยันตัวตนโดยใช้ใบรับรองอิเล็กทรอนิกส์ที่ได้รับจากกรมออกใบรับรองอิเล็กทรอนิกส์ (Certification Authority : CA)</li>
-              <li>สั่งพิมพ์ (Print out) คำขอรับชื่อผู้ใช้และรหัสผ่าน เพื่อทำการลงลายมือชื่อ พร้อมแนบเอกสารดังนี้
-                <ol type="a">
-                  <li>หนังสือรับรองการจดทะเบียนนิติบุคคล (ออกให้ไม่เกิน 6 เดือน)</li>
-                  <li>หนังสือบริคณห์สนธิ (ออกให้ไม่เกิน 6 เดือน)</li>
-                  <li>บอจ.5 สำเนารายชื่อผู้ถือหุ้น (ออกให้ไม่เกิน 6 เดือน)</li>
-                  <li>สำเนาบัตรประจำตัวประชาชนพร้อมเซ็นรับรองสำเนาถูกต้องของกรรมการผู้มีอำนาจลงนาม</li>
-                  <li>หนังสือมอบอำนาจ และบัตรประจำตัวประชาชนของผู้รับมอบอำนาจ (ถ้ามี)</li>
-                </ol>
-              </li>
-            </ol>
-            <p>ทั้งนี้ เมื่อเจ้าหน้าที่ได้ตรวจสอบข้อมูลและอนุมัติแล้ว ระบบจะแจ้งให้ผู้รับบริการยืนยันการเปิดใช้งาน (Activate User) ทางอีเมล ภายใน 30 วันนับแต่วันที่ได้รับแจ้ง</p>
-            <p><strong>ข้อ 4</strong> ผู้รับบริการต้องไม่นำชื่อผู้ใช้และรหัสผ่าน (Username &amp; Password) ไปใช้ในทางที่ขัดต่อกฎหมาย และความสงบเรียบร้อย หรือศีลธรรมอันดีของประชาชน</p>
-            <p><strong>ข้อ 5</strong> ผู้รับบริการตกลงและเข้าใจดีว่า การสร้างลายมือชื่ออิเล็กทรอนิกส์ด้วยการใช้ชื่อผู้ใช้ (Username) จะต้องใช้คู่กับรหัสผ่าน (Password) ซึ่งผู้รับบริการเป็นผู้กำหนดขึ้นด้วยตนเอง และใช้ร่วมกับรหัสลับแบบใช้ครั้งเดียว (One Time Password : OTP)</p>
-            <p><strong>ข้อ 6</strong> ผู้รับบริการต้องเก็บรักษาชื่อผู้ใช้และรหัสผ่าน (Username &amp; Password) ที่ได้รับไว้เป็นความลับ ในกรณีที่มีเหตุอันควรสงสัยว่าชื่อผู้ใช้และรหัสผ่านล่วงรู้ไปถึงบุคคลอื่น ผู้รับบริการมีหน้าที่ต้องดำเนินการตั้งรหัสผ่านใหม่โดยทันทีผ่านระบบ Mining Account</p>
-            <p><strong>ข้อ 7</strong> ผู้รับบริการตกลงและยอมรับว่าการใช้ลายมือชื่ออิเล็กทรอนิกส์ที่เกิดจากการใช้ชื่อผู้ใช้และรหัสผ่านในระบบ Mining Account มีความผูกพันตามกฎหมายเสมือนเป็นการลงลายมือชื่อของผู้รับบริการในเอกสารทุกประการ</p>
-            <p><strong>ข้อ 8</strong> ผู้รับบริการตกลงและยอมรับว่ากรมมีสิทธิที่จะแก้ไข เปลี่ยนแปลง หรือยกเลิกข้อตกลงและเงื่อนไขนี้ได้ตามที่กรมเห็นสมควร</p>
-            <p><strong>ข้อ 9</strong> ผู้รับบริการต้องปฏิบัติตามข้อตกลงและเงื่อนไขของกรมโดยเคร่งครัด กรมมีสิทธิปฏิเสธและไม่ต้องรับผิดชอบในความเสียหายที่เกิดขึ้นจากเหตุสุดวิสัย</p>
-            <p><strong>ข้อ 10</strong> ผู้ใดแอบอ้างหรือกระทำการอันเป็นการละเมิดสิทธิส่วนบุคคลโดยใช้ข้อมูลของผู้อื่นมาแอบอ้างในการสมัคร ถือเป็นความผิดและต้องได้รับโทษตามที่กฎหมายกำหนดไว้</p>
-            <p><strong>ข้อ 11</strong> กรมอาจส่งข้อมูลหรือแจ้งข่าวประชาสัมพันธ์ผ่านช่องทางอีเมล หรือช่องทางอื่นใดให้แก่ผู้รับบริการได้ตามที่กรมเห็นสมควร</p>
-            <p><strong>ข้อ 12</strong> กรมมีสิทธิระงับหรือยกเลิกการให้บริการกับผู้รับบริการได้ทันที ถ้าปรากฏว่าผู้รับบริการปฏิบัติผิดข้อตกลงและเงื่อนไขนี้แม้เพียงข้อใดข้อหนึ่ง</p>
-            <p><strong>ข้อ 13</strong> การใช้ชื่อผู้ใช้และรหัสผ่านของผู้รับบริการที่เป็นผู้แทนซึ่งกระทำแทนห้างหุ้นส่วนและบริษัทจำกัด ถือว่าเป็นไปตามความประสงค์ของผู้ประกอบการ</p>
-            <p><strong>ข้อ 14</strong> กรมมีสิทธิระงับหรือยกเลิกการให้บริการกับผู้รับบริการได้ทันที ถ้าปรากฏว่าผู้รับบริการปฏิบัติผิดข้อตกลงและเงื่อนไขนี้แม้เพียงข้อใดข้อหนึ่ง</p>
-            <p><strong>ข้อ 15</strong> คำประกาศเกี่ยวกับความเป็นส่วนตัว (Privacy Notice) สำหรับผู้รับบริการตามพระราชบัญญัติแร่ พ.ศ. 2560 — <a href="#" class="text-primary">คลิกเพื่ออ่านเพิ่มเติม</a></p>
-            <p><strong>ข้อ 16</strong> กรมมีการเก็บรวบรวมข้อมูลส่วนบุคคล เพื่อใช้ในการยืนยันตัวตน ได้แก่ ชื่อและชื่อสกุล / เลขบัตรประจำตัวประชาชน / ที่อยู่ / วันเดือนปีเกิด / ภาพใบหน้า</p>
-            <p><strong>ข้อ 17</strong> กรมจะเก็บรักษาข้อมูลส่วนบุคคลของผู้รับบริการไว้ตราบเท่าที่จำเป็นตามสมควร เมื่อพ้นระยะเวลาดังกล่าวกรมจะลบ/ทำลายหรือทำให้ข้อมูลไม่สามารถระบุตัวตนได้ ทั้งนี้ หากผู้รับบริการประสงค์ยกเลิกข้อตกลง ต้องแจ้งเป็นลายลักษณ์อักษรล่วงหน้าไม่น้อยกว่า 3 วัน</p>
-            <hr />
-            <p class="fw-semibold">ข้าพเจ้ายอมรับ และได้อ่านข้อความในข้อตกลงและเงื่อนไขนี้เข้าใจโดยละเอียดแล้ว</p>
-            <p>ข้าพเจ้าตกลงยินยอมให้กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ เก็บรวบรวม ใช้ หรือเปิดเผยข้อมูลส่วนบุคคลของข้าพเจ้าตามวัตถุประสงค์ที่ระบุไว้</p>
-          </div>
-
-          <p id="termsScrollNote" class="text-muted small text-center mb-2" style="font-size:.78rem;">
-            <i class="ri ri-arrow-down-line"></i> กรุณาเลื่อนอ่านข้อตกลงให้ครบก่อนยอมรับ
-          </p>
-
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="agreeTerms" />
-            <label class="form-check-label" for="agreeTerms" style="font-size:.88rem;">
-              ข้าพเจ้าได้อ่านและยอมรับข้อตกลงและเงื่อนไขข้างต้นทุกประการ
-            </label>
-          </div>
-          <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="agreePrivacy" />
-            <label class="form-check-label" for="agreePrivacy" style="font-size:.88rem;">
-              ข้าพเจ้ายินยอมให้ กพร. เก็บรวบรวมและใช้ข้อมูลส่วนบุคคลตามวัตถุประสงค์ที่ระบุไว้
-            </label>
-          </div>
-          <div id="termsAlert" class="alert alert-danger p-2 d-none small mb-2">
-            <i class="ri ri-error-warning-line me-1"></i> กรุณายืนยันว่าได้อ่านและยอมรับข้อตกลงแล้ว
-          </div>
-
-          <div class="step-nav">
-            <a href="/Auth/RegisterChannel" class="btn btn-outline-secondary">
-              <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
-            </a>
-            <button type="button" class="btn btn-primary" data-step-next>
-              ยอมรับและดำเนินการต่อ <i class="ri ri-arrow-right-line ms-1"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- ===== STEP 1: ข้อมูลพื้นฐาน ===== -->
-        <div class="step-pane" id="pane-1">
-          <div class="mb-4">
-            <h5 class="fw-bold mb-1"><i class="ri ri-user-line me-2 text-primary"></i>ข้อมูลพื้นฐาน</h5>
-            <p class="text-muted mb-0">กรอกข้อมูลสำหรับสร้างบัญชีสมาชิก</p>
-          </div>
-          <div class="row gx-4">
-            <div class="col-12 mb-4">
-              <label class="form-label" for="memberType">ประเภทสมาชิก <span class="text-danger">*</span></label>
-              <select id="memberType" name="memberType" class="form-select form-select-lg">
-                <option value="">-- กรุณาเลือกประเภทสมาชิก --</option>
-                <option value="บุคคลธรรมดา">บุคคลธรรมดา</option>
-                <option value="นิติบุคคล">นิติบุคคล</option>
-                <option value="วิสาหกิจชุมชน">วิสาหกิจชุมชน</option>
-              </select>
-            </div>
-            <div id="prefixWrap" class="col-md-3 mb-4" style="display:none;">
-              <label class="form-label" for="prefix">คำนำหน้า <span class="text-danger">*</span></label>
-              <select id="prefix" name="prefix" class="form-select">
-                <option value="">--</option>
-                <option>นาย</option><option>นาง</option><option>นางสาว</option>
-              </select>
-            </div>
-            <div class="col-md-4 mb-4">
-              <label class="form-label" for="firstName">ชื่อ <span class="text-danger">*</span></label>
-              <div class="form-floating form-floating-outline">
-                <input type="text" id="firstName" class="form-control" placeholder="ชื่อ" />
-                <label>ชื่อ</label>
-              </div>
-            </div>
-            <div class="col-md-5 mb-4">
-              <label class="form-label" for="lastName">นามสกุล <span class="text-danger">*</span></label>
-              <div class="form-floating form-floating-outline">
-                <input type="text" id="lastName" class="form-control" placeholder="นามสกุล" />
-                <label>นามสกุล</label>
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <label class="form-label" for="idNumber">เลขบัตรประชาชน / เลขทะเบียนนิติบุคคล <span class="text-danger">*</span></label>
-              <div class="form-floating form-floating-outline">
-                <input type="text" id="idNumber" class="form-control" placeholder="13 หลัก" maxlength="13" />
-                <label>เลข 13 หลัก (ไม่ต้องใส่เครื่องหมาย)</label>
-              </div>
-              <div id="idDuplicateAlert" class="alert alert-danger mt-2 p-2 d-none small">
-                <i class="ri ri-error-warning-line me-1"></i>หมายเลขนี้มีในระบบแล้ว กรุณาติดต่อเจ้าหน้าที่
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <label class="form-label" for="email">อีเมล <span class="text-danger">*</span></label>
-              <div class="form-floating form-floating-outline">
-                <input type="email" id="email" class="form-control" placeholder="name@example.com" />
-                <label>อีเมล</label>
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <label class="form-label" for="phone">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
-              <div class="form-floating form-floating-outline">
-                <input type="tel" id="phone" class="form-control" placeholder="0XXXXXXXXX" maxlength="10" />
-                <label>เบอร์โทรศัพท์ 10 หลัก</label>
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <label class="form-label" for="password">รหัสผ่าน <span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <div class="form-floating form-floating-outline">
-                  <input type="password" id="password" class="form-control" placeholder="รหัสผ่าน" />
-                  <label>≥8 ตัว (ตัวอักษร+ตัวเลข+สัญลักษณ์)</label>
-                </div>
-                <span class="input-group-text cursor-pointer" onclick="var i=this.previousElementSibling.querySelector('input');i.type=i.type==='password'?'text':'password'">
-                  <i class="icon-base ri ri-eye-off-line"></i>
+          <div class="step" data-target="#step-terms">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
+              <span class="bs-stepper-label">
+                <span class="bs-stepper-number">01</span>
+                <span class="d-flex flex-column gap-1 ms-2">
+                  <span class="bs-stepper-title">ข้อตกลงและเงื่อนไข</span>
+                  <span class="bs-stepper-subtitle">อ่านและยอมรับข้อตกลง</span>
                 </span>
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <label class="form-label" for="confirmPassword">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
-              <div class="input-group input-group-merge">
-                <div class="form-floating form-floating-outline">
-                  <input type="password" id="confirmPassword" class="form-control" placeholder="ยืนยันรหัสผ่าน" />
-                  <label>ยืนยันรหัสผ่านอีกครั้ง</label>
-                </div>
-                <span class="input-group-text cursor-pointer" onclick="var i=this.previousElementSibling.querySelector('input');i.type=i.type==='password'?'text':'password'">
-                  <i class="icon-base ri ri-eye-off-line"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="step-nav">
-            <button type="button" class="btn btn-outline-secondary" data-step-prev>
-              <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
-            </button>
-            <button type="button" class="btn btn-primary" data-step-next>
-              ถัดไป <i class="ri ri-arrow-right-line ms-1"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- ===== STEP 2: แนบเอกสาร ===== -->
-        <div class="step-pane" id="pane-2">
-          <div class="mb-4">
-            <h5 class="fw-bold mb-1"><i class="ri ri-attachment-line me-2 text-primary"></i>แนบเอกสารประกอบ</h5>
-            <p class="text-muted mb-0">อัปโหลดเอกสารตามประเภทสมาชิกที่เลือก</p>
-          </div>
-          <div id="docHint" class="doc-hint mb-4">
-            <span class="text-muted">กรุณาเลือกประเภทสมาชิกก่อน</span>
-          </div>
-          <div id="dropzoneArea" class="dropzone-dpim mb-4">
-            <div class="dz-message">
-              <i class="ri ri-upload-cloud-line ri-2x text-primary mb-2 d-block" style="font-size:2rem;"></i>
-              <span class="fw-semibold">ลากไฟล์มาวางที่นี่</span><br>
-              <small class="text-muted">หรือ <span class="text-primary">คลิกเพื่อเลือกไฟล์</span><br>รองรับ PDF, JPG, PNG ขนาดไม่เกิน 5 MB ต่อไฟล์</small>
-            </div>
-          </div>
-          <div class="step-nav">
-            <button type="button" class="btn btn-outline-secondary" data-step-prev>
-              <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
-            </button>
-            <button type="button" class="btn btn-primary" data-step-next>
-              ถัดไป <i class="ri ri-arrow-right-line ms-1"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- ===== STEP 3: ตรวจสอบ ===== -->
-        <div class="step-pane" id="pane-3">
-          <div class="mb-4">
-            <h5 class="fw-bold mb-1"><i class="ri ri-file-list-3-line me-2 text-primary"></i>ตรวจสอบข้อมูล</h5>
-            <p class="text-muted mb-0">กรุณาตรวจสอบข้อมูลก่อนยืนยัน</p>
-          </div>
-          <div class="card border mb-4">
-            <div class="card-body">
-              <dl class="row mb-0">
-                <dt class="col-sm-4 text-muted">ประเภทสมาชิก</dt>
-                <dd class="col-sm-8 fw-semibold" id="rv-memberType">—</dd>
-                <dt class="col-sm-4 text-muted">ชื่อ-นามสกุล</dt>
-                <dd class="col-sm-8 fw-semibold" id="rv-name">—</dd>
-                <dt class="col-sm-4 text-muted">เลขบัตร</dt>
-                <dd class="col-sm-8 fw-semibold" id="rv-idNumber">—</dd>
-                <dt class="col-sm-4 text-muted">อีเมล</dt>
-                <dd class="col-sm-8 fw-semibold" id="rv-email">—</dd>
-                <dt class="col-sm-4 text-muted mb-0">เบอร์โทร</dt>
-                <dd class="col-sm-8 fw-semibold mb-0" id="rv-phone">—</dd>
-              </dl>
-            </div>
-          </div>
-          <div class="alert alert-success p-3 mb-4" style="font-size:.85rem;">
-            <i class="ri ri-checkbox-circle-line me-2"></i>
-            ท่านได้ยอมรับข้อตกลงและเงื่อนไขการใช้งานระบบ Mining Account แล้ว
-          </div>
-          <div class="step-nav">
-            <button type="button" class="btn btn-outline-secondary" data-step-prev>
-              <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
-            </button>
-            <button type="button" class="btn btn-success" id="btnSubmitReg">
-              <i class="ri ri-check-line me-1"></i> ยืนยันการลงทะเบียน
-            </button>
-          </div>
-        </div>
-
-        <!-- ===== STEP 4: สำเร็จ ===== -->
-        <div class="step-pane" id="pane-4">
-          <div class="text-center py-6">
-            <div class="mb-4">
-              <span class="avatar avatar-xl bg-label-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width:88px;height:88px;font-size:2.5rem;">
-                <i class="ri ri-checkbox-circle-line text-success"></i>
               </span>
-            </div>
-            <h4 class="fw-bold text-success mb-2">ลงทะเบียนสำเร็จ!</h4>
-            <p class="text-muted mb-4">ระบบ DPIM ได้ส่งลิงก์ยืนยันไปยังอีเมลของท่านแล้ว<br>กรุณาตรวจสอบอีเมลเพื่อเปิดใช้งานบัญชี</p>
-            <div class="card border d-inline-block px-5 py-3 mb-5">
-              <p class="text-muted small mb-1">หมายเลขอ้างอิง</p>
-              <h5 class="fw-bold text-primary mb-0">REG-2569-00001
-                <button id="btnCopyRef" class="btn btn-sm btn-outline-primary ms-2 py-0">คัดลอก</button>
-              </h5>
-            </div>
-            <div class="d-flex justify-content-center mb-5">
-              <ul class="list-unstyled text-start" style="max-width:300px;">
-                <li class="d-flex align-items-start mb-3">
-                  <span class="badge bg-success rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-check-line"></i></span>
-                  <div>
-                    <div class="fw-semibold">ลงทะเบียนสมาชิก</div>
-                    <div class="text-muted small">เสร็จสิ้น</div>
-                  </div>
-                </li>
-                <li class="d-flex align-items-start mb-3">
-                  <span class="badge bg-label-primary rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-mail-line text-primary"></i></span>
-                  <div>
-                    <div class="fw-semibold">ยืนยันอีเมล</div>
-                    <div class="text-muted small">รอการยืนยันจากท่าน</div>
-                  </div>
-                </li>
-                <li class="d-flex align-items-start mb-3">
-                  <span class="badge bg-label-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-user-follow-line text-secondary"></i></span>
-                  <div>
-                    <div class="fw-semibold">อนุมัติโดยเจ้าหน้าที่</div>
-                    <div class="text-muted small">รอการตรวจสอบเอกสาร</div>
-                  </div>
-                </li>
-                <li class="d-flex align-items-start">
-                  <span class="badge bg-label-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-shield-check-line text-secondary"></i></span>
-                  <div>
-                    <div class="fw-semibold">เปิดใช้งานบัญชี</div>
-                    <div class="text-muted small">ภายใน 30 วันหลังได้รับแจ้ง</div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <a href="/Auth/LoginBasic" class="btn btn-primary">
-              <i class="ri ri-login-box-line me-1"></i> ไปหน้าเข้าสู่ระบบ
-            </a>
+            </button>
           </div>
+          <div class="line"></div>
+
+          <div class="step" data-target="#step-info">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
+              <span class="bs-stepper-label">
+                <span class="bs-stepper-number">02</span>
+                <span class="d-flex flex-column gap-1 ms-2">
+                  <span class="bs-stepper-title">ข้อมูลพื้นฐาน</span>
+                  <span class="bs-stepper-subtitle">กรอกข้อมูลสมาชิก</span>
+                </span>
+              </span>
+            </button>
+          </div>
+          <div class="line"></div>
+
+          <div class="step" data-target="#step-docs">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
+              <span class="bs-stepper-label">
+                <span class="bs-stepper-number">03</span>
+                <span class="d-flex flex-column gap-1 ms-2">
+                  <span class="bs-stepper-title">แนบเอกสาร</span>
+                  <span class="bs-stepper-subtitle">อัปโหลดเอกสารประกอบ</span>
+                </span>
+              </span>
+            </button>
+          </div>
+          <div class="line"></div>
+
+          <div class="step" data-target="#step-review">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
+              <span class="bs-stepper-label">
+                <span class="bs-stepper-number">04</span>
+                <span class="d-flex flex-column gap-1 ms-2">
+                  <span class="bs-stepper-title">ตรวจสอบ</span>
+                  <span class="bs-stepper-subtitle">ทบทวนและยืนยัน</span>
+                </span>
+              </span>
+            </button>
+          </div>
+          <div class="line"></div>
+
+          <div class="step" data-target="#step-done">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle"><i class="icon-base ri ri-check-line"></i></span>
+              <span class="bs-stepper-label">
+                <span class="bs-stepper-number">05</span>
+                <span class="d-flex flex-column gap-1 ms-2">
+                  <span class="bs-stepper-title">สำเร็จ</span>
+                  <span class="bs-stepper-subtitle">การลงทะเบียนเสร็จสิ้น</span>
+                </span>
+              </span>
+            </button>
+          </div>
+
         </div>
+        <!-- /header -->
+
+        <!-- ===== RIGHT: Content ===== -->
+        <div class="bs-stepper-content">
+          <form id="regForm" onsubmit="return false">
+
+            <!-- STEP 1: ข้อตกลง -->
+            <div id="step-terms" class="content">
+              <div class="content-header mb-4">
+                <h5 class="mb-0 fw-bold"><i class="ri ri-file-text-line me-2 text-primary"></i>ข้อตกลงและเงื่อนไข</h5>
+                <small class="text-muted">การขอรับ Username &amp; Password สำหรับระบบ Mining Account กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่</small>
+              </div>
+
+              <div id="termsBox" class="terms-box mb-2">
+                <p style="font-size:.83rem;color:var(--bs-secondary-color);">ข้าพเจ้าผู้สมัครขอรับชื่อผู้ใช้และรหัสผ่าน (Username &amp; Password) สำหรับการใช้งานระบบลงทะเบียนผู้ใช้งานอิเล็กทรอนิกส์ (Mining Account) โดยตกลงและยินยอมผูกพันและปฏิบัติตามข้อตกลงและเงื่อนไขดังต่อไปนี้ทุกประการ</p>
+                <p><strong>ข้อ 1</strong> ข้อตกลงและเงื่อนไขนี้ใช้บังคับระหว่าง กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่ ซึ่งต่อไปนี้จะเรียกว่า "กรม" กับผู้สมัครขอรับชื่อผู้ใช้และรหัสผ่าน (Username &amp; Password) เพื่อใช้บริการระบบ Mining Account ซึ่งต่อไปนี้จะเรียกว่า "ผู้รับบริการ"</p>
+                <p><strong>ข้อ 2</strong> ผู้รับบริการ จะต้องกรอกหรือระบุข้อมูลรายละเอียดต่าง ๆ ตามความเป็นจริงให้ครบถ้วน ทั้งนี้ เพื่อประโยชน์แก่ผู้รับบริการ และผู้รับบริการตกลงยินยอมให้ กรม ตรวจสอบความถูกต้องและเปิดเผยข้อมูลตามที่ได้ระบุไว้ หากตรวจพบว่าข้อมูลของผู้รับบริการไม่เป็นความจริง กรมอาจระงับหรือยกเลิกสิทธิการใช้งานของผู้รับบริการได้โดยไม่ต้องแจ้งให้ทราบล่วงหน้า</p>
+                <p><strong>ข้อ 3</strong> เมื่อผู้รับบริการทำการกรอกข้อมูลเรียบร้อยแล้ว ให้ผู้รับบริการดำเนินการยืนยันตัวผ่านช่องทางใดช่องทางหนึ่ง ได้แก่</p>
+                <p><u>กรณีบุคคลธรรมดา</u></p>
+                <ol>
+                  <li>ยืนยันตัวตนต่อหน้าเจ้าหน้าที่ด้วยตนเอง โดยแสดงบัตรประจำตัวประชาชนที่ยังไม่หมดอายุ</li>
+                  <li>ยืนยันตัวตนผ่านระบบ e-KYC โดยใช้บัตรประจำตัวประชาชน ประกอบกับการถ่ายภาพใบหน้า (Selfie)</li>
+                  <li>ยืนยันตัวตนโดยใช้ใบรับรองอิเล็กทรอนิกส์จาก CA</li>
+                  <li>มอบอำนาจให้บุคคลอื่นยื่นเอกสารยืนยันตัวตนแทน พร้อมหนังสือมอบอำนาจและเอกสารประกอบ</li>
+                </ol>
+                <p><u>กรณีนิติบุคคล</u></p>
+                <ol>
+                  <li>ยืนยันตัวตนโดยใช้ใบรับรองอิเล็กทรอนิกส์จาก CA</li>
+                  <li>สั่งพิมพ์คำขอรับ Username &amp; Password พร้อมแนบหนังสือรับรองนิติบุคคล, หนังสือบริคณห์สนธิ, บอจ.5, สำเนาบัตรประชาชนกรรมการผู้มีอำนาจ</li>
+                </ol>
+                <p>เมื่อเจ้าหน้าที่อนุมัติแล้ว ระบบจะแจ้งให้ยืนยัน Activate User ทางอีเมล ภายใน 30 วันนับแต่วันที่ได้รับแจ้ง</p>
+                <p><strong>ข้อ 4</strong> ผู้รับบริการต้องไม่นำ Username &amp; Password ไปใช้ในทางที่ขัดต่อกฎหมาย และความสงบเรียบร้อยหรือศีลธรรมอันดีของประชาชน</p>
+                <p><strong>ข้อ 5</strong> การสร้างลายมือชื่ออิเล็กทรอนิกส์ด้วยการใช้ Username จะต้องใช้คู่กับ Password และ OTP</p>
+                <p><strong>ข้อ 6</strong> ผู้รับบริการต้องเก็บรักษา Username &amp; Password ไว้เป็นความลับ หากสงสัยว่าล่วงรู้ไปถึงบุคคลอื่น ต้องตั้งรหัสผ่านใหม่โดยทันที</p>
+                <p><strong>ข้อ 7</strong> การใช้ลายมือชื่ออิเล็กทรอนิกส์ที่เกิดจากการใช้ Username &amp; Password มีความผูกพันตามกฎหมายเสมือนการลงลายมือชื่อในเอกสารทุกประการ</p>
+                <p><strong>ข้อ 8</strong> กรมมีสิทธิแก้ไข เปลี่ยนแปลง หรือยกเลิกข้อตกลงนี้ได้ตามที่เห็นสมควร</p>
+                <p><strong>ข้อ 9</strong> ผู้รับบริการต้องปฏิบัติตามข้อตกลงโดยเคร่งครัด กรมมีสิทธิปฏิเสธและไม่ต้องรับผิดชอบในความเสียหายที่เกิดจากเหตุสุดวิสัย</p>
+                <p><strong>ข้อ 10</strong> ผู้ใดแอบอ้างหรือกระทำการละเมิดสิทธิส่วนบุคคลโดยใช้ข้อมูลของผู้อื่น ถือเป็นความผิดและต้องรับโทษตามกฎหมาย</p>
+                <p><strong>ข้อ 11</strong> กรมอาจส่งข้อมูลหรือแจ้งข่าวประชาสัมพันธ์ผ่านอีเมลหรือช่องทางอื่นให้แก่ผู้รับบริการได้ตามที่เห็นสมควร</p>
+                <p><strong>ข้อ 12</strong> กรมมีสิทธิระงับหรือยกเลิกการให้บริการทันที หากผู้รับบริการปฏิบัติผิดข้อตกลงแม้เพียงข้อใดข้อหนึ่ง</p>
+                <p><strong>ข้อ 13</strong> การใช้ Username &amp; Password ของผู้แทนห้างหุ้นส่วนหรือบริษัทจำกัด ถือว่าเป็นไปตามความประสงค์ของผู้ประกอบการ</p>
+                <p><strong>ข้อ 14</strong> กรมมีสิทธิระงับหรือยกเลิกการให้บริการทันที หากผู้รับบริการปฏิบัติผิดข้อตกลง</p>
+                <p><strong>ข้อ 15</strong> คำประกาศเกี่ยวกับความเป็นส่วนตัว (Privacy Notice) สำหรับผู้รับบริการตาม พ.ร.บ.แร่ พ.ศ. 2560 — <a href="#" class="text-primary">คลิกเพื่ออ่านเพิ่มเติม</a></p>
+                <p><strong>ข้อ 16</strong> กรมเก็บรวบรวมข้อมูลส่วนบุคคล ได้แก่ ชื่อ-สกุล / เลขบัตรประชาชน / ที่อยู่ / วันเดือนปีเกิด / ภาพใบหน้า</p>
+                <p><strong>ข้อ 17</strong> กรมจะเก็บรักษาข้อมูลส่วนบุคคลตราบเท่าที่จำเป็น เมื่อพ้นระยะเวลาจะลบ/ทำลายหรือทำให้ไม่สามารถระบุตัวตนได้ หากต้องการยกเลิกต้องแจ้งเป็นลายลักษณ์อักษรล่วงหน้าไม่น้อยกว่า 3 วัน</p>
+                <hr />
+                <p class="fw-semibold">ข้าพเจ้ายอมรับ และได้อ่านข้อความในข้อตกลงและเงื่อนไขนี้เข้าใจโดยละเอียดแล้ว</p>
+              </div>
+
+              <p id="termsScrollNote" class="text-muted small text-center mb-2" style="font-size:.78rem;">
+                <i class="ri ri-arrow-down-line"></i> กรุณาเลื่อนอ่านข้อตกลงให้ครบก่อนยอมรับ
+              </p>
+
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="agreeTerms" />
+                <label class="form-check-label" for="agreeTerms">
+                  ข้าพเจ้าได้อ่านและยอมรับข้อตกลงและเงื่อนไขข้างต้นทุกประการ
+                </label>
+              </div>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="agreePrivacy" />
+                <label class="form-check-label" for="agreePrivacy">
+                  ข้าพเจ้ายินยอมให้ กพร. เก็บรวบรวมและใช้ข้อมูลส่วนบุคคลตามวัตถุประสงค์ที่ระบุไว้
+                </label>
+              </div>
+
+              <div id="termsAlert" class="alert alert-danger p-2 d-none mb-3" style="font-size:.87rem;">
+                <i class="ri ri-error-warning-line me-1"></i> กรุณายืนยันว่าได้อ่านและยอมรับข้อตกลงแล้ว
+              </div>
+
+              <div class="d-flex justify-content-between mt-4">
+                <a href="/Auth/RegisterChannel" class="btn btn-outline-secondary">
+                  <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </a>
+                <button type="button" class="btn btn-primary" data-step-next="1">
+                  ยอมรับและดำเนินการต่อ <i class="ri ri-arrow-right-line ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 2: ข้อมูลพื้นฐาน -->
+            <div id="step-info" class="content">
+              <div class="content-header mb-4">
+                <h5 class="mb-0 fw-bold"><i class="ri ri-user-line me-2 text-primary"></i>ข้อมูลพื้นฐาน</h5>
+                <small class="text-muted">กรอกข้อมูลสำหรับสร้างบัญชีสมาชิก Mining Account</small>
+              </div>
+
+              <div class="row gx-4">
+                <div class="col-12 mb-4">
+                  <label class="form-label" for="memberType">ประเภทสมาชิก <span class="text-danger">*</span></label>
+                  <select id="memberType" name="memberType" class="form-select form-select-lg">
+                    <option value="">-- กรุณาเลือกประเภทสมาชิก --</option>
+                    <option value="บุคคลธรรมดา">บุคคลธรรมดา</option>
+                    <option value="นิติบุคคล">นิติบุคคล</option>
+                    <option value="วิสาหกิจชุมชน">วิสาหกิจชุมชน</option>
+                  </select>
+                </div>
+                <div id="prefixWrap" class="col-md-3 mb-4" style="display:none;">
+                  <label class="form-label" for="prefix">คำนำหน้า <span class="text-danger">*</span></label>
+                  <select id="prefix" name="prefix" class="form-select">
+                    <option value="">--</option>
+                    <option>นาย</option><option>นาง</option><option>นางสาว</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-4">
+                  <label class="form-label" for="firstName">ชื่อ <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="text" id="firstName" class="form-control" placeholder="ชื่อ" />
+                    <label>ชื่อ</label>
+                  </div>
+                </div>
+                <div class="col-md-5 mb-4">
+                  <label class="form-label" for="lastName">นามสกุล <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="text" id="lastName" class="form-control" placeholder="นามสกุล" />
+                    <label>นามสกุล</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="idNumber">เลขบัตรประชาชน / เลขทะเบียนนิติบุคคล <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="text" id="idNumber" class="form-control" placeholder="13 หลัก" maxlength="13" />
+                    <label>เลข 13 หลัก (ไม่ต้องใส่เครื่องหมาย)</label>
+                  </div>
+                  <div id="idDuplicateAlert" class="alert alert-danger mt-2 p-2 d-none small">
+                    <i class="ri ri-error-warning-line me-1"></i>หมายเลขนี้มีในระบบแล้ว กรุณาติดต่อเจ้าหน้าที่
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="email">อีเมล <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="email" id="email" class="form-control" placeholder="name@example.com" />
+                    <label>อีเมล</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="phone">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+                  <div class="form-floating form-floating-outline">
+                    <input type="tel" id="phone" class="form-control" placeholder="0XXXXXXXXX" maxlength="10" />
+                    <label>เบอร์โทรศัพท์ 10 หลัก</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="password">รหัสผ่าน <span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <div class="form-floating form-floating-outline">
+                      <input type="password" id="password" class="form-control" placeholder="รหัสผ่าน" />
+                      <label>≥8 ตัว (ตัวอักษร+ตัวเลข+สัญลักษณ์)</label>
+                    </div>
+                    <span class="input-group-text cursor-pointer" onclick="var i=this.previousElementSibling.querySelector('input');i.type=i.type==='password'?'text':'password'">
+                      <i class="icon-base ri ri-eye-off-line"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <label class="form-label" for="confirmPassword">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
+                  <div class="input-group input-group-merge">
+                    <div class="form-floating form-floating-outline">
+                      <input type="password" id="confirmPassword" class="form-control" placeholder="ยืนยันรหัสผ่าน" />
+                      <label>ยืนยันรหัสผ่านอีกครั้ง</label>
+                    </div>
+                    <span class="input-group-text cursor-pointer" onclick="var i=this.previousElementSibling.querySelector('input');i.type=i.type==='password'?'text':'password'">
+                      <i class="icon-base ri ri-eye-off-line"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mt-2">
+                <button type="button" class="btn btn-outline-secondary" data-step-prev>
+                  <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </button>
+                <button type="button" class="btn btn-primary" data-step-next="2">
+                  ถัดไป <i class="ri ri-arrow-right-line ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 3: แนบเอกสาร -->
+            <div id="step-docs" class="content">
+              <div class="content-header mb-4">
+                <h5 class="mb-0 fw-bold"><i class="ri ri-attachment-line me-2 text-primary"></i>แนบเอกสารประกอบ</h5>
+                <small class="text-muted">อัปโหลดเอกสารตามประเภทสมาชิกที่เลือก</small>
+              </div>
+              <div id="docHint" class="doc-hint mb-4">
+                <span class="text-muted">กรุณาเลือกประเภทสมาชิกก่อน</span>
+              </div>
+
+              <!-- เอกสารทั่วไป -->
+              <h6 class="fw-semibold mb-2"><i class="ri ri-file-copy-line me-1 text-primary"></i>เอกสารประกอบการสมัคร</h6>
+              <div id="dropzoneArea" class="dropzone-dpim mb-4">
+                <div class="dz-message">
+                  <i class="ri ri-upload-cloud-line text-primary mb-2 d-block" style="font-size:2rem;"></i>
+                  <span class="fw-semibold">ลากไฟล์มาวางที่นี่</span><br>
+                  <small class="text-muted">หรือ <span class="text-primary">คลิกเพื่อเลือกไฟล์</span><br>รองรับ PDF, JPG, PNG ขนาดไม่เกิน 5 MB</small>
+                </div>
+              </div>
+
+              <!-- ใบรับรองอิเล็กทรอนิกส์ -->
+              <h6 class="fw-semibold mb-3"><i class="ri ri-award-line me-1 text-primary"></i>ใบรับรองอิเล็กทรอนิกส์ (Certificate)</h6>
+
+              <!-- Cert 1: กพร. -->
+              <div class="cert-upload-box mb-3">
+                <div class="cert-label">
+                  <i class="ri ri-government-line me-1 text-primary"></i>
+                  ใบรับรองอิเล็กทรอนิกส์ของกรมอุตสาหกรรมพื้นฐานและการเหมืองแร่
+                </div>
+                <div class="cert-desc">ไฟล์ใบรับรองฯ ที่ออกโดย กพร. สำหรับยืนยันตัวตนในระบบ Mining Account (.cer, .crt, .p12, .pfx)</div>
+                <div class="d-flex align-items-center gap-3">
+                  <label class="btn btn-outline-primary btn-sm mb-0" for="certDPIM">
+                    <i class="ri ri-upload-2-line me-1"></i> เลือกไฟล์
+                  </label>
+                  <input type="file" id="certDPIM" name="certDPIM" class="d-none" accept=".cer,.crt,.p12,.pfx" />
+                  <span id="certDPIMName" class="text-muted small">ยังไม่ได้เลือกไฟล์</span>
+                </div>
+              </div>
+
+              <!-- Cert 2: CA ในประเทศ -->
+              <div class="cert-upload-box mb-4">
+                <div class="cert-label">
+                  <i class="ri ri-shield-check-line me-1 text-success"></i>
+                  ใบรับรองอิเล็กทรอนิกส์ประเภทนิติบุคคล (CA ในประเทศ)
+                </div>
+                <div class="cert-desc">
+                  ใบรับรองฯ ที่ออกให้โดยผู้ให้บริการออกใบรับรองอิเล็กทรอนิกส์ (CA) ในประเทศ<br>
+                  เช่น <strong>Thai Digital ID</strong>, <strong>INET</strong>, <strong>NT</strong> เป็นต้น (.cer, .crt, .p12, .pfx)
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <label class="btn btn-outline-success btn-sm mb-0" for="certCA">
+                    <i class="ri ri-upload-2-line me-1"></i> เลือกไฟล์
+                  </label>
+                  <input type="file" id="certCA" name="certCA" class="d-none" accept=".cer,.crt,.p12,.pfx" />
+                  <span id="certCAName" class="text-muted small">ยังไม่ได้เลือกไฟล์</span>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-2">
+                <button type="button" class="btn btn-outline-secondary" data-step-prev>
+                  <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </button>
+                <button type="button" class="btn btn-primary" data-step-next="3">
+                  ถัดไป <i class="ri ri-arrow-right-line ms-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 4: ตรวจสอบ -->
+            <div id="step-review" class="content">
+              <div class="content-header mb-4">
+                <h5 class="mb-0 fw-bold"><i class="ri ri-file-list-3-line me-2 text-primary"></i>ตรวจสอบข้อมูล</h5>
+                <small class="text-muted">กรุณาตรวจสอบข้อมูลก่อนยืนยัน</small>
+              </div>
+              <div class="card border mb-4">
+                <div class="card-body">
+                  <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">ประเภทสมาชิก</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-memberType">—</dd>
+                    <dt class="col-sm-4 text-muted">ชื่อ-นามสกุล</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-name">—</dd>
+                    <dt class="col-sm-4 text-muted">เลขบัตร</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-idNumber">—</dd>
+                    <dt class="col-sm-4 text-muted">อีเมล</dt>
+                    <dd class="col-sm-8 fw-semibold" id="rv-email">—</dd>
+                    <dt class="col-sm-4 text-muted mb-0">เบอร์โทร</dt>
+                    <dd class="col-sm-8 fw-semibold mb-0" id="rv-phone">—</dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="alert alert-success p-3 mb-4" style="font-size:.875rem;">
+                <i class="ri ri-checkbox-circle-line me-2"></i>
+                ท่านได้ยอมรับข้อตกลงและเงื่อนไขการใช้งานระบบ Mining Account แล้ว
+              </div>
+              <div class="d-flex justify-content-between mt-2">
+                <button type="button" class="btn btn-outline-secondary" data-step-prev>
+                  <i class="ri ri-arrow-left-line me-1"></i> ย้อนกลับ
+                </button>
+                <button type="button" class="btn btn-success" id="btnSubmitReg">
+                  <i class="ri ri-check-line me-1"></i> ยืนยันการลงทะเบียน
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 5: สำเร็จ -->
+            <div id="step-done" class="content">
+              <div class="text-center py-5">
+                <div class="mb-4">
+                  <span class="avatar avatar-xl bg-label-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width:88px;height:88px;font-size:2.5rem;">
+                    <i class="ri ri-checkbox-circle-line text-success"></i>
+                  </span>
+                </div>
+                <h4 class="fw-bold text-success mb-2">ลงทะเบียนสำเร็จ!</h4>
+                <p class="text-muted mb-4">ระบบ DPIM ได้ส่งลิงก์ยืนยันไปยังอีเมลของท่านแล้ว<br>กรุณาตรวจสอบอีเมลเพื่อเปิดใช้งานบัญชี</p>
+                <div class="card border d-inline-block px-5 py-3 mb-5">
+                  <p class="text-muted small mb-1">หมายเลขอ้างอิง</p>
+                  <h5 class="fw-bold text-primary mb-0">REG-2569-00001
+                    <button id="btnCopyRef" class="btn btn-sm btn-outline-primary ms-2 py-0">คัดลอก</button>
+                  </h5>
+                </div>
+                <div class="d-flex justify-content-center mb-5">
+                  <ul class="list-unstyled text-start" style="max-width:300px;">
+                    <li class="d-flex align-items-start mb-3">
+                      <span class="badge bg-success rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-check-line"></i></span>
+                      <div><div class="fw-semibold">ลงทะเบียนสมาชิก</div><div class="text-muted small">เสร็จสิ้น</div></div>
+                    </li>
+                    <li class="d-flex align-items-start mb-3">
+                      <span class="badge bg-label-primary rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-mail-line text-primary"></i></span>
+                      <div><div class="fw-semibold">ยืนยันอีเมล</div><div class="text-muted small">รอการยืนยันจากท่าน</div></div>
+                    </li>
+                    <li class="d-flex align-items-start mb-3">
+                      <span class="badge bg-label-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-user-follow-line text-secondary"></i></span>
+                      <div><div class="fw-semibold">อนุมัติโดยเจ้าหน้าที่</div><div class="text-muted small">รอการตรวจสอบเอกสาร</div></div>
+                    </li>
+                    <li class="d-flex align-items-start">
+                      <span class="badge bg-label-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width:28px;height:28px;"><i class="ri ri-shield-check-line text-secondary"></i></span>
+                      <div><div class="fw-semibold">เปิดใช้งานบัญชี</div><div class="text-muted small">ภายใน 30 วันหลังได้รับแจ้ง</div></div>
+                    </li>
+                  </ul>
+                </div>
+                <a href="/Auth/LoginBasic" class="btn btn-primary">
+                  <i class="ri ri-login-box-line me-1"></i> ไปหน้าเข้าสู่ระบบ
+                </a>
+              </div>
+            </div>
+
+          </form>
+        </div>
+        <!-- /content -->
 
       </div>
-    </div>
-    <!-- /Right -->
+      <!-- /bs-stepper -->
 
+    </div>
   </div>
 </div>

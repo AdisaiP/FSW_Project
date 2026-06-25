@@ -7,8 +7,8 @@
   var reqName = "นายสมชาย ใจดี";
   var reqDept = "บริษัท ทดสอบ จำกัด";
   var reqDate = "20/04/2569";
-  var reqSystems = new[] { "ระบบตรวจสอบ RMBS1", "ระบบประกาศ PS/NoPS" };
-  var reqReason = "ต้องการเข้าถึงระบบเพื่อดำเนินการตรวจสอบและออกเอกสาร RMBS1 สำหรับการส่งออกสินค้าไปต่างประเทศ";
+  var reqSystems = new[] { "ระบบบัญชีแร่ประจำปี", "ระบบนำเข้า/ส่งออกแร่" };
+  var reqReason = "ต้องการเข้าถึงระบบเพื่อดำเนินการยื่นบัญชีแร่ประจำปีและตรวจสอบสถานะการนำเข้า/ส่งออกแร่";
 }
 
 @section VendorStyles {
@@ -27,14 +27,7 @@
   .info-row { display:flex; gap:.5rem; margin-bottom:.5rem; }
   .info-label { font-weight:600; color:var(--dpim-blue); min-width:160px; font-size:.88rem; }
   .info-value { color:var(--bs-body-color); font-size:.88rem; }
-  .decision-radio { display:none; }
-  .decision-card {
-    border:2px solid var(--bs-border-color); border-radius:10px;
-    padding:1rem 1.25rem; cursor:pointer; transition:all .18s ease;
-    text-align:center;
-  }
-  .decision-radio:checked + .decision-card { border-color:var(--dpim-blue); background:rgba(35,64,143,.05); }
-  #decision-reject:checked + .decision-card { border-color:#dc3545; background:rgba(220,53,69,.05); }
+  .decision-radio { accent-color:var(--dpim-blue); }
   .btn-dpim { background:var(--dpim-blue); border-color:var(--dpim-blue); color:#fff; }
   .btn-dpim:hover { background:#1b3175; border-color:#1b3175; color:#fff; }
   .btn-dpim-green { background:var(--dpim-green); border-color:var(--dpim-green); color:#fff; }
@@ -144,19 +137,17 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="card-body">
           <p class="text-muted mb-3" style="font-size:.85rem;">เลือกผลการพิจารณาและบันทึก</p>
 
-          <div class="row g-3 mb-4">
-            <div class="col-6">
-              <input class="decision-radio" type="radio" id="decision-approve" name="decision" value="approve" />
-              <label class="decision-card" for="decision-approve">
-                <i class="ri ri-checkbox-circle-line mb-1" style="font-size:2rem;color:var(--dpim-green);display:block;"></i>
-                <div class="fw-semibold" style="color:var(--dpim-green);">อนุมัติ</div>
+          <div class="d-flex gap-4 mb-4">
+            <div class="form-check">
+              <input class="form-check-input decision-radio" type="radio" id="decision-approve" name="decision" value="approve" />
+              <label class="form-check-label fw-semibold" for="decision-approve">
+                อนุมัติ
               </label>
             </div>
-            <div class="col-6">
-              <input class="decision-radio" type="radio" id="decision-reject" name="decision" value="reject" />
-              <label class="decision-card" for="decision-reject">
-                <i class="ri ri-close-circle-line mb-1" style="font-size:2rem;color:#dc3545;display:block;"></i>
-                <div class="fw-semibold text-danger">ปฏิเสธ</div>
+            <div class="form-check">
+              <input class="form-check-input decision-radio" type="radio" id="decision-reject" name="decision" value="reject" />
+              <label class="form-check-label fw-semibold" for="decision-reject">
+                ไม่อนุมัติ
               </label>
             </div>
           </div>
